@@ -7,6 +7,8 @@
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_modify_cv.h"
 
+/** TODO: This needs a rewrite and probably a rename **/
+
 UTL_NAMESPACE_BEGIN
 
 namespace details {
