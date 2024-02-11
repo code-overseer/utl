@@ -1,0 +1,4 @@
+* Supporting modules will probably be a massive PITA
+* TODO: hide private symbols, put the visibility macros in utl_abi
+* TODO: Maybe move all the type_traits builtins to a single file
+* TODO: Add clang-format so I don't have to keep regexing things

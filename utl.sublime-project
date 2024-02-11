@@ -1,0 +1,57 @@
+{
+	"folders":
+	[
+		{
+			"path": "include/",
+			"name": "Include"
+		},
+		{
+			"path": "tests/",
+			"name": "Tests"
+		},
+		{
+			"path": "scratch/",
+			"name": "Scratch"
+		},
+		{
+			"path": ".",
+			"name": "UTL",
+			"folder_exclude_patterns": [ "*/" ]
+		}
+	],
+	"settings":
+	{
+		"tab_size": 4,
+		"ClangFormat":
+		{
+			"format_on_save":true,
+			"binary": "$project_path/Tools/CoreFormatting/clang-format.exe",
+			"style": "File"
+		}
+	},
+	"build_systems":
+	[
+		{
+			"name": "UTL Build",
+			"cancel": { "kill": true },
+			"file_regex": "^(/...*?):([0-9]+):?([0-9]+)",
+			"variants":
+			[
+				{
+					"name": "Compile Tests",
+					"shell_cmd": "make -C $project_path/Tests compile"
+				},
+				{
+					"name": "Preprocess Tests",
+					"shell_cmd": "make -C $project_path/Tests preprocess"
+				},
+				{
+					"name": "Print Build Variables",
+					"shell_cmd": "make -C $project_path/Tests print"	
+				}
+			]
+		}
+	]
+
+
+}
