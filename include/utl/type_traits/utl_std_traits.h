@@ -8,32 +8,36 @@
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_extent.h"
-#include "utl/type_traits/utl_is_arithmetics.h"
-#include "utl/type_traits/utl_is_array.h"
+#include "utl/type_traits/utl_is_arithmetic.h"
 #include "utl/type_traits/utl_is_base_of.h"
 #include "utl/type_traits/utl_is_class.h"
 #include "utl/type_traits/utl_is_complete.h"
 #include "utl/type_traits/utl_is_compound.h"
-#include "utl/type_traits/utl_is_cv.h"
 #include "utl/type_traits/utl_is_enum.h"
 #include "utl/type_traits/utl_is_floating_point.h"
 #include "utl/type_traits/utl_is_function.h"
 #include "utl/type_traits/utl_is_fundamental.h"
 #include "utl/type_traits/utl_is_integral.h"
-#include "utl/type_traits/utl_is_member_pointer.h"
+#include "utl/type_traits/utl_is_member_x_pointer.h"
 #include "utl/type_traits/utl_is_null_pointer.h"
 #include "utl/type_traits/utl_is_object.h"
 #include "utl/type_traits/utl_is_pointer.h"
-#include "utl/type_traits/utl_is_reference.h"
 #include "utl/type_traits/utl_is_same.h"
 #include "utl/type_traits/utl_is_scalar.h"
 #include "utl/type_traits/utl_is_union.h"
 #include "utl/type_traits/utl_is_void.h"
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/type_traits/utl_modifier_traits.h"
+#include "utl/type_traits/utl_modify_pointer.h"
+#include "utl/type_traits/utl_modify_x_cv.h"
+#include "utl/type_traits/utl_modify_x_reference.h"
 #include "utl/type_traits/utl_rank.h"
 #include "utl/type_traits/utl_type_identity.h"
 #include "utl/type_traits/utl_void_t.h"
+#include "utl/type_traits/utl_is_x_array.h"
+#include "utl/type_traits/utl_is_x_cv.h"
+#include "utl/type_traits/utl_is_x_reference.h"
+#include "utl/type_traits/utl_is_x_signed.h"
 
 #include <type_traits>
 
@@ -45,8 +49,6 @@ using ::std::is_standard_layout;
 using ::std::is_empty;
 using ::std::is_polymorphic;
 using ::std::is_abstract;
-using ::std::is_signed;
-using ::std::is_unsigned;
 
 using ::std::is_constructible;
 using ::std::is_trivially_constructible;

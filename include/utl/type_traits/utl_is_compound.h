@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_common.h"
 
 #ifdef UTL_USE_STD_TYPE_TRAITS
 
@@ -11,6 +11,13 @@
 UTL_NAMESPACE_BEGIN
 
 using std::is_compound;
+
+#ifdef UTL_CXX17
+using std::is_compound_v;
+#elif defined(UTL_CXX14)   // ifdef UTL_CXX17
+template<typename T>
+UTL_INLINE_CXX17 constexpr bool is_compound_v = is_compund<T>::value;
+#endif  // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
 

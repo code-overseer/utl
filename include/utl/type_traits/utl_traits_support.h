@@ -8,8 +8,6 @@
 #define UTL_TRAIT_SUPPORTED_is_empty 1
 #define UTL_TRAIT_SUPPORTED_is_polymorphic 1
 #define UTL_TRAIT_SUPPORTED_is_abstract 1
-#define UTL_TRAIT_SUPPORTED_is_signed 1
-#define UTL_TRAIT_SUPPORTED_is_unsigned 1
 
 #define UTL_TRAIT_SUPPORTED_is_constructible 1
 #define UTL_TRAIT_SUPPORTED_is_trivially_constructible 1

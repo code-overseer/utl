@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_common.h"
 
 #ifdef UTL_USE_STD_TYPE_TRAITS
 
@@ -13,6 +13,23 @@ UTL_NAMESPACE_BEGIN
 using std::is_reference;
 using std::is_lvalue_reference;
 using std::is_rvalue_reference;
+
+#ifdef UTL_CXX17
+
+using std::is_reference_v;
+using std::is_lvalue_reference_v;
+using std::is_rvalue_reference_v;
+
+#elif defined(UTL_CXX14)   // ifdef UTL_CXX17
+
+template<typename T>
+UTL_INLINE_CXX17 constexpr bool is_reference_v = is_reference<T>::value;
+template<typename T>
+UTL_INLINE_CXX17 constexpr bool is_lvalue_reference_v = is_lvalue_reference<T>::value;
+template<typename T>
+UTL_INLINE_CXX17 constexpr bool is_rvalue_reference_v = is_rvalue_reference<T>::value;
+
+#endif  // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
 
