@@ -18,6 +18,12 @@ struct is_boolean : false_type {};
 
 template<>
 struct is_boolean<bool> : true_type {};
+template<>
+struct is_boolean<bool const> : true_type {};
+template<>
+struct is_boolean<bool volatile> : true_type {};
+template<>
+struct is_boolean<bool const volatile> : true_type {};
 
 /**
  *  These checks don't check the result of mixed types operations, only with boolean

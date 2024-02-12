@@ -2,17 +2,42 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_standard.h"
-#include "utl/type_traits/utl_std_traits.h"
+#include "utl/type_traits/utl_common.h"
+
+#include "utl/type_traits/utl_common_type.h"
+#include "utl/type_traits/utl_constants.h"
+#include "utl/type_traits/utl_copy_cvref.h"
+#include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_has_type.h"
-#include "utl/type_traits/utl_combine_qualifiers.h"
+#include "utl/type_traits/utl_merge_x_cv.h"
+#include "utl/type_traits/utl_modify_x_reference.h"
+#include "utl/type_traits/utl_remove_cvref.h"
+
+// is_convertible
+#include "utl/type_traits/utl_std_traits.h"
+
+#if defined(UTL_USE_STD_TYPE_TRAITS) && defined(UTL_CXX20)
+
+#include <type_traits>
+
+UTL_NAMESPACE_BEGIN
+
+using std::basic_common_reference;
+using std::common_reference;
+
+using std::basic_common_reference_t;
+using std::common_reference_t;
+
+UTL_NAMESPACE_END
+
+#else   // defined(UTL_USE_STD_TYPE_TRAITS) && defined(UTL_CXX20)
 
 UTL_STD_NAMESPACE_BEGIN
 /* UTL_UNDEFINED_BEHAVIOUR */
 template<typename T, typename U, template<typename> class TQual, template<typename> class UQual>
 struct basic_common_reference;
 UTL_STD_NAMESPACE_END
+
 
 UTL_NAMESPACE_BEGIN
 
@@ -24,23 +49,18 @@ struct empty_t {};
 template<typename T, typename U, template<typename> class TQual, template<typename> class UQual, 
     size_t = sizeof(::std::basic_common_reference<T,U,TQual,UQual>)>
 ::std::basic_common_reference<T,U,TQual,UQual> basic_ref_test(int);
+
 template<typename T, typename U, template<typename> class TQual, template<typename> class UQual>
 empty_t basic_ref_test(float);
-
-template<typename T, typename U, template<typename> class TQual, template<typename> class UQual, 
-    typename R = decltype(basic_ref_test<T,U,TQual,UQual>(0))>
-using basic_ref_impl = R;
 
 }   // namespace common_reference
 }   // namespace details
 
 template<typename T, typename U, template<typename> class TQual, template<typename> class UQual>
-struct basic_common_reference : details::common_reference::basic_ref_impl<T,U,TQual,UQual>{};
+struct basic_common_reference : decltype(details::common_reference::basic_ref_test<T,U,TQual,UQual>(0)) {};
 
 template<typename T, typename U, template<typename> class TQual, template<typename> class UQual>
 using basic_common_reference_t = typename basic_common_reference<T,U,TQual,UQual>::type;
-
-#ifndef UTL_CXX20
 
 template<typename...>
 struct common_reference;
@@ -60,8 +80,10 @@ struct copy_cvref_from {
     using apply = copy_cvref_t<T, U>;
 };
 
+template<typename T0, typename T1, typename = void>
+struct ternary_result {};
 template<typename T0, typename T1>
-struct ternary_result {
+struct ternary_result<T0, T1, void_t<decltype(false ? declval<T0(&)()>()() : declval<T1(&)()>()())>> {
     using type = decltype(false ? declval<T0(&)()>()() : declval<T1(&)()>()());
 };
 
@@ -77,11 +99,11 @@ using simple_common_ref_t = typename simple_common_ref<T0,T1>::type;
 template<typename T0, typename T1>
 struct simple_common_ref<T0&, T1&, void_t<
         ternary_result_t<
-            typename combine_cv<T0,T1>::template apply<T0>&,
-            typename combine_cv<T0,T1>::template apply<T1>&
+            merge_cv_t<T0, type_list<T0,T1>>&,
+            merge_cv_t<T1, type_list<T0,T1>>&
         >   // ternary_result_t
     >   // void_t
-> : ternary_result<typename combine_cv<T0,T1>::template apply<T0>&, typename combine_cv<T0,T1>::template apply<T1>&> {};
+> : ternary_result<merge_cv_t<T0, type_list<T0,T1>>&, merge_cv_t<T1, type_list<T0,T1>>&> {};
 
 template<typename Target, typename... Ts>
 using all_convertible_to = conjunction<is_convertible<Ts, Target>...>;
@@ -149,13 +171,6 @@ struct common_reference<T,U> : details::common_reference::impl<T,U> {};
 template<typename T, typename U, typename... Vs>
 struct common_reference<T, U, Vs...> : details::common_reference::impl_gt_2<T,U,Vs...> {};
 
-#else   // ifndef UTL_CXX20
-
-using std::common_reference;
-
-template<typename... Ts>
-using common_reference_t = typename common_reference<Ts...>::type;
-
-#endif  // ifndef UTL_CXX20
-
 UTL_NAMESPACE_END
+
+#endif   // defined(UTL_USE_STD_TYPE_TRAITS) && defined(UTL_CXX20)

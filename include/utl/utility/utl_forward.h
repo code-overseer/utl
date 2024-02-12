@@ -23,7 +23,6 @@ UTL_NAMESPACE_END
 UTL_PRAGMA_WARN("The current standard does not implement a constexpr forward, `UTL_USE_STD_forward` ignored")
 #endif  // defined(UTL_USE_STD_forward) && UTL_USE_STD_forward
 
-#include "utl/type_traits/utl_copy_qualifiers.h"
 #include "utl/type_traits/utl_std_traits.h"
 
 UTL_NAMESPACE_BEGIN
@@ -58,8 +57,8 @@ UTL_NAMESPACE_END
 
 #else   // defined(UTL_CXX23) && defined(UTL_USE_STD_forward_like) && UTL_USE_STD_forward_like
 
-#include "utl/type_traits/utl_copy_qualifiers.h"
-#include "utl/type_traits/utl_std_traits.h"
+#include "utl/type_traits/utl_copy_cvref.h"
+#include "utl/type_traits/utl_modify_x_reference.h"
 
 #if defined(UTL_USE_STD_forward_like) && UTL_USE_STD_forward_like
 UTL_PRAGMA_WARN("The current standard does not implement forward_like, `UTL_USE_STD_forward_like` ignored")
@@ -67,13 +66,11 @@ UTL_PRAGMA_WARN("The current standard does not implement forward_like, `UTL_USE_
 
 UTL_NAMESPACE_BEGIN
 
-inline namespace cpp23 {
 template<typename T, typename U>
 UTL_ATTRIBUTES(NODISCARD,CONST,INTRINSIC)
 constexpr auto forward_like(U&& u UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept -> add_rvalue_reference_t<copy_cvref_t<T, remove_reference_t<U>>> {
     return static_cast<add_rvalue_reference_t<copy_cvref_t<T, remove_reference_t<U>>>>(u);
 }
-}   // inline namespace cpp23 
 
 UTL_NAMESPACE_END
 #endif  // defined(UTL_CXX23) && defined(UTL_USE_STD_forward_like) && UTL_USE_STD_forward_like
