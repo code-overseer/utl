@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_common.h"
 
 #ifdef UTL_USE_STD_TYPE_TRAITS
 
@@ -11,6 +11,13 @@
 UTL_NAMESPACE_BEGIN
 
 using std::is_object;
+
+#ifdef UTL_CXX17
+using std::is_object_v;
+#elif defined(UTL_CXX14)   // ifdef UTL_CXX17
+template<typename T>
+UTL_INLINE_CXX17 constexpr bool is_object_v = is_object<T>::value;
+#endif  // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
 
@@ -46,7 +53,7 @@ UTL_NAMESPACE_END
 
 #else   // ifdef UTL_BUILTIN_is_object
 
-#include "utl/type_traits/utl_is_array.h"
+#include "utl/type_traits/utl_is_xarray.h"
 #include "utl/type_traits/utl_is_class.h"
 #include "utl/type_traits/utl_is_scalar.h"
 #include "utl/type_traits/utl_is_union.h"

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_common.h"
 
 #ifdef UTL_USE_STD_TYPE_TRAITS
 
@@ -12,7 +12,23 @@ UTL_NAMESPACE_BEGIN
 
 using std::is_member_pointer;
 using std::is_member_function_pointer;
+
+#ifdef UTL_CXX17
+
+using std::is_member_pointer_v;
+using std::is_member_function_pointer_v;
 using std::is_member_object_pointer;
+
+#elif defined(UTL_CXX14)   // ifdef UTL_CXX17
+
+template<typename T>
+UTL_INLINE_CXX17 constexpr bool is_member_pointer_v = is_member_pointer<T>::value;
+template<typename T>
+UTL_INLINE_CXX17 constexpr bool is_member_function_pointer_v = is_member_function_pointer<T>::value;
+template<typename T>
+UTL_INLINE_CXX17 constexpr bool is_member_object_pointer_v = is_member_object_pointer<T>::value;
+
+#endif  // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_common.h"
 
 #ifdef UTL_USE_STD_TYPE_TRAITS
 
@@ -12,15 +12,38 @@ UTL_NAMESPACE_BEGIN
 
 using std::add_const;
 using std::add_volatile;
+using std::add_cv;
 using std::remove_const;
 using std::remove_volatile;
+using std::remove_cv;
+
+#ifdef UTL_CXX14
+
+using std::add_const_t;
+using std::add_volatile_t;
+using std::add_cv_t;
+using std::remove_const_t;
+using std::remove_volatile_t;
+using std::remove_cv_t;
+
+#else   // UTL_CXX14
+
+template<typename T>
+using add_const_t = T const;
+template<typename T>
+using add_volatile_t = T volatile;
+template<typename T>
+using add_cv_t = T const volatile;
+template <typename T>
+using remove_const_t = typename remove_const<T>::type;
+template <typename T>
+using remove_volatile_t = typename remove_volatile<T>::type;
+template <typename T>
+using remove_cv_t = typename remove_volatile<T>::type;
+
+#endif   // UTL_CXX14
 
 UTL_NAMESPACE_END
-
-#define UTL_TRAIT_SUPPORTED_add_const 1
-#define UTL_TRAIT_SUPPORTED_add_volatile 1
-#define UTL_TRAIT_SUPPORTED_remove_const 1
-#define UTL_TRAIT_SUPPORTED_remove_volatile 1
 
 #else   // ifdef UTL_USE_STD_TYPE_TRAITS
 
@@ -101,36 +124,29 @@ UTL_NAMESPACE_BEGIN
 
 template<typename T>
 struct add_const { using type = T const; };
-
-template<typename T>
-using add_const_t = typename add_const<T>::type;
-
 template<typename T>
 struct add_volatile { using type = T volatile; };
-
-template<typename T>
-using add_volatile_t = typename add_volatile<T>::type;
-
 template<typename T>
 struct add_cv { using type = T const volatile; };
-
-template<typename T>
-using add_cv_t = typename add_cv<T>::type;
-
 template<typename T>
 struct remove_cv { using type = remove_const_t<remove_volatile_t<T>>; };
 
 template<typename T>
-using remove_cv_t = typename remove_cv<T>::type;
+using add_const_t = T const;
+template<typename T>
+using add_volatile_t = T volatile;
+template<typename T>
+using add_cv_t = T const volatile;
+template<typename T>
+using remove_cv_t = remove_const_t<remove_volatile_t<T>>;
 
 UTL_NAMESPACE_END
+
+#endif  // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #define UTL_TRAIT_SUPPORTED_add_const 1
 #define UTL_TRAIT_SUPPORTED_add_volatile 1
 #define UTL_TRAIT_SUPPORTED_add_cv 1
-
 #define UTL_TRAIT_SUPPORTED_remove_const 1
 #define UTL_TRAIT_SUPPORTED_remove_volatile 1
 #define UTL_TRAIT_SUPPORTED_remove_cv 1
-
-#endif  // ifdef UTL_USE_STD_TYPE_TRAITS

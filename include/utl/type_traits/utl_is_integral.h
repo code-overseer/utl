@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_common.h"
 
 #ifdef UTL_USE_STD_TYPE_TRAITS
 
@@ -11,6 +11,13 @@
 UTL_NAMESPACE_BEGIN
 
 using std::is_integral;
+
+#ifdef UTL_CXX17
+using std::is_integral_v;
+#elif defined(UTL_CXX14)   // ifdef UTL_CXX17
+template<typename T>
+UTL_INLINE_CXX17 constexpr bool is_integral_v = is_integral<T>::value;
+#endif  // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
 
@@ -67,7 +74,7 @@ template <> struct is_integral<unsigned long long>: true_type {};
 template <> struct is_integral<char8_t>: true_type {};
 #endif
 
-#if defined(UTL_SUPPORTS_INT128) && !defined(UTL_DISABLE_INT128_SUPPORT)
+#ifdef UTL_SUPPORTS_INT128
 template <> struct is_integral<__int128_t>: true_type {};
 template <> struct is_integral<__uint128_t>: true_type {};
 #endif

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_common.h"
 
 #ifdef UTL_USE_STD_TYPE_TRAITS
 
@@ -11,6 +11,13 @@
 UTL_NAMESPACE_BEGIN
 
 using std::is_array;
+
+#ifdef UTL_CXX17
+using std::is_array_v;
+#elif defined(UTL_CXX14)   // ifdef UTL_CXX17
+template<typename T>
+UTL_INLINE_CXX17 constexpr bool is_array_v = is_array<T>::value;
+#endif  // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
 
@@ -79,9 +86,25 @@ UTL_NAMESPACE_BEGIN
 using std::is_bounded_array;
 using std::is_unbounded_array;
 
+#ifdef UTL_CXX17
+
+using std::is_bounded_array_v;
+using std::is_unbounded_array_v;
+
+#elif defined(UTL_CXX14)   // ifdef UTL_CXX17
+
+template<typename T>
+UTL_INLINE_CXX17 constexpr bool is_bounded_array_v = is_bounded_array<T>::value;
+template<typename T>
+UTL_INLINE_CXX17 constexpr bool is_unbounded_array_v = is_unbounded_array<T>::value;
+
+#endif  // ifdef UTL_CXX17
+
 UTL_NAMESPACE_END
 
 #else   // defined(UTL_USE_STD_TYPE_TRAITS) && defined(UTL_CXX20)
+
+#include "utl/type_traits/utl_constants.h"
 
 UTL_NAMESPACE_BEGIN
 

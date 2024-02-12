@@ -23,7 +23,8 @@ using value_constant = integral_constant<T, N>;
 
 template<size_t N>
 using size_constant = integral_constant<size_t, N>;
-using npos_type = size_constant<size_t, (size_t)-1>;
+
+using npos_type = size_constant<(size_t)-1>;
 
 template<bool B>
 using bool_constant = integral_constant<bool, B>;

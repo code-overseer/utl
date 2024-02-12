@@ -2,8 +2,14 @@
 
 #pragma once
 
+#ifndef UTL_DISABLE_INT128_SUPPORT
+#define UTL_DISABLE_INT128_SUPPORT 0
+#endif
+
 #ifdef __SIZEOF_INT128__
+#if !UTL_DISABLE_INT128_SUPPORT
 #define UTL_SUPPORTS_INT128
+#endif
 #endif
 
 #ifdef __STDCPP_FLOAT16_T__

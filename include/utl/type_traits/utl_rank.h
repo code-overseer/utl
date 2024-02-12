@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_common.h"
 
 #ifdef UTL_USE_STD_TYPE_TRAITS
 
@@ -11,6 +11,13 @@
 UTL_NAMESPACE_BEGIN
 
 using std::rank;
+
+#ifdef UTL_CXX17
+using std::rank_v;
+#elif defined(UTL_CXX14)   // UTL_CXX17
+template<typename T>
+UTL_INLINE_CXX17 constexpr bool rank_v = rank<T>::value;
+#endif  // UTL_CXX17
 
 UTL_NAMESPACE_END
 

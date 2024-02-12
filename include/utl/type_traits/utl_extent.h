@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_common.h"
 
 #ifdef UTL_USE_STD_TYPE_TRAITS
 
@@ -11,6 +11,13 @@
 UTL_NAMESPACE_BEGIN
 
 using std::extent;
+
+#ifdef UTL_CXX17
+using std::extent_v;
+#elif defined(UTL_CXX14)   // UTL_CXX17
+template<typename T, size_t Dim>
+UTL_INLINE_CXX17 constexpr size_t extent_v = extent<T, Dim>::value;
+#endif  // UTL_CXX17
 
 UTL_NAMESPACE_END
 
@@ -51,10 +58,7 @@ struct extent<T[N], 0> : size_constant<N> {};
 template<typename T, size_t Dim>
 struct extent<T[N], Dim> : extent<T, Dim - 1> {};
 
-#ifdef UTL_CXX14
-template<typename T>
-UTL_INLINE_CXX17 constexpr size_t extent_v = extent<T>::value;
-#endif  // UTL_CXX14
+UTL_IMPLEMENT_VALUE_TRAIT(extent, (typename, T), (size_t, Dim))
 
 UTL_NAMESPACE_END
 
