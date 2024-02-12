@@ -9,10 +9,10 @@ UTL_NAMESPACE_BEGIN
 namespace utility {
 namespace details {
 template<typename T>
-T&& declval_impl(int);
+T&& declval_impl(int) noexcept;
 
 template<typename T>
-T declval_impl(float);
+T declval_impl(float) noexcept;
 }
 }
 

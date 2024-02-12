@@ -21,8 +21,9 @@
 #include "utl/preprocessor/utl_standard.h"
 #include "utl/memory/utl_uses_allocator.h"
 #include "utl/type_traits/utl_common_reference.h"
+#include "utl/type_traits/utl_common_type.h"
 #include "utl/type_traits/utl_has_type.h"
-#include "utl/type_traits/utl_std_traits.h"
+#include "utl/type_traits/utl_decay.h"
 #include "utl/type_traits/utl_template_list.h"
 #include "utl/type_traits/utl_unwrap_reference.h"
 #include "utl/type_traits/utl_variadic_proxy.h"
@@ -33,7 +34,7 @@
 #include "utl/utility/utl_sequence.h"
 #include "utl/utility/utl_swap.h"
 #include "utl/tuple/utl_tuple_concepts.h"
-#include "utl/concepts.h"
+#include "utl/concepts/utl_same_as.h"
 
 #define TT_SCOPE UTL_SCOPE tuple_traits::
 

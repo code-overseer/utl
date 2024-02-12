@@ -39,6 +39,11 @@ struct variadic_traits {
     static constexpr bool is_const_swappable = conjunction<UTL_SCOPE is_swappable<add_const_t<Types>>...>::value;
 
     template<typename... UTypes>
+    struct matches : conjunction<
+        UTL_SCOPE is_same<Types, UTypes>...
+    > {};
+
+    template<typename... UTypes>
     struct is_nothrow_assignable : conjunction<
         UTL_SCOPE is_nothrow_assignable<add_lvalue_reference_t<Types>, UTypes>...
     > {};

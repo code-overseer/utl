@@ -31,8 +31,6 @@ UTL_NAMESPACE_END
 
 #else   // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#include "utl/type_traits/utl_constants.h"
-
 #ifndef UTL_DISABLE_BUILTIN_add_pointer
 #define UTL_DISABLE_BUILTIN_add_pointer 0
 #endif

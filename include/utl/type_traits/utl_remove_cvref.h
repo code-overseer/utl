@@ -18,8 +18,6 @@ UTL_NAMESPACE_END
 
 #else   // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#include "utl/type_traits/utl_constants.h"
-
 #ifndef UTL_DISABLE_BUILTIN_remove_cvref
 #define UTL_DISABLE_BUILTIN_remove_cvref 0
 #endif
@@ -41,6 +39,8 @@ using remove_cvref_t = UTL_BUILTIN_remove_cvref(T);
 UTL_NAMESPACE_END
 
 #else   // ifdef UTL_BUILTIN_remove_cvref
+
+#include "utl/type_traits/utl_modify_x_reference.h"
 
 UTL_NAMESPACE_BEGIN
 

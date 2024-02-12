@@ -8,8 +8,8 @@
 #include "utl/tuple/utl_tuple_fwd.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_copy_qualifiers.h"
-#include "utl/type_traits/utl_modifier_traits.h"
-#include "utl/type_traits/utl_std_traits.h"
+#include "utl/type_traits/utl_logical_traits.h"
+#include "utl/type_traits/utl_remove_cvref.h"
 #include "utl/type_traits/utl_template_list.h"
 #include "utl/utility/utl_forward.h"
 #include "utl/utility/utl_sequence.h"
@@ -114,7 +114,7 @@ struct get_cpo_t {
     UTL_ATTRIBUTES(NODISCARD, FLATTEN)
     constexpr enable_if_t<
         sizeof(get<I>(declval<T>())) && !is_tuple<T>::value,
-    result_t<I, T>> operator()(T&& t UTL_ATTRIBUTES(LIFETIMEBOUND)) const noexcept(noexcept(get<I>(declval<T>()))) {
+    result_t<I, T>> operator()(T&& t UTL_ATTRIBUTE(LIFETIMEBOUND)) const noexcept(noexcept(get<I>(declval<T>()))) {
         return get<I>(forward<T>(t));
     }
 
@@ -122,7 +122,7 @@ struct get_cpo_t {
     UTL_ATTRIBUTES(NODISCARD, FLATTEN, CONST)
     constexpr enable_if_t<
         sizeof(get<I>(declval<T>())) && is_tuple<T>::value,
-    result_t<I, T>> operator()(T&& t UTL_ATTRIBUTES(LIFETIMEBOUND)) const noexcept(noexcept(get<I>(declval<T>()))) {
+    result_t<I, T>> operator()(T&& t UTL_ATTRIBUTE(LIFETIMEBOUND)) const noexcept(noexcept(get<I>(declval<T>()))) {
         return get<I>(forward<T>(t));
     }
 };
@@ -138,6 +138,8 @@ template<size_t I>
 UTL_INLINE_CXX17 constexpr details::get_cpo_t<I> get = {};
 
 #else   // ifdef UTL_CXX14
+
+/** 2-arity CPOs are only available in C++14 with template variables **/
 
 template<size_t I, typename T>
 UTL_ATTRIBUTES(NODISCARD, FLATTEN)

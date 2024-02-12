@@ -107,6 +107,8 @@ UTL_NAMESPACE_END
 
 #else   // ifdef UTL_BUILTIN_add_lvalue_reference
 
+UTL_NAMESPACE_BEGIN
+
 namespace details {
 namespace type_traits {
 template<typename T>
@@ -115,8 +117,6 @@ template<typename T>
 T add_lvalue_ref(float) noexcept;
 }
 }
-
-UTL_NAMESPACE_BEGIN
 
 template<typename T>
 struct add_lvalue_reference { using type = decltype(details::type_traits::add_rvalue_ref<T>(0)); };
@@ -142,6 +142,8 @@ UTL_NAMESPACE_END
 
 #else   // ifdef UTL_BUILTIN_add_rvalue_reference
 
+UTL_NAMESPACE_BEGIN
+
 namespace details {
 namespace type_traits {
 template<typename T>
@@ -150,8 +152,6 @@ template<typename T>
 T add_rvalue_ref(float) noexcept;
 }
 }
-
-UTL_NAMESPACE_BEGIN
 
 template<typename T>
 struct add_rvalue_reference { using type = decltype(details::type_traits::add_rvalue_ref<T>(0)); };

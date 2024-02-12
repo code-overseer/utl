@@ -8,9 +8,11 @@
 
 #define UTL_SCOPE ::UTL_NS::
 
-#ifndef UTL_NAMESPACE_BEGIN
-#define UTL_NAMESPACE_BEGIN namespace UTL_NS {
+#ifdef UTL_NAMESPACE_BEGIN
+#error "Cannot define UTL_NAMESPACE_BEGIN"
 #endif
+
+#define UTL_NAMESPACE_BEGIN namespace UTL_NS {
 
 #ifndef UTL_NAMESPACE_END
 #define UTL_NAMESPACE_END }
