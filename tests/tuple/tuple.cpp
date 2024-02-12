@@ -259,8 +259,12 @@ template<int>
 struct trivial_struct {
     int x,y;
 };
+static_assert(utl::is_trivial<trivial_struct<0>>::value, "Should be trivial");
+
+#ifdef UTL_CXX20
 static_assert(utl::is_trivial<utl::tuple<long long, double, trivial_struct<0>, trivial_struct<1>>>::value,
-    "If all element are trivial, tuple is trivial");
+    "If all element are trivial, tuple is trivial in >C++20");
+#endif
 
 static_assert(utl::is_standard_layout<utl::tuple<long long, double, trivial_struct<0>, trivial_struct<1>>>::value,
     "If all element are standard layout, tuple is standard layout");
