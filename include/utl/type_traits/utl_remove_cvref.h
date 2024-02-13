@@ -45,7 +45,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template<typename T>
-struct remove_cvref : remove_reference<remove_cv_t<T>> {};
+struct remove_cvref : remove_cv<remove_reference_t<T>> {};
 
 template<typename T>
 using remove_cvref_t = typename remove_cvref<T>::type;
