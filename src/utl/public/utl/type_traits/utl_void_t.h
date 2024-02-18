@@ -1,5 +1,7 @@
 // Copyright 2023-2024 Bryan Wong
 
+#pragma once
+
 #include "utl/preprocessor/utl_namespace.h"
 
 UTL_NAMESPACE_BEGIN
