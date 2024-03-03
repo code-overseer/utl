@@ -10,7 +10,7 @@ UTL_NAMESPACE_BEGIN
 namespace concepts {
 namespace details {
 template<typename T>
-struct proxy_t;
+struct proxy_t {};
 }
 }
 

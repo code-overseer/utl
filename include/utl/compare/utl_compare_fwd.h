@@ -7,6 +7,7 @@
 #include "utl/preprocessor/utl_compiler.h"
 
 #ifdef UTL_COMPILER_GCC
+// TODO: add preprocessor flag to either include std header/use this UB/disable std compatibility
 namespace std {
 /* UTL_UNDEFINED_BEHAVIOUR */
 /* @note (22/12/2023) GCC does not put the orderings under an inline namespace */

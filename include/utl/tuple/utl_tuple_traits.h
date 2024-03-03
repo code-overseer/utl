@@ -15,10 +15,13 @@
 #include "utl/utility/utl_sequence.h"
 
 namespace std {
+// @see tuple_fwd for note on tuple_size and tuple_element
 template <typename... T>
 struct tuple_size<UTL_SCOPE tuple<T...>> : UTL_SCOPE integral_constant<size_t, sizeof...(T)> {};
 template <size_t I, typename... T>
 struct tuple_element<I, UTL_SCOPE tuple<T...>> : UTL_SCOPE template_element<I, UTL_SCOPE tuple<T...>> {};
+// TODO: if std is included or forward declared use std, else use UTL
+// RANT: specializable std templates should provide forward declarations
 template <typename... T, typename Alloc>
 struct uses_allocator<UTL_SCOPE tuple<T...>, Alloc> : true_type {};
 }
@@ -38,6 +41,9 @@ template<typename T>
 struct is_tuple<T const volatile> : is_tuple<T> {};
 template<typename... T>
 struct is_tuple<tuple<T...>> : true_type {};
+
+template<typename T>
+using tuple_index_sequence = make_index_sequence<tuple_size<T>::value>;
 
 namespace tuple_traits {
 namespace details {
@@ -297,15 +303,13 @@ template<typename... Ts>
 struct concat_elements<UTL_SCOPE tuple<Ts...>> { using type = UTL_SCOPE tuple<Ts...>; };
 
 template<typename T0>
-struct concat_elements<T0>
-{
+struct concat_elements<T0> {
     static_assert(is_tuple_like<T0>::value, "Only tuple_like types can be concatenated");
     using type = decltype(details::concat_elements_helper<T0>());
 };
 
 template<typename T0, typename T1>
-struct concat_elements<T0, T1> 
-{
+struct concat_elements<T0, T1> {
     static_assert(is_tuple_like<T0>::value, "Only tuple_like types can be concatenated");
     static_assert(is_tuple_like<T1>::value, "Only tuple_like types can be concatenated");
     using type = decltype(details::concat_elements_helper<T0, T1>());

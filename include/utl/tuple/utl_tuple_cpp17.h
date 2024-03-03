@@ -62,6 +62,7 @@ struct basic_ref_impl<UTL_SCOPE tuple<Ts...>, UTL_SCOPE tuple<Us...>, TQual, UQu
 
 UTL_NAMESPACE_END
 
+// TODO: if std is included or forward declared use std, else use UTL
 namespace std {
 template<typename... Ts, typename... Us>
 struct common_type<UTL_SCOPE tuple<Ts...>, UTL_SCOPE tuple<Us...>> :
