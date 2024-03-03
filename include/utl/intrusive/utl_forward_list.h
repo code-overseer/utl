@@ -11,15 +11,14 @@
 
 #ifdef UTL_CXX20
 namespace utl {
-
+namespace intrusive {
 template <typename NodeType, typename Policy>
 class forward_list;
 
-namespace intrusive {
 namespace details {
 class forward_list {
 template <typename NodeType, typename Policy>
-friend class UTL_SCOPE forward_list;
+friend class UTL_SCOPE intrusive::forward_list;
 
 template <typename NodeType>
 class base {
