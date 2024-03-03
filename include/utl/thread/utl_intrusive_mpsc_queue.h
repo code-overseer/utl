@@ -11,7 +11,7 @@
 #include "utl/type_traits/utl_constants.h"
 
 #ifdef UTL_CXX20
-namespace utl {
+UTL_NAMESPACE_BEGIN
 namespace chrono {
 template<typename R, typename P>
 class duration;
@@ -310,5 +310,5 @@ public:
 };
 
 }   // namespace intrusive
-}   // namespace utl
+UTL_NAMESPACE_END
 #endif

@@ -6,7 +6,8 @@
 #include "utl/concepts/utl_same_as.h"
 
 #ifdef UTL_CXX14
-namespace utl {
+
+UTL_NAMESPACE_BEGIN
 namespace intrusive {
 
 /**
@@ -480,6 +481,8 @@ struct node_policy_traits {
         propagate_on_container_copy_assignment::value,
     void> assign(T& dst, policy_type const& src) noexcept {
         dst = src;
+        // policy should be equal even after copy assignment
+        UTL_ASSERT(policy_traits::equals(dsr, src));
     }
 
     template<typename T = policy_type>
@@ -494,6 +497,8 @@ struct node_policy_traits {
         propagate_on_container_move_assignment::value,
     void>  assign(T& dst, policy_type&& src) noexcept {
         dst = move(src);
+        // policy should be equal even after move assignment
+        UTL_ASSERT(policy_traits::equals(dsr, src));
     }
 
     template<typename T = policy_type>
@@ -538,6 +543,5 @@ struct node_policy_traits {
 
 }   // namespace intrusive
 
-
-}   // namespace utl
+UTL_NAMESPACE_END
 #endif

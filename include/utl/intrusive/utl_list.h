@@ -12,7 +12,7 @@
 #include <atomic>
 
 #ifdef UTL_CXX20
-namespace utl {
+UTL_NAMESPACE_BEGIN
 namespace intrusive {
 template <bidirectional NodeType, release_invocable<NodeType> Policy>
 class list : private Policy {
@@ -27,5 +27,6 @@ public:
     
 };
 }   // namespace intrusive
-}   // namespace utl
+UTL_NAMESPACE_END
+
 #endif

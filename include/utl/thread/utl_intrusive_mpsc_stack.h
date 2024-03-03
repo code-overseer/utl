@@ -12,7 +12,7 @@
 #include "utl/utility/utl_forward.h"
 
 #ifdef UTL_CXX20
-namespace utl {
+UTL_NAMESPACE_BEGIN
 
 namespace intrusive {
 
@@ -175,5 +175,5 @@ private:
     node_type* head_;
 };
 }   // namespace intrusive
-}   // namespace utl
+UTL_NAMESPACE_END
 #endif

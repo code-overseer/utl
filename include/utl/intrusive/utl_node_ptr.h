@@ -7,7 +7,7 @@
 #include "utl/intrusive/utl_nodes.h"
 
 #ifdef UTL_CXX20
-namespace utl {
+UTL_NAMESPACE_BEGIN
 namespace intrusive {
 
 /**
@@ -53,5 +53,5 @@ private:
 template <typename Node, typename NodePolicy>
 using node_ptr = unique_ptr<Node, default_node_deleter<Node, NodePolicy>>;
 }   // namespace intrusive
-}   // namespace utl
+UTL_NAMESPACE_END
 #endif

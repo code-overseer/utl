@@ -10,7 +10,7 @@
 #include "utl/exception.h"
 
 #ifdef UTL_CXX20
-namespace utl {
+UTL_NAMESPACE_BEGIN
 namespace intrusive {
 template <typename NodeType, typename Policy>
 class forward_list;
@@ -357,8 +357,6 @@ public:
             clear();
             other.swap(static_cast<base_type&>(*this));
             policy_traits::assign(policy_, move(other.policy_));
-            // policy should be equal even after move assignment
-            UTL_ASSERT(policy_traits::equals(policy_, other.policy_));
         }
 
         return *this;
@@ -782,5 +780,5 @@ private:
     }
 };
 }   // namespace intrusive
-}   // namespace utl
+UTL_NAMESPACE_END
 #endif
