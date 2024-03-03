@@ -6,11 +6,15 @@
 
 #else    // defined(UTL_USE_STD_tuple) && UTL_USE_STD_tuple
 
-#include "utl/utility/utl_sequence.h"
-
 
 UTL_STD_NAMESPACE_BEGIN
 /* UTL_UNDEFINED_BEHAVIOUR */
+/** 
+ * @note: Might have to bite the bullet on this UB, <tuple> or any other header is too massive
+ * Can't define a utl version as the std version interacts with the core language
+ * for e.g. structured bindings
+ * RANT: Things like these that interact with core language SHOULD provide forward declarations
+ */
 template<typename>
 struct tuple_size;
 template<decltype(sizeof(0)), typename>
@@ -32,14 +36,13 @@ struct is_tuple;
 
 template<typename T>
 UTL_INLINE_CXX17 constexpr size_t tuple_size_v = tuple_size<T>::value;
+template<typename T>
+UTL_INLINE_CXX17 constexpr bool is_tuple_v = is_tuple<T>::value;
 
 #endif
 
 template<size_t I, typename T>
 using tuple_element_t = typename tuple_element<I, T>::type;
-
-template<typename T>
-using tuple_index_sequence = make_index_sequence<tuple_size<T>::value>;
 
 template<typename...>
 class tuple;

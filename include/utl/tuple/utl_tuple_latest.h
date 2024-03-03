@@ -38,6 +38,7 @@
 
 #define TT_SCOPE UTL_SCOPE tuple_traits::
 
+// TODO: if std is included or forward declared use std, else use UTL
 namespace std {
 template<typename... Ts, typename... Us>
 requires (... && requires {
