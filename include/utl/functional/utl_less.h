@@ -8,17 +8,17 @@
 
 UTL_NAMESPACE_BEGIN
 
-template<typename T = void>
-struct less {
-    constexpr bool operator()(T const& lhs, T const& rhs) const noexcept(declval<T const&>() < declval<T const&>()) {
+template <typename T = void> struct less {
+    constexpr bool operator() (T const& lhs, T const& rhs) const
+        noexcept(declval<T const&>() < declval<T const&>()) {
         return lhs < rhs;
     }
 };
 
-template<>
-struct less<void> {
-    template<typename T, typename U>
-    constexpr auto operator()(T&& lhs, U&& rhs) const noexcept(declval<T>() < declval<U>()) -> decltype(declval<T>() < declval<U>()) {
+template <> struct less<void> {
+    template <typename T, typename U>
+    constexpr auto operator() (T&& lhs, U&& rhs) const noexcept(declval<T>() < declval<U>())
+        -> decltype(declval<T>() < declval<U>()) {
         return forward<T>(lhs) < forward<U>(rhs);
     }
 };

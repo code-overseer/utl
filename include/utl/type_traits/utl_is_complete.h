@@ -12,21 +12,19 @@ namespace type_traits {
 namespace details {
 using size_t = decltype(sizeof(0));
 
-template<typename T, size_t = sizeof(T)>
-true_type is_complete(int);
+template <typename T, size_t = sizeof(T)> true_type is_complete(int);
 
-template<typename T>
-false_type is_complete(float);
+template <typename T> false_type is_complete(float);
 
-}
-}
+} // namespace details
+} // namespace type_traits
 
-template<typename T, typename R = decltype(type_traits::details::is_complete<T>(0))>
+template <typename T, typename R = decltype(type_traits::details::is_complete<T>(0))>
 struct is_complete : R {};
 
 #ifdef UTL_CXX14
-template<typename T, typename R = decltype(type_traits::details::is_complete<T>(0))>
+template <typename T, typename R = decltype(type_traits::details::is_complete<T>(0))>
 UTL_INLINE_CXX17 constexpr bool is_complete_v = R::value;
-#endif  // UTL_CXX14
+#endif // UTL_CXX14
 
 UTL_NAMESPACE_END

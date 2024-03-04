@@ -25,7 +25,6 @@
 		"ClangFormat":
 		{
 			"format_on_save":true,
-			"binary": "$project_path/Tools/CoreFormatting/clang-format.exe",
 			"style": "File"
 		}
 	},
