@@ -3,29 +3,29 @@
 #pragma once
 
 #ifndef UTL_DISABLE_INT128_SUPPORT
-#define UTL_DISABLE_INT128_SUPPORT 0
+#  define UTL_DISABLE_INT128_SUPPORT 0
 #endif
 
 #ifdef __SIZEOF_INT128__
-#if !UTL_DISABLE_INT128_SUPPORT
-#define UTL_SUPPORTS_INT128
-#endif
+#  if !UTL_DISABLE_INT128_SUPPORT
+#    define UTL_SUPPORTS_INT128
+#  endif
 #endif
 
 #ifdef __STDCPP_FLOAT16_T__
-  #define UTL_SUPPORTS_FLOAT16
+#  define UTL_SUPPORTS_FLOAT16
 #endif
 #ifdef __STDCPP_FLOAT32_T__
-  #define UTL_SUPPORTS_FLOAT32
+#  define UTL_SUPPORTS_FLOAT32
 #endif
 #ifdef __STDCPP_FLOAT64_T__
-  #define UTL_SUPPORTS_FLOAT64
+#  define UTL_SUPPORTS_FLOAT64
 #endif
 #ifdef __STDCPP_FLOAT128_T__
-  #define UTL_SUPPORTS_FLOAT128
+#  define UTL_SUPPORTS_FLOAT128
 #endif
 #ifdef __STDCPP_BFLOAT16_T__
-  #define UTL_SUPPORTS_BFLOAT16
+#  define UTL_SUPPORTS_BFLOAT16
 #endif
 
 #include "utl/preprocessor/utl_builtins.h"

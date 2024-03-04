@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_namespace.h"
+
 #include <type_traits>
 
 UTL_NAMESPACE_BEGIN

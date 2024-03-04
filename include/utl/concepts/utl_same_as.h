@@ -9,18 +9,14 @@
 UTL_NAMESPACE_BEGIN
 namespace concepts {
 namespace details {
-template<typename T>
-struct proxy_t {};
-}
-}
+template <typename T> struct proxy_t {};
+} // namespace details
+} // namespace concepts
 
-template<typename T, typename U>
-concept same_as =
-    requires(void(*f)(concepts::details::proxy_t<T>*), concepts::details::proxy_t<U>* u) {
-        f(u);
-    } && requires(void(*f)(concepts::details::proxy_t<U>*), concepts::details::proxy_t<T>* t) {
-        f(t);
-    };
+template <typename T, typename U>
+concept same_as = requires(void (*f)(concepts::details::proxy_t<T>*),
+                      concepts::details::proxy_t<U>* u) { f(u); } &&
+    requires(void (*f)(concepts::details::proxy_t<U>*), concepts::details::proxy_t<T>* t) { f(t); };
 
 UTL_NAMESPACE_END
 #endif

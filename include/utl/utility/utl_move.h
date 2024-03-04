@@ -4,11 +4,11 @@
 
 #include "utl/preprocessor/utl_attributes.h"
 #include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_standard.h"
 #include "utl/preprocessor/utl_pragma.h"
+#include "utl/preprocessor/utl_standard.h"
 
 #if defined(UTL_CXX14) && defined(UTL_USE_STD_move) && UTL_USE_STD_move
-#include <utility>
+#  include <utility>
 
 UTL_NAMESPACE_BEGIN
 
@@ -17,35 +17,38 @@ using std::move_if_noexcept;
 
 UTL_NAMESPACE_END
 
-#else   // defined(UTL_CXX14) && defined(UTL_USE_STD_move)
+#else // defined(UTL_CXX14) && defined(UTL_USE_STD_move)
 
-#if defined(UTL_USE_STD_move) && UTL_USE_STD_move
-UTL_PRAGMA_WARN("The current standard does not implement a constexpr move, `UTL_USE_STD_move` ignored")
-#endif
+#  if defined(UTL_USE_STD_move) && UTL_USE_STD_move
+UTL_PRAGMA_WARN(
+    "The current standard does not implement a constexpr move, `UTL_USE_STD_move` ignored")
+#  endif
 
 UTL_NAMESPACE_BEGIN
 
-template<typename T>
-UTL_ATTRIBUTES(NODISCARD,CONST,INTRINSIC)
+template <typename T>
+UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC)
 constexpr remove_reference_t<T>&& move(T&& t UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
     return static_cast<remove_reference_t<T>&&>(t);
 }
 
 namespace details {
 namespace utility {
-template<typename T>
+template <typename T>
 using move_if_noexcept_result_t =
-    conditional_t<!is_nothrow_move_constructible<T>::value && is_copy_constructible<T>::value, const T&, T&&>;
+    conditional_t<!is_nothrow_move_constructible<T>::value && is_copy_constructible<T>::value,
+        T const&, T&&>;
 
-}   // namespace utility
-}   // namespace details
+} // namespace utility
+} // namespace details
 
-template<typename T>
-UTL_ATTRIBUTES(NODISCARD,CONST,INTRINSIC)
-constexpr details::utility::move_if_noexcept_result_t<T> move_if_noexcept(T& t UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
+template <typename T>
+UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC)
+constexpr details::utility::move_if_noexcept_result_t<T> move_if_noexcept(
+    T& t UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
     return move(t);
 }
 
 UTL_NAMESPACE_END
 
-#endif  // defined(UTL_CXX14) && defined(UTL_USE_STD_move) && UTL_USE_STD_move
+#endif // defined(UTL_CXX14) && defined(UTL_USE_STD_move) && UTL_USE_STD_move
