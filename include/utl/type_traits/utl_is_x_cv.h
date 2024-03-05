@@ -20,8 +20,10 @@ using std::is_volatile_v;
 
 #  elif defined(UTL_CXX14) // ifdef UTL_CXX17
 
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_const_v = is_const<T>::value;
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_volatile_v = is_volatile<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_const_v = is_const<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_volatile_v = is_volatile<T>::value;
 
 #  endif // ifdef UTL_CXX17
 
@@ -53,10 +55,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_const : bool_constant<UTL_BUILTIN_is_const(T)> {};
+template <typename T>
+struct is_const : bool_constant<UTL_BUILTIN_is_const(T)> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_const_v = UTL_BUILTIN_is_const(T);
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_const_v = UTL_BUILTIN_is_const(T);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -65,12 +69,16 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_const : false_type {};
-template <typename T> struct is_const<T const> : true_type {};
-template <typename T> struct is_const<T const volatile> : true_type {};
+template <typename T>
+struct is_const : false_type {};
+template <typename T>
+struct is_const<T const> : true_type {};
+template <typename T>
+struct is_const<T const volatile> : true_type {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_const_v = is_const<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_const_v = is_const<T>::value;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -81,10 +89,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_volatile : bool_constant<UTL_BUILTIN_is_volatile(T)> {};
+template <typename T>
+struct is_volatile : bool_constant<UTL_BUILTIN_is_volatile(T)> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_volatile_v = UTL_BUILTIN_is_volatile(T);
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_volatile_v = UTL_BUILTIN_is_volatile(T);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -93,12 +103,16 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_volatile : false_type {};
-template <typename T> struct is_volatile<T volatile> : true_type {};
-template <typename T> struct is_volatile<T const volatile> : true_type {};
+template <typename T>
+struct is_volatile : false_type {};
+template <typename T>
+struct is_volatile<T volatile> : true_type {};
+template <typename T>
+struct is_volatile<T const volatile> : true_type {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_volatile_v = is_volatile<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_volatile_v = is_volatile<T>::value;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END

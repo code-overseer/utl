@@ -6,26 +6,32 @@
 
 UTL_STD_NAMESPACE_BEGIN
 /* UTL_UNDEFINED_BEHAVIOUR */
-template <typename> class reference_wrapper;
+template <typename>
+class reference_wrapper;
 UTL_STD_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename> class reference_wrapper;
+template <typename>
+class reference_wrapper;
 
-template <typename T> struct unwrap_reference {
+template <typename T>
+struct unwrap_reference {
     using type = T;
 };
 
-template <typename T> struct unwrap_reference<reference_wrapper<T>> {
+template <typename T>
+struct unwrap_reference<reference_wrapper<T>> {
     using type = T&;
 };
 
-template <typename T> struct unwrap_reference<::std::reference_wrapper<T>> {
+template <typename T>
+struct unwrap_reference<::std::reference_wrapper<T>> {
     using type = T&;
 };
 
-template <typename T> using unwrap_reference_t = typename unwrap_reference<T>::type;
+template <typename T>
+using unwrap_reference_t = typename unwrap_reference<T>::type;
 
 UTL_NAMESPACE_END
 

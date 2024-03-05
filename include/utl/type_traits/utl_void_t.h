@@ -4,7 +4,8 @@
 
 UTL_NAMESPACE_BEGIN
 
-template <typename...> using void_t = void;
+template <typename...>
+using void_t = void;
 
 UTL_NAMESPACE_END
 

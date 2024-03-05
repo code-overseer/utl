@@ -61,32 +61,41 @@ struct basic_common_reference :
 template <typename T, typename U, template <typename> class TQual, template <typename> class UQual>
 using basic_common_reference_t = typename basic_common_reference<T, U, TQual, UQual>::type;
 
-template <typename...> struct common_reference;
+template <typename...>
+struct common_reference;
 
-template <typename... Ts> using common_reference_t = typename common_reference<Ts...>::type;
+template <typename... Ts>
+using common_reference_t = typename common_reference<Ts...>::type;
 
-template <> struct common_reference<> {};
-template <typename T> struct common_reference<T> {
+template <>
+struct common_reference<> {};
+template <typename T>
+struct common_reference<T> {
     using type = T;
 };
 
 namespace details {
 namespace common_reference {
 
-template <typename T> struct copy_cvref_from {
-    template <typename U> using apply = copy_cvref_t<T, U>;
+template <typename T>
+struct copy_cvref_from {
+    template <typename U>
+    using apply = copy_cvref_t<T, U>;
 };
 
-template <typename T0, typename T1, typename = void> struct ternary_result {};
+template <typename T0, typename T1, typename = void>
+struct ternary_result {};
 template <typename T0, typename T1>
 struct ternary_result<T0, T1,
     void_t<decltype(false ? declval<T0 (&)()>()() : declval<T1 (&)()>()())>> {
     using type = decltype(false ? declval<T0 (&)()>()() : declval<T1 (&)()>()());
 };
 
-template <typename T0, typename T1> using ternary_result_t = typename ternary_result<T0, T1>::type;
+template <typename T0, typename T1>
+using ternary_result_t = typename ternary_result<T0, T1>::type;
 
-template <typename T0, typename T1, typename = void> struct simple_common_ref;
+template <typename T0, typename T1, typename = void>
+struct simple_common_ref;
 
 template <typename T0, typename T1>
 using simple_common_ref_t = typename simple_common_ref<T0, T1>::type;
@@ -100,8 +109,10 @@ struct simple_common_ref<T0&, T1&,
 
 template <typename Target, typename... Ts>
 using all_convertible_to = conjunction<is_convertible<Ts, Target>...>;
-template <typename T> using rvalue_ref = add_rvalue_reference<remove_reference_t<T>>;
-template <typename T> using rvalue_ref_t = typename rvalue_ref<T>::type;
+template <typename T>
+using rvalue_ref = add_rvalue_reference<remove_reference_t<T>>;
+template <typename T>
+using rvalue_ref_t = typename rvalue_ref<T>::type;
 
 template <typename T0, typename T1>
 struct simple_common_ref<T0&&, T1&&,
@@ -119,9 +130,11 @@ template <typename T0, typename T1>
 struct simple_common_ref<T0&&, T1&, void_t<simple_common_ref_t<T1&, T0&&>> // void_t
     > : simple_common_ref<T1&, T0&&> {};
 
-template <typename...> struct first_type;
+template <typename...>
+struct first_type;
 
-template <> struct first_type<> {};
+template <>
+struct first_type<> {};
 
 template <typename T, typename... Ts>
 struct first_type<T, Ts...> : conditional_t<has_type<T>::value, T, first_type<Ts...>> {};
@@ -132,7 +145,8 @@ using impl = first_type<simple_common_ref<T, U>,
         copy_cvref_from<U>::template apply>, // basic_common_reference
     ternary_result<T, U>, common_type<T, U>>;
 
-template <typename List, typename = void> struct sfinae_gt_2 {};
+template <typename List, typename = void>
+struct sfinae_gt_2 {};
 
 template <typename T, typename U, typename... Vs>
 struct sfinae_gt_2<type_list<T, U, Vs...>, void_t<UTL_SCOPE common_reference_t<T, U>>> :

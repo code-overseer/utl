@@ -15,7 +15,8 @@ using std::is_fundamental;
 #  ifdef UTL_CXX17
 using std::is_fundamental_v;
 #  elif defined(UTL_CXX14) // ifdef UTL_CXX17
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_fundamental_v = is_fundamental<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_fundamental_v = is_fundamental<T>::value;
 #  endif                   // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
@@ -38,7 +39,8 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_fundamental : bool_constant<UTL_BUILTIN_is_fundamental(T)> {};
+template <typename T>
+struct is_fundamental : bool_constant<UTL_BUILTIN_is_fundamental(T)> {};
 
 #    ifdef UTL_CXX14
 template <typename T>
@@ -62,7 +64,8 @@ struct is_fundamental :
     bool_constant<is_void<T>::value || is_null_pointer<T>::value || is_arithmetic<T>::value> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_fundamental_v = is_fundamental<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_fundamental_v = is_fundamental<T>::value;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END

@@ -41,13 +41,13 @@
 // TODO: if std is included or forward declared use std, else use UTL
 namespace std {
 template <typename... Ts, typename... Us>
-    requires (... && requires { typename UTL_SCOPE common_type<Ts, Us>::type; })
+requires (... && requires { typename UTL_SCOPE common_type<Ts, Us>::type; })
 struct common_type<UTL_SCOPE tuple<Ts...>, UTL_SCOPE tuple<Us...>> {
     using type = UTL_SCOPE tuple<common_type_t<Ts, Us>...>;
 };
 template <typename... Ts, typename... Us, template <typename> class TQual,
     template <typename> class UQual>
-    requires (... && requires { typename UTL_SCOPE common_reference<TQual<Ts>, UQual<Us>>::type; })
+requires (... && requires { typename UTL_SCOPE common_reference<TQual<Ts>, UQual<Us>>::type; })
 struct basic_common_reference<UTL_SCOPE tuple<Ts...>, UTL_SCOPE tuple<Us...>, TQual, UQual> {
     using type = UTL_SCOPE tuple<UTL_SCOPE common_reference_t<TQual<Ts>, UQual<Us>>...>;
 };
@@ -68,11 +68,13 @@ consteval decltype(auto) conjunction_sequence(F&& func, index_sequence<Is...>) n
 }
 } // namespace details
 
-template <size_t N, typename F> consteval decltype(auto) disjunction_sequence(F&& func) noexcept {
+template <size_t N, typename F>
+consteval decltype(auto) disjunction_sequence(F&& func) noexcept {
     return details::disjunction_sequence(forward<F>(func), make_index_sequence<N>());
 }
 
-template <size_t N, typename F> consteval decltype(auto) conjunction_sequence(F&& func) noexcept {
+template <size_t N, typename F>
+consteval decltype(auto) conjunction_sequence(F&& func) noexcept {
     return details::conjunction_sequence(forward<F>(func), make_index_sequence<N>());
 }
 } // namespace utility
@@ -80,7 +82,8 @@ template <size_t N, typename F> consteval decltype(auto) conjunction_sequence(F&
 namespace details {
 namespace tuple {
 
-template <typename...> struct invalid_swap_t {
+template <typename...>
+struct invalid_swap_t {
     inline constexpr void swap(invalid_swap_t& other) const noexcept {}
     inline constexpr void swap(invalid_swap_t const& other) const noexcept {}
 
@@ -88,23 +91,28 @@ private:
     ~invalid_swap_t() = default;
 };
 
-template <typename...> struct storage;
-template <size_t I, typename T, typename = void> struct offset_impl;
+template <typename...>
+struct storage;
+template <size_t I, typename T, typename = void>
+struct offset_impl;
 struct invalid_t {
 private:
     ~invalid_t() = default;
 };
 
-template <> struct storage<> {
+template <>
+struct storage<> {
     constexpr storage() noexcept = default;
-    constexpr storage& operator= (storage const&) noexcept = default;
-    constexpr storage& operator= (storage&&) noexcept = default;
+    constexpr storage& operator=(storage const&) noexcept = default;
+    constexpr storage& operator=(storage&&) noexcept = default;
     constexpr void     swap(storage<>& other) noexcept {}
 };
 
-template <typename T> struct storage<T> : variadic_traits<T> {
+template <typename T>
+struct storage<T> : variadic_traits<T> {
 public:
-    template <typename U> using not_this = is_same<storage<T>, remove_cvref_t<U>>;
+    template <typename U>
+    using not_this = is_same<storage<T>, remove_cvref_t<U>>;
     using traits = variadic_traits<T>;
     using head_type = T;
     using move_assign_t = conditional_t<traits::is_move_assignable, invalid_t, storage>;
@@ -112,25 +120,25 @@ public:
 
     constexpr storage() noexcept(traits::is_nothrow_default_constructible) = default;
     constexpr storage(storage const&) noexcept(traits::is_nothrow_copy_constructible) = default;
-    constexpr storage& operator= (storage const&) noexcept(
+    constexpr storage& operator=(storage const&) noexcept(
         traits::is_nothrow_copy_assignable) = default;
 
 #ifdef UTL_ENFORCE_NONMOVABILIITY
     constexpr storage(move_construct_t&&) noexcept(traits::is_nothrow_move_constructible) = delete;
-    constexpr storage& operator= (move_assign_t&&) noexcept(
+    constexpr storage& operator=(move_assign_t&&) noexcept(
         traits::is_nothrow_move_assignable) = delete;
 #else
     constexpr storage(storage&&) noexcept(traits::is_nothrow_move_constructible) = default;
-    constexpr storage& operator= (storage&&) noexcept(traits::is_nothrow_move_assignable) = default;
+    constexpr storage& operator=(storage&&) noexcept(traits::is_nothrow_move_assignable) = default;
 #endif
 
     template <typename U>
-        requires (!not_this<U>::value)
+    requires (!not_this<U>::value)
     constexpr storage(U&& head) noexcept(traits::template is_nothrow_constructible<U>::value)
         : head(forward<U>(head)) {}
 
     template <typename Alloc>
-        requires UTL_SCOPE
+    requires UTL_SCOPE
     uses_allocator<T, Alloc>::value&&
         UTL_SCOPE is_constructible<T, allocator_arg_t, Alloc const&>::value constexpr storage(
             allocator_arg_t, Alloc const& alloc) noexcept(requires(Alloc const& a) {
@@ -139,7 +147,7 @@ public:
         : head(allocator_arg, alloc) {}
 
     template <typename Alloc>
-        requires UTL_SCOPE
+    requires UTL_SCOPE
     uses_allocator<T, Alloc>::value &&
         (!UTL_SCOPE is_constructible<T, allocator_arg_t, Alloc const&>::value) &&
         UTL_SCOPE is_constructible<T, Alloc const&>::value
@@ -149,13 +157,13 @@ public:
         : head(alloc) {}
 
     template <typename Alloc>
-        requires (!UTL_SCOPE uses_allocator<T, Alloc>::value)
+    requires (!UTL_SCOPE uses_allocator<T, Alloc>::value)
     constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(requires {
         { T() } noexcept;
     }) : head() {}
 
     template <typename Alloc, typename U>
-        requires UTL_SCOPE
+    requires UTL_SCOPE
     uses_allocator<T, Alloc>::value&&
         UTL_SCOPE is_constructible<T, allocator_arg_t, Alloc const&, U>::value constexpr storage(
             allocator_arg_t, Alloc const& alloc,
@@ -165,7 +173,7 @@ public:
         : head(allocator_arg, alloc, forward<U>(other_head)) {}
 
     template <typename Alloc, typename U>
-        requires UTL_SCOPE
+    requires UTL_SCOPE
     uses_allocator<T, Alloc>::value &&
         (!UTL_SCOPE is_constructible<T, allocator_arg_t, Alloc const&, U>::value) &&
         UTL_SCOPE is_constructible<T, Alloc const&, U>::value constexpr storage(allocator_arg_t,
@@ -175,7 +183,7 @@ public:
         : head(forward<U>(other_head), alloc) {}
 
     template <typename Alloc, typename U>
-        requires (!UTL_SCOPE uses_allocator<T, Alloc>::value)
+    requires (!UTL_SCOPE uses_allocator<T, Alloc>::value)
     constexpr storage(allocator_arg_t, Alloc const& alloc, U&& other_head) noexcept(
         requires(U&& u) {
             { T(forward<U>(u)) } noexcept;
@@ -223,25 +231,25 @@ public:
     }
 
     template <size_t I>
-        requires (I == 0)
+    requires (I == 0)
     UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() && noexcept -> T&& {
         return move(head);
     }
 
     template <size_t I>
-        requires (I == 0)
+    requires (I == 0)
     UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() & noexcept -> T& {
         return head;
     }
 
     template <size_t I>
-        requires (I == 0)
+    requires (I == 0)
     UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const&& noexcept -> T const&& {
         return move(head);
     }
 
     template <size_t I>
-        requires (I == 0)
+    requires (I == 0)
     UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const& noexcept -> T const& {
         return head;
     }
@@ -249,7 +257,8 @@ public:
     UTL_ATTRIBUTE(NO_UNIQUE_ADDRESS) head_type head;
 };
 
-template <typename T, typename... Tail> struct storage<T, Tail...> : variadic_traits<T, Tail...> {
+template <typename T, typename... Tail>
+struct storage<T, Tail...> : variadic_traits<T, Tail...> {
     using traits = variadic_traits<T, Tail...>;
     using head_type = T;
     using tail_type = storage<Tail...>;
@@ -258,20 +267,20 @@ template <typename T, typename... Tail> struct storage<T, Tail...> : variadic_tr
 
     constexpr storage() noexcept(traits::is_nothrow_default_constructible) = default;
     constexpr storage(storage const&) noexcept(traits::is_nothrow_copy_constructible) = default;
-    constexpr storage& operator= (storage const&) noexcept(
+    constexpr storage& operator=(storage const&) noexcept(
         traits::is_nothrow_copy_assignable) = default;
 
 #ifdef UTL_ENFORCE_NONMOVABILIITY
     constexpr storage(move_construct_t&&) noexcept(traits::is_nothrow_move_constructible) = delete;
-    constexpr storage& operator= (move_assign_t&&) noexcept(
+    constexpr storage& operator=(move_assign_t&&) noexcept(
         traits::is_nothrow_move_assignable) = delete;
 #else
     constexpr storage(storage&&) noexcept(traits::is_nothrow_move_constructible) = default;
-    constexpr storage& operator= (storage&&) noexcept(traits::is_nothrow_move_assignable) = default;
+    constexpr storage& operator=(storage&&) noexcept(traits::is_nothrow_move_assignable) = default;
 #endif
 
     template <typename UHead, typename... UTail>
-        requires (sizeof...(UTail) == sizeof...(Tail))
+    requires (sizeof...(UTail) == sizeof...(Tail))
     constexpr storage(UHead&& other_head, UTail&&... other_tail) noexcept(
         requires(UHead&& h, UTail&&... ts) {
             { head_type(forward<UHead>(h)) } noexcept;
@@ -281,7 +290,7 @@ template <typename T, typename... Tail> struct storage<T, Tail...> : variadic_tr
         , tail(forward<UTail>(other_tail)...) {}
 
     template <typename Alloc>
-        requires UTL_SCOPE
+    requires UTL_SCOPE
     uses_allocator<T, Alloc>::value&&
         UTL_SCOPE is_constructible<T, allocator_arg_t, Alloc const&>::value constexpr storage(
             allocator_arg_t, Alloc const& alloc) noexcept(requires(Alloc const& a) {
@@ -292,7 +301,7 @@ template <typename T, typename... Tail> struct storage<T, Tail...> : variadic_tr
         , tail(allocator_arg, alloc) {}
 
     template <typename Alloc>
-        requires UTL_SCOPE
+    requires UTL_SCOPE
     uses_allocator<T, Alloc>::value &&
         (!UTL_SCOPE is_constructible<T, allocator_arg_t, Alloc const&>::value) &&
         UTL_SCOPE is_constructible<T, Alloc const&>::value
@@ -304,7 +313,7 @@ template <typename T, typename... Tail> struct storage<T, Tail...> : variadic_tr
         , tail(allocator_arg, alloc) {}
 
     template <typename Alloc>
-        requires (!UTL_SCOPE uses_allocator<T, Alloc>::value)
+    requires (!UTL_SCOPE uses_allocator<T, Alloc>::value)
     constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(requires(Alloc const& a) {
         { head_type() } noexcept;
         { tail_type(allocator_arg, a) } noexcept;
@@ -312,7 +321,7 @@ template <typename T, typename... Tail> struct storage<T, Tail...> : variadic_tr
        , tail(allocator_arg, alloc) {}
 
     template <typename Alloc, typename UHead, typename... UTail>
-        requires UTL_SCOPE
+    requires UTL_SCOPE
     uses_allocator<T, Alloc>::value&& UTL_SCOPE
         is_constructible<T, allocator_arg_t, Alloc const&, UHead>::value constexpr storage(
             allocator_arg_t, Alloc const& alloc, UHead&& other_head,
@@ -324,7 +333,7 @@ template <typename T, typename... Tail> struct storage<T, Tail...> : variadic_tr
         , tail(allocator_arg, alloc, forward<UTail>(other_tail)...) {}
 
     template <typename Alloc, typename UHead, typename... UTail>
-        requires UTL_SCOPE
+    requires UTL_SCOPE
     uses_allocator<T, Alloc>::value &&
         (!UTL_SCOPE is_constructible<T, allocator_arg_t, Alloc const&, UHead>::value) &&
         UTL_SCOPE is_constructible<T, UHead, Alloc const&>::value
@@ -337,7 +346,7 @@ template <typename T, typename... Tail> struct storage<T, Tail...> : variadic_tr
         , tail(allocator_arg, alloc, forward<UTail>(other_tail)...) {}
 
     template <typename Alloc, typename UHead, typename... UTail>
-        requires (!UTL_SCOPE uses_allocator<T, Alloc>::value)
+    requires (!UTL_SCOPE uses_allocator<T, Alloc>::value)
     constexpr storage(allocator_arg_t, Alloc const& alloc, UHead&& other_head,
         UTail&&... other_tail) noexcept(requires(Alloc const& a, UHead&& h, UTail&&... ts) {
         { head_type(forward<UHead>(h)) } noexcept;
@@ -390,56 +399,56 @@ template <typename T, typename... Tail> struct storage<T, Tail...> : variadic_tr
     }
 
     template <size_t I>
-        requires (I == 0)
+    requires (I == 0)
     UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() && noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
         -> T&& {
         return move(head);
     }
 
     template <size_t I>
-        requires (I == 0)
+    requires (I == 0)
     UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() & noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
         -> T& {
         return head;
     }
 
     template <size_t I>
-        requires (I == 0)
+    requires (I == 0)
     UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const&& noexcept
         UTL_ATTRIBUTE(LIFETIMEBOUND) -> T const&& {
         return move(head);
     }
 
     template <size_t I>
-        requires (I == 0)
+    requires (I == 0)
     UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const& noexcept
         UTL_ATTRIBUTE(LIFETIMEBOUND) -> T const& {
         return head;
     }
 
     template <size_t I>
-        requires (I > 0) && (I < traits::size)
+    requires (I > 0) && (I < traits::size)
     UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() && noexcept
         UTL_ATTRIBUTE(LIFETIMEBOUND) -> template_element_t<I, storage>&& {
         return move(tail).template get<I - 1>();
     }
 
     template <size_t I>
-        requires (I > 0) && (I < traits::size)
+    requires (I > 0) && (I < traits::size)
     UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() & noexcept
         UTL_ATTRIBUTE(LIFETIMEBOUND) -> template_element_t<I, storage>& {
         return tail.template get<I - 1>();
     }
 
     template <size_t I>
-        requires (I > 0) && (I < traits::size)
+    requires (I > 0) && (I < traits::size)
     UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() const&& noexcept
         UTL_ATTRIBUTE(LIFETIMEBOUND) -> template_element_t<I, storage> const&& {
         return move(tail).template get<I - 1>();
     }
 
     template <size_t I>
-        requires (I > 0) && (I < traits::size)
+    requires (I > 0) && (I < traits::size)
     UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() const& noexcept
         UTL_ATTRIBUTE(LIFETIMEBOUND) -> template_element_t<I, storage> const& {
         return tail.template get<I - 1>();
@@ -449,7 +458,8 @@ template <typename T, typename... Tail> struct storage<T, Tail...> : variadic_tr
     UTL_ATTRIBUTE(NO_UNIQUE_ADDRESS) tail_type tail;
 };
 
-template <typename... Ts> struct offset_impl<0, storage<Ts...>> {
+template <typename... Ts>
+struct offset_impl<0, storage<Ts...>> {
     using type = storage<Ts...>;
     static_assert(is_standard_layout<type>::value, "Must be standard layout");
     static constexpr size_t value = offsetof(type, head);
@@ -467,7 +477,8 @@ struct offset_impl<I, storage<T0, Ts...>, enable_if_t<(I > 0)>> {
 } // namespace tuple
 } // namespace details
 
-template <> class tuple<> : private details::tuple::storage<> {
+template <>
+class tuple<> : private details::tuple::storage<> {
 public:
     using storage::storage;
     using storage::operator=;
@@ -475,9 +486,11 @@ public:
     friend inline constexpr void swap(tuple const&, tuple const&) noexcept {}
 };
 
-template <typename... Types> class tuple : private details::tuple::storage<Types...> {
+template <typename... Types>
+class tuple : private details::tuple::storage<Types...> {
 private:
-    template <size_t I, typename T> friend struct tuple_element_offset;
+    template <size_t I, typename T>
+    friend struct tuple_element_offset;
 
     using base_type = details::tuple::storage<Types...>;
     using traits = typename base_type::traits;
@@ -489,7 +502,8 @@ private:
         conditional_t<traits::is_move_assignable, details::tuple::invalid_t, tuple>;
     using move_construct_t =
         conditional_t<traits::is_move_constructible, details::tuple::invalid_t, tuple>;
-    template <typename T> using not_this = negation<is_same<T, tuple>>;
+    template <typename T>
+    using not_this = negation<is_same<T, tuple>>;
     using base_type::get;
 
     template <typename TupleLike, size_t... Is>
@@ -522,28 +536,27 @@ private:
 
 public:
     constexpr tuple(tuple const&) noexcept(traits::is_nothrow_copy_constructible) = default;
-    constexpr tuple& operator= (tuple const&) noexcept(
-        traits::is_nothrow_copy_assignable) = default;
+    constexpr tuple& operator=(tuple const&) noexcept(traits::is_nothrow_copy_assignable) = default;
     constexpr tuple(tuple&&) noexcept(traits::is_nothrow_move_constructible) = default;
-    constexpr tuple& operator= (tuple&&) noexcept(traits::is_nothrow_move_assignable) = default;
+    constexpr tuple& operator=(tuple&&) noexcept(traits::is_nothrow_move_assignable) = default;
 
     UTL_CONSTEXPR_CXX20 ~tuple() = default;
 
     template <same_as<tuple> U = tuple>
-    constexpr tuple const& operator= (U const& other) const
+    constexpr tuple const& operator=(U const& other) const
         noexcept(noexcept(assign(other, index_sequence_for<Types...>{}))) {
         return assign(other, index_sequence_for<Types...>{});
     }
 
     template <same_as<tuple> U = tuple>
-    constexpr tuple const& operator= (U&& other) const
+    constexpr tuple const& operator=(U&& other) const
         noexcept(noexcept(assign(declval<U>(), index_sequence_for<Types...>{}))) {
         return assign(move(other), index_sequence_for<Types...>{});
     }
 
 public:
     template <same_as<Types>... Us>
-        requires traits::template
+    requires traits::template
     is_swappable_with<Us&...>::value constexpr void swap(tuple<Us...>& other) noexcept(
         traits::template is_nothrow_swappable_with<Us&...>::value) {
         static_assert(is_base_of<details::tuple::storage<Us...>, tuple<Us...>>::value,
@@ -552,7 +565,7 @@ public:
     }
 
     template <same_as<Types>... Us>
-        requires traits::template
+    requires traits::template
     is_const_swappable_with<Us const&...>::value constexpr void swap(
         tuple<Us...> const& other) const
         noexcept(traits::template is_nothrow_const_swappable_with<Us const&...>::value) {
@@ -586,7 +599,7 @@ public:
 
 public:
     template <typename UHead, typename... UTail>
-        requires (sizeof...(Types) == sizeof...(UTail) + 1) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTail) + 1) && traits::template
     is_constructible<UHead, UTail...>::value &&
         (!traits::template is_dangling<UHead&&, UTail&&...>::value) explicit(
             traits::template is_explicit_constructible<UHead,
@@ -597,7 +610,7 @@ public:
         : base_type(forward<UHead>(head), forward<UTail>(tail)...) {}
 
     template <typename UHead, typename... UTail>
-        requires (sizeof...(Types) == sizeof...(UTail) + 1) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTail) + 1) && traits::template
     is_constructible<UHead, UTail...>::value&&
         traits::template is_dangling<UHead&&, UTail&&...>::value explicit(
             traits::template is_explicit_constructible<UHead,
@@ -607,7 +620,7 @@ public:
 
 public:
     template <typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible<UTypes&...>::value &&
         (!traits::template is_dangling<UTypes&...>::value) explicit(
             traits::template is_explicit_constructible<
@@ -618,7 +631,7 @@ public:
         : tuple(other, index_sequence_for<UTypes...>{}) {}
 
     template <typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible<UTypes&...>::value&& traits::template is_dangling<UTypes&...>::value explicit(
         traits::template is_explicit_constructible<
             UTypes&...>::value) constexpr tuple(tuple<UTypes...>& other) noexcept((... &&
@@ -628,7 +641,7 @@ public:
 
 public:
     template <typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible<UTypes const&...>::value &&
         (!traits::template is_dangling<UTypes const&...>::value) explicit(
             traits::template is_explicit_constructible<UTypes const&...>::
@@ -639,7 +652,7 @@ public:
         : tuple(other, index_sequence_for<UTypes...>{}) {}
 
     template <typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible<UTypes const&...>::value&&
         traits::template is_dangling<UTypes const&...>::value explicit(
             traits::template is_explicit_constructible<
@@ -650,7 +663,7 @@ public:
 
 public:
     template <typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible<UTypes&&...>::value &&
         (!traits::template is_dangling<UTypes&&...>::value) explicit(
             traits::template is_explicit_constructible<
@@ -661,7 +674,7 @@ public:
         : tuple(move(other), index_sequence_for<UTypes...>{}) {}
 
     template <typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible<UTypes&&...>::value&&
         traits::template is_dangling<UTypes&&...>::value explicit(
             traits::template is_explicit_constructible<
@@ -675,14 +688,14 @@ public:
      * Non-standard overload
      */
     template <typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) &&
+    requires (sizeof...(Types) == sizeof...(UTypes)) &&
         (!traits::template is_constructible<UTypes && ...>::value)
     constexpr tuple(tuple<UTypes...>&&) = delete;
 #endif
 
 public:
     template <typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible<UTypes const&&...>::value &&
         (!traits::template is_dangling<UTypes const&&...>::value) explicit(
             traits::template is_explicit_constructible<
@@ -693,7 +706,7 @@ public:
         : tuple(move(other), index_sequence_for<UTypes...>{}) {}
 
     template <typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible<UTypes const&&...>::value&&
         traits::template is_dangling<UTypes const&&...>::value explicit(
             traits::template is_explicit_constructible<UTypes const&&...>::
@@ -707,30 +720,30 @@ public:
      * Non-standard overload
      */
     template <typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) &&
+    requires (sizeof...(Types) == sizeof...(UTypes)) &&
         (!traits::template is_constructible<UTypes const && ...>::value)
     constexpr tuple(tuple<UTypes...> const&&) = delete;
 #endif
 
 public:
     template <tuple_like TupleLike>
-        requires requires {
-            requires tuple_size<TupleLike>::value == sizeof...(Types);
-            requires !same_as<remove_cvref_t<TupleLike>, tuple>;
-            requires utility::conjunction_sequence<sizeof...(Types)>([](auto i) {
-                using constant_t = decltype(i);
-                using element_t = tuple_element_t<constant_t::value, tuple>;
-                return requires(TupleLike&& t) {
-                    { element_t(get<constant_t::value>(t)) };
-                };
-            });
-            requires utility::conjunction_sequence<sizeof...(Types)>([](auto i) {
-                using constant_t = decltype(i);
-                using element_t = tuple_element_t<constant_t::value, tuple>;
-                using param_t = decltype(TT_SCOPE decl_element<constant_t::value, TupleLike&&>());
-                return !reference_constructs_from_temporary<element_t, param_t>::value;
-            });
-        }
+    requires requires {
+        requires tuple_size<TupleLike>::value == sizeof...(Types);
+        requires !same_as<remove_cvref_t<TupleLike>, tuple>;
+        requires utility::conjunction_sequence<sizeof...(Types)>([](auto i) {
+            using constant_t = decltype(i);
+            using element_t = tuple_element_t<constant_t::value, tuple>;
+            return requires(TupleLike&& t) {
+                { element_t(get<constant_t::value>(t)) };
+            };
+        });
+        requires utility::conjunction_sequence<sizeof...(Types)>([](auto i) {
+            using constant_t = decltype(i);
+            using element_t = tuple_element_t<constant_t::value, tuple>;
+            using param_t = decltype(TT_SCOPE decl_element<constant_t::value, TupleLike&&>());
+            return !reference_constructs_from_temporary<element_t, param_t>::value;
+        });
+    }
     explicit(TT_SCOPE rebind_references_t<traits::template is_explicit_constructible, TupleLike,
         sizeof...(Types)>::value) constexpr tuple(TupleLike&& p) noexcept(requires(TupleLike&& t) {
         { tuple(forward<TupleLike>(t), index_sequence_for<Types...>{}) } noexcept;
@@ -738,13 +751,12 @@ public:
         : tuple(forward<TupleLike>(p), index_sequence_for<Types...>{}) {}
 
     template <tuple_like TupleLike>
-        requires requires {
-            requires tuple_size<TupleLike>::value == sizeof...(Types);
-            requires !same_as<remove_cvref_t<TupleLike>, tuple>;
-            requires TT_SCOPE
-                rebind_references_t<traits::template is_constructible, TupleLike>::value;
-            requires TT_SCOPE rebind_references_t<traits::template is_dangling, TupleLike>::value;
-        }
+    requires requires {
+        requires tuple_size<TupleLike>::value == sizeof...(Types);
+        requires !same_as<remove_cvref_t<TupleLike>, tuple>;
+        requires TT_SCOPE rebind_references_t<traits::template is_constructible, TupleLike>::value;
+        requires TT_SCOPE rebind_references_t<traits::template is_dangling, TupleLike>::value;
+    }
     explicit(TT_SCOPE rebind_references_t<traits::template is_explicit_constructible, TupleLike,
         sizeof...(Types)>::value) constexpr tuple(TupleLike&& p) noexcept(requires(TupleLike&& t) {
         { tuple(forward<TupleLike>(t), index_sequence_for<Types...>{}) } noexcept;
@@ -752,7 +764,7 @@ public:
 
 public:
     template <typename Alloc>
-        requires traits::template
+    requires traits::template
     is_constructible_with_allocator<Alloc>::value explicit(
         traits::template is_explicit_constructible_with_allocator<
             Alloc>::value) constexpr tuple(allocator_arg_t,
@@ -762,8 +774,7 @@ public:
 
 public:
     template <typename Alloc>
-        requires (
-            ... && traits::template is_constructible_with_allocator<Alloc, Types const&>::value)
+    requires (... && traits::template is_constructible_with_allocator<Alloc, Types const&>::value)
     explicit(traits::template is_explicit_constructible_with_allocator<Alloc,
         Types const&>::value) constexpr tuple(allocator_arg_t, Alloc const& alloc,
         Types const&... args) noexcept(traits::
@@ -772,7 +783,7 @@ public:
 
 public:
     template <typename Alloc, typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible_with_allocator<Alloc, UTypes...>::value&&
         traits::template is_explicit_constructible_with_allocator<Alloc, UTypes...>::value &&
         (!traits::template is_dangling_without_allocator<Alloc,
@@ -783,7 +794,7 @@ public:
         : base_type(allocator_arg, alloc, forward<UTypes>(args)...) {}
 
     template <typename Alloc, typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible_with_allocator<Alloc, UTypes...>::value&&
         traits::template is_implicit_constructible_with_allocator<Alloc, UTypes...>::value &&
         (!traits::template is_dangling_without_allocator<Alloc, UTypes...>::value) constexpr tuple(
@@ -794,7 +805,7 @@ public:
         : base_type(allocator_arg, alloc, forward<UTypes>(args)...) {}
 
     template <typename Alloc, typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible_with_allocator<Alloc, UTypes...>::value&&
             traits::template is_explicit_constructible_with_allocator<Alloc, UTypes...>::value&&
             traits::template is_dangling_without_allocator<Alloc,
@@ -804,7 +815,7 @@ public:
             }) = delete;
 
     template <typename Alloc, typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible_with_allocator<Alloc, UTypes...>::value&&
             traits::template is_implicit_constructible_with_allocator<Alloc, UTypes...>::value&&
             traits::template is_dangling_without_allocator<Alloc, UTypes...>::value constexpr tuple(
@@ -815,7 +826,7 @@ public:
 
 public:
     template <typename Alloc, typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible_with_allocator<Alloc, UTypes&...>::value &&
         (!traits::template is_dangling_without_allocator<Alloc, UTypes&...>::value) explicit(
             traits::template is_explicit_constructible_with_allocator<Alloc,
@@ -827,7 +838,7 @@ public:
         : tuple(allocator_arg, alloc, other, index_sequence_for<UTypes...>{}) {}
 
     template <typename Alloc, typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible_with_allocator<Alloc, UTypes&...>::value&&
         traits::template is_dangling_without_allocator<Alloc, UTypes&...>::value explicit(
             traits::template is_explicit_constructible_with_allocator<Alloc,
@@ -839,7 +850,7 @@ public:
 
 public:
     template <typename Alloc, typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible_with_allocator<Alloc, UTypes const&...>::value &&
         (!traits::template is_dangling_without_allocator<Alloc, UTypes const&...>::value) explicit(
             traits::template is_explicit_constructible_with_allocator<Alloc,
@@ -851,7 +862,7 @@ public:
         : tuple(allocator_arg, alloc, other, index_sequence_for<UTypes...>{}) {}
 
     template <typename Alloc, typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible_with_allocator<Alloc, UTypes const&...>::value&&
         traits::template is_dangling_without_allocator<Alloc, UTypes const&...>::value explicit(
             traits::template is_explicit_constructible_with_allocator<Alloc,
@@ -863,7 +874,7 @@ public:
 
 public:
     template <typename Alloc, typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible_with_allocator<Alloc, UTypes&&...>::value &&
         (!traits::template is_dangling_without_allocator<Alloc, UTypes&&...>::value) explicit(
             traits::template is_explicit_constructible_with_allocator<Alloc,
@@ -875,7 +886,7 @@ public:
         : tuple(allocator_arg, alloc, move(other), index_sequence_for<UTypes...>{}) {}
 
     template <typename Alloc, typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible_with_allocator<Alloc, UTypes&&...>::value&&
         traits::template is_dangling_without_allocator<Alloc, UTypes&&...>::value explicit(
             traits::template is_explicit_constructible_with_allocator<Alloc,
@@ -890,14 +901,14 @@ public:
      * Non-standard overload
      */
     template <typename Alloc, typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) &&
+    requires (sizeof...(Types) == sizeof...(UTypes)) &&
         (!traits::template is_constructible_with_allocator<Alloc, UTypes && ...>::value)
     constexpr tuple(allocator_arg_t, Alloc const& alloc, tuple<UTypes...>&& other) = delete;
 #endif
 
 public:
     template <typename Alloc, typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible_with_allocator<Alloc, UTypes const&&...>::value &&
         (!traits::template is_dangling_without_allocator<Alloc, UTypes const&&...>::value) explicit(
             traits::template is_explicit_constructible_with_allocator<Alloc,
@@ -909,7 +920,7 @@ public:
         : tuple(allocator_arg, alloc, move(other), index_sequence_for<UTypes...>{}) {}
 
     template <typename Alloc, typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
+    requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible_with_allocator<Alloc, UTypes const&&...>::value&&
         traits::template is_dangling_without_allocator<Alloc, UTypes const&&...>::value explicit(
             traits::template is_explicit_constructible_with_allocator<Alloc,
@@ -924,25 +935,23 @@ public:
      * Non-standard overload
      */
     template <typename Alloc, typename... UTypes>
-        requires (sizeof...(Types) == sizeof...(UTypes)) &&
+    requires (sizeof...(Types) == sizeof...(UTypes)) &&
         (!traits::template is_constructible_with_allocator<Alloc, UTypes const && ...>::value)
     constexpr tuple(allocator_arg_t, Alloc const& alloc, tuple<UTypes...> const&& other) = delete;
 #endif
 
 public:
     template <typename Alloc, tuple_like TupleLike>
-        requires requires {
-            requires tuple_size<TupleLike>::value == sizeof...(Types);
-            requires !same_as<remove_cvref_t<TupleLike>, tuple>;
-            requires TT_SCOPE
-                rebind_references_t<variadic_proxy<traits::template is_constructible_with_allocator,
-                                        Alloc>::template apply,
-                    TupleLike>::value;
-            requires !TT_SCOPE rebind_references_t<
-                variadic_proxy<traits::template is_dangling_without_allocator,
-                    Alloc>::template apply,
-                TupleLike>::value;
-        }
+    requires requires {
+        requires tuple_size<TupleLike>::value == sizeof...(Types);
+        requires !same_as<remove_cvref_t<TupleLike>, tuple>;
+        requires TT_SCOPE rebind_references_t<
+            variadic_proxy<traits::template is_constructible_with_allocator, Alloc>::template apply,
+            TupleLike>::value;
+        requires !TT_SCOPE rebind_references_t<
+            variadic_proxy<traits::template is_dangling_without_allocator, Alloc>::template apply,
+            TupleLike>::value;
+    }
     explicit(TT_SCOPE rebind_references_t<
         variadic_proxy<traits::template is_explicit_constructible_with_allocator,
             Alloc>::template apply,
@@ -955,18 +964,16 @@ public:
         : tuple(allocator_arg, alloc, forward<TupleLike>(other), index_sequence_for<Types...>{}) {}
 
     template <typename Alloc, tuple_like TupleLike>
-        requires requires {
-            requires tuple_size<TupleLike>::value == sizeof...(Types);
-            requires !same_as<remove_cvref_t<TupleLike>, tuple>;
-            requires TT_SCOPE
-                rebind_references_t<variadic_proxy<traits::template is_constructible_with_allocator,
-                                        Alloc>::template apply,
-                    TupleLike>::value;
-            requires TT_SCOPE
-                rebind_references_t<variadic_proxy<traits::template is_dangling_without_allocator,
-                                        Alloc>::template apply,
-                    TupleLike>::value;
-        }
+    requires requires {
+        requires tuple_size<TupleLike>::value == sizeof...(Types);
+        requires !same_as<remove_cvref_t<TupleLike>, tuple>;
+        requires TT_SCOPE rebind_references_t<
+            variadic_proxy<traits::template is_constructible_with_allocator, Alloc>::template apply,
+            TupleLike>::value;
+        requires TT_SCOPE rebind_references_t<
+            variadic_proxy<traits::template is_dangling_without_allocator, Alloc>::template apply,
+            TupleLike>::value;
+    }
     explicit(TT_SCOPE rebind_references_t<
         variadic_proxy<traits::template is_explicit_constructible_with_allocator,
             Alloc>::template apply,
@@ -979,7 +986,7 @@ public:
 
 public:
     template <typename Alloc>
-        requires traits::template
+    requires traits::template
     is_constructible_with_allocator<Alloc, Types const&...>::value constexpr tuple(allocator_arg_t,
         Alloc const& alloc,
         tuple const& other) noexcept(requires(Alloc const& alloc, tuple const& other) {
@@ -988,7 +995,7 @@ public:
         : tuple(allocator_arg, alloc, other, index_sequence_for<Types...>{}) {}
 
     template <typename Alloc>
-        requires traits::template
+    requires traits::template
     is_constructible_with_allocator<Alloc, Types&&...>::value constexpr tuple(allocator_arg_t,
         Alloc const& alloc, tuple&& other) noexcept(requires(Alloc const& alloc, tuple&& other) {
         { tuple(allocator_arg, alloc, move(other), index_sequence_for<Types...>{}) } noexcept;
@@ -996,7 +1003,7 @@ public:
         : tuple(allocator_arg, alloc, move(other), index_sequence_for<Types...>{}) {}
 
     template <typename Alloc>
-        requires traits::template
+    requires traits::template
     is_constructible_with_allocator<Alloc, Types const&&...>::value constexpr tuple(allocator_arg_t,
         Alloc const&  alloc,
         tuple const&& other) noexcept(requires(Alloc const& alloc, tuple const&& other) {
@@ -1006,8 +1013,8 @@ public:
 
 public:
     template <typename... UTypes>
-        requires traits::template
-    is_assignable<UTypes const&...>::value constexpr tuple& operator= (
+    requires traits::template
+    is_assignable<UTypes const&...>::value constexpr tuple& operator=(
         tuple<UTypes...> const& other) noexcept(requires(tuple& t, tuple<UTypes...> const& other) {
         { t.assign(other, index_sequence_for<Types...>{}) } noexcept;
     }) {
@@ -1015,8 +1022,8 @@ public:
     }
 
     template <assignable_from<Types const&>... UTypes>
-        requires traits::template
-    is_const_assignable<UTypes const&...>::value constexpr tuple const& operator= (
+    requires traits::template
+    is_const_assignable<UTypes const&...>::value constexpr tuple const& operator=(
         tuple<UTypes...> const& other) const
         noexcept(requires(tuple const& t, tuple<UTypes...> const& other) {
             { t.assign(other, index_sequence_for<Types...>{}) } noexcept;
@@ -1026,8 +1033,8 @@ public:
 
 public:
     template <typename... UTypes>
-        requires traits::template
-    is_assignable<UTypes&...>::value constexpr tuple& operator= (tuple<UTypes...>& other) noexcept(
+    requires traits::template
+    is_assignable<UTypes&...>::value constexpr tuple& operator=(tuple<UTypes...>& other) noexcept(
         requires(tuple& t, tuple<UTypes...>& other) {
             { t.assign(other, index_sequence_for<Types...>{}) } noexcept;
         }) {
@@ -1035,8 +1042,8 @@ public:
     }
 
     template <assignable_from<Types&>... UTypes>
-        requires traits::template
-    is_const_assignable<UTypes&...>::value constexpr tuple const& operator= (
+    requires traits::template
+    is_const_assignable<UTypes&...>::value constexpr tuple const& operator=(
         tuple<UTypes...>& other) const noexcept(requires(tuple const& t, tuple<UTypes...>& other) {
         { t.assign(other, index_sequence_for<Types...>{}) } noexcept;
     }) {
@@ -1045,11 +1052,11 @@ public:
 
 public:
     template <typename... UTypes>
-        requires traits::template
-    is_assignable<UTypes&&...>::value constexpr tuple& operator= (
-        tuple<UTypes...>&& other) noexcept(requires(tuple& t, tuple<UTypes...>&& other) {
-        { t.assign(move(other), index_sequence_for<Types...>{}) } noexcept;
-    }) {
+    requires traits::template
+    is_assignable<UTypes&&...>::value constexpr tuple& operator=(tuple<UTypes...>&& other) noexcept(
+        requires(tuple& t, tuple<UTypes...>&& other) {
+            { t.assign(move(other), index_sequence_for<Types...>{}) } noexcept;
+        }) {
         return assign(move(other), index_sequence_for<Types...>{});
     }
 
@@ -1057,13 +1064,13 @@ public:
      * Non-standard overload
      */
     template <typename... UTypes>
-        requires (!traits::template is_assignable<UTypes && ...>::value)
-    constexpr tuple& operator= (tuple<UTypes...>&& other) = delete;
+    requires (!traits::template is_assignable<UTypes && ...>::value)
+    constexpr tuple& operator=(tuple<UTypes...>&& other) = delete;
 
 public:
     template <typename... UTypes>
-        requires traits::template
-    is_const_assignable<UTypes&&...>::value constexpr tuple const& operator= (
+    requires traits::template
+    is_const_assignable<UTypes&&...>::value constexpr tuple const& operator=(
         tuple<UTypes...>&& other) const
         noexcept(requires(tuple const& t, tuple<UTypes...>&& other) {
             { t.assign(move(other), index_sequence_for<Types...>{}) } noexcept;
@@ -1076,14 +1083,14 @@ public:
      * Non-standard overload
      */
     template <typename... UTypes>
-        requires (!traits::template is_const_assignable<UTypes && ...>::value)
-    constexpr tuple const& operator= (tuple<UTypes...>&& other) const = delete;
+    requires (!traits::template is_const_assignable<UTypes && ...>::value)
+    constexpr tuple const& operator=(tuple<UTypes...>&& other) const = delete;
 #endif
 
 public:
     template <typename... UTypes>
-        requires traits::template
-    is_assignable<UTypes const&&...>::value constexpr tuple& operator= (
+    requires traits::template
+    is_assignable<UTypes const&&...>::value constexpr tuple& operator=(
         tuple<UTypes...> const&& other) noexcept(requires(tuple& t,
         tuple<UTypes...> const&&                                 other) {
         { t.assign(move(other), index_sequence_for<Types...>{}) } noexcept;
@@ -1096,14 +1103,14 @@ public:
      * Non-standard overload
      */
     template <typename... UTypes>
-        requires (!traits::template is_assignable<UTypes const && ...>::value)
-    constexpr tuple& operator= (tuple<UTypes...> const&& other) = delete;
+    requires (!traits::template is_assignable<UTypes const && ...>::value)
+    constexpr tuple& operator=(tuple<UTypes...> const&& other) = delete;
 #endif
 
 public:
     template <typename... UTypes>
-        requires traits::template
-    is_const_assignable<UTypes const&&...>::value constexpr tuple const& operator= (
+    requires traits::template
+    is_const_assignable<UTypes const&&...>::value constexpr tuple const& operator=(
         tuple<UTypes...> const&& other) const
         noexcept(requires(tuple const& t, tuple<UTypes...> const&& other) {
             { t.assign(move(other), index_sequence_for<Types...>{}) } noexcept;
@@ -1116,32 +1123,32 @@ public:
      * Non-standard overload
      */
     template <typename... UTypes>
-        requires (!traits::template is_const_assignable<UTypes const && ...>::value)
-    constexpr tuple const& operator= (tuple<UTypes...> const&& other) const = delete;
+    requires (!traits::template is_const_assignable<UTypes const && ...>::value)
+    constexpr tuple const& operator=(tuple<UTypes...> const&& other) const = delete;
 #endif
 
 public:
     template <tuple_like TupleLike>
-        requires requires {
-            requires tuple_size<TupleLike>::value == sizeof...(Types);
-            requires !same_as<remove_cvref_t<TupleLike>, tuple>;
-            requires TT_SCOPE rebind_references_t<traits::template is_assignable, TupleLike,
-                sizeof...(Types)>::value;
-        }
-    constexpr tuple& operator= (TupleLike&& other) noexcept(requires(tuple& t, TupleLike&& other) {
+    requires requires {
+        requires tuple_size<TupleLike>::value == sizeof...(Types);
+        requires !same_as<remove_cvref_t<TupleLike>, tuple>;
+        requires TT_SCOPE
+            rebind_references_t<traits::template is_assignable, TupleLike, sizeof...(Types)>::value;
+    }
+    constexpr tuple& operator=(TupleLike&& other) noexcept(requires(tuple& t, TupleLike&& other) {
         { t.assign(forward<TupleLike>(other), index_sequence_for<Types...>{}) } noexcept;
     }) {
         return assign(forward<TupleLike>(other), index_sequence_for<Types...>{});
     }
 
     template <tuple_like TupleLike>
-        requires requires {
-            requires tuple_size<TupleLike>::value == sizeof...(Types);
-            requires !same_as<remove_cvref_t<TupleLike>, tuple>;
-            requires TT_SCOPE rebind_references_t<traits::template is_const_assignable, TupleLike,
-                sizeof...(Types)>::value;
-        }
-    constexpr tuple const& operator= (TupleLike&& other) const
+    requires requires {
+        requires tuple_size<TupleLike>::value == sizeof...(Types);
+        requires !same_as<remove_cvref_t<TupleLike>, tuple>;
+        requires TT_SCOPE rebind_references_t<traits::template is_const_assignable, TupleLike,
+            sizeof...(Types)>::value;
+    }
+    constexpr tuple const& operator=(TupleLike&& other) const
         noexcept(requires(tuple const& t, TupleLike&& other) {
             { t.assign(forward<TupleLike>(other), index_sequence_for<Types...>{}) } noexcept;
         }) {
@@ -1149,7 +1156,8 @@ public:
     }
 };
 
-template <size_t I, typename T> struct tuple_element_offset;
+template <size_t I, typename T>
+struct tuple_element_offset;
 
 template <size_t I, typename... Ts>
 struct tuple_element_offset<I, tuple<Ts...>> :

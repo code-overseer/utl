@@ -10,7 +10,8 @@
 
 UTL_STD_NAMESPACE_BEGIN
 /* UTL_UNDEFINED_BEHAVIOUR */
-template <typename T, typename Alloc> struct uses_allocator;
+template <typename T, typename Alloc>
+struct uses_allocator;
 
 struct allocator_arg_t;
 UTL_STD_NAMESPACE_END
@@ -27,9 +28,11 @@ template <typename T, typename Alloc,
     typename R = is_convertible<Alloc, typename T::allocator_type>>
 R resolver(float);
 
-template <typename T, typename Alloc> false_type resolver(...);
+template <typename T, typename Alloc>
+false_type resolver(...);
 
-template <typename T, typename Alloc, typename R = decltype(resolver<T, Alloc>(0))> using impl = R;
+template <typename T, typename Alloc, typename R = decltype(resolver<T, Alloc>(0))>
+using impl = R;
 
 } // namespace uses_allocator
 } // namespace details
@@ -41,7 +44,7 @@ struct allocator_arg_t {
     constexpr allocator_arg_t(T) noexcept {}
     template <typename T UTL_REQUIRES_CXX11(is_same<T, ::std::allocator_arg_t>::value)>
     UTL_REQUIRES_CXX20(same_as<T, ::std::allocator_arg_t>)
-    constexpr operator T () const noexcept {
+    constexpr operator T() const noexcept {
         return {};
     }
 };

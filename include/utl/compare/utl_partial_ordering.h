@@ -30,7 +30,8 @@ public:
                   : p == T::greater    ? greater
                                        : unordered) {}
 
-    template <same_as<std::partial_ordering> T> constexpr operator T () noexcept {
+    template <same_as<std::partial_ordering> T>
+    constexpr operator T() noexcept {
         return *this == less      ? T::less
             : *this == equivalent ? T::equivalent
             : *this == greater    ? T::greater
@@ -40,60 +41,58 @@ public:
 
     constexpr partial_ordering(partial_ordering const&) noexcept = default;
     constexpr partial_ordering(partial_ordering&&) noexcept = default;
-    constexpr partial_ordering& operator= (partial_ordering const&) noexcept = default;
-    constexpr partial_ordering& operator= (partial_ordering&&) noexcept = default;
+    constexpr partial_ordering& operator=(partial_ordering const&) noexcept = default;
+    constexpr partial_ordering& operator=(partial_ordering&&) noexcept = default;
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator== (partial_ordering l, partial_ordering r) noexcept {
+    friend constexpr bool operator==(partial_ordering l, partial_ordering r) noexcept {
         return l.value == r.value;
     }
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator== (partial_ordering l, zero_t) noexcept { return l.value == 0; }
+    friend constexpr bool operator==(partial_ordering l, zero_t) noexcept { return l.value == 0; }
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator< (zero_t, partial_ordering r) noexcept {
+    friend constexpr bool operator<(zero_t, partial_ordering r) noexcept {
         return r.value == greater.value;
     }
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator< (partial_ordering l, zero_t) noexcept {
+    friend constexpr bool operator<(partial_ordering l, zero_t) noexcept {
         return l.value == less.value;
     }
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator> (zero_t, partial_ordering r) noexcept {
+    friend constexpr bool operator>(zero_t, partial_ordering r) noexcept {
         return r.value == less.value;
     }
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator> (partial_ordering l, zero_t) noexcept {
+    friend constexpr bool operator>(partial_ordering l, zero_t) noexcept {
         return l.value == greater.value;
     }
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator<= (zero_t, partial_ordering r) noexcept {
+    friend constexpr bool operator<=(zero_t, partial_ordering r) noexcept {
         return r.value == greater.value || r.value == equivalent.value;
     }
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator<= (partial_ordering l, zero_t) noexcept {
+    friend constexpr bool operator<=(partial_ordering l, zero_t) noexcept {
         return l.value == less.value || l.value == equivalent.value;
     }
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator>= (zero_t, partial_ordering r) noexcept {
+    friend constexpr bool operator>=(zero_t, partial_ordering r) noexcept {
         return r.value == less.value || r.value == equivalent.value;
     }
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator>= (partial_ordering l, zero_t) noexcept {
+    friend constexpr bool operator>=(partial_ordering l, zero_t) noexcept {
         return l.value == greater.value || l.value == equivalent.value;
     }
 
 #ifdef UTL_CXX20
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr partial_ordering operator<=> (partial_ordering l, zero_t) noexcept {
-        return l;
-    }
+    friend constexpr partial_ordering operator<=>(partial_ordering l, zero_t) noexcept { return l; }
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr partial_ordering operator<=> (zero_t, partial_ordering r) noexcept {
+    friend constexpr partial_ordering operator<=>(zero_t, partial_ordering r) noexcept {
         switch (r.value) {
         case value_t(order_t::less):
             return greater;

@@ -6,9 +6,11 @@ UTL_NAMESPACE_BEGIN
 
 using size_t = decltype(sizeof(0));
 
-template <typename... Ts> struct undefined_trait {
+template <typename... Ts>
+struct undefined_trait {
 private:
-    template <typename U> static UTL_CONSTEVAL_CXX20 size_t sum_of_sizes() noexcept {
+    template <typename U>
+    static UTL_CONSTEVAL_CXX20 size_t sum_of_sizes() noexcept {
         return sizeof(U);
     }
 

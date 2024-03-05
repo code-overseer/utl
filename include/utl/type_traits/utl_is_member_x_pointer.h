@@ -64,7 +64,8 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_member_pointer : bool_constant<UTL_BUILTIN_is_member_pointer(T)> {};
+template <typename T>
+struct is_member_pointer : bool_constant<UTL_BUILTIN_is_member_pointer(T)> {};
 
 #    ifdef UTL_CXX14
 template <typename T>
@@ -77,9 +78,11 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_member_pointer : false_type {};
+template <typename T>
+struct is_member_pointer : false_type {};
 
-template <typename T, typename U> struct is_member_pointer<T U::*> : true_type {};
+template <typename T, typename U>
+struct is_member_pointer<T U::*> : true_type {};
 
 #    ifdef UTL_CXX14
 template <typename T>
@@ -111,9 +114,11 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_member_function_pointer : false_type {};
+template <typename T>
+struct is_member_function_pointer : false_type {};
 
-template <typename T, typename U> struct is_member_function_pointer<T U::*> : is_function<T> {};
+template <typename T, typename U>
+struct is_member_function_pointer<T U::*> : is_function<T> {};
 
 #    ifdef UTL_CXX14
 template <typename T>
@@ -145,7 +150,8 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_member_object_pointer : false_type {};
+template <typename T>
+struct is_member_object_pointer : false_type {};
 
 template <typename T, typename U>
 struct is_member_object_pointer<T U::*> : bool_constant<!is_function<T>::value> {};

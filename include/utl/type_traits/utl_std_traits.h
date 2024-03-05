@@ -88,27 +88,33 @@ using ::std::has_virtual_destructor;
 
 using ::std::alignment_of;
 
-template <typename... Ts> struct common_type : ::std::common_type<Ts...> {};
+template <typename... Ts>
+struct common_type : ::std::common_type<Ts...> {};
 
 using ::std::underlying_type;
 
-template <typename... T> using common_type_t = typename common_type<T...>::type;
-template <typename T> using underlying_type_t = typename underlying_type<T>::type;
+template <typename... T>
+using common_type_t = typename common_type<T...>::type;
+template <typename T>
+using underlying_type_t = typename underlying_type<T>::type;
 
 namespace details {
 namespace convertible {
 template <typename From, typename To>
 auto nothrow_test(int) -> enable_if_t<is_convertible<From, To>::value,
     bool_constant<noexcept(static_cast<To>(declval<From>()))>>;
-template <typename, typename> false_type nothrow_test(float);
-template <typename From, typename To> using is_nothrow = decltype(nothrow_test<From, To>(0));
+template <typename, typename>
+false_type nothrow_test(float);
+template <typename From, typename To>
+using is_nothrow = decltype(nothrow_test<From, To>(0));
 
 } /* namespace convertible */
 } /* namespace details */
 
 template <typename From, typename To>
 struct is_nothrow_convertible : details::convertible::is_nothrow<From, To> {};
-template <typename To> struct is_nothrow_convertible<To, To> : true_type {};
+template <typename To>
+struct is_nothrow_convertible<To, To> : true_type {};
 
 #ifdef UTL_BUILTIN_is_layout_compatible
 template <typename T, typename U>
@@ -121,8 +127,10 @@ UTL_INLINE_CXX17 constexpr bool is_layout_compatible_v = UTL_BUILTIN_is_layout_c
 
 #  define UTL_TRAIT_SUPPORTED_is_layout_compatible 1
 #else /* ifdef UTL_BUILTIN_is_layout_compatible */
-template <typename, typename> struct is_layout_compatible : false_type {};
-template <typename T> struct is_layout_compatible<T, T> : true_type {};
+template <typename, typename>
+struct is_layout_compatible : false_type {};
+template <typename T>
+struct is_layout_compatible<T, T> : true_type {};
 
 #  ifdef UTL_CXX14
 template <typename T, typename U>
@@ -147,8 +155,10 @@ UTL_INLINE_CXX17 constexpr bool is_pointer_interconvertible_base_of_v =
 
 #  define UTL_TRAIT_SUPPORTED_is_pointer_interconvertible_base_of 1
 #else /* ifdef UTL_BUILTIN_is_pointer_interconvertible_base_of */
-template <typename, typename> struct is_pointer_interconvertible_base_of : false_type {};
-template <typename T> struct is_pointer_interconvertible_base_of<T, T> : true_type {};
+template <typename, typename>
+struct is_pointer_interconvertible_base_of : false_type {};
+template <typename T>
+struct is_pointer_interconvertible_base_of<T, T> : true_type {};
 
 #  ifdef UTL_CXX14
 template <typename T, typename U>
@@ -173,7 +183,8 @@ UTL_INLINE_CXX17 constexpr bool reference_constructs_from_temporary_v =
 #  endif
 
 #else /* ifdef UTL_BUILTIN_reference_constructs_from_temporary */
-template <typename, typename> struct reference_constructs_from_temporary : false_type {};
+template <typename, typename>
+struct reference_constructs_from_temporary : false_type {};
 
 #  ifdef UTL_CXX14
 template <typename T, typename U>

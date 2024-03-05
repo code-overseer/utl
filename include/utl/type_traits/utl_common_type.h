@@ -10,7 +10,8 @@
 
 UTL_STD_NAMESPACE_BEGIN
 /* UTL_UNDEFINED_BEHAVIOUR */
-template <typename...> struct common_type;
+template <typename...>
+struct common_type;
 UTL_STD_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN

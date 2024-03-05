@@ -16,7 +16,8 @@ template <typename T, typename THead>
 auto implicit_test(int) -> conjunction<is_convertible<THead, T>, is_constructible<T, THead>>;
 template <typename T>
 auto implicit_test(int) -> decltype((declval<void(T)>()({}), is_default_constructible<T>{}));
-template <typename T, typename...> auto implicit_test(...) -> false_type;
+template <typename T, typename...>
+auto implicit_test(...) -> false_type;
 
 template <typename TTarget, typename... TArgs>
 using is_implicit = decltype(implicit_test<TTarget, TArgs...>(0));
@@ -34,7 +35,8 @@ auto explicit_test(int)
 template <typename T>
 auto explicit_test(int) -> conjunction<negation<decltype(implicit_test<T>(0))>,
     decltype((declval<void(T)>()(T{}), is_default_constructible<T>{}))>;
-template <typename T, typename...> auto explicit_test(...) -> false_type;
+template <typename T, typename...>
+auto explicit_test(...) -> false_type;
 
 template <typename TTarget, typename... TArgs>
 using is_explicit = decltype(explicit_test<TTarget, TArgs...>(0));

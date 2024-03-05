@@ -20,8 +20,10 @@ using std::remove_extent_t;
 
 #  else // UTL_CXX14
 
-template <typename T> using remove_extent_t = typename remove_extent<T>::type;
-template <typename T> using remove_all_extent_t = typename remove_all_extent<T>::type;
+template <typename T>
+using remove_extent_t = typename remove_extent<T>::type;
+template <typename T>
+using remove_all_extent_t = typename remove_all_extent<T>::type;
 
 #  endif // UTL_CXX14
 
@@ -41,11 +43,13 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct remove_extent {
+template <typename T>
+struct remove_extent {
     using type = UTL_BUILTIN_remove_extent(T);
 };
 
-template <typename T> using remove_extent_t = UTL_BUILTIN_remove_extent(T);
+template <typename T>
+using remove_extent_t = UTL_BUILTIN_remove_extent(T);
 
 UTL_NAMESPACE_END
 
@@ -55,16 +59,20 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct remove_extent {
+template <typename T>
+struct remove_extent {
     using type = T;
 };
-template <typename T> struct remove_extent<T[]> {
+template <typename T>
+struct remove_extent<T[]> {
     using type = T;
 };
-template <typename T, size_t N> struct remove_extent<T[N]> {
+template <typename T, size_t N>
+struct remove_extent<T[N]> {
     using type = T;
 };
-template <typename T> using remove_extent_t = typename remove_extent<T>::type;
+template <typename T>
+using remove_extent_t = typename remove_extent<T>::type;
 
 UTL_NAMESPACE_END
 
@@ -72,15 +80,19 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct remove_all_extent {
+template <typename T>
+struct remove_all_extent {
     using type = T;
 };
-template <typename T> using remove_all_extent_t = typename remove_all_extent<T>::type;
+template <typename T>
+using remove_all_extent_t = typename remove_all_extent<T>::type;
 
-template <typename T> struct remove_all_extent<T[]> {
+template <typename T>
+struct remove_all_extent<T[]> {
     using type = remove_all_extent_t<T>;
 };
-template <typename T, size_t N> struct remove_all_extent<T[N]> {
+template <typename T, size_t N>
+struct remove_all_extent<T[N]> {
     using type = remove_all_extent_t<T>;
 };
 

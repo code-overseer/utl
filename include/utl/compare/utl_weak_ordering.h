@@ -20,7 +20,7 @@ public:
     static weak_ordering const equivalent;
     static weak_ordering const greater;
 
-    constexpr operator partial_ordering () const { return partial_ordering(order_t(value)); }
+    constexpr operator partial_ordering() const { return partial_ordering(order_t(value)); }
 
 #ifdef UTL_CXX20
     template <same_as<std::weak_ordering> T>
@@ -29,63 +29,64 @@ public:
                   : p == T::equivalent ? equivalent
                                        : greater) {}
 
-    template <same_as<std::weak_ordering> T> constexpr operator T () noexcept {
+    template <same_as<std::weak_ordering> T>
+    constexpr operator T() noexcept {
         return *this == less ? T::less : *this == equivalent ? T::equivalent : T::greater;
     }
 #endif
     constexpr weak_ordering(weak_ordering const&) noexcept = default;
     constexpr weak_ordering(weak_ordering&&) noexcept = default;
-    constexpr weak_ordering& operator= (weak_ordering const&) noexcept = default;
-    constexpr weak_ordering& operator= (weak_ordering&&) noexcept = default;
+    constexpr weak_ordering& operator=(weak_ordering const&) noexcept = default;
+    constexpr weak_ordering& operator=(weak_ordering&&) noexcept = default;
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator== (weak_ordering l, weak_ordering r) noexcept {
+    friend constexpr bool operator==(weak_ordering l, weak_ordering r) noexcept {
         return l.value == r.value;
     }
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator== (weak_ordering l, zero_t) noexcept { return l.value == 0; }
+    friend constexpr bool operator==(weak_ordering l, zero_t) noexcept { return l.value == 0; }
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator< (zero_t, weak_ordering r) noexcept {
+    friend constexpr bool operator<(zero_t, weak_ordering r) noexcept {
         return r.value == greater.value;
     }
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator< (weak_ordering l, zero_t) noexcept {
+    friend constexpr bool operator<(weak_ordering l, zero_t) noexcept {
         return l.value == less.value;
     }
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator> (zero_t, weak_ordering r) noexcept {
+    friend constexpr bool operator>(zero_t, weak_ordering r) noexcept {
         return r.value == less.value;
     }
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator> (weak_ordering l, zero_t) noexcept {
+    friend constexpr bool operator>(weak_ordering l, zero_t) noexcept {
         return l.value == greater.value;
     }
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator<= (zero_t, weak_ordering r) noexcept {
+    friend constexpr bool operator<=(zero_t, weak_ordering r) noexcept {
         return r.value == greater.value || r.value == equivalent.value;
     }
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator<= (weak_ordering l, zero_t) noexcept {
+    friend constexpr bool operator<=(weak_ordering l, zero_t) noexcept {
         return l.value == less.value || l.value == equivalent.value;
     }
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator>= (zero_t, weak_ordering r) noexcept {
+    friend constexpr bool operator>=(zero_t, weak_ordering r) noexcept {
         return r.value == less.value || r.value == equivalent.value;
     }
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator>= (weak_ordering l, zero_t) noexcept {
+    friend constexpr bool operator>=(weak_ordering l, zero_t) noexcept {
         return l.value == greater.value || l.value == equivalent.value;
     }
 
 #ifdef UTL_CXX20
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr weak_ordering operator<=> (weak_ordering l, zero_t) noexcept { return l; }
+    friend constexpr weak_ordering operator<=>(weak_ordering l, zero_t) noexcept { return l; }
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr weak_ordering operator<=> (zero_t, weak_ordering r) noexcept {
+    friend constexpr weak_ordering operator<=>(zero_t, weak_ordering r) noexcept {
         return weak_ordering(order_t(-r.value));
     }
 #endif

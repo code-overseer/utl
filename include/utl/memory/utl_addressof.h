@@ -7,7 +7,8 @@
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> constexpr T* addressof(T&&) = delete;
+template <typename T>
+constexpr T* addressof(T&&) = delete;
 
 #ifdef UTL_BUILTIN_addressof
 
@@ -25,23 +26,27 @@ constexpr enable_if_t<!is_object<remove_reference_t<T>>::value, T*> addressof(
     return &arg;
 }
 
-template <typename T> struct is_addressof_constexpr : true_type {};
+template <typename T>
+struct is_addressof_constexpr : true_type {};
 
 #else // ifdef UTL_BUILTIN_addressof
 
 namespace details {
 namespace addressof {
-template <typename T, typename = void> struct has_adl_overload : false_type {};
+template <typename T, typename = void>
+struct has_adl_overload : false_type {};
 template <typename T>
-struct has_adl_overload<T, void_t<decltype(operator& (declval<add_lvalue_reference_t<T>>()))>> :
+struct has_adl_overload<T, void_t<decltype(operator&(declval<add_lvalue_reference_t<T>>()))>> :
     true_type {};
 
-template <typename T, typename = void> struct has_member_overload : false_type {};
+template <typename T, typename = void>
+struct has_member_overload : false_type {};
 template <typename T>
-struct has_member_overload<T, void_t<decltype(declval<add_lvalue_reference_t<T>>().operator& ())>> :
+struct has_member_overload<T, void_t<decltype(declval<add_lvalue_reference_t<T>>().operator&())>> :
     true_type {};
 
-template <typename T, typename = void> struct natively_invocable : false_type {};
+template <typename T, typename = void>
+struct natively_invocable : false_type {};
 template <typename T>
 struct natively_invocable<T, void_t<decltype(&declval<add_lvalue_reference_t<T>>())>> :
     true_type {};

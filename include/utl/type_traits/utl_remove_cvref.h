@@ -30,11 +30,13 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct remove_cvref {
+template <typename T>
+struct remove_cvref {
     using type = UTL_BUILTIN_remove_cvref(T);
 };
 
-template <typename T> using remove_cvref_t = UTL_BUILTIN_remove_cvref(T);
+template <typename T>
+using remove_cvref_t = UTL_BUILTIN_remove_cvref(T);
 
 UTL_NAMESPACE_END
 
@@ -44,9 +46,11 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct remove_cvref : remove_cv<remove_reference_t<T>> {};
+template <typename T>
+struct remove_cvref : remove_cv<remove_reference_t<T>> {};
 
-template <typename T> using remove_cvref_t = typename remove_cvref<T>::type;
+template <typename T>
+using remove_cvref_t = typename remove_cvref<T>::type;
 
 UTL_NAMESPACE_END
 

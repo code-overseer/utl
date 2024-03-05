@@ -15,7 +15,8 @@ using std::is_scalar;
 #  ifdef UTL_CXX17
 using std::is_scalar_v;
 #  elif defined(UTL_CXX14) // ifdef UTL_CXX17
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_scalar_v = is_scalar<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_scalar_v = is_scalar<T>::value;
 #  endif                   // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
@@ -38,10 +39,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_scalar : bool_constant<UTL_BUILTIN_is_scalar(T)> {};
+template <typename T>
+struct is_scalar : bool_constant<UTL_BUILTIN_is_scalar(T)> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_scalar_v = UTL_BUILTIN_is_scalar(T);
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_scalar_v = UTL_BUILTIN_is_scalar(T);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -64,7 +67,8 @@ template <typename T>
     is_enum<T>::value >> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_scalar_v = is_scalar<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_scalar_v = is_scalar<T>::value;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END

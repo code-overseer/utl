@@ -17,7 +17,8 @@ UTL_NAMESPACE_BEGIN
 namespace compare_ops {
 namespace details {
 
-template <typename T> using const_ref_t = remove_reference_t<T> const&;
+template <typename T>
+using const_ref_t = remove_reference_t<T> const&;
 template <typename T>
 using sequence_t = conditional_t<TT_SCOPE is_tuple_like<T>::value, tuple_index_sequence<T>, void>;
 
@@ -82,12 +83,18 @@ struct all_have_gteq_impl<T, U, index_sequence<Is...>,
     > : true_type {};
 } // namespace details
 
-template <typename T, typename U = T> struct all_have_eq : details::all_have_eq_impl<T, U> {};
-template <typename T, typename U = T> struct all_have_neq : details::all_have_neq_impl<T, U> {};
-template <typename T, typename U = T> struct all_have_lt : details::all_have_lt_impl<T, U> {};
-template <typename T, typename U = T> struct all_have_gt : details::all_have_gt_impl<T, U> {};
-template <typename T, typename U = T> struct all_have_lteq : details::all_have_lteq_impl<T, U> {};
-template <typename T, typename U = T> struct all_have_gteq : details::all_have_gteq_impl<T, U> {};
+template <typename T, typename U = T>
+struct all_have_eq : details::all_have_eq_impl<T, U> {};
+template <typename T, typename U = T>
+struct all_have_neq : details::all_have_neq_impl<T, U> {};
+template <typename T, typename U = T>
+struct all_have_lt : details::all_have_lt_impl<T, U> {};
+template <typename T, typename U = T>
+struct all_have_gt : details::all_have_gt_impl<T, U> {};
+template <typename T, typename U = T>
+struct all_have_lteq : details::all_have_lteq_impl<T, U> {};
+template <typename T, typename U = T>
+struct all_have_gteq : details::all_have_gteq_impl<T, U> {};
 
 namespace details {
 template <typename T, typename U, typename Seq = sequence_t<T>, typename = void>

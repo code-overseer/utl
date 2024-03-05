@@ -10,11 +10,13 @@
 
 UTL_NAMESPACE_BEGIN
 
-template <typename F> struct function_type;
+template <typename F>
+struct function_type;
 
 namespace details {
 namespace function_info {
-template <typename F, typename = void> struct function_type;
+template <typename F, typename = void>
+struct function_type;
 template <typename F>
 struct function_type<F*, enable_if_t<is_function<F>::value>> : UTL_SCOPE function_type<F> {};
 template <typename F>
@@ -22,175 +24,250 @@ struct function_type<F&, enable_if_t<is_function<F>::value>> : UTL_SCOPE functio
 } // namespace function_info
 } // namespace details
 
-template <typename F> struct function_type : details::function_info::function_type<F> {};
-template <typename F> using function_type_t = typename function_type<F>::type;
+template <typename F>
+struct function_type : details::function_info::function_type<F> {};
+template <typename F>
+using function_type_t = typename function_type<F>::type;
 
-template <typename R, typename... A> struct function_type<R(A...)> {
+template <typename R, typename... A>
+struct function_type<R(A...)> {
     using type = R(A...);
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) const> {
+template <typename R, typename... A>
+struct function_type<R(A...) const> {
     using type = R(A...) const;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) const volatile> {
+template <typename R, typename... A>
+struct function_type<R(A...) const volatile> {
     using type = R(A...) const volatile;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) volatile> {
+template <typename R, typename... A>
+struct function_type<R(A...) volatile> {
     using type = R(A...) volatile;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...)&> {
+template <typename R, typename... A>
+struct function_type<R(A...)&> {
     using type = R(A...);
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) const&> {
+template <typename R, typename... A>
+struct function_type<R(A...) const&> {
     using type = R(A...) const&;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) const volatile&> {
+template <typename R, typename... A>
+struct function_type<R(A...) const volatile&> {
     using type = R(A...) const volatile&;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) volatile&> {
+template <typename R, typename... A>
+struct function_type<R(A...) volatile&> {
     using type = R(A...) volatile&;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) &&> {
+template <typename R, typename... A>
+struct function_type<R(A...) &&> {
     using type = R(A...);
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) const&&> {
+template <typename R, typename... A>
+struct function_type<R(A...) const&&> {
     using type = R(A...) const&&;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) const volatile&&> {
+template <typename R, typename... A>
+struct function_type<R(A...) const volatile&&> {
     using type = R(A...) const volatile&&;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) volatile&&> {
+template <typename R, typename... A>
+struct function_type<R(A...) volatile&&> {
     using type = R(A...) volatile&&;
     using return_type = R;
 };
 
 namespace functional {
-template <typename F> struct is_const;
-template <typename R, typename... A> struct is_const<R(A...)> : bool_constant<false> {};
-template <typename R, typename... A> struct is_const<R(A...) const> : bool_constant<true> {};
+template <typename F>
+struct is_const;
+template <typename R, typename... A>
+struct is_const<R(A...)> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_const<R(A...) const> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_const<R(A...) const volatile> : bool_constant<true> {};
-template <typename R, typename... A> struct is_const<R(A...) volatile> : bool_constant<false> {};
-template <typename R, typename... A> struct is_const<R(A...)&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_const<R(A...) const&> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_const<R(A...) volatile> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_const<R(A...)&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_const<R(A...) const&> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_const<R(A...) const volatile&> : bool_constant<true> {};
-template <typename R, typename... A> struct is_const<R(A...) volatile&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_const<R(A...) &&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_const<R(A...) const&&> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_const<R(A...) volatile&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_const<R(A...) &&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_const<R(A...) const&&> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_const<R(A...) const volatile&&> : bool_constant<true> {};
-template <typename R, typename... A> struct is_const<R(A...) volatile&&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_const<R(A...) volatile&&> : bool_constant<false> {};
 
-template <typename F> struct is_volatile;
-template <typename R, typename... A> struct is_volatile<R(A...)> : bool_constant<false> {};
-template <typename R, typename... A> struct is_volatile<R(A...) const> : bool_constant<false> {};
+template <typename F>
+struct is_volatile;
+template <typename R, typename... A>
+struct is_volatile<R(A...)> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_volatile<R(A...) const> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_volatile<R(A...) const volatile> : bool_constant<true> {};
-template <typename R, typename... A> struct is_volatile<R(A...) volatile> : bool_constant<true> {};
-template <typename R, typename... A> struct is_volatile<R(A...)&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_volatile<R(A...) const&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_volatile<R(A...) volatile> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_volatile<R(A...)&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_volatile<R(A...) const&> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_volatile<R(A...) const volatile&> : bool_constant<true> {};
-template <typename R, typename... A> struct is_volatile<R(A...) volatile&> : bool_constant<true> {};
-template <typename R, typename... A> struct is_volatile<R(A...) &&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_volatile<R(A...) const&&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_volatile<R(A...) volatile&> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_volatile<R(A...) &&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_volatile<R(A...) const&&> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_volatile<R(A...) const volatile&&> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_volatile<R(A...) volatile&&> : bool_constant<true> {};
 
-template <typename F> struct is_cv;
-template <typename R, typename... A> struct is_cv<R(A...)> : bool_constant<false> {};
-template <typename R, typename... A> struct is_cv<R(A...) const> : bool_constant<false> {};
-template <typename R, typename... A> struct is_cv<R(A...) const volatile> : bool_constant<true> {};
-template <typename R, typename... A> struct is_cv<R(A...) volatile> : bool_constant<false> {};
-template <typename R, typename... A> struct is_cv<R(A...)&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_cv<R(A...) const&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_cv<R(A...) const volatile&> : bool_constant<true> {};
-template <typename R, typename... A> struct is_cv<R(A...) volatile&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_cv<R(A...) &&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_cv<R(A...) const&&> : bool_constant<false> {};
+template <typename F>
+struct is_cv;
+template <typename R, typename... A>
+struct is_cv<R(A...)> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_cv<R(A...) const> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_cv<R(A...) const volatile> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_cv<R(A...) volatile> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_cv<R(A...)&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_cv<R(A...) const&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_cv<R(A...) const volatile&> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_cv<R(A...) volatile&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_cv<R(A...) &&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_cv<R(A...) const&&> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_cv<R(A...) const volatile&&> : bool_constant<true> {};
-template <typename R, typename... A> struct is_cv<R(A...) volatile&&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_cv<R(A...) volatile&&> : bool_constant<false> {};
 
-template <typename F> struct is_lvalue;
-template <typename R, typename... A> struct is_lvalue<R(A...)> : bool_constant<false> {};
-template <typename R, typename... A> struct is_lvalue<R(A...) const> : bool_constant<false> {};
+template <typename F>
+struct is_lvalue;
+template <typename R, typename... A>
+struct is_lvalue<R(A...)> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_lvalue<R(A...) const> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_lvalue<R(A...) const volatile> : bool_constant<false> {};
-template <typename R, typename... A> struct is_lvalue<R(A...) volatile> : bool_constant<false> {};
-template <typename R, typename... A> struct is_lvalue<R(A...)&> : bool_constant<true> {};
-template <typename R, typename... A> struct is_lvalue<R(A...) const&> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_lvalue<R(A...) volatile> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_lvalue<R(A...)&> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_lvalue<R(A...) const&> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_lvalue<R(A...) const volatile&> : bool_constant<true> {};
-template <typename R, typename... A> struct is_lvalue<R(A...) volatile&> : bool_constant<true> {};
-template <typename R, typename... A> struct is_lvalue<R(A...) &&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_lvalue<R(A...) const&&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_lvalue<R(A...) volatile&> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_lvalue<R(A...) &&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_lvalue<R(A...) const&&> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_lvalue<R(A...) const volatile&&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_lvalue<R(A...) volatile&&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_lvalue<R(A...) volatile&&> : bool_constant<false> {};
 
-template <typename F> struct is_rvalue;
-template <typename R, typename... A> struct is_rvalue<R(A...)> : bool_constant<false> {};
-template <typename R, typename... A> struct is_rvalue<R(A...) const> : bool_constant<false> {};
+template <typename F>
+struct is_rvalue;
+template <typename R, typename... A>
+struct is_rvalue<R(A...)> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_rvalue<R(A...) const> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_rvalue<R(A...) const volatile> : bool_constant<false> {};
-template <typename R, typename... A> struct is_rvalue<R(A...) volatile> : bool_constant<false> {};
-template <typename R, typename... A> struct is_rvalue<R(A...)&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_rvalue<R(A...) const&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_rvalue<R(A...) volatile> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_rvalue<R(A...)&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_rvalue<R(A...) const&> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_rvalue<R(A...) const volatile&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_rvalue<R(A...) volatile&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_rvalue<R(A...) &&> : bool_constant<true> {};
-template <typename R, typename... A> struct is_rvalue<R(A...) const&&> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_rvalue<R(A...) volatile&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_rvalue<R(A...) &&> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_rvalue<R(A...) const&&> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_rvalue<R(A...) const volatile&&> : bool_constant<true> {};
-template <typename R, typename... A> struct is_rvalue<R(A...) volatile&&> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_rvalue<R(A...) volatile&&> : bool_constant<true> {};
 
-template <typename F> struct is_noexcept;
-template <typename R, typename... A> struct is_noexcept<R(A...)> : bool_constant<false> {};
-template <typename R, typename... A> struct is_noexcept<R(A...) const> : bool_constant<false> {};
+template <typename F>
+struct is_noexcept;
+template <typename R, typename... A>
+struct is_noexcept<R(A...)> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_noexcept<R(A...) const> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_noexcept<R(A...) const volatile> : bool_constant<false> {};
-template <typename R, typename... A> struct is_noexcept<R(A...) volatile> : bool_constant<false> {};
-template <typename R, typename... A> struct is_noexcept<R(A...)&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_noexcept<R(A...) const&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_noexcept<R(A...) volatile> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_noexcept<R(A...)&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_noexcept<R(A...) const&> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_noexcept<R(A...) const volatile&> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_noexcept<R(A...) volatile&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_noexcept<R(A...) &&> : bool_constant<false> {};
-template <typename R, typename... A> struct is_noexcept<R(A...) const&&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_noexcept<R(A...) &&> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_noexcept<R(A...) const&&> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_noexcept<R(A...) const volatile&&> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_noexcept<R(A...) volatile&&> : bool_constant<false> {};
 
-template <typename F> struct argument_list;
-template <typename F> using argument_list_t = typename argument_list<F>::type;
+template <typename F>
+struct argument_list;
+template <typename F>
+using argument_list_t = typename argument_list<F>::type;
 template <typename R, typename... A>
 struct argument_list<R(A...)> : type_identity<type_list<A...>> {};
 template <typename R, typename... A>
@@ -218,81 +295,96 @@ struct argument_list<R(A...) volatile&&> : type_identity<type_list<A...>> {};
 
 #ifdef UTL_CXX17
 
-template <typename R, typename... A> struct function_type<R(A...) noexcept> {
+template <typename R, typename... A>
+struct function_type<R(A...) noexcept> {
     using type = R(A...) noexcept;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) const noexcept> {
+template <typename R, typename... A>
+struct function_type<R(A...) const noexcept> {
     using type = R(A...) const noexcept;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) const volatile noexcept> {
+template <typename R, typename... A>
+struct function_type<R(A...) const volatile noexcept> {
     using type = R(A...) const volatile noexcept;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) volatile noexcept> {
+template <typename R, typename... A>
+struct function_type<R(A...) volatile noexcept> {
     using type = R(A...) volatile noexcept;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) & noexcept> {
+template <typename R, typename... A>
+struct function_type<R(A...) & noexcept> {
     using type = R(A...);
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) const & noexcept> {
+template <typename R, typename... A>
+struct function_type<R(A...) const & noexcept> {
     using type = R(A...) const&;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) const volatile & noexcept> {
+template <typename R, typename... A>
+struct function_type<R(A...) const volatile & noexcept> {
     using type = R(A...) const volatile&;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) volatile & noexcept> {
+template <typename R, typename... A>
+struct function_type<R(A...) volatile & noexcept> {
     using type = R(A...) volatile&;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) && noexcept> {
+template <typename R, typename... A>
+struct function_type<R(A...) && noexcept> {
     using type = R(A...);
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) const && noexcept> {
+template <typename R, typename... A>
+struct function_type<R(A...) const && noexcept> {
     using type = R(A...) const&&;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) const volatile && noexcept> {
+template <typename R, typename... A>
+struct function_type<R(A...) const volatile && noexcept> {
     using type = R(A...) const volatile&&;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct function_type<R(A...) volatile && noexcept> {
+template <typename R, typename... A>
+struct function_type<R(A...) volatile && noexcept> {
     using type = R(A...) volatile&&;
     using return_type = R;
 };
 
-template <typename R, typename... A> struct is_const<R(A...) noexcept> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_const<R(A...) noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_const<R(A...) const noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_const<R(A...) const volatile noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_const<R(A...) volatile noexcept> : bool_constant<false> {};
-template <typename R, typename... A> struct is_const<R(A...) & noexcept> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_const<R(A...) & noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_const<R(A...) const & noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_const<R(A...) const volatile & noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_const<R(A...) volatile & noexcept> : bool_constant<false> {};
-template <typename R, typename... A> struct is_const<R(A...) && noexcept> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_const<R(A...) && noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_const<R(A...) const && noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
@@ -300,7 +392,8 @@ struct is_const<R(A...) const volatile && noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_const<R(A...) volatile && noexcept> : bool_constant<false> {};
 
-template <typename R, typename... A> struct is_volatile<R(A...) noexcept> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_volatile<R(A...) noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_volatile<R(A...) const noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
@@ -324,20 +417,24 @@ struct is_volatile<R(A...) const volatile && noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_volatile<R(A...) volatile && noexcept> : bool_constant<true> {};
 
-template <typename R, typename... A> struct is_cv<R(A...) noexcept> : bool_constant<false> {};
-template <typename R, typename... A> struct is_cv<R(A...) const noexcept> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_cv<R(A...) noexcept> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_cv<R(A...) const noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_cv<R(A...) const volatile noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_cv<R(A...) volatile noexcept> : bool_constant<false> {};
-template <typename R, typename... A> struct is_cv<R(A...) & noexcept> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_cv<R(A...) & noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_cv<R(A...) const & noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_cv<R(A...) const volatile & noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_cv<R(A...) volatile & noexcept> : bool_constant<false> {};
-template <typename R, typename... A> struct is_cv<R(A...) && noexcept> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_cv<R(A...) && noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_cv<R(A...) const && noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
@@ -345,14 +442,16 @@ struct is_cv<R(A...) const volatile && noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_cv<R(A...) volatile && noexcept> : bool_constant<false> {};
 
-template <typename R, typename... A> struct is_lvalue<R(A...) noexcept> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_lvalue<R(A...) noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_lvalue<R(A...) const noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_lvalue<R(A...) const volatile noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_lvalue<R(A...) volatile noexcept> : bool_constant<false> {};
-template <typename R, typename... A> struct is_lvalue<R(A...) & noexcept> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_lvalue<R(A...) & noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_lvalue<R(A...) const & noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
@@ -368,21 +467,24 @@ struct is_lvalue<R(A...) const volatile && noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_lvalue<R(A...) volatile && noexcept> : bool_constant<false> {};
 
-template <typename R, typename... A> struct is_rvalue<R(A...) noexcept> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_rvalue<R(A...) noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_rvalue<R(A...) const noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_rvalue<R(A...) const volatile noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_rvalue<R(A...) volatile noexcept> : bool_constant<false> {};
-template <typename R, typename... A> struct is_rvalue<R(A...) & noexcept> : bool_constant<false> {};
+template <typename R, typename... A>
+struct is_rvalue<R(A...) & noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_rvalue<R(A...) const & noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_rvalue<R(A...) const volatile & noexcept> : bool_constant<false> {};
 template <typename R, typename... A>
 struct is_rvalue<R(A...) volatile & noexcept> : bool_constant<false> {};
-template <typename R, typename... A> struct is_rvalue<R(A...) && noexcept> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_rvalue<R(A...) && noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_rvalue<R(A...) const && noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
@@ -390,7 +492,8 @@ struct is_rvalue<R(A...) const volatile && noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_rvalue<R(A...) volatile && noexcept> : bool_constant<true> {};
 
-template <typename R, typename... A> struct is_noexcept<R(A...) noexcept> : bool_constant<true> {};
+template <typename R, typename... A>
+struct is_noexcept<R(A...) noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
 struct is_noexcept<R(A...) const noexcept> : bool_constant<true> {};
 template <typename R, typename... A>
@@ -443,7 +546,8 @@ struct argument_list<R(A...) volatile && noexcept> : type_identity<type_list<A..
 
 } // namespace functional
 
-template <typename F> struct function_traits : function_type<F> {
+template <typename F>
+struct function_traits : function_type<F> {
     using function_type::return_type;
     using function_type::type;
     using argument_list = functional::argument_list_t<F>;
@@ -466,7 +570,8 @@ struct template_element<I, function_type<F>> : template_element<I, function_trai
 
 template <typename F>
 struct template_size<function_traits<F>> : template_size<functional::argument_list_t<F>> {};
-template <typename F> struct template_size<function_type<F>> : template_size<function_traits<F>> {};
+template <typename F>
+struct template_size<function_type<F>> : template_size<function_traits<F>> {};
 
 template <typename T, typename F>
 struct template_count<T, function_traits<F>> : template_count<T, functional::argument_list_t<F>> {};

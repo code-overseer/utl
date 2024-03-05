@@ -20,8 +20,8 @@ public:
     static strong_ordering const equal;
     static strong_ordering const greater;
 
-    constexpr operator partial_ordering () const { return partial_ordering(order_t(value)); }
-    constexpr operator weak_ordering () const { return weak_ordering(order_t(value)); }
+    constexpr operator partial_ordering() const { return partial_ordering(order_t(value)); }
+    constexpr operator weak_ordering() const { return weak_ordering(order_t(value)); }
 #ifdef UTL_CXX20
     template <same_as<std::strong_ordering> T>
     constexpr strong_ordering(T p) noexcept
@@ -30,7 +30,8 @@ public:
                   : p == T::equal      ? equal
                                        : greater) {}
 
-    template <same_as<std::strong_ordering> T> constexpr operator T () noexcept {
+    template <same_as<std::strong_ordering> T>
+    constexpr operator T() noexcept {
         return *this == less      ? T::less
             : *this == equivalent ? T::equivalent
             : *this == equal      ? T::equal
@@ -39,23 +40,23 @@ public:
 #endif
     constexpr strong_ordering(strong_ordering const&) noexcept = default;
     constexpr strong_ordering(strong_ordering&&) noexcept = default;
-    constexpr strong_ordering& operator= (strong_ordering const&) noexcept = default;
-    constexpr strong_ordering& operator= (strong_ordering&&) noexcept = default;
+    constexpr strong_ordering& operator=(strong_ordering const&) noexcept = default;
+    constexpr strong_ordering& operator=(strong_ordering&&) noexcept = default;
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator== (strong_ordering l, strong_ordering r) noexcept {
+    friend constexpr bool operator==(strong_ordering l, strong_ordering r) noexcept {
         return l.value == r.value;
     }
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr bool operator== (strong_ordering l, zero_t) noexcept { return l.value == 0; }
+    friend constexpr bool operator==(strong_ordering l, zero_t) noexcept { return l.value == 0; }
 
-#define UTL_ORDERING_COMPARISONS(SYMBOL)                                         \
-    UTL_ATTRIBUTES(NODISCARD, CONST)                                             \
-    friend constexpr bool operator SYMBOL (zero_t, strong_ordering r) noexcept { \
-        return 0 SYMBOL r.value;                                                 \
-    }                                                                            \
-    friend constexpr bool operator SYMBOL (strong_ordering l, zero_t) noexcept { \
-        return l.value SYMBOL 0;                                                 \
+#define UTL_ORDERING_COMPARISONS(SYMBOL)                                        \
+    UTL_ATTRIBUTES(NODISCARD, CONST)                                            \
+    friend constexpr bool operator SYMBOL(zero_t, strong_ordering r) noexcept { \
+        return 0 SYMBOL r.value;                                                \
+    }                                                                           \
+    friend constexpr bool operator SYMBOL(strong_ordering l, zero_t) noexcept { \
+        return l.value SYMBOL 0;                                                \
     }
 
     UTL_ORDERING_COMPARISONS(<)
@@ -67,10 +68,10 @@ public:
 
 #ifdef UTL_CXX20
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr strong_ordering operator<=> (strong_ordering l, zero_t) noexcept { return l; }
+    friend constexpr strong_ordering operator<=>(strong_ordering l, zero_t) noexcept { return l; }
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    friend constexpr strong_ordering operator<=> (zero_t, strong_ordering r) noexcept {
+    friend constexpr strong_ordering operator<=>(zero_t, strong_ordering r) noexcept {
         return strong_ordering(order_t(-r.value));
     }
 #endif

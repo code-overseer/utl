@@ -13,34 +13,53 @@ UTL_NAMESPACE_BEGIN
 
 namespace seq {
 namespace details {
-template <typename T> UTL_ATTRIBUTES(NODISCARD) UTL_CONSTEVAL_CXX20 T pow(T n, size_t p) noexcept {
+template <typename T>
+UTL_ATTRIBUTES(NODISCARD)
+UTL_CONSTEVAL_CXX20 T pow(T n, size_t p) noexcept {
     return !p ? 1 : ((p & 1) ? n : 1) * pow(n * n, p >> 1);
 }
 } // namespace details
 
-template <typename T, T... Is> using array_t = T const[sizeof...(Is)];
+template <typename T, T... Is>
+using array_t = T const[sizeof...(Is)];
 
-template <typename T, T... Is> UTL_INLINE_CXX17 constexpr array_t<T, Is...> array{Is...};
+template <typename T, T... Is>
+UTL_INLINE_CXX17 constexpr array_t<T, Is...> array{Is...};
 
-template <typename T, T N> using scalar_t = integral_constant<T, N>;
+template <typename T, T N>
+using scalar_t = integral_constant<T, N>;
 
-template <uint8_t N> using uscalar8_t = scalar_t<decltype(N), N>;
-template <uint16_t N> using uscalar16_t = scalar_t<decltype(N), N>;
-template <uint32_t N> using uscalar32_t = scalar_t<decltype(N), N>;
-template <uint64_t N> using uscalar64_t = scalar_t<decltype(N), N>;
+template <uint8_t N>
+using uscalar8_t = scalar_t<decltype(N), N>;
+template <uint16_t N>
+using uscalar16_t = scalar_t<decltype(N), N>;
+template <uint32_t N>
+using uscalar32_t = scalar_t<decltype(N), N>;
+template <uint64_t N>
+using uscalar64_t = scalar_t<decltype(N), N>;
 
-template <int8_t N> using scalar8_t = scalar_t<decltype(N), N>;
-template <int16_t N> using scalar16_t = scalar_t<decltype(N), N>;
-template <int32_t N> using scalar32_t = scalar_t<decltype(N), N>;
-template <int64_t N> using scalar64_t = scalar_t<decltype(N), N>;
+template <int8_t N>
+using scalar8_t = scalar_t<decltype(N), N>;
+template <int16_t N>
+using scalar16_t = scalar_t<decltype(N), N>;
+template <int32_t N>
+using scalar32_t = scalar_t<decltype(N), N>;
+template <int64_t N>
+using scalar64_t = scalar_t<decltype(N), N>;
 
-template <make_signed_t<size_t> N> using sindex_t = scalar_t<decltype(N), N>;
-template <size_t N> using index_t = scalar_t<decltype(N), N>;
+template <make_signed_t<size_t> N>
+using sindex_t = scalar_t<decltype(N), N>;
+template <size_t N>
+using index_t = scalar_t<decltype(N), N>;
 
-template <typename T, size_t N> using range_t = make_integer_sequence<T, N>;
-template <typename T, T... Is> using sequence_t = integer_sequence<T, Is...>;
-template <typename T, size_t N> UTL_INLINE_CXX17 constexpr range_t<T, N>       range = {};
-template <typename T, T... Is> UTL_INLINE_CXX17 constexpr sequence_t<T, Is...> sequence = {};
+template <typename T, size_t N>
+using range_t = make_integer_sequence<T, N>;
+template <typename T, T... Is>
+using sequence_t = integer_sequence<T, Is...>;
+template <typename T, size_t N>
+UTL_INLINE_CXX17 constexpr range_t<T, N> range = {};
+template <typename T, T... Is>
+UTL_INLINE_CXX17 constexpr sequence_t<T, Is...> sequence = {};
 
 template <typename T, T I>
 UTL_ATTRIBUTES(NODISCARD, CONST)
@@ -69,13 +88,13 @@ constexpr auto NAME(sequence_t<T, Is...>, sequence_t<U, Js...>) noexcept
 }
 template <typename T, T... Is, typename U, U J>
 UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr auto operator SYM (sequence_t<T, Is...>, scalar_t<U, J>) noexcept
+constexpr auto operator SYM(sequence_t<T, Is...>, scalar_t<U, J>) noexcept
     -> sequence_t<UTL_BINOP_RESULT(SYM, T, U), (Is SYM J)...> {
     return {};
 }
 template <typename T, T... Is, typename U, U... Js>
 UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr auto operator SYM (sequence_t<T, Is...>, sequence_t<U, Js...>) noexcept
+constexpr auto operator SYM(sequence_t<T, Is...>, sequence_t<U, Js...>) noexcept
     -> sequence_t<UTL_BINOP_RESULT(SYM, T, U), (Is SYM Js)...> {
     return {};
 }

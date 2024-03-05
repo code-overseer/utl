@@ -6,10 +6,12 @@
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct type_identity {
+template <typename T>
+struct type_identity {
     using type = T;
 };
-template <typename T> using type_identity_t = typename type_identity<T>::type;
+template <typename T>
+using type_identity_t = typename type_identity<T>::type;
 
 UTL_NAMESPACE_END
 

@@ -26,7 +26,8 @@ UTL_PRAGMA_WARN(
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> void as_const(T&&) noexcept = delete;
+template <typename T>
+void as_const(T&&) noexcept = delete;
 
 template <typename T>
 UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC)

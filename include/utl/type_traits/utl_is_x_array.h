@@ -15,7 +15,8 @@ using std::is_array;
 #  ifdef UTL_CXX17
 using std::is_array_v;
 #  elif defined(UTL_CXX14) // ifdef UTL_CXX17
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_array_v = is_array<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_array_v = is_array<T>::value;
 #  endif                   // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
@@ -40,10 +41,12 @@ UTL_PRAGMA_WARN("builtin is_array is disabled by default and cannot be enabled")
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_array : bool_constant<UTL_BUILTIN_is_array(T)> {};
+template <typename T>
+struct is_array : bool_constant<UTL_BUILTIN_is_array(T)> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_array_v = UTL_BUILTIN_is_array(T);
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_array_v = UTL_BUILTIN_is_array(T);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -52,14 +55,18 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_array : false_type {};
+template <typename T>
+struct is_array : false_type {};
 
-template <typename T> struct is_array<T[]> : true_type {};
+template <typename T>
+struct is_array<T[]> : true_type {};
 
-template <typename T, size_t N> struct is_array<T[N]> : true_type {};
+template <typename T, size_t N>
+struct is_array<T[N]> : true_type {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_array_v = is_array<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_array_v = is_array<T>::value;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -101,11 +108,15 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_bounded_array : false_type {};
-template <typename T, decltype(sizeof(0)) N> struct is_bounded_array<T[N]> : true_type {};
+template <typename T>
+struct is_bounded_array : false_type {};
+template <typename T, decltype(sizeof(0)) N>
+struct is_bounded_array<T[N]> : true_type {};
 
-template <typename T> struct is_unbounded_array : false_type {};
-template <typename T> struct is_unbounded_array<T[]> : true_type {};
+template <typename T>
+struct is_unbounded_array : false_type {};
+template <typename T>
+struct is_unbounded_array<T[]> : true_type {};
 
 UTL_NAMESPACE_END
 

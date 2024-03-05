@@ -15,7 +15,8 @@ using std::is_union;
 #  ifdef UTL_CXX17
 using std::is_union_v;
 #  elif defined(UTL_CXX14) // ifdef UTL_CXX17
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_union_v = is_union<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_union_v = is_union<T>::value;
 #  endif                   // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
@@ -38,10 +39,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_union : bool_constant<UTL_BUILTIN_is_union(T)> {};
+template <typename T>
+struct is_union : bool_constant<UTL_BUILTIN_is_union(T)> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_union_v = UTL_BUILTIN_is_union(T);
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_union_v = UTL_BUILTIN_is_union(T);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -54,10 +57,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_union : undefined_trait<T> {};
+template <typename T>
+struct is_union : undefined_trait<T> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_union_v = is_union<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_union_v = is_union<T>::value;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END

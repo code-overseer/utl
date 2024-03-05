@@ -28,12 +28,18 @@ using std::remove_volatile_t;
 
 #  else // UTL_CXX14
 
-template <typename T> using add_const_t = T const;
-template <typename T> using add_volatile_t = T volatile;
-template <typename T> using add_cv_t = T const volatile;
-template <typename T> using remove_const_t = typename remove_const<T>::type;
-template <typename T> using remove_volatile_t = typename remove_volatile<T>::type;
-template <typename T> using remove_cv_t = typename remove_volatile<T>::type;
+template <typename T>
+using add_const_t = T const;
+template <typename T>
+using add_volatile_t = T volatile;
+template <typename T>
+using add_cv_t = T const volatile;
+template <typename T>
+using remove_const_t = typename remove_const<T>::type;
+template <typename T>
+using remove_volatile_t = typename remove_volatile<T>::type;
+template <typename T>
+using remove_cv_t = typename remove_volatile<T>::type;
 
 #  endif // UTL_CXX14
 
@@ -62,11 +68,13 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct remove_volatile {
+template <typename T>
+struct remove_volatile {
     using type = UTL_BUILTIN_remove_const(T);
 };
 
-template <typename T> using remove_const_t = UTL_BUILTIN_remove_const(T);
+template <typename T>
+using remove_const_t = UTL_BUILTIN_remove_const(T);
 
 UTL_NAMESPACE_END
 
@@ -74,14 +82,17 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct remove_const {
+template <typename T>
+struct remove_const {
     using type = T;
 };
-template <typename T> struct remove_const<T const> {
+template <typename T>
+struct remove_const<T const> {
     using type = T;
 };
 
-template <typename T> using remove_const_t = typename remove_const<T>::type;
+template <typename T>
+using remove_const_t = typename remove_const<T>::type;
 
 UTL_NAMESPACE_END
 
@@ -91,11 +102,13 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct remove_volatile {
+template <typename T>
+struct remove_volatile {
     using type = UTL_BUILTIN_remove_volatile(T);
 };
 
-template <typename T> using remove_volatile_t = UTL_BUILTIN_remove_volatile(T);
+template <typename T>
+using remove_volatile_t = UTL_BUILTIN_remove_volatile(T);
 
 UTL_NAMESPACE_END
 
@@ -103,14 +116,17 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct remove_volatile {
+template <typename T>
+struct remove_volatile {
     using type = T;
 };
-template <typename T> struct remove_volatile<T volatile> {
+template <typename T>
+struct remove_volatile<T volatile> {
     using type = T;
 };
 
-template <typename T> using remove_volatile_t = typename remove_volatile<T>::type;
+template <typename T>
+using remove_volatile_t = typename remove_volatile<T>::type;
 
 UTL_NAMESPACE_END
 
@@ -118,23 +134,31 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct add_const {
+template <typename T>
+struct add_const {
     using type = T const;
 };
-template <typename T> struct add_volatile {
+template <typename T>
+struct add_volatile {
     using type = T volatile;
 };
-template <typename T> struct add_cv {
+template <typename T>
+struct add_cv {
     using type = T const volatile;
 };
-template <typename T> struct remove_cv {
+template <typename T>
+struct remove_cv {
     using type = remove_const_t<remove_volatile_t<T>>;
 };
 
-template <typename T> using add_const_t = T const;
-template <typename T> using add_volatile_t = T volatile;
-template <typename T> using add_cv_t = T const volatile;
-template <typename T> using remove_cv_t = remove_const_t<remove_volatile_t<T>>;
+template <typename T>
+using add_const_t = T const;
+template <typename T>
+using add_volatile_t = T volatile;
+template <typename T>
+using add_cv_t = T const volatile;
+template <typename T>
+using remove_cv_t = remove_const_t<remove_volatile_t<T>>;
 
 UTL_NAMESPACE_END
 
