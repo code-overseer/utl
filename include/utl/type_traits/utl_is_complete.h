@@ -12,9 +12,11 @@ namespace type_traits {
 namespace details {
 using size_t = decltype(sizeof(0));
 
-template <typename T, size_t = sizeof(T)> true_type is_complete(int);
+template <typename T, size_t = sizeof(T)>
+true_type is_complete(int);
 
-template <typename T> false_type is_complete(float);
+template <typename T>
+false_type is_complete(float);
 
 } // namespace details
 } // namespace type_traits

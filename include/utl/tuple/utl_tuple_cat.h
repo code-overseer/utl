@@ -15,11 +15,13 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace tuple {
 
-template <typename, typename> struct is_all_reference_impl;
+template <typename, typename>
+struct is_all_reference_impl;
 template <typename T, size_t... Is>
 struct is_all_reference_impl<T, index_sequence<Is...>> :
     conjunction<is_reference<tuple_element_t<Is, T>>...> {};
-template <typename T> using is_all_reference = is_all_reference_impl<T, tuple_index_sequence<T>>;
+template <typename T>
+using is_all_reference = is_all_reference_impl<T, tuple_index_sequence<T>>;
 
 // unpacks into references
 template <typename Tuple, size_t... Ns>
@@ -37,7 +39,8 @@ constexpr auto tuple_forward(Tuple&& tuple) noexcept(
     return tuple_forward(forward<Tuple>(tuple), tuple_index_sequence<Tuple>{});
 }
 
-template <typename T> constexpr auto tuple_cat_impl(T&& tuple) noexcept -> T&& {
+template <typename T>
+constexpr auto tuple_cat_impl(T&& tuple) noexcept -> T&& {
     static_assert(is_all_reference<T>::value, "Elements must all be references");
     return forward<T>(tuple);
 }

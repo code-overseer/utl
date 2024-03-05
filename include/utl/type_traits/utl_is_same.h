@@ -15,7 +15,8 @@ using std::is_same;
 #  ifdef UTL_CXX17
 using std::is_same_v;
 #  elif defined(UTL_CXX14) // ifdef UTL_CXX17
-template <typename T, typename U> UTL_INLINE_CXX17 constexpr bool is_same_v = is_same<T, U>::value;
+template <typename T, typename U>
+UTL_INLINE_CXX17 constexpr bool is_same_v = is_same<T, U>::value;
 #  endif                   // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
@@ -36,7 +37,8 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T0, typename T1> struct is_same : bool_constant<UTL_BUILTIN_is_same(T0, T1)> {};
+template <typename T0, typename T1>
+struct is_same : bool_constant<UTL_BUILTIN_is_same(T0, T1)> {};
 
 #    ifdef UTL_CXX14
 template <typename T0, typename T1>
@@ -49,12 +51,15 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename, typename> struct is_same : false_type {};
+template <typename, typename>
+struct is_same : false_type {};
 
-template <typename T> struct is_same<T, T> : true_type {};
+template <typename T>
+struct is_same<T, T> : true_type {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_same_v = is_same<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_same_v = is_same<T>::value;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END

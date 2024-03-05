@@ -13,7 +13,8 @@ UTL_NAMESPACE_BEGIN
 
 using size_t = decltype(sizeof(0));
 
-template <typename... Types> struct variadic_traits {
+template <typename... Types>
+struct variadic_traits {
     static constexpr size_t size = sizeof...(Types);
 
     static constexpr bool is_nothrow_swappable =

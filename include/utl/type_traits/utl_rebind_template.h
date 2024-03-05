@@ -6,7 +6,8 @@
 
 UTL_NAMESPACE_BEGIN
 
-template <typename From, template <typename...> To> struct rebind_template;
+template <typename From, template <typename...> To>
+struct rebind_template;
 
 template <template <typename...> class From, template <typename...> class To, typename... A>
 struct rebind_template<From<A...>, To> {

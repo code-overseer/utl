@@ -12,6 +12,7 @@ AllowShortBlocksOnASingleLine: Empty
 AllowShortEnumsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: Inline
 AllowShortLambdasOnASingleLine: All
+# AllowShortCompoundRequirementOnASingleLine: true
 BraceWrapping:
   AfterCaseLabel: false
   AfterClass: false
@@ -34,6 +35,9 @@ BreakInheritanceList: AfterColon
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeComma
 BreakStringLiterals: true
+# BreakTemplateDeclarations: MultiLine
+AlwaysBreakTemplateDeclarations: true
+IndentRequiresClause: false
 ColumnLimit: 100
 CompactNamespaces: false
 PackConstructorInitializers: CurrentLine
@@ -52,7 +56,6 @@ PointerAlignment: Left
 QualifierAlignment: Right
 SortIncludes: CaseSensitive
 SpaceBeforeCaseColon: false
-
 SpaceBeforeParens: Custom
 SpaceBeforeParensOptions:
   AfterControlStatements: true
@@ -60,7 +63,7 @@ SpaceBeforeParensOptions:
   AfterFunctionDeclarationName: false
   AfterFunctionDefinitionName: false
   AfterIfMacros: false
-  AfterOverloadedOperator: true
+  AfterOverloadedOperator: false
   AfterRequiresInClause: true
   AfterRequiresInExpression: false
   BeforeNonEmptyParentheses: false
@@ -78,3 +81,4 @@ IncludeCategories:
     Priority:        3
   - Regex:           '^<.*>'
     Priority:        4
+

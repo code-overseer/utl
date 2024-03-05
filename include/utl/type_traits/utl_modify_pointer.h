@@ -20,8 +20,10 @@ using std::remove_pointer_t;
 
 #  else // UTL_CXX14
 
-template <typename T> using add_pointer_t = typename add_pointer<T>::type;
-template <typename T> using remove_pointer_t = typename remove_pointer<T>::type;
+template <typename T>
+using add_pointer_t = typename add_pointer<T>::type;
+template <typename T>
+using remove_pointer_t = typename remove_pointer<T>::type;
 
 #  endif // UTL_CXX14
 
@@ -49,11 +51,13 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct add_pointer {
+template <typename T>
+struct add_pointer {
     using type = UTL_BUILTIN_add_pointer(T);
 };
 
-template <typename T> using add_pointer_t = UTL_BUILTIN_add_pointer(T);
+template <typename T>
+using add_pointer_t = UTL_BUILTIN_add_pointer(T);
 
 UTL_NAMESPACE_END
 
@@ -65,19 +69,23 @@ UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace type_traits {
-template <typename T, typename = T&> remove_reference_t<T>* add_ptr(int) noexcept;
+template <typename T, typename = T&>
+remove_reference_t<T>* add_ptr(int) noexcept;
 template <typename T>
 auto add_ptr(float) noexcept
     -> decltype(static_cast<T* (*)(T const volatile*)>(0)((void const volatile*)0));
-template <typename T> T add_ptr(...) noexcept;
+template <typename T>
+T add_ptr(...) noexcept;
 } // namespace type_traits
 } // namespace details
 
-template <typename T> struct add_pointer {
+template <typename T>
+struct add_pointer {
     using type = decltype(details::type_traits::add_ptr<T>(0));
 };
 
-template <typename T> using add_pointer_t = decltype(details::type_traits::add_ptr<T>(0));
+template <typename T>
+using add_pointer_t = decltype(details::type_traits::add_ptr<T>(0));
 
 UTL_NAMESPACE_END
 
@@ -87,11 +95,13 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct remove_pointer {
+template <typename T>
+struct remove_pointer {
     using type = UTL_BUILTIN_remove_pointer(T);
 };
 
-template <typename T> using remove_pointer_t = UTL_BUILTIN_remove_pointer(T);
+template <typename T>
+using remove_pointer_t = UTL_BUILTIN_remove_pointer(T);
 
 UTL_NAMESPACE_END
 
@@ -99,23 +109,29 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct remove_pointer {
+template <typename T>
+struct remove_pointer {
     using type = T;
 };
-template <typename T> struct remove_pointer<T*> {
+template <typename T>
+struct remove_pointer<T*> {
     using type = T;
 };
-template <typename T> struct remove_pointer<T* const> {
+template <typename T>
+struct remove_pointer<T* const> {
     using type = T;
 };
-template <typename T> struct remove_pointer<T* volatile> {
+template <typename T>
+struct remove_pointer<T* volatile> {
     using type = T;
 };
-template <typename T> struct remove_pointer<T* const volatile> {
+template <typename T>
+struct remove_pointer<T* const volatile> {
     using type = T;
 };
 
-template <typename T> using remove_pointer_t = typename remove_pointer<T>::type;
+template <typename T>
+using remove_pointer_t = typename remove_pointer<T>::type;
 
 UTL_NAMESPACE_END
 

@@ -9,9 +9,11 @@ UTL_NAMESPACE_BEGIN
 
 using size_t = decltype(sizeof(0));
 
-template <size_t I, typename List> struct template_element;
+template <size_t I, typename List>
+struct template_element;
 
-template <typename List> struct template_size;
+template <typename List>
+struct template_size;
 
 template <size_t I, typename List>
 using template_element_t = typename template_element<I, List>::type;
@@ -21,16 +23,19 @@ struct template_element<0, List<Head, Tail...>> {
     using type = Head;
 };
 
-template <typename... T> struct type_list;
+template <typename... T>
+struct type_list;
 
 template <size_t I, template <typename...> class List, typename Head, typename... Tail>
 struct template_element<I, List<Head, Tail...>> : template_element<I - 1, type_list<Tail...>> {};
 
-template <template <typename...> class List, typename... Args> struct template_size<List<Args...>> {
+template <template <typename...> class List, typename... Args>
+struct template_size<List<Args...>> {
     static constexpr size_t value = sizeof...(Args);
 };
 
-template <typename T, typename List> struct template_count;
+template <typename T, typename List>
+struct template_count;
 
 template <typename T, template <typename...> class List>
 struct template_count<T, List<>> : integral_constant<size_t, 0> {};
@@ -53,16 +58,19 @@ template <typename T, template <typename...> class TList, typename Head, typenam
 struct template_index<T, TList<Head, Tail...>> :
     integral_constant<size_t, 1 + template_index<T, TList<Tail...>>::value> {};
 
-template <typename T, typename U> struct template_concat;
+template <typename T, typename U>
+struct template_concat;
 template <template <typename...> class List, typename... Ts, typename... Us>
 struct template_concat<List<Ts...>, List<Us...>> {
     using type = List<Ts..., Us...>;
 };
-template <typename T, typename U> using template_concat_t = typename template_concat<T, U>::type;
+template <typename T, typename U>
+using template_concat_t = typename template_concat<T, U>::type;
 
 #ifdef UTL_CXX17
 
-template <auto... V> struct auto_list;
+template <auto... V>
+struct auto_list;
 
 template <template <auto...> class List, auto Head, auto... Tail>
 struct template_element<0, List<Head, Tail...>> {
@@ -72,7 +80,8 @@ struct template_element<0, List<Head, Tail...>> {
 template <size_t I, template <auto...> class List, auto Head, auto... Tail>
 struct template_element<I, List<Head, Tail...>> : template_element<I - 1, auto_list<Tail...>> {};
 
-template <template <auto...> class List, auto... Tail> struct template_size<List<Tail...>> {
+template <template <auto...> class List, auto... Tail>
+struct template_size<List<Tail...>> {
     static constexpr size_t value = sizeof...(Tail);
 };
 
@@ -84,7 +93,8 @@ struct template_count<value_constant<T, Value>, List<Value, Tail...>> :
     integral_constant<size_t,
         1 + template_count<value_constant<T, Value>, auto_list<Tail...>>::value> {};
 
-template <auto V> using auto_constant = value_constant<decltype(V), V>;
+template <auto V>
+using auto_constant = value_constant<decltype(V), V>;
 
 #endif // ifdef UTL_CXX17
 

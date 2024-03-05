@@ -15,7 +15,8 @@ using std::is_class;
 #  ifdef UTL_CXX17
 using std::is_class_v;
 #  elif defined(UTL_CXX14) // ifdef UTL_CXX17
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_class_v = is_class<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_class_v = is_class<T>::value;
 #  endif                   // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
@@ -38,10 +39,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_class : bool_constant<UTL_BUILTIN_is_class(T)> {};
+template <typename T>
+struct is_class : bool_constant<UTL_BUILTIN_is_class(T)> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_class_v = UTL_BUILTIN_is_class(T);
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_class_v = UTL_BUILTIN_is_class(T);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -54,10 +57,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_class : undefined_trait<T> {};
+template <typename T>
+struct is_class : undefined_trait<T> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_class_v = is_class<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_class_v = is_class<T>::value;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END

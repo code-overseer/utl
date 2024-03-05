@@ -20,8 +20,10 @@ using std::is_unsigned_v;
 
 #  elif defined(UTL_CXX14) // ifdef UTL_CXX17
 
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_signed_v = is_signed<T>::value;
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_unsigned_v = is_unsigned<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_signed_v = is_signed<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_unsigned_v = is_unsigned<T>::value;
 
 #  endif // ifdef UTL_CXX17
 
@@ -50,10 +52,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_signed : bool_constant<UTL_BUILTIN_is_signed(T)> {};
+template <typename T>
+struct is_signed : bool_constant<UTL_BUILTIN_is_signed(T)> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_signed_v = UTL_BUILTIN_is_signed(T);
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_signed_v = UTL_BUILTIN_is_signed(T);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -71,7 +75,8 @@ template <typename T>
 struct is_signed : conjunction<is_arithmetic<T>, bool_constant<T(-1) < T(0)>> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_signed_v = is_signed<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_signed_v = is_signed<T>::value;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -84,10 +89,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_unsigned : bool_constant<UTL_BUILTIN_is_unsigned(T)> {};
+template <typename T>
+struct is_unsigned : bool_constant<UTL_BUILTIN_is_unsigned(T)> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_unsigned_v = UTL_BUILTIN_is_unsigned(T);
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_unsigned_v = UTL_BUILTIN_is_unsigned(T);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -104,10 +111,12 @@ UTL_NAMESPACE_BEGIN
 template <typename T>
     struct is_unsigned : conjunction < is_arithmetic<T>,
     bool_constant<T(-1)> T(0) >> {};
-template <> struct is_unsigned<bool> : true_type {};
+template <>
+struct is_unsigned<bool> : true_type {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_unsigned_v = is_unsigned<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_unsigned_v = is_unsigned<T>::value;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END

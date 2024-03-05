@@ -17,7 +17,8 @@ UTL_NAMESPACE_BEGIN
  * @result typename type - const-qualified Target iff there is a const-qualified type in the type
  * list
  */
-template <typename Target, typename TypeList> struct merge_const;
+template <typename Target, typename TypeList>
+struct merge_const;
 template <typename Target, template <typename...> class TypeList>
 struct merge_const<Target, TypeList<>> {
     using type = Target;
@@ -41,7 +42,8 @@ using merge_const_t = typename merge_const<Target, TypeList>::type;
  * @result typename type - volatile-qualified Target iff there is a volatile-qualified type in the
  * type list
  */
-template <typename Target, typename TypeList> struct merge_volatile;
+template <typename Target, typename TypeList>
+struct merge_volatile;
 template <typename Target, template <typename...> class TypeList>
 struct merge_volatile<Target, TypeList<>> {
     using type = Target;
@@ -65,7 +67,8 @@ using merge_volatile_t = typename merge_volatile<Target, TypeList>::type;
  * @result typename type - cv-qualified Target depending on the const/volatile-ness of the elements
  * in the typelist
  */
-template <typename Target, typename TypeList> struct merge_cv;
+template <typename Target, typename TypeList>
+struct merge_cv;
 template <typename Target, template <typename...> class TypeList>
 struct merge_cv<Target, TypeList<>> {
     using type = Target;

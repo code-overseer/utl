@@ -47,11 +47,16 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T, size_t Dim> struct extent : size_constant<0> {};
-template <typename T> struct extent<T[], 0> : size_constant<0> {};
-template <typename T, size_t Dim> struct extent<T[], Dim> : extent<T, Dim - 1> {};
-template <typename T> struct extent<T[N], 0> : size_constant<N> {};
-template <typename T, size_t Dim> struct extent<T[N], Dim> : extent<T, Dim - 1> {};
+template <typename T, size_t Dim>
+struct extent : size_constant<0> {};
+template <typename T>
+struct extent<T[], 0> : size_constant<0> {};
+template <typename T, size_t Dim>
+struct extent<T[], Dim> : extent<T, Dim - 1> {};
+template <typename T>
+struct extent<T[N], 0> : size_constant<N> {};
+template <typename T, size_t Dim>
+struct extent<T[N], Dim> : extent<T, Dim - 1> {};
 
 UTL_IMPLEMENT_VALUE_TRAIT(extent, (typename, T), (size_t, Dim))
 

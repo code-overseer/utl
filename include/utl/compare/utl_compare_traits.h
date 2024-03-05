@@ -12,57 +12,69 @@
 UTL_NAMESPACE_BEGIN
 
 namespace compare_ops {
-template <typename T, typename U = T, typename = void> struct has_eq : false_type {};
+template <typename T, typename U = T, typename = void>
+struct has_eq : false_type {};
 template <typename T, typename U>
 struct has_eq<T, U,
     enable_if_t<is_boolean_testable<decltype(declval<T>() == declval<U>())>::value>> : true_type {};
 
-template <typename T, typename U = T, typename = void> struct has_nothrow_eq : false_type {};
+template <typename T, typename U = T, typename = void>
+struct has_nothrow_eq : false_type {};
 template <typename T, typename U>
 struct has_nothrow_eq<T, U, enable_if_t<has_eq<T, U>::value>> :
     bool_constant<noexcept(declval<T>() == declval<U>())> {};
 
-template <typename T, typename U = T, typename = void> struct has_neq : false_type {};
+template <typename T, typename U = T, typename = void>
+struct has_neq : false_type {};
 template <typename T, typename U>
 struct has_neq<T, U,
     enable_if_t<is_boolean_testable<decltype(declval<T>() != declval<U>())>::value>> : true_type {};
-template <typename T, typename U = T, typename = void> struct has_nothrow_neq : false_type {};
+template <typename T, typename U = T, typename = void>
+struct has_nothrow_neq : false_type {};
 template <typename T, typename U>
 struct has_nothrow_neq<T, U, enable_if_t<has_neq<T, U>::value>> :
     bool_constant<noexcept(declval<T>() != declval<U>())> {};
 
-template <typename T, typename U = T, typename = void> struct has_lt : false_type {};
+template <typename T, typename U = T, typename = void>
+struct has_lt : false_type {};
 template <typename T, typename U>
 struct has_lt<T, U,
     enable_if_t<is_boolean_testable<decltype(declval<T>() < declval<U>())>::value>> : true_type {};
-template <typename T, typename U = T, typename = void> struct has_nothrow_lt : false_type {};
+template <typename T, typename U = T, typename = void>
+struct has_nothrow_lt : false_type {};
 template <typename T, typename U>
 struct has_nothrow_lt<T, U, enable_if_t<has_lt<T, U>::value>> :
     bool_constant<noexcept(declval<T>() < declval<U>())> {};
 
-template <typename T, typename U = T, typename = void> struct has_gt : false_type {};
+template <typename T, typename U = T, typename = void>
+struct has_gt : false_type {};
 template <typename T, typename U>
 struct has_gt<T, U,
     enable_if_t<is_boolean_testable<decltype(declval<T>() > declval<U>())>::value>> : true_type {};
-template <typename T, typename U = T, typename = void> struct has_nothrow_gt : false_type {};
+template <typename T, typename U = T, typename = void>
+struct has_nothrow_gt : false_type {};
 template <typename T, typename U>
 struct has_nothrow_gt<T, U, enable_if_t<has_gt<T, U>::value>> :
     bool_constant<noexcept(declval<T>() > declval<U>())> {};
 
-template <typename T, typename U = T, typename = void> struct has_lteq : false_type {};
+template <typename T, typename U = T, typename = void>
+struct has_lteq : false_type {};
 template <typename T, typename U>
 struct has_lteq<T, U,
     enable_if_t<is_boolean_testable<decltype(declval<T>() <= declval<U>())>::value>> : true_type {};
-template <typename T, typename U = T, typename = void> struct has_nothrow_lteq : false_type {};
+template <typename T, typename U = T, typename = void>
+struct has_nothrow_lteq : false_type {};
 template <typename T, typename U>
 struct has_nothrow_lteq<T, U, enable_if_t<has_lteq<T, U>::value>> :
     bool_constant<noexcept(declval<T>() <= declval<U>())> {};
 
-template <typename T, typename U = T, typename = void> struct has_gteq : false_type {};
+template <typename T, typename U = T, typename = void>
+struct has_gteq : false_type {};
 template <typename T, typename U>
 struct has_gteq<T, U,
     enable_if_t<is_boolean_testable<decltype(declval<T>() >= declval<U>())>::value>> : true_type {};
-template <typename T, typename U = T, typename = void> struct has_nothrow_gteq : false_type {};
+template <typename T, typename U = T, typename = void>
+struct has_nothrow_gteq : false_type {};
 template <typename T, typename U>
 struct has_nothrow_gteq<T, U, enable_if_t<has_gteq<T, U>::value>> :
     bool_constant<noexcept(declval<T>() >= declval<U>())> {};
@@ -82,13 +94,15 @@ template <typename T, typename U>
 struct is_nonequality_comparable<T, U,
     enable_if_t<is_boolean_testable<decltype(declval<T>() != declval<U>())>::value>> : true_type {};
 
-template <typename T, typename U = T, typename = void> struct is_less_comparable : false_type {};
+template <typename T, typename U = T, typename = void>
+struct is_less_comparable : false_type {};
 
 template <typename T, typename U>
 struct is_less_comparable<T, U,
     enable_if_t<is_boolean_testable<decltype(declval<T>() < declval<U>())>::value>> : true_type {};
 
-template <typename T, typename U = T, typename = void> struct is_greater_comparable : false_type {};
+template <typename T, typename U = T, typename = void>
+struct is_greater_comparable : false_type {};
 
 template <typename T, typename U>
 struct is_greater_comparable<T, U,
@@ -111,37 +125,43 @@ struct is_greater_equal_comparable<T, U,
 namespace details {
 namespace compare_traits {
 
-template <typename T, typename U> auto nothrow_equality_test(float) -> false_type;
+template <typename T, typename U>
+auto nothrow_equality_test(float) -> false_type;
 
 template <typename T, typename U>
 auto nothrow_equality_test(int)
     -> bool_constant<noexcept(static_cast<bool>(declval<T>() == declval<U>()))>;
 
-template <typename T, typename U> auto nothrow_nonequality_test(float) -> false_type;
+template <typename T, typename U>
+auto nothrow_nonequality_test(float) -> false_type;
 
 template <typename T, typename U>
 auto nothrow_nonequality_test(int)
     -> bool_constant<noexcept(static_cast<bool>(declval<T>() != declval<U>()))>;
 
-template <typename T, typename U> auto nothrow_less_test(float) -> false_type;
+template <typename T, typename U>
+auto nothrow_less_test(float) -> false_type;
 
 template <typename T, typename U>
 auto nothrow_less_test(int)
     -> bool_constant<noexcept(static_cast<bool>(declval<T>() < declval<U>()))>;
 
-template <typename T, typename U> auto nothrow_greater_test(float) -> false_type;
+template <typename T, typename U>
+auto nothrow_greater_test(float) -> false_type;
 
 template <typename T, typename U>
 auto nothrow_greater_test(int)
     -> bool_constant<noexcept(static_cast<bool>(declval<T>() > declval<U>()))>;
 
-template <typename T, typename U> auto nothrow_less_equal_test(float) -> false_type;
+template <typename T, typename U>
+auto nothrow_less_equal_test(float) -> false_type;
 
 template <typename T, typename U>
 auto nothrow_less_equal_test(int)
     -> bool_constant<noexcept(static_cast<bool>(declval<T>() <= declval<U>()))>;
 
-template <typename T, typename U> auto nothrow_greater_equal_test(float) -> false_type;
+template <typename T, typename U>
+auto nothrow_greater_equal_test(float) -> false_type;
 
 template <typename T, typename U>
 auto nothrow_greater_equal_test(int)
@@ -179,7 +199,8 @@ struct is_nothrow_greater_equal_comparable : R {};
 namespace details {
 namespace compare_traits {
 
-template <typename T, typename U, typename Cat> false_type three_way_comparable_with_test(...);
+template <typename T, typename U, typename Cat>
+false_type three_way_comparable_with_test(...);
 
 template <typename T, typename U, typename Cat>
 auto three_way_comparable_with_test(int)

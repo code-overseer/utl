@@ -15,7 +15,8 @@ using std::is_object;
 #  ifdef UTL_CXX17
 using std::is_object_v;
 #  elif defined(UTL_CXX14) // ifdef UTL_CXX17
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_object_v = is_object<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_object_v = is_object<T>::value;
 #  endif                   // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
@@ -38,10 +39,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_object : bool_constant<UTL_BUILTIN_is_object(T)> {};
+template <typename T>
+struct is_object : bool_constant<UTL_BUILTIN_is_object(T)> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_object_v = UTL_BUILTIN_is_object(T);
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_object_v = UTL_BUILTIN_is_object(T);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -63,7 +66,8 @@ struct is_object :
         is_class<T>::value> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_object_v = is_object<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_object_v = is_object<T>::value;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END

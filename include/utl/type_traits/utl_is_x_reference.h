@@ -22,7 +22,8 @@ using std::is_rvalue_reference_v;
 
 #  elif defined(UTL_CXX14) // ifdef UTL_CXX17
 
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_reference_v = is_reference<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_reference_v = is_reference<T>::value;
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_lvalue_reference_v = is_lvalue_reference<T>::value;
 template <typename T>
@@ -64,10 +65,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_reference : bool_constant<UTL_BUILTIN_is_reference(T)> {};
+template <typename T>
+struct is_reference : bool_constant<UTL_BUILTIN_is_reference(T)> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_reference_v = UTL_BUILTIN_is_reference(T);
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_reference_v = UTL_BUILTIN_is_reference(T);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -76,14 +79,18 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_reference : false_type {};
+template <typename T>
+struct is_reference : false_type {};
 
-template <typename T> struct is_reference<T&> : true_type {};
+template <typename T>
+struct is_reference<T&> : true_type {};
 
-template <typename T> struct is_reference<T&&> : true_type {};
+template <typename T>
+struct is_reference<T&&> : true_type {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_reference_v = is_reference<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_reference_v = is_reference<T>::value;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -108,9 +115,11 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_lvalue_reference : false_type {};
+template <typename T>
+struct is_lvalue_reference : false_type {};
 
-template <typename T> struct is_lvalue_reference<T&> : true_type {};
+template <typename T>
+struct is_lvalue_reference<T&> : true_type {};
 
 #    ifdef UTL_CXX14
 template <typename T>
@@ -139,9 +148,11 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_rvalue_reference : false_type {};
+template <typename T>
+struct is_rvalue_reference : false_type {};
 
-template <typename T> struct is_rvalue_reference<T&&> : true_type {};
+template <typename T>
+struct is_rvalue_reference<T&&> : true_type {};
 
 #    ifdef UTL_CXX14
 template <typename T>

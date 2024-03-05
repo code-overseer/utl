@@ -15,7 +15,8 @@ using std::is_enum;
 #  ifdef UTL_CXX17
 using std::is_enum_v;
 #  elif defined(UTL_CXX14) // ifdef UTL_CXX17
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_enum_v = is_enum<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_enum_v = is_enum<T>::value;
 #  endif                   // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
@@ -38,10 +39,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_enum : bool_constant<UTL_BUILTIN_is_enum(T)> {};
+template <typename T>
+struct is_enum : bool_constant<UTL_BUILTIN_is_enum(T)> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_enum_v = UTL_BUILTIN_is_enum(T);
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_enum_v = UTL_BUILTIN_is_enum(T);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -54,10 +57,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct is_enum : undefined_trait<T> {};
+template <typename T>
+struct is_enum : undefined_trait<T> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_enum_v = is_enum<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_enum_v = is_enum<T>::value;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END

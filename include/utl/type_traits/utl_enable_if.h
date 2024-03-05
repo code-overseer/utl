@@ -6,13 +6,16 @@
 
 UTL_NAMESPACE_BEGIN
 
-template <bool, typename = void> struct enable_if;
+template <bool, typename = void>
+struct enable_if;
 
-template <typename T> struct enable_if<true, T> {
+template <typename T>
+struct enable_if<true, T> {
     using type = T;
 };
 
-template <bool B, typename T = void> using enable_if_t = typename enable_if<B, T>::type;
+template <bool B, typename T = void>
+using enable_if_t = typename enable_if<B, T>::type;
 
 UTL_NAMESPACE_END
 

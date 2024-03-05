@@ -15,7 +15,8 @@ using std::is_arithmetic;
 #  ifdef UTL_CXX17
 using std::is_arithmetic_v;
 #  elif defined(UTL_CXX14) // ifdef UTL_CXX17
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_arithmetic_v = is_arithmetic<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_arithmetic_v = is_arithmetic<T>::value;
 #  endif                   // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
@@ -34,7 +35,8 @@ template <typename T>
 struct is_arithmetic : bool_constant<is_integral<T>::value || is_floating_point<T>::value> {};
 
 #  ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_arithmetic_v = is_arithmetic<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_arithmetic_v = is_arithmetic<T>::value;
 #  endif // UTL_CXX14
 
 UTL_NAMESPACE_END

@@ -76,7 +76,8 @@ template <typename Base, typename Derive>
 struct is_base_of : type_traits::details::is_unambiguous_public_inheritance<Base, Derive> {};
 
 #    ifdef UTL_CXX14
-template <typename T> UTL_INLINE_CXX17 constexpr bool is_base_of_v = is_base_of<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_base_of_v = is_base_of<T>::value;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END

@@ -7,14 +7,18 @@
 
 UTL_NAMESPACE_BEGIN
 
-template <typename From, typename To> struct copy_cvref : copy_cv<From, To> {};
-template <typename From, typename To> struct copy_cvref<From&, To> {
+template <typename From, typename To>
+struct copy_cvref : copy_cv<From, To> {};
+template <typename From, typename To>
+struct copy_cvref<From&, To> {
     using type = typename copy_cv<From, To>::type&;
 };
-template <typename From, typename To> struct copy_cvref<From&&, To> {
+template <typename From, typename To>
+struct copy_cvref<From&&, To> {
     using type = typename copy_cv<From, To>::type&&;
 };
 
-template <typename F, typename T> using copy_cvref_t = typename copy_cvref<F, T>::type;
+template <typename F, typename T>
+using copy_cvref_t = typename copy_cvref<F, T>::type;
 
 UTL_NAMESPACE_END

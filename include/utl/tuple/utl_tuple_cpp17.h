@@ -36,7 +36,8 @@ UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace tuple {
-template <typename, typename, typename = void> struct common_type_impl {};
+template <typename, typename, typename = void>
+struct common_type_impl {};
 
 template <typename... Ts, typename... Us>
 struct common_type_impl<UTL_SCOPE tuple<Ts...>, UTL_SCOPE tuple<Us...>,
@@ -77,7 +78,8 @@ UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace tuple {
-template <typename...> struct invalid_swap_t {
+template <typename...>
+struct invalid_swap_t {
     inline UTL_CONSTEXPR_CXX14 void swap(invalid_swap_t& other) const noexcept {}
     inline UTL_CONSTEXPR_CXX14 void swap(invalid_swap_t const& other) const noexcept {}
 
@@ -85,21 +87,25 @@ private:
     ~invalid_swap_t() = default;
 };
 
-template <typename...> struct storage;
-template <size_t I, typename T, typename = void> struct offset_impl;
+template <typename...>
+struct storage;
+template <size_t I, typename T, typename = void>
+struct offset_impl;
 struct invalid_t {
 private:
     ~invalid_t() = default;
 };
 
-template <> struct storage<> {
+template <>
+struct storage<> {
     constexpr storage() noexcept = default;
-    constexpr storage&       operator= (storage const&) noexcept = default;
-    constexpr storage&       operator= (storage&&) noexcept = default;
+    constexpr storage&       operator=(storage const&) noexcept = default;
+    constexpr storage&       operator=(storage&&) noexcept = default;
     UTL_CONSTEXPR_CXX14 void swap(storage<>& other) noexcept {}
 };
 
-template <typename T> struct storage<T> : variadic_traits<T> {
+template <typename T>
+struct storage<T> : variadic_traits<T> {
 public:
     using traits = variadic_traits<T>;
     using head_type = T;
@@ -108,16 +114,16 @@ public:
 
     constexpr storage() noexcept(traits::is_nothrow_default_constructible) = default;
     constexpr storage(storage const&) noexcept(traits::is_nothrow_copy_constructible) = default;
-    UTL_CONSTEXPR_CXX14 storage& operator= (storage const&) noexcept(
+    UTL_CONSTEXPR_CXX14 storage& operator=(storage const&) noexcept(
         traits::is_nothrow_copy_assignable) = default;
 
 #ifdef UTL_ENFORCE_NONMOVABILIITY
     constexpr storage(move_construct_t&&) noexcept(traits::is_nothrow_move_constructible) = delete;
-    UTL_CONSTEXPR_CXX14 storage& operator= (move_assign_t&&) noexcept(
+    UTL_CONSTEXPR_CXX14 storage& operator=(move_assign_t&&) noexcept(
         traits::is_nothrow_move_assignable) = delete;
 #else
     constexpr storage(storage&&) noexcept(traits::is_nothrow_move_constructible) = default;
-    UTL_CONSTEXPR_CXX14 storage& operator= (storage&&) noexcept(
+    UTL_CONSTEXPR_CXX14 storage& operator=(storage&&) noexcept(
         traits::is_nothrow_move_assignable) = default;
 #endif
 
@@ -237,7 +243,8 @@ public:
     UTL_ATTRIBUTE(NO_UNIQUE_ADDRESS) head_type head;
 };
 
-template <typename T, typename... Tail> struct storage<T, Tail...> : variadic_traits<T, Tail...> {
+template <typename T, typename... Tail>
+struct storage<T, Tail...> : variadic_traits<T, Tail...> {
     using traits = variadic_traits<T, Tail...>;
     using head_type = T;
     using tail_type = storage<Tail...>;
@@ -246,16 +253,16 @@ template <typename T, typename... Tail> struct storage<T, Tail...> : variadic_tr
 
     constexpr storage() noexcept(traits::is_nothrow_default_constructible) = default;
     constexpr storage(storage const&) noexcept(traits::is_nothrow_copy_constructible) = default;
-    UTL_CONSTEXPR_CXX14 storage& operator= (storage const&) noexcept(
+    UTL_CONSTEXPR_CXX14 storage& operator=(storage const&) noexcept(
         traits::is_nothrow_copy_assignable) = default;
 
 #ifdef UTL_ENFORCE_NONMOVABILIITY
     constexpr storage(move_construct_t&&) noexcept(traits::is_nothrow_move_constructible) = delete;
-    UTL_CONSTEXPR_CXX14 storage& operator= (move_assign_t&&) noexcept(
+    UTL_CONSTEXPR_CXX14 storage& operator=(move_assign_t&&) noexcept(
         traits::is_nothrow_move_assignable) = delete;
 #else
     constexpr storage(storage&&) noexcept(traits::is_nothrow_move_constructible) = default;
-    UTL_CONSTEXPR_CXX14 storage& operator= (storage&&) noexcept(
+    UTL_CONSTEXPR_CXX14 storage& operator=(storage&&) noexcept(
         traits::is_nothrow_move_assignable) = default;
 #endif
 
@@ -427,7 +434,8 @@ template <typename T, typename... Tail> struct storage<T, Tail...> : variadic_tr
     UTL_ATTRIBUTE(NO_UNIQUE_ADDRESS) tail_type tail;
 };
 
-template <typename... Ts> struct offset_impl<0, storage<Ts...>> {
+template <typename... Ts>
+struct offset_impl<0, storage<Ts...>> {
     using type = storage<Ts...>;
     static_assert(is_standard_layout<type>::value, "Must be standard layout");
     static constexpr size_t value = offsetof(type, head);
@@ -445,7 +453,8 @@ struct offset_impl<I, storage<T0, Ts...>, enable_if_t<(I > 0)>> {
 } // namespace tuple
 } // namespace details
 
-template <> class tuple<> : private details::tuple::storage<> {
+template <>
+class tuple<> : private details::tuple::storage<> {
 public:
     using storage::storage;
     using storage::operator=;
@@ -453,9 +462,11 @@ public:
     friend inline UTL_CONSTEXPR_CXX14 void swap(tuple const&, tuple const&) noexcept {}
 };
 
-template <typename... Types> class tuple : private details::tuple::storage<Types...> {
+template <typename... Types>
+class tuple : private details::tuple::storage<Types...> {
 private:
-    template <size_t I, typename T> friend struct tuple_element_offset;
+    template <size_t I, typename T>
+    friend struct tuple_element_offset;
 
     using base_type = details::tuple::storage<Types...>;
     using traits = typename base_type::traits;
@@ -467,7 +478,8 @@ private:
         conditional_t<traits::is_move_assignable, details::tuple::invalid_t, tuple>;
     using move_construct_t =
         conditional_t<traits::is_move_constructible, details::tuple::invalid_t, tuple>;
-    template <typename T> using not_this = negation<is_same<T, tuple>>;
+    template <typename T>
+    using not_this = negation<is_same<T, tuple>>;
     using base_type::get;
 
     template <typename TupleLike, size_t... Is>
@@ -505,24 +517,24 @@ private:
 
 public:
     constexpr tuple(tuple const&) noexcept(traits::is_nothrow_copy_constructible) = default;
-    UTL_CONSTEXPR_CXX14 tuple& operator= (tuple const& other) noexcept(
+    UTL_CONSTEXPR_CXX14 tuple& operator=(tuple const& other) noexcept(
         traits::is_nothrow_copy_assignable) = default;
     constexpr tuple(tuple&&) noexcept(traits::is_nothrow_move_constructible) = default;
-    UTL_CONSTEXPR_CXX14 tuple& operator= (tuple&&) noexcept(
+    UTL_CONSTEXPR_CXX14 tuple& operator=(tuple&&) noexcept(
         traits::is_nothrow_move_assignable) = default;
 
     UTL_CONSTEXPR_CXX20 ~tuple() = default;
 
     template <bool NotEmpty = (sizeof...(Types) >= 1),
         typename = enable_if_t<NotEmpty && traits::is_const_copy_assignable>>
-    constexpr tuple const& operator= (tuple const& other) const
+    constexpr tuple const& operator=(tuple const& other) const
         noexcept(traits::is_nothrow_const_copy_assignable) {
         return assign(other, index_sequence_for<Types...>{});
     }
 
     template <bool NotEmpty = (sizeof...(Types) >= 1),
         typename = enable_if_t<NotEmpty && traits::is_const_move_assignable>>
-    constexpr tuple const& operator= (tuple&& other) const
+    constexpr tuple const& operator=(tuple&& other) const
         noexcept(traits::is_nothrow_const_move_assignable) {
         return assign(move(other), index_sequence_for<Types...>{});
     }
@@ -1230,7 +1242,7 @@ public:
     template <typename... UTypes,
         typename = enable_if_t<
             conjunction<typename traits::template is_assignable<UTypes const&...>>::value>>
-    UTL_CONSTEXPR_CXX14 tuple& operator= (tuple<UTypes...> const& other) noexcept(
+    UTL_CONSTEXPR_CXX14 tuple& operator=(tuple<UTypes...> const& other) noexcept(
         traits::template is_nothrow_assignable<UTypes const&...>::value) {
         return assign(other, index_sequence_for<Types...>{});
     }
@@ -1238,7 +1250,7 @@ public:
     template <typename... UTypes,
         typename = enable_if_t<
             conjunction<typename traits::template is_const_assignable<UTypes const&...>>::value>>
-    constexpr tuple const& operator= (tuple<UTypes...> const& other) const
+    constexpr tuple const& operator=(tuple<UTypes...> const& other) const
         noexcept(traits::template is_nothrow_const_assignable<UTypes const&...>::value) {
         return assign(other, index_sequence_for<Types...>{});
     }
@@ -1247,7 +1259,7 @@ public:
     template <typename... UTypes,
         enable_if_t<conjunction<typename traits::template is_assignable<UTypes&&...>>::value, int> =
             0>
-    UTL_CONSTEXPR_CXX14 tuple& operator= (tuple<UTypes...>&& other) noexcept(
+    UTL_CONSTEXPR_CXX14 tuple& operator=(tuple<UTypes...>&& other) noexcept(
         traits::template is_nothrow_assignable<UTypes&&...>::value) {
         return assign(move(other), index_sequence_for<Types...>{});
     }
@@ -1256,12 +1268,12 @@ public:
         enable_if_t<
             disjunction<negation<typename traits::template is_assignable<UTypes&&...>>>::value,
             int> = 1>
-    UTL_CONSTEXPR_CXX14 tuple& operator= (tuple<UTypes...>&& other) = delete;
+    UTL_CONSTEXPR_CXX14 tuple& operator=(tuple<UTypes...>&& other) = delete;
 
     template <typename... UTypes,
         enable_if_t<conjunction<typename traits::template is_const_assignable<UTypes&&...>>::value,
             int> = 0>
-    constexpr tuple const& operator= (tuple<UTypes...>&& other) const
+    constexpr tuple const& operator=(tuple<UTypes...>&& other) const
         noexcept(traits::template is_nothrow_const_assignable<UTypes&&...>::value) {
         return assign(move(other), index_sequence_for<Types...>{});
     }
@@ -1274,7 +1286,7 @@ public:
         enable_if_t<disjunction<negation<
                         typename traits::template is_const_assignable<UTypes&&...>>>::value,
             int> = 1>
-    constexpr tuple const& operator= (tuple<UTypes...>&& other) const = delete;
+    constexpr tuple const& operator=(tuple<UTypes...>&& other) const = delete;
 #endif
 
 public:
@@ -1284,7 +1296,7 @@ public:
                         TT_SCOPE rebind_references_t<traits::template is_assignable, TupleLike,
                             sizeof...(Types)>>::value,
             int> = 0>
-    UTL_CONSTEXPR_CXX14 tuple& operator= (TupleLike&& other) noexcept(
+    UTL_CONSTEXPR_CXX14 tuple& operator=(TupleLike&& other) noexcept(
         conjunction<TT_SCOPE is_all_nothrow_gettable<TupleLike, sizeof...(Types)>,
             TT_SCOPE         rebind_references_t<traits::template is_nothrow_assignable, TupleLike,
                 sizeof...(Types)>>::value) {
@@ -1297,7 +1309,7 @@ public:
                         TT_SCOPE rebind_references_t<traits::template is_const_assignable,
                             TupleLike, sizeof...(Types)>>::value,
             int> = 1>
-    constexpr tuple const& operator= (TupleLike&& other) const
+    constexpr tuple const& operator=(TupleLike&& other) const
         noexcept(conjunction<TT_SCOPE is_all_nothrow_gettable<TupleLike, sizeof...(Types)>,
             TT_SCOPE rebind_references_t<traits::template is_nothrow_const_assignable, TupleLike,
                 sizeof...(Types)>>::value) {
@@ -1305,7 +1317,8 @@ public:
     }
 };
 
-template <size_t I, typename T> struct tuple_element_offset;
+template <size_t I, typename T>
+struct tuple_element_offset;
 
 template <size_t I, typename... Ts>
 struct tuple_element_offset<I, tuple<Ts...>> :
@@ -1363,7 +1376,7 @@ constexpr bool equals(T const& l, U const& r) noexcept(compare_ops::has_nothrow_
 template <typename... Ts, typename... Us>
 UTL_NODISCARD constexpr enable_if_t<
     conjunction<compare_ops::all_have_eq<tuple<Ts...>, tuple<Us...>>>::value, bool>
-operator== (tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(details::tuple::equals(l, r)) {
+operator==(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(details::tuple::equals(l, r)) {
     return details::tuple::equals(l, r);
 }
 
@@ -1372,44 +1385,44 @@ UTL_NODISCARD constexpr enable_if_t<
     conjunction<compare_ops::all_have_eq<tuple<Ts...>, tuple<Us...>>,
         compare_ops::all_have_lt<tuple<Ts...>, tuple<Us...>>>::value,
     bool>
-operator< (tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(details::tuple::less(l, r)) {
+operator<(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(details::tuple::less(l, r)) {
     return details::tuple::less(l, r);
 }
 
 UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr bool operator== (tuple<> const& l, tuple<> const& r) noexcept {
+constexpr bool operator==(tuple<> const& l, tuple<> const& r) noexcept {
     return true;
 }
 
 UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr bool operator< (tuple<> const& l, tuple<> const& r) noexcept {
+constexpr bool operator<(tuple<> const& l, tuple<> const& r) noexcept {
     return false;
 }
 
 template <typename... Ts, typename... Us>
 UTL_NODISCARD constexpr enable_if_t<compare_ops::has_eq<tuple<Ts...>, tuple<Us...>>::value, bool>
-operator!= (tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
+operator!=(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
     is_nothrow_equality_comparable<tuple<Ts...>, tuple<Us...>>::value) {
     return !(l == r);
 }
 
 template <typename... Ts, typename... Us>
 UTL_NODISCARD constexpr enable_if_t<compare_ops::has_lt<tuple<Us...>, tuple<Ts...>>::value, bool>
-operator<= (tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
+operator<=(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
     compare_ops::has_nothrow_lt<tuple<Us...>, tuple<Ts...>>::value) {
     return !(r < l);
 }
 
 template <typename... Ts, typename... Us>
 UTL_NODISCARD constexpr enable_if_t<compare_ops::has_lt<tuple<Us...>, tuple<Ts...>>::value, bool>
-operator> (tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
+operator>(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
     compare_ops::has_nothrow_lt<tuple<Us...>, tuple<Ts...>>::value) {
     return static_cast<bool>(r < l);
 }
 
 template <typename... Ts, typename... Us>
 UTL_NODISCARD constexpr enable_if_t<compare_ops::has_lt<tuple<Ts...>, tuple<Us...>>::value, bool>
-operator>= (tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
+operator>=(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
     compare_ops::has_nothrow_lt<tuple<Ts...>, tuple<Us...>>::value) {
     return !(l < r);
 }

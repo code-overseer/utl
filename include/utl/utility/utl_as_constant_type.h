@@ -26,8 +26,10 @@ constexpr integral_constant<decltype(V), V> as_integral_constant() noexcept {
     return {};
 }
 
-template <auto V> using index_constant_t = decltype(as_index_constant<V>());
-template <auto V> using integral_constant_t = decltype(as_integral_constant<V>());
+template <auto V>
+using index_constant_t = decltype(as_index_constant<V>());
+template <auto V>
+using integral_constant_t = decltype(as_integral_constant<V>());
 
 UTL_NAMESPACE_END
 

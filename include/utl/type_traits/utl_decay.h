@@ -18,7 +18,8 @@ using std::decay_t;
 
 #  else // UTL_CXX14
 
-template <typename T> using decay_t = typename decay<T>::type;
+template <typename T>
+using decay_t = typename decay<T>::type;
 
 #  endif // UTL_CXX14
 
@@ -38,11 +39,13 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T> struct decay {
+template <typename T>
+struct decay {
     using type = UTL_BUILTIN_decay(T);
 };
 
-template <typename T> using decay_t = UTL_BUILTIN_decay(T);
+template <typename T>
+using decay_t = UTL_BUILTIN_decay(T);
 
 UTL_NAMESPACE_END
 
@@ -57,25 +60,30 @@ UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace type_traits {
-template <typename T, typename = void> struct decay_impl {
+template <typename T, typename = void>
+struct decay_impl {
     using type = remove_cv_t<T>;
 };
 
-template <typename T> struct decay_impl<T, enable_if_t<is_function<T>::value>> {
+template <typename T>
+struct decay_impl<T, enable_if_t<is_function<T>::value>> {
     using type = T*;
 };
 
-template <typename T> struct decay_impl<T[]> {
+template <typename T>
+struct decay_impl<T[]> {
     using type = T*;
 };
 
-template <typename T, size_t N> struct decay_impl<T[N]> {
+template <typename T, size_t N>
+struct decay_impl<T[N]> {
     using type = T*;
 };
 } // namespace type_traits
 } // namespace details
 
-template <typename T> struct decay : details::type_traits::decay_impl<remove_reference_t<T>> {};
+template <typename T>
+struct decay : details::type_traits::decay_impl<remove_reference_t<T>> {};
 
 using decay_t = typename details::type_traits::decay_impl<remove_reference_t<T>>::type;
 
