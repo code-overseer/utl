@@ -17,33 +17,33 @@
 
 #define UTL_IE_CONCAT5(_0, _1, _2, _3, _4) _0##_1##_2##_3##_4
 #define UTL_IE_EMPTY_CASE_0001 ,
+/* clang-format off */
+#define UTL_IS_EMPTY_(_0, _1, _2, _3) UTL_IE_HAS_COMMA(UTL_IE_CONCAT5(UTL_IE_EMPTY_CASE_, _0, _1, _2, _3))
+#define UTL_IS_EMPTY(...)                                                        \
+UTL_IS_EMPTY_(                                                                   \
+          /* test if there is just one argument, eventually an empty             \
+             one */                                                              \
+          UTL_PASTE(UTL_IE_HAS_COMMA(__VA_ARGS__)),                              \
+          /* test if _TRIGGER_PARENTHESIS_ together with the argument            \
+             adds a comma */                                                     \
+          UTL_PASTE(UTL_IE_HAS_COMMA(UTL_IE_TRIGGER_PARENTHESIS __VA_ARGS__)),   \
+          /* test if the argument together with a parenthesis                    \
+             adds a comma */                                                     \
+          UTL_PASTE(UTL_IE_HAS_COMMA(__VA_ARGS__ ())),                           \
+          /* test if placing it between UTL_TRIGGER_PARENTHESIS and the          \
+             parenthesis adds a comma */                                         \
+          UTL_PASTE(UTL_IE_HAS_COMMA(UTL_IE_TRIGGER_PARENTHESIS __VA_ARGS__ ())) \
+          )
+/* clang-format on */
 
-#define UTL_IS_EMPTY_(_0, _1, _2, _3) \
-    UTL_IE_HAS_COMMA(UTL_IE_CONCAT5(UTL_IE_EMPTY_CASE_, _0, _1, _2, _3))
-#define UTL_IS_EMPTY(...)                                                                        \
-    UTL_IS_EMPTY_(/* test if there is just one argument, eventually an empty                     \
-                     one */                                                                      \
-        UTL_PASTE(UTL_IE_HAS_COMMA(__VA_ARGS__)), /* test if _TRIGGER_PARENTHESIS_ together with \
-                                                     the argument adds a comma */                \
-        UTL_PASTE(UTL_IE_HAS_COMMA(                                                              \
-            UTL_IE_TRIGGER_PARENTHESIS __VA_ARGS__)), /* test if the argument together with a    \
-                                                         parenthesis adds a comma */             \
-        UTL_PASTE(UTL_IE_HAS_COMMA(                                                              \
-            __VA_ARGS__())), /* test if placing it between UTL_TRIGGER_PARENTHESIS and the       \
-                                parenthesis adds a comma */                                      \
-        UTL_PASTE(UTL_IE_HAS_COMMA(UTL_IE_TRIGGER_PARENTHESIS __VA_ARGS__())))
-
-#define UTL_C89_STATIC_ASSERT(COND, MSG) typedef char static_assertion_##MSG[(!!(COND)) * 2 - 1]
-#define UTL_C89_COMPILE_TIME_ASSERT3(X, L) UTL_C89_STATIC_ASSERT(X, LINE##L)
-#define UTL_C89_COMPILE_TIME_ASSERT2(X, L) UTL_C89_COMPILE_TIME_ASSERT3(X, L)
-#define UTL_C89_COMPILE_TIME_ASSERT(X) UTL_C89_COMPILE_TIME_ASSERT2(X, __LINE__)
+#define UTL_C89_STATIC_ASSERT_3(COND, MSG) typedef char static_assertion[(!!(COND)) * 2 - 1]
+#define UTL_C89_STATIC_ASSERT_2(X, L) UTL_C89_STATIC_ASSERT_3(X, LINE##L)
+#define UTL_C89_STATIC_ASSERT_1(X, L) UTL_C89_STATIC_ASSERT_2(X, L)
+#define UTL_C89_STATIC_ASSERT(X) UTL_C89_STATIC_ASSERT_1(X, __LINE__)
 UTL_C89_STATIC_ASSERT(UTL_IS_EMPTY());
 UTL_C89_STATIC_ASSERT(!UTL_IS_EMPTY(XYZ));
 UTL_C89_STATIC_ASSERT(!UTL_IS_EMPTY(A, B, C));
-#undef UTL_C89_COMPILE_TIME_ASSERT
-#undef UTL_C89_COMPILE_TIME_ASSERT2
-#undef UTL_C89_COMPILE_TIME_ASSERT3
-#undef UTL_C89_STATIC_ASSERT
+
 /**
  * Appends the result of IS_EMPTY to a prefix, used to resolve macro overloads
  *
