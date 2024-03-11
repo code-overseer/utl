@@ -2,11 +2,5 @@
 
 #pragma once
 
-#define ASSERT(...)
-#define ASSERT_MSG(...)
-
-#define BREAK(...)
-#define BREAK_MSG(...)
-
-#define BREAK_IF(...)
-#define BREAK_IF_MSG(...)
+#define UTL_ASSERT(...)
+#define UTL_ASSERT_MSG(...)
