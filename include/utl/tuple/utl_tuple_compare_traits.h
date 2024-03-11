@@ -175,8 +175,8 @@ template <typename T, typename U, typename Cat, size_t... Is>
 auto all_three_way_comparable_with_test(int, index_sequence<Is...>)
     -> bool_constant<tuple_size<T>::value == tuple_size<U>::value &&
         conjunction<decltype(three_way_comparable_with_test<
-            remove_cvref_t<decltype(TT_SCOPE get<Is>(declval<T>()))>,
-            remove_cvref_t<decltype(TT_SCOPE get<Is>(declval<U>()))>, Cat>(0))...>::value>;
+            remove_cvref_t<decltype(UTL_TUPLE_GET(Is, declval<T>()))>,
+            remove_cvref_t<decltype(UTL_TUPLE_GET(Is, declval<U>()))>, Cat>(0))...>::value>;
 
 template <typename T, typename U, typename Cat, size_t... Is>
 auto all_nothrow_three_way_comparable_with_test(float, index_sequence<Is...>) -> false_type;
@@ -186,8 +186,8 @@ auto all_nothrow_three_way_comparable_with_test(int, index_sequence<Is...>)
     -> bool_constant<tuple_size<T>::value == tuple_size<U>::value &&
         TT_SCOPE is_all_nothrow_gettable<T>::value && TT_SCOPE is_all_nothrow_gettable<U>::value &&
         conjunction<decltype(nothrow_three_way_comparable_with_test<
-            remove_cvref_t<decltype(TT_SCOPE get<Is>(declval<T>()))>,
-            remove_cvref_t<decltype(TT_SCOPE get<Is>(declval<U>()))>, Cat>(0))...>::value>;
+            remove_cvref_t<decltype(UTL_TUPLE_GET(Is, declval<T>()))>,
+            remove_cvref_t<decltype(UTL_TUPLE_GET(Is, declval<U>()))>, Cat>(0))...>::value>;
 
 template <typename T, typename U, typename Cat, size_t N = tuple_size<T>::value>
 using all_three_way_comparable_with_test_t =

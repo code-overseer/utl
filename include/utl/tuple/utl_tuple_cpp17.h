@@ -99,8 +99,8 @@ private:
 template <>
 struct storage<> {
     constexpr storage() noexcept = default;
-    constexpr storage&       operator=(storage const&) noexcept = default;
-    constexpr storage&       operator=(storage&&) noexcept = default;
+    constexpr storage& operator=(storage const&) noexcept = default;
+    constexpr storage& operator=(storage&&) noexcept = default;
     UTL_CONSTEXPR_CXX14 void swap(storage<>& other) noexcept {}
 };
 
@@ -458,7 +458,7 @@ class tuple<> : private details::tuple::storage<> {
 public:
     using storage::storage;
     using storage::operator=;
-    UTL_CONSTEXPR_CXX14 void               swap(tuple const& other) const noexcept {}
+    UTL_CONSTEXPR_CXX14 void swap(tuple const& other) const noexcept {}
     friend inline UTL_CONSTEXPR_CXX14 void swap(tuple const&, tuple const&) noexcept {}
 };
 
@@ -487,24 +487,24 @@ private:
         conjunction<TT_SCOPE is_all_nothrow_gettable<TupleLike, sizeof...(Is)>,
             TT_SCOPE rebind_references_t<traits::template is_nothrow_constructible, TupleLike,
                 sizeof...(Is)>>::value)
-        : base_type(TT_SCOPE get<Is>(forward<TupleLike>(other))...) {}
+        : base_type(UTL_TUPLE_GET(Is, forward<TupleLike>(other))...) {}
 
     template <typename Alloc, typename TupleLike, size_t... Is>
     constexpr tuple(allocator_arg_t, Alloc const& alloc, TupleLike&& other,
         index_sequence<
             Is...>) noexcept(conjunction<TT_SCOPE is_all_nothrow_gettable<TupleLike, sizeof...(Is)>,
-        TT_SCOPE                                  rebind_references_t<
+        TT_SCOPE rebind_references_t<
             variadic_proxy<traits::template is_nothrow_constructible_with_allocator,
                 Alloc>::template apply,
             TupleLike, sizeof...(Types)>>::value)
-        : base_type(allocator_arg, alloc, TT_SCOPE get<Is>(forward<TupleLike>(other))...) {}
+        : base_type(allocator_arg, alloc, UTL_TUPLE_GET(Is, forward<TupleLike>(other))...) {}
 
     template <typename TupleLike, size_t... Is>
     UTL_CONSTEXPR_CXX14 tuple& assign(TupleLike&& other, index_sequence<Is...>) noexcept(
         conjunction<TT_SCOPE is_all_nothrow_gettable<TupleLike, sizeof...(Is)>,
-            TT_SCOPE         rebind_references_t<traits::template is_nothrow_assignable, TupleLike,
+            TT_SCOPE rebind_references_t<traits::template is_nothrow_assignable, TupleLike,
                 sizeof...(Is)>>::value) {
-        return (tuple&)base_type::assign(TT_SCOPE get<Is>(forward<TupleLike>(other))...);
+        return (tuple&)base_type::assign(UTL_TUPLE_GET(Is, forward<TupleLike>(other))...);
     }
 
     template <typename TupleLike, size_t... Is>
@@ -512,7 +512,7 @@ private:
         noexcept(conjunction<TT_SCOPE is_all_nothrow_gettable<TupleLike, sizeof...(Is)>,
             TT_SCOPE rebind_references_t<traits::template is_nothrow_const_assignable, TupleLike,
                 sizeof...(Is)>>::value) {
-        return (tuple const&)base_type::assign(TT_SCOPE get<Is>(forward<TupleLike>(other))...);
+        return (tuple const&)base_type::assign(UTL_TUPLE_GET(Is, forward<TupleLike>(other))...);
     }
 
 public:
@@ -552,7 +552,7 @@ public:
     template <typename... Us>
     UTL_CONSTEXPR_CXX14 enable_if_t<conjunction<typename traits::template matches<Us...>,
         typename traits::template is_swappable_with<Us const&...>>::value>
-                        swap(tuple<Us...> const& other) noexcept(
+    swap(tuple<Us...> const& other) noexcept(
         traits::template is_nothrow_swappable_with<Us const&...>::value) {
         static_assert(is_base_of<details::tuple::storage<Us...>, tuple<Us...>>::value,
             "tuple must inherit from storage");
@@ -1149,7 +1149,7 @@ public:
             int> = 0>
     constexpr tuple(allocator_arg_t, Alloc const& alloc, TupleLike&& other) noexcept(
         conjunction<TT_SCOPE is_all_nothrow_gettable<TupleLike, sizeof...(Types)>,
-            TT_SCOPE         rebind_references_t<
+            TT_SCOPE rebind_references_t<
                 variadic_proxy<traits::template is_nothrow_constructible_with_allocator,
                     Alloc>::template apply,
                 TupleLike, sizeof...(Types)>>::value)
@@ -1170,7 +1170,7 @@ public:
             int> = 1>
     explicit constexpr tuple(allocator_arg_t, Alloc const& alloc, TupleLike&& other) noexcept(
         conjunction<TT_SCOPE is_all_nothrow_gettable<TupleLike, sizeof...(Types)>,
-            TT_SCOPE         rebind_references_t<
+            TT_SCOPE rebind_references_t<
                 variadic_proxy<traits::template is_nothrow_constructible_with_allocator,
                     Alloc>::template apply,
                 TupleLike, sizeof...(Types)>>::value)
@@ -1191,7 +1191,7 @@ public:
             int> = 2>
     constexpr tuple(allocator_arg_t, Alloc const& alloc, TupleLike&& other) noexcept(
         conjunction<TT_SCOPE is_all_nothrow_gettable<TupleLike, sizeof...(Types)>,
-            TT_SCOPE         rebind_references_t<
+            TT_SCOPE rebind_references_t<
                 variadic_proxy<traits::template is_nothrow_constructible_with_allocator,
                     Alloc>::template apply,
                 TupleLike, sizeof...(Types)>>::value) = delete;
@@ -1211,7 +1211,7 @@ public:
             int> = 3>
     explicit constexpr tuple(allocator_arg_t, Alloc const& alloc, TupleLike&& other) noexcept(
         conjunction<TT_SCOPE is_all_nothrow_gettable<TupleLike, sizeof...(Types)>,
-            TT_SCOPE         rebind_references_t<
+            TT_SCOPE rebind_references_t<
                 variadic_proxy<traits::template is_nothrow_constructible_with_allocator,
                     Alloc>::template apply,
                 TupleLike, sizeof...(Types)>>::value) = delete;
@@ -1298,7 +1298,7 @@ public:
             int> = 0>
     UTL_CONSTEXPR_CXX14 tuple& operator=(TupleLike&& other) noexcept(
         conjunction<TT_SCOPE is_all_nothrow_gettable<TupleLike, sizeof...(Types)>,
-            TT_SCOPE         rebind_references_t<traits::template is_nothrow_assignable, TupleLike,
+            TT_SCOPE rebind_references_t<traits::template is_nothrow_assignable, TupleLike,
                 sizeof...(Types)>>::value) {
         return assign(forward<TupleLike>(other), index_sequence_for<Types...>{});
     }
@@ -1337,8 +1337,8 @@ template <size_t I, typename T, typename U>
 UTL_ATTRIBUTES(NODISCARD, CONST)
 constexpr enable_if_t<(I < tuple_size<T>::value), bool> less(T const& l, U const& r) noexcept(
     conjunction<compare_ops::has_nothrow_eq<T, U>, compare_ops::has_nothrow_lt<T, U>>::value) {
-    return (TT_SCOPE get<I - 1>(l) == TT_SCOPE get<I - 1>(r)) &&
-        ((TT_SCOPE get<I>(l) < TT_SCOPE get<I>(r)) || less<I + 1>(l, r));
+    return (UTL_TUPLE_GET(I - 1, l) == UTL_TUPLE_GET(I - 1, r)) &&
+        ((UTL_TUPLE_GET(I, l) < UTL_TUPLE_GET(I, r)) || less<I + 1>(l, r));
 }
 
 template <typename T, typename U>
@@ -1347,7 +1347,7 @@ constexpr bool less(T const& l, U const& r) noexcept(
     conjunction<compare_ops::has_nothrow_eq<T, U>, compare_ops::has_nothrow_lt<T, U>>::value) {
     static_assert(compare_ops::all_have_eq<T, U>::value, "All elements must be comparable");
     static_assert(compare_ops::all_have_lt<T, U>::value, "All elements must be comparable");
-    return (TT_SCOPE get<0>(l) < TT_SCOPE get<0>(r)) || less<1>(l, r);
+    return (UTL_TUPLE_GET(0, l) < UTL_TUPLE_GET(0, r)) || less<1>(l, r);
 }
 
 template <size_t I, typename T, typename U>
@@ -1360,7 +1360,7 @@ template <size_t I, typename T, typename U>
 UTL_ATTRIBUTES(NODISCARD, CONST)
 constexpr enable_if_t<(I < tuple_size<T>::value), bool> equals(T const& l, U const& r) noexcept(
     compare_ops::has_nothrow_eq<T, U>::value) {
-    return (TT_SCOPE get<I>(l) == TT_SCOPE get<I>(r)) && equals<I + 1>(l, r);
+    return (UTL_TUPLE_GET(I, l) == UTL_TUPLE_GET(I, r)) && equals<I + 1>(l, r);
 }
 
 template <typename T, typename U>

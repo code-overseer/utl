@@ -126,7 +126,7 @@ struct get_cpo_t {
     template <typename T>
     UTL_ATTRIBUTES(NODISCARD, FLATTEN, CONST)
     constexpr enable_if_t<sizeof(get<I>(declval<T>())) && is_tuple<T>::value, result_t<I, T>>
-    operator()(T&& t UTL_ATTRIBUTE(LIFETIMEBOUND)) const noexcept(noexcept(get<I>(declval<T>()))) {
+    operator()(T&& t UTL_ATTRIBUTE(LIFETIMEBOUND)) const noexcept {
         return get<I>(forward<T>(t));
     }
 };
@@ -155,23 +155,24 @@ constexpr enable_if_t<!is_tuple<T>::value, result_t<I, T>> get(
 template <size_t I, typename T>
 UTL_ATTRIBUTES(NODISCARD, FLATTEN, CONST)
 constexpr enable_if_t<is_tuple<T>::value, result_t<I, T>> get(
-    T&& t UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept(noexcept(details::get_cpo_t<I>()(declval<T>()))) {
+    T&& t UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
     return details::get_cpo_t<I>()(forward<T>());
 }
 
 #endif // ifdef UTL_CXX14
 
+#define UTL_TUPLE_GET(I, tuple) UTL_SCOPE tuple_traits::get<I>(tuple)
+
 namespace details {
 template <size_t I, typename T>
-auto nothrow_test(int) -> bool_constant<noexcept(UTL_SCOPE tuple_traits::get<I>(declval<T>()))>;
+auto nothrow_test(int) -> bool_constant<noexcept(UTL_TUPLE_GET(I, declval<T>()))>;
 template <size_t I, typename>
 auto nothrow_test(float) -> false_type;
 
 template <size_t I, typename T, typename = void>
 struct is_callable : false_type {};
 template <size_t I, typename T>
-struct is_callable<I, T, void_t<decltype(UTL_SCOPE tuple_traits::get<I>(declval<T>()))>> :
-    true_type {};
+struct is_callable<I, T, void_t<decltype(UTL_TUPLE_GET(I, declval<T>()))>> : true_type {};
 
 template <size_t I, typename T>
 using is_nothrow = decltype(nothrow_test<I, T>(0));
@@ -234,8 +235,8 @@ Target<typename UTL_SCOPE tuple_element<Is, T>::type...> rebuild_target_elements
  *
  * @return `Target<Ref...>`
  *  where:
- *    `Ref` is `decltype(get<I>(declval<TupleLike>()))` or `decltype(declval<TupleLike>().get<I>())`
- * where I is in the interval [0, N)
+ *    `Ref` is `decltype(get<I>(declval<TupleLike>()))` or
+ * `decltype(declval<TupleLike>().get<I>())` where I is in the interval [0, N)
  */
 template <template <typename...> class Target, typename TupleLike,
     size_t N = tuple_size<TupleLike>::value>
@@ -257,8 +258,8 @@ struct rebind_references {
  *
  * @return `Target<Ref...>`
  *  where:
- *    `Ref` is `decltype(get<I>(declval<TupleLike>()))` or `decltype(declval<TupleLike>().get<I>())`
- * where I is in the interval [0, N)
+ *    `Ref` is `decltype(get<I>(declval<TupleLike>()))` or
+ * `decltype(declval<TupleLike>().get<I>())` where I is in the interval [0, N)
  */
 template <template <typename...> class Target, typename TupleLike,
     size_t N = tuple_size<TupleLike>::value>

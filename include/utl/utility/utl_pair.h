@@ -216,11 +216,11 @@ private:
         typename... Args1, size_t... Is, size_t... Js>
     constexpr pair(L0<Args0...>& l0, L1<Args1...>& l1, index_sequence<Is...>,
         index_sequence<Js...>) noexcept(conjunction<TT_SCOPE is_nothrow_gettable<Is, L0<Args0>&>...,
-        TT_SCOPE                                             is_nothrow_gettable<Js, L1<Args1>&>...,
-        UTL_SCOPE                                            is_nothrow_constructible<T0, Args0...>,
+        TT_SCOPE is_nothrow_gettable<Js, L1<Args1>&>...,
+        UTL_SCOPE is_nothrow_constructible<T0, Args0...>,
         UTL_SCOPE is_nothrow_constructible<T1, Args1...>>::value)
-        : first(forward<Args0>(TT_SCOPE get<Is>(l0))...)
-        , second(forward<Args1>(TT_SCOPE get<Js>(l1))...) {}
+        : first(forward<Args0>(UTL_TUPLE_GET(Is, l0))...)
+        , second(forward<Args1>(UTL_TUPLE_GET(Js, l1))...) {}
 
 public:
     using first_type = T0;
@@ -259,7 +259,7 @@ public:
     }
     template <typename U0 = T0, typename U1 = T1>
     UTL_CONSTEXPR_CXX14 enable_if_t<traits::template is_swappable_with<U0 const&, U1 const&>::value>
-                        swap(pair<U0, U1> const& other) noexcept(
+    swap(pair<U0, U1> const& other) noexcept(
         traits::template is_nothrow_swappable_with<U0 const&, U1 const&>::value) {
         using UTL_SCOPE swap;
         swap(first, other.first);
@@ -495,8 +495,8 @@ public:
             int> = 0>
     constexpr pair(P&& p) noexcept(TT_SCOPE is_all_nothrow_gettable<P, 2>::value &&
         TT_SCOPE rebind_references_t<traits::template is_nothrow_constructible, P, 2>::value)
-        : first(TT_SCOPE get<0>(forward<P>(p)))
-        , second(TT_SCOPE get<1>(forward<P>(p))) {}
+        : first(UTL_TUPLE_GET(0, forward<P>(p)))
+        , second(UTL_TUPLE_GET(1, forward<P>(p))) {}
 
     template <typename P,
         enable_if_t<TT_SCOPE is_all_gettable<P, 2>::value &&
@@ -506,8 +506,8 @@ public:
             int> = 1>
     explicit constexpr pair(P&& p) noexcept(TT_SCOPE is_all_nothrow_gettable<P, 2>::value &&
         TT_SCOPE rebind_references_t<traits::template is_nothrow_constructible, P, 2>::value)
-        : first(TT_SCOPE get<0>(forward<P>(p)))
-        , second(TT_SCOPE get<1>(forward<P>(p))) {}
+        : first(UTL_TUPLE_GET(0, forward<P>(p)))
+        , second(UTL_TUPLE_GET(1, forward<P>(p))) {}
 
     template <typename P,
         enable_if_t<TT_SCOPE is_all_gettable<P, 2>::value &&
@@ -534,7 +534,7 @@ public:
     template <template <typename...> class L0, template <typename...> class L1, typename... Args0,
         typename... Args1,
         typename = enable_if_t<UTL_SCOPE is_constructible<T0, Args0...>::value &&
-            UTL_SCOPE                    is_constructible<T1, Args1...>::value>>
+            UTL_SCOPE is_constructible<T1, Args1...>::value>>
     constexpr pair(piecewise_construct_t, L0<Args0...> l0, L1<Args1...> l1) noexcept(
         UTL_SCOPE is_nothrow_constructible<pair, L0<Args0...>&, L1<Args1...>&,
             index_sequence_for<Args0...>, index_sequence_for<Args1...>>::value)
@@ -542,7 +542,7 @@ public:
 
     template <typename... Args0, typename... Args1,
         typename = enable_if_t<UTL_SCOPE is_constructible<T0, Args0...>::value &&
-            UTL_SCOPE                    is_constructible<T1, Args1...>::value>>
+            UTL_SCOPE is_constructible<T1, Args1...>::value>>
     constexpr pair(piecewise_construct_t, tuple<Args0...> l0, tuple<Args1...> l1) noexcept(
         UTL_SCOPE is_nothrow_constructible<pair, tuple<Args0...>&, tuple<Args1...>&,
             index_sequence_for<Args0...>, index_sequence_for<Args1...>>::value);
@@ -567,7 +567,7 @@ public:
 public:
     template <typename U0, typename U1>
     UTL_CONSTEXPR_CXX14 enable_if_t<traits::template is_assignable<U0&&, U1&&>::value, pair&>
-                        operator=(pair<U0, U1>&& p) noexcept(
+    operator=(pair<U0, U1>&& p) noexcept(
         traits::template is_nothrow_assignable<U0&&, U1&&>::value) {
         return assign(move(p).first, move(p).second);
     }
@@ -584,11 +584,11 @@ public:
     template <typename P>
     UTL_CONSTEXPR_CXX14 enable_if_t<tuple_size<P>::value == 2 &&
             conjunction<TT_SCOPE is_all_gettable<P>,
-                TT_SCOPE         rebind_references_t<traits::template is_assignable, P>>::value,
+                TT_SCOPE rebind_references_t<traits::template is_assignable, P>>::value,
         pair&>
-                        operator=(P&& p) noexcept(TT_SCOPE is_all_nothrow_gettable<P>::value &&
+    operator=(P&& p) noexcept(TT_SCOPE is_all_nothrow_gettable<P>::value &&
         TT_SCOPE rebind_references_t<traits::template is_nothrow_assignable, P>::value) {
-        return assign(TT_SCOPE get<0>(forward<P>(p)), TT_SCOPE get<1>(forward<P>(p)));
+        return assign(UTL_TUPLE_GET(0, forward<P>(p)), UTL_TUPLE_GET(1, forward<P>(p)));
     }
 
     template <typename P>
@@ -598,7 +598,7 @@ public:
         pair const&>
     operator=(P&& p) const noexcept(TT_SCOPE is_all_nothrow_gettable<P, 2>::value &&
         TT_SCOPE rebind_references_t<traits::template is_nothrow_const_assignable, P, 2>::value) {
-        return assign(TT_SCOPE get<0>(forward<P>(p)), TT_SCOPE get<1>(forward<P>(p)));
+        return assign(UTL_TUPLE_GET(0, forward<P>(p)), UTL_TUPLE_GET(1, forward<P>(p)));
     }
 
     UTL_CONSTEXPR_CXX20 ~pair() = default;
