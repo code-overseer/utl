@@ -2,20 +2,12 @@
 	"folders":
 	[
 		{
-			"path": "include/",
-			"name": "Include"
-		},
-		{
-			"path": "tests/",
-			"name": "Tests"
-		},
-		{
-			"path": "scratch/",
-			"name": "Scratch"
+			"path": "src/utl",
+			"name": "UTL"
 		},
 		{
 			"path": ".",
-			"name": "UTL",
+			"name": "Root",
 			"folder_exclude_patterns": [ "*/" ]
 		}
 	],

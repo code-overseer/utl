@@ -1,5 +1,6 @@
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIR := $(dir $(MKFILE_PATH))
+MODULE_DIR := $(MKFILE_DIR)
 
 BIN = main
 SRCS := $(wildcard $(MKFILE_DIR)**/*.cpp)
