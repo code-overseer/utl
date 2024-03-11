@@ -30,15 +30,15 @@
 			[
 				{
 					"name": "Compile Tests",
-					"shell_cmd": "make -C $project_path/Tests compile"
+					"shell_cmd": "make -C $project_path/src/utl compile"
 				},
 				{
 					"name": "Preprocess Tests",
-					"shell_cmd": "make -C $project_path/Tests preprocess"
+					"shell_cmd": "make -C $project_path/src/utl preprocess"
 				},
 				{
 					"name": "Print Build Variables",
-					"shell_cmd": "make -C $project_path/Tests print"	
+					"shell_cmd": "make -C $project_path/src/utl print"	
 				}
 			]
 		}
