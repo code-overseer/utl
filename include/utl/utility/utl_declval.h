@@ -2,12 +2,4 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_namespace.h"
-
-#include <type_traits>
-
-UTL_NAMESPACE_BEGIN
-
-using std::declval;
-
-UTL_NAMESPACE_END
+#include "utl/type_traits/utl_declval.h"

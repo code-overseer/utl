@@ -4,7 +4,6 @@ BasedOnStyle: LLVM
 ---
 Language: Cpp
 AlignAfterOpenBracket: DontAlign
-AlignConsecutiveDeclarations: true
 AlignEscapedNewlines: Left
 AlignOperands: DontAlign
 AlignTrailingComments: true
@@ -13,6 +12,12 @@ AllowShortEnumsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: Inline
 AllowShortLambdasOnASingleLine: All
 # AllowShortCompoundRequirementOnASingleLine: true
+AlignArrayOfStructures: Right
+AlignConsecutiveAssignments:
+  Enabled: false
+AlignConsecutiveDeclarations:
+  Enabled: false
+
 BraceWrapping:
   AfterCaseLabel: false
   AfterClass: false

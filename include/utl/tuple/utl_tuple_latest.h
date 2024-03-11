@@ -105,7 +105,7 @@ struct storage<> {
     constexpr storage() noexcept = default;
     constexpr storage& operator=(storage const&) noexcept = default;
     constexpr storage& operator=(storage&&) noexcept = default;
-    constexpr void     swap(storage<>& other) noexcept {}
+    constexpr void swap(storage<>& other) noexcept {}
 };
 
 template <typename T>
@@ -482,7 +482,7 @@ class tuple<> : private details::tuple::storage<> {
 public:
     using storage::storage;
     using storage::operator=;
-    constexpr void               swap(tuple const& other) const noexcept {}
+    constexpr void swap(tuple const& other) const noexcept {}
     friend inline constexpr void swap(tuple const&, tuple const&) noexcept {}
 };
 
@@ -508,30 +508,30 @@ private:
 
     template <typename TupleLike, size_t... Is>
     constexpr tuple(TupleLike&& other, index_sequence<Is...>) noexcept(requires(TupleLike&& t) {
-        { base_type(TT_SCOPE get<Is>(forward<TupleLike>(t))...) } noexcept;
-    }) : base_type(TT_SCOPE get<Is>(forward<TupleLike>(other))...) {}
+        { base_type(UTL_TUPLE_GET(Is, forward<TupleLike>(t))...) } noexcept;
+    }) : base_type(UTL_TUPLE_GET(Is, forward<TupleLike>(other))...) {}
 
     template <typename Alloc, typename TupleLike, size_t... Is>
     constexpr tuple(allocator_arg_t, Alloc const& alloc, TupleLike&& other,
         index_sequence<Is...>) noexcept(requires(Alloc const& a, TupleLike&& t) {
-        { base_type(allocator_arg, a, TT_SCOPE get<Is>(forward<TupleLike>(t))...) } noexcept;
+        { base_type(allocator_arg, a, UTL_TUPLE_GET(Is, forward<TupleLike>(t))...) } noexcept;
     })
-        : base_type(allocator_arg, alloc, TT_SCOPE get<Is>(forward<TupleLike>(other))...) {}
+        : base_type(allocator_arg, alloc, UTL_TUPLE_GET(Is, forward<TupleLike>(other))...) {}
 
     template <typename TupleLike, size_t... Is>
     constexpr tuple& assign(TupleLike&& other, index_sequence<Is...>) noexcept(
         requires(base_type& b, TupleLike&& t) {
-            { b.assign(TT_SCOPE get<Is>(forward<TupleLike>(t))...) } noexcept;
+            { b.assign(UTL_TUPLE_GET(Is, forward<TupleLike>(t))...) } noexcept;
         }) {
-        return (tuple&)base_type::assign(TT_SCOPE get<Is>(forward<TupleLike>(other))...);
+        return (tuple&)base_type::assign(UTL_TUPLE_GET(Is, forward<TupleLike>(other))...);
     }
 
     template <typename TupleLike, size_t... Is>
     constexpr tuple const& assign(TupleLike&& other, index_sequence<Is...>) const
         noexcept(requires(base_type const& b, TupleLike&& t) {
-            { b.assign(TT_SCOPE get<Is>(forward<TupleLike>(t))...) } noexcept;
+            { b.assign(UTL_TUPLE_GET(Is, forward<TupleLike>(t))...) } noexcept;
         }) {
-        return (tuple const&)base_type::assign(TT_SCOPE get<Is>(forward<TupleLike>(other))...);
+        return (tuple const&)base_type::assign(UTL_TUPLE_GET(Is, forward<TupleLike>(other))...);
     }
 
 public:
@@ -807,7 +807,7 @@ public:
     template <typename Alloc, typename... UTypes>
     requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible_with_allocator<Alloc, UTypes...>::value&&
-            traits::template is_explicit_constructible_with_allocator<Alloc, UTypes...>::value&&
+        traits::template is_explicit_constructible_with_allocator<Alloc, UTypes...>::value&&
             traits::template is_dangling_without_allocator<Alloc,
                 UTypes...>::value explicit constexpr tuple(allocator_arg_t, Alloc const& alloc,
                 UTypes&&... args) noexcept(requires(Alloc const& alloc, UTypes&&... args) {
@@ -817,7 +817,7 @@ public:
     template <typename Alloc, typename... UTypes>
     requires (sizeof...(Types) == sizeof...(UTypes)) && traits::template
     is_constructible_with_allocator<Alloc, UTypes...>::value&&
-            traits::template is_implicit_constructible_with_allocator<Alloc, UTypes...>::value&&
+        traits::template is_implicit_constructible_with_allocator<Alloc, UTypes...>::value&&
             traits::template is_dangling_without_allocator<Alloc, UTypes...>::value constexpr tuple(
                 allocator_arg_t, Alloc const& alloc,
                 UTypes&&... args) noexcept(requires(Alloc const& alloc, UTypes&&... args) {
@@ -832,7 +832,7 @@ public:
             traits::template is_explicit_constructible_with_allocator<Alloc,
                 UTypes&...>::value) constexpr tuple(allocator_arg_t, Alloc const& alloc,
             tuple<UTypes...>& other) noexcept(requires(Alloc const& alloc,
-            tuple<UTypes...>&                                       other) {
+            tuple<UTypes...>& other) {
             { tuple(allocator_arg, alloc, other, index_sequence_for<UTypes...>{}) } noexcept;
         })
         : tuple(allocator_arg, alloc, other, index_sequence_for<UTypes...>{}) {}
@@ -844,7 +844,7 @@ public:
             traits::template is_explicit_constructible_with_allocator<Alloc,
                 UTypes&...>::value) constexpr tuple(allocator_arg_t, Alloc const& alloc,
             tuple<UTypes...>& other) noexcept(requires(Alloc const& alloc,
-            tuple<UTypes...>&                                       other) {
+            tuple<UTypes...>& other) {
             { tuple(allocator_arg, alloc, other, index_sequence_for<UTypes...>{}) } noexcept;
         }) = delete;
 
@@ -856,7 +856,7 @@ public:
             traits::template is_explicit_constructible_with_allocator<Alloc,
                 UTypes const&...>::value) constexpr tuple(allocator_arg_t, Alloc const& alloc,
             tuple<UTypes...> const& other) noexcept(requires(Alloc const& alloc,
-            tuple<UTypes...> const&                                       other) {
+            tuple<UTypes...> const& other) {
             { tuple(allocator_arg, alloc, other, index_sequence_for<UTypes...>{}) } noexcept;
         })
         : tuple(allocator_arg, alloc, other, index_sequence_for<UTypes...>{}) {}
@@ -868,7 +868,7 @@ public:
             traits::template is_explicit_constructible_with_allocator<Alloc,
                 UTypes const&...>::value) constexpr tuple(allocator_arg_t, Alloc const& alloc,
             tuple<UTypes...> const& other) noexcept(requires(Alloc const& alloc,
-            tuple<UTypes...> const&                                       other) {
+            tuple<UTypes...> const& other) {
             { tuple(allocator_arg, alloc, other, index_sequence_for<UTypes...>{}) } noexcept;
         }) = delete;
 
@@ -880,7 +880,7 @@ public:
             traits::template is_explicit_constructible_with_allocator<Alloc,
                 UTypes&&...>::value) constexpr tuple(allocator_arg_t, Alloc const& alloc,
             tuple<UTypes...>&& other) noexcept(requires(Alloc const& alloc,
-            tuple<UTypes...>&&                                       other) {
+            tuple<UTypes...>&& other) {
             { tuple(allocator_arg, alloc, move(other), index_sequence_for<UTypes...>{}) } noexcept;
         })
         : tuple(allocator_arg, alloc, move(other), index_sequence_for<UTypes...>{}) {}
@@ -892,7 +892,7 @@ public:
             traits::template is_explicit_constructible_with_allocator<Alloc,
                 UTypes&&...>::value) constexpr tuple(allocator_arg_t, Alloc const& alloc,
             tuple<UTypes...>&& other) noexcept(requires(Alloc const& alloc,
-            tuple<UTypes...>&&                                       other) {
+            tuple<UTypes...>&& other) {
             { tuple(allocator_arg, alloc, move(other), index_sequence_for<UTypes...>{}) } noexcept;
         }) = delete;
 
@@ -914,7 +914,7 @@ public:
             traits::template is_explicit_constructible_with_allocator<Alloc,
                 UTypes const&&...>::value) constexpr tuple(allocator_arg_t, Alloc const& alloc,
             tuple<UTypes...> const&& other) noexcept(requires(Alloc const& alloc,
-            tuple<UTypes...> const&&                                       other) {
+            tuple<UTypes...> const&& other) {
             { tuple(allocator_arg, alloc, move(other), index_sequence_for<UTypes...>{}) } noexcept;
         })
         : tuple(allocator_arg, alloc, move(other), index_sequence_for<UTypes...>{}) {}
@@ -926,7 +926,7 @@ public:
             traits::template is_explicit_constructible_with_allocator<Alloc,
                 UTypes const&&...>::value) constexpr tuple(allocator_arg_t, Alloc const& alloc,
             tuple<UTypes...> const&& other) noexcept(requires(Alloc const& alloc,
-            tuple<UTypes...> const&&                                       other) {
+            tuple<UTypes...> const&& other) {
             { tuple(allocator_arg, alloc, move(other), index_sequence_for<UTypes...>{}) } noexcept;
         }) = delete;
 
@@ -1005,7 +1005,7 @@ public:
     template <typename Alloc>
     requires traits::template
     is_constructible_with_allocator<Alloc, Types const&&...>::value constexpr tuple(allocator_arg_t,
-        Alloc const&  alloc,
+        Alloc const& alloc,
         tuple const&& other) noexcept(requires(Alloc const& alloc, tuple const&& other) {
         { tuple(allocator_arg, alloc, move(other), index_sequence_for<Types...>{}) } noexcept;
     })
@@ -1092,7 +1092,7 @@ public:
     requires traits::template
     is_assignable<UTypes const&&...>::value constexpr tuple& operator=(
         tuple<UTypes...> const&& other) noexcept(requires(tuple& t,
-        tuple<UTypes...> const&&                                 other) {
+        tuple<UTypes...> const&& other) {
         { t.assign(move(other), index_sequence_for<Types...>{}) } noexcept;
     }) {
         return assign(move(other), index_sequence_for<Types...>{});
