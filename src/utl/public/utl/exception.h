@@ -7,6 +7,13 @@
 #include "utl/preprocessor/utl_attributes.h"
 #include "utl/preprocessor/utl_namespace.h"
 
+#ifdef UTL_WITH_EXCEPTIONS
+#  define UTL_THROW(...) throw(__VA_ARGS__)
+#  define UTL_RETHROW throw
+#  define UTL_TRY try
+#  define UTL_CATCH(...) catch (__VA_ARGS__)
+#else // UTL_WITH_EXCEPTIONS
+
 UTL_NAMESPACE_BEGIN
 
 namespace details {
@@ -26,13 +33,6 @@ constexpr bool always_true(A&&...) noexcept {
 } // namespace details
 
 UTL_NAMESPACE_END
-
-#ifdef UTL_WITH_EXCEPTIONS
-#  define UTL_THROW(...) throw(__VA_ARGS__)
-#  define UTL_RETHROW throw
-#  define UTL_TRY try
-#  define UTL_CATCH(...) catch (__VA_ARGS__)
-#else // UTL_WITH_EXCEPTIONS
 
 #  define UTL_THROW(...)                                                   \
       UTL_ASSERT(UTL_SCOPE details::exception::always_false(__VA_ARGS__)); \
