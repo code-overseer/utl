@@ -8,12 +8,29 @@
 #include "utl/preprocessor/utl_namespace.h"
 
 #ifdef UTL_WITH_EXCEPTIONS
+#  include <exception>
 #  define UTL_THROW(...) throw(__VA_ARGS__)
 #  define UTL_RETHROW throw
 #  define UTL_TRY try
 #  define UTL_CATCH(...) catch (__VA_ARGS__)
-#else // UTL_WITH_EXCEPTIONS
 
+UTL_NAMESPACE_BEGIN
+using std::exception;
+using std::exception_ptr;
+#  ifdef UTL_CXX17
+using std::uncaught_exceptions;
+#  else
+using std::uncaught_exception;
+#  endif
+using std::current_exception;
+using std::get_terminate;
+using std::make_exception_ptr;
+using std::rethrow_exception;
+using std::set_terminate;
+using std::terminate;
+UTL_NAMESPACE_END
+
+#else // UTL_WITH_EXCEPTIONS
 UTL_NAMESPACE_BEGIN
 
 namespace details {
