@@ -39,16 +39,19 @@ scope_exit<decay_t<Fn>> make_scope_exit(Fn&& f) noexcept(
 }
 
 namespace details {
-struct scope_exit_proxy_t {
+namespace scope {
+struct exit_proxy_t {
     template <typename Fn,
         typename = enable_if_t<is_constructible<scope_exit<decay_t<Fn>>, Fn>::value>>
     scope_exit<decay_t<Fn>> operator->*(Fn&& f) const
         noexcept(is_nothrow_constructible<scope_exit<decay_t<Fn>>, declval<Fn>()>) {
         return scope_exit<decay_t<Fn>>{forward<Fn>(f)};
     }
-} scope_exit_proxy;
+} exit_proxy;
+} // namespace scope
 } // namespace details
 
-#define UTL_ON_SCOPE_FAIL() auto UTL_UNIQUE_VAR(ScopeFail) = scope_exit_proxy->*[&]()
+#define UTL_ON_SCOPE_FAIL() \
+    auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::exit_proxy->*[&]()
 
 UTL_NAMESPACE_END

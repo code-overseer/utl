@@ -41,17 +41,20 @@ scope_fail<decay_t<Fn>> make_scope_fail(Fn&& f) noexcept(
 }
 
 namespace details {
-struct scope_fail_proxy_t {
+namespace scope {
+struct fail_proxy_t {
     template <typename Fn,
         typename = enable_if_t<is_constructible<scope_fail<decay_t<Fn>>, Fn>::value>>
     scope_fail<decay_t<Fn>> operator->*(Fn&& f) const
         noexcept(is_nothrow_constructible<scope_fail<decay_t<Fn>>, declval<Fn>()>) {
         return scope_fail<decay_t<Fn>>{forward<Fn>(f)};
     }
-} scope_fail_proxy;
+} fail_proxy;
+} // namespace scope
 } // namespace details
 
-#  define UTL_ON_SCOPE_FAIL() auto UTL_UNIQUE_VAR(ScopeFail) = scope_fail_proxy->*[&]()
+#  define UTL_ON_SCOPE_FAIL() \
+      auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::fail_proxy->*[&]()
 #else
 template <typename F>
 class scope_fail {

@@ -42,17 +42,20 @@ scope_success<decay_t<Fn>> make_scope_success(Fn&& f) noexcept(
 }
 
 namespace details {
-struct scope_success_proxy_t {
+namespace scope {
+struct success_proxy_t {
     template <typename Fn,
         typename = enable_if_t<is_constructible<scope_success<decay_t<Fn>>, Fn>::value>>
     scope_success<decay_t<Fn>> operator->*(Fn&& f) const
         noexcept(is_nothrow_constructible<scope_success<decay_t<Fn>>, declval<Fn>()>) {
         return scope_success<decay_t<Fn>>{forward<Fn>(f)};
     }
-} scope_success_proxy;
+} success_proxy;
+} // namespace scope
 } // namespace details
 
-#  define UTL_ON_SCOPE_SUCCESS() auto UTL_UNIQUE_VAR(ScopeSuccess) = scope_success_proxy->*[&]()
+#  define UTL_ON_SCOPE_SUCCESS() \
+      auto UTL_UNIQUE_VAR(ScopeSuccess) = UTL_SCOPE details::scope::success_proxy->*[&]()
 
 #else
 template <typename F>
