@@ -4,7 +4,7 @@
 
 #include "utl/base_preprocessor.h"
 #include "utl/memory/utl_uses_allocator.h"
-#include "utl/type_traits/utl_constructor_traits.h"
+#include "utl/type_traits/utl_is_x_constructible.h"
 #include "utl/type_traits/utl_std_traits.h"
 #include "utl/utility/utl_sequence.h"
 #include "utl/utility/utl_swap.h"
@@ -74,12 +74,12 @@ struct variadic_traits {
     struct is_nothrow_constructible_with_allocator :
         conjunction<
             disjunction<UTL_SCOPE is_nothrow_constructible_with_allocator<Types, Alloc, UTypes>,
-                UTL_SCOPE         is_nothrow_constructible<Types, UTypes>>... // disjunction
+                UTL_SCOPE is_nothrow_constructible<Types, UTypes>>... // disjunction
             > {};
     template <typename Alloc>
     struct is_nothrow_constructible_with_allocator<Alloc> :
         conjunction<disjunction<UTL_SCOPE is_nothrow_constructible_with_allocator<Types, Alloc>,
-            UTL_SCOPE                     is_nothrow_constructible<Types>>... // disjunction
+            UTL_SCOPE is_nothrow_constructible<Types>>... // disjunction
             > {};
     template <typename... UTypes>
     struct is_convertible : conjunction<UTL_SCOPE is_convertible<Types, UTypes>...> {};
@@ -96,8 +96,8 @@ struct variadic_traits {
     template <typename Alloc>
     struct is_implicit_constructible_with_allocator<Alloc> :
         conjunction<conditional_t<UTL_SCOPE uses_allocator<Types, Alloc>::value,
-            UTL_SCOPE                       is_implicit_constructible_with_allocator<Types, Alloc>,
-            UTL_SCOPE                       is_implicit_constructible<Types>>... // disjunction
+            UTL_SCOPE is_implicit_constructible_with_allocator<Types, Alloc>,
+            UTL_SCOPE is_implicit_constructible<Types>>... // disjunction
             > {};
 
     template <typename... UTypes UTL_REQUIRES_CXX11(sizeof...(Types) != sizeof...(UTypes))>
@@ -117,20 +117,20 @@ struct variadic_traits {
     template <typename Alloc>
     struct is_explicit_constructible_with_allocator<Alloc> :
         disjunction<conditional_t<UTL_SCOPE uses_allocator<Types, Alloc>::value,
-            UTL_SCOPE                       is_explicit_constructible_with_allocator<Types, Alloc>,
-            UTL_SCOPE                       is_explicit_constructible<Types>>...> {};
+            UTL_SCOPE is_explicit_constructible_with_allocator<Types, Alloc>,
+            UTL_SCOPE is_explicit_constructible<Types>>...> {};
 
     template <typename... UTypes>
     struct is_constructible : conjunction<UTL_SCOPE is_constructible<Types, UTypes>...> {};
     template <typename Alloc, typename... UTypes>
     struct is_constructible_with_allocator :
         conjunction<disjunction<UTL_SCOPE is_constructible_with_allocator<Types, Alloc, UTypes>,
-            UTL_SCOPE                     is_constructible<Types, UTypes>>... // disjunction
+            UTL_SCOPE is_constructible<Types, UTypes>>... // disjunction
             > {};
     template <typename Alloc>
     struct is_constructible_with_allocator<Alloc> :
         conjunction<disjunction<UTL_SCOPE is_constructible_with_allocator<Types, Alloc>,
-            UTL_SCOPE                     is_constructible<Types>>... // disjunction
+            UTL_SCOPE is_constructible<Types>>... // disjunction
             > {};
     template <typename... UTypes>
     struct is_assignable :
