@@ -27,6 +27,8 @@
 #include "utl/type_traits/utl_is_scalar.h"
 #include "utl/type_traits/utl_is_union.h"
 #include "utl/type_traits/utl_is_void.h"
+#include "utl/type_traits/utl_is_x_constructible.h"
+#include "utl/type_traits/utl_is_x_convertible.h"
 #include "utl/type_traits/utl_is_x_cv.h"
 #include "utl/type_traits/utl_is_x_reference.h"
 #include "utl/type_traits/utl_is_x_signed.h"
@@ -51,22 +53,6 @@ using ::std::is_standard_layout;
 using ::std::is_trivial;
 using ::std::is_trivially_copyable;
 
-using ::std::is_constructible;
-using ::std::is_nothrow_constructible;
-using ::std::is_trivially_constructible;
-
-using ::std::is_default_constructible;
-using ::std::is_nothrow_default_constructible;
-using ::std::is_trivially_default_constructible;
-
-using ::std::is_copy_constructible;
-using ::std::is_nothrow_copy_constructible;
-using ::std::is_trivially_copy_constructible;
-
-using ::std::is_move_constructible;
-using ::std::is_nothrow_move_constructible;
-using ::std::is_trivially_move_constructible;
-
 using ::std::is_assignable;
 using ::std::is_nothrow_assignable;
 using ::std::is_trivially_assignable;
@@ -79,7 +65,6 @@ using ::std::is_move_assignable;
 using ::std::is_nothrow_move_assignable;
 using ::std::is_trivially_move_assignable;
 
-using ::std::is_convertible;
 using ::std::is_destructible;
 using ::std::is_nothrow_destructible;
 using ::std::is_trivially_destructible;
@@ -97,24 +82,6 @@ template <typename... T>
 using common_type_t = typename common_type<T...>::type;
 template <typename T>
 using underlying_type_t = typename underlying_type<T>::type;
-
-namespace details {
-namespace convertible {
-template <typename From, typename To>
-auto nothrow_test(int) -> enable_if_t<is_convertible<From, To>::value,
-    bool_constant<noexcept(static_cast<To>(declval<From>()))>>;
-template <typename, typename>
-false_type nothrow_test(float);
-template <typename From, typename To>
-using is_nothrow = decltype(nothrow_test<From, To>(0));
-
-} /* namespace convertible */
-} /* namespace details */
-
-template <typename From, typename To>
-struct is_nothrow_convertible : details::convertible::is_nothrow<From, To> {};
-template <typename To>
-struct is_nothrow_convertible<To, To> : true_type {};
 
 #ifdef UTL_BUILTIN_is_layout_compatible
 template <typename T, typename U>
