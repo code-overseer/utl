@@ -9,25 +9,11 @@
 #define UTL_TRAIT_SUPPORTED_is_polymorphic 1
 #define UTL_TRAIT_SUPPORTED_is_abstract 1
 
-#define UTL_TRAIT_SUPPORTED_is_assignable 1
-#define UTL_TRAIT_SUPPORTED_is_trivially_assignable 1
-#define UTL_TRAIT_SUPPORTED_is_nothrow_assignable 1
-
-#define UTL_TRAIT_SUPPORTED_is_copy_assignable 1
-#define UTL_TRAIT_SUPPORTED_is_trivially_copy_assignable 1
-#define UTL_TRAIT_SUPPORTED_is_nothrow_copy_assignable 1
-
-#define UTL_TRAIT_SUPPORTED_is_move_assignable 1
-#define UTL_TRAIT_SUPPORTED_is_trivially_move_assignable 1
-#define UTL_TRAIT_SUPPORTED_is_nothrow_move_assignable 1
-
 #define UTL_TRAIT_SUPPORTED_is_destructible 1
 #define UTL_TRAIT_SUPPORTED_is_trivially_destructible 1
 #define UTL_TRAIT_SUPPORTED_is_nothrow_destructible 1
 
 #define UTL_TRAIT_SUPPORTED_has_virtual_destructor 1
-
-#define UTL_TRAIT_SUPPORTED_alignment_of 1
 
 #define UTL_TRAIT_SUPPORTED_common_type 1
 #define UTL_TRAIT_SUPPORTED_underlying_type 1

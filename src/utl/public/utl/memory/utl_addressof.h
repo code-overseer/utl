@@ -3,7 +3,8 @@
 #pragma once
 
 #include "utl/base_preprocessor.h"
-#include "utl/type_traits/utl_std_traits.h"
+#include "utl/type_traits/utl_is_object.h"
+#include "utl/type_traits/utl_modify_x_reference.h"
 
 UTL_NAMESPACE_BEGIN
 

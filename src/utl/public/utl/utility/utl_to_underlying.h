@@ -13,9 +13,9 @@
 
 UTL_NAMESPACE_BEGIN
 
-using std::to_underlying
+using std::to_underlying;
 
-    UTL_NAMESPACE_END
+UTL_NAMESPACE_END
 
 #else // defined(UTL_CXX23) && defined(UTL_USE_STD_to_underlying) && UTL_USE_STD_to_underlying
 
@@ -24,6 +24,9 @@ UTL_PRAGMA_WARN(
     "The current standard does not implement to_underlying, `UTL_USE_STD_to_underlying` ignored")
 #  endif // defined(UTL_USE_STD_to_underlying) && UTL_USE_STD_to_underlying
 
+#  include "utl/type_traits/utl_enable_if.h"
+#  include "utl/type_traits/utl_is_enum.h"
+// underlying_type
 #  include "utl/type_traits/utl_std_traits.h"
 
 UTL_NAMESPACE_BEGIN

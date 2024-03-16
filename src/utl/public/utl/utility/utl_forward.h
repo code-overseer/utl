@@ -24,7 +24,8 @@ UTL_PRAGMA_WARN(
     "The current standard does not implement a constexpr forward, `UTL_USE_STD_forward` ignored")
 #  endif // defined(UTL_USE_STD_forward) && UTL_USE_STD_forward
 
-#  include "utl/type_traits/utl_std_traits.h"
+#  include "utl/type_traits/utl_is_x_reference.h"
+#  include "utl/type_traits/utl_modify_x_reference.h"
 
 UTL_NAMESPACE_BEGIN
 

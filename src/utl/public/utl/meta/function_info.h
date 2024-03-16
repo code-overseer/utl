@@ -4,8 +4,9 @@
 
 #include "utl/base_preprocessor.h"
 #include "utl/tuple/utl_tuple_fwd.h"
+#include "utl/type_traits/utl_enable_if.h"
+#include "utl/type_traits/utl_is_function.h"
 #include "utl/type_traits/utl_rebind_template.h"
-#include "utl/type_traits/utl_std_traits.h"
 #include "utl/type_traits/utl_template_list.h"
 
 UTL_NAMESPACE_BEGIN

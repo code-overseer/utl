@@ -24,7 +24,7 @@ struct tuple_element<I, UTL_SCOPE tuple<T...>> :
 // TODO: if std is included or forward declared use std, else use UTL
 // RANT: specializable std templates should provide forward declarations
 template <typename... T, typename Alloc>
-struct uses_allocator<UTL_SCOPE tuple<T...>, Alloc> : true_type {};
+struct uses_allocator<UTL_SCOPE tuple<T...>, Alloc> : UTL_SCOPE true_type {};
 } // namespace std
 
 UTL_NAMESPACE_BEGIN
