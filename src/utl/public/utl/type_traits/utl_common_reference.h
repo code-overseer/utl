@@ -8,12 +8,10 @@
 #include "utl/type_traits/utl_copy_cvref.h"
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_has_type.h"
+#include "utl/type_traits/utl_is_x_convertible.h"
 #include "utl/type_traits/utl_merge_x_cv.h"
 #include "utl/type_traits/utl_modify_x_reference.h"
 #include "utl/type_traits/utl_remove_cvref.h"
-
-// is_convertible
-#include "utl/type_traits/utl_std_traits.h"
 
 #if defined(UTL_USE_STD_TYPE_TRAITS) && defined(UTL_CXX20)
 

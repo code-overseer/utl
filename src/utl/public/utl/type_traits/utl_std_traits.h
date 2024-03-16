@@ -53,35 +53,21 @@ using ::std::is_standard_layout;
 using ::std::is_trivial;
 using ::std::is_trivially_copyable;
 
-using ::std::is_assignable;
-using ::std::is_nothrow_assignable;
-using ::std::is_trivially_assignable;
-
-using ::std::is_copy_assignable;
-using ::std::is_nothrow_copy_assignable;
-using ::std::is_trivially_copy_assignable;
-
-using ::std::is_move_assignable;
-using ::std::is_nothrow_move_assignable;
-using ::std::is_trivially_move_assignable;
-
 using ::std::is_destructible;
 using ::std::is_nothrow_destructible;
 using ::std::is_trivially_destructible;
 
 using ::std::has_virtual_destructor;
 
-using ::std::alignment_of;
-
 template <typename... Ts>
 struct common_type : ::std::common_type<Ts...> {};
 
 using ::std::underlying_type;
+template <typename T>
+using underlying_type_t = typename underlying_type<T>::type;
 
 template <typename... T>
 using common_type_t = typename common_type<T...>::type;
-template <typename T>
-using underlying_type_t = typename underlying_type<T>::type;
 
 #ifdef UTL_BUILTIN_is_layout_compatible
 template <typename T, typename U>

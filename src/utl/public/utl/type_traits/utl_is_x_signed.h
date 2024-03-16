@@ -72,7 +72,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_signed : conjunction<is_arithmetic<T>, bool_constant<T(-1) < T(0)>> {};
+struct is_signed : conjunction<is_arithmetic<T>, bool_constant<(T(-1) < T(0))>> {};
 
 #    ifdef UTL_CXX14
 template <typename T>
@@ -109,8 +109,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-    struct is_unsigned : conjunction < is_arithmetic<T>,
-    bool_constant<T(-1)> T(0) >> {};
+struct is_unsigned : conjunction<is_arithmetic<T>, bool_constant<(T(-1) > T(0))>> {};
 template <>
 struct is_unsigned<bool> : true_type {};
 

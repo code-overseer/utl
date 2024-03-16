@@ -26,7 +26,9 @@ UTL_NAMESPACE_END
 #else // defined(UTL_CXX20) && defined(UTL_USE_STD_cmp_utility) && UTL_USE_STD_cmp_utility
 
 #  include "utl/limits.h"
-#  include "utl/type_traits/utl_std_traits.h"
+#  include "utl/type_traits/utl_enable_if.h"
+#  include "utl/type_traits/utl_is_integral.h"
+#  include "utl/type_traits/utl_is_x_signed.h"
 #  include "utl/utility/utl_signs.h"
 
 #  if defined(UTL_USE_STD_cmp_utility) && UTL_USE_STD_cmp_utility

@@ -6,7 +6,9 @@
 #include "utl/preprocessor/utl_namespace.h"
 #include "utl/preprocessor/utl_pragma.h"
 #include "utl/preprocessor/utl_standard.h"
-#include "utl/type_traits/utl_std_traits.h"
+#include "utl/type_traits/utl_enable_if.h"
+#include "utl/type_traits/utl_is_integral.h"
+#include "utl/type_traits/utl_make_x_signed.h"
 
 #ifndef UTL_CXX20
 
