@@ -28,7 +28,8 @@ UTL_NAMESPACE_END
 #  include "utl/limits.h"
 #  include "utl/type_traits/utl_enable_if.h"
 #  include "utl/type_traits/utl_is_integral.h"
-#  include "utl/type_traits/utl_is_x_signed.h"
+#  include "utl/type_traits/utl_is_signed.h"
+#  include "utl/type_traits/utl_is_unsigned.h"
 #  include "utl/utility/utl_signs.h"
 
 #  if defined(UTL_USE_STD_cmp_utility) && UTL_USE_STD_cmp_utility

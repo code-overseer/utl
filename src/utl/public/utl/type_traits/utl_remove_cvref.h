@@ -42,7 +42,8 @@ UTL_NAMESPACE_END
 
 #  else // ifdef UTL_BUILTIN_remove_cvref
 
-#    include "utl/type_traits/utl_modify_x_reference.h"
+#    include "utl/type_traits/utl_remove_cv.h"
+#    include "utl/type_traits/utl_remove_reference.h"
 
 UTL_NAMESPACE_BEGIN
 

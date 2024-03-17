@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "utl/type_traits/utl_add_rvalue_reference.h"
 #include "utl/type_traits/utl_common.h"
 #include "utl/type_traits/utl_common_type.h"
 #include "utl/type_traits/utl_constants.h"
@@ -9,9 +10,9 @@
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_has_type.h"
 #include "utl/type_traits/utl_is_x_convertible.h"
-#include "utl/type_traits/utl_merge_x_cv.h"
-#include "utl/type_traits/utl_modify_x_reference.h"
+#include "utl/type_traits/utl_merge_cv.h"
 #include "utl/type_traits/utl_remove_cvref.h"
+#include "utl/type_traits/utl_remove_reference.h"
 
 #if defined(UTL_USE_STD_TYPE_TRAITS) && defined(UTL_CXX20)
 

@@ -1,0 +1,172 @@
+// Copyright 2023-2024 Bryan Wong
+
+#pragma once
+
+#include "utl/make_unsigned/utl_common.h"
+
+#ifdef UTL_USE_STD_TYPE_TRAITS
+
+#  include <make_unsigned>
+
+UTL_NAMESPACE_BEGIN
+
+using std::make_unsigned;
+
+#  ifdef UTL_CXX14
+
+using std::make_unsigned_t;
+
+#  else  // ifdef UTL_CXX14
+template <typename T>
+using make_unsigned_t = typename make_unsigned<T>::type;
+#  endif // ifdef UTL_CXX14
+
+UTL_NAMESPACE_END
+
+#  define UTL_TRAIT_SUPPORTED_make_unsigned 1
+
+#else // ifdef UTL_USE_STD_TYPE_TRAITS
+
+#  include "utl/make_unsigned/utl_constants.h"
+
+#  ifndef UTL_DISABLE_BUILTIN_make_unsigned
+#    define UTL_DISABLE_BUILTIN_make_unsigned 0
+#  endif // ifndef UTL_DISABLE_BUILTIN_make_unsigned
+
+#  if UTL_SHOULD_USE_BUILTIN(make_unsigned)
+#    define UTL_BUILTIN_make_unsigned(...) __make_unsigned(__VA_ARGS__)
+#  endif // UTL_SHOULD_USE_BUILTIN(make_unsigned)
+
+#  ifdef UTL_BUILTIN_make_unsigned
+
+UTL_NAMESPACE_BEGIN
+
+template <typename T>
+struct make_unsigned {
+    using type = UTL_BUILTIN_make_unsigned(T);
+};
+
+template <typename T>
+using make_unsigned_t = UTL_BUILTIN_make_unsigned(T);
+
+UTL_NAMESPACE_END
+
+#    define UTL_TRAIT_SUPPORTED_make_unsigned 1
+
+#  else // ifdef UTL_BUILTIN_make_unsigned
+
+#    include "utl/make_unsigned/utl_is_enum.h"
+#    include "utl/make_unsigned/utl_is_integral.h"
+#    include "utl/make_unsigned/utl_logical_traits.h"
+
+UTL_NAMESPACE_BEGIN
+
+namespace details {
+namespace make_unsigned {
+
+template <size_t I>
+struct unsigned_table_entry;
+template <size_t I>
+using unsigned_table_entry_t = typename unsigned_table_entry<I>::type;
+#    define UTL_GENERATE_TABLE_ENTRY(N, T) \
+        template <>                        \
+        struct unsigned_table_entry<N> {   \
+            using type = T;                \
+        }
+
+UTL_GENERATE_TABLE_ENTRY(0, unsigned char);
+UTL_GENERATE_TABLE_ENTRY(1, unsigned short);
+UTL_GENERATE_TABLE_ENTRY(2, unsigned int);
+UTL_GENERATE_TABLE_ENTRY(3, unsigned long);
+UTL_GENERATE_TABLE_ENTRY(4, unsigned long long);
+#    ifdef UTL_SUPPORTS_INT128
+UTL_GENERATE_TABLE_ENTRY(5, __uint128_t);
+#    endif
+
+#    undef UTL_GENERATE_TABLE_ENTRY
+
+template <typename T, size_t Idx = 0, bool = (is_integral<T>::value || is_enum<T>::value)>
+struct find_unsigned;
+template <typename T, size_t Idx = 0>
+using find_unsigned_t = typename find_unsigned<T, Idx>::type;
+
+template <typename T, size_t Idx>
+struct find_unsigned<T, Idx, true> :
+    conditional_t<sizeof(T) == sizeof(unsigned_table_entry_t<Idx>), unsigned_table_entry<Idx>,
+        find_unsigned<T, Idx + 1>> {};
+} // namespace make_unsigned
+} // namespace details
+
+template <typename T>
+struct make_unsigned {
+    using type = details::make_unsigned::find_unsigned_t<T>;
+};
+template <typename T>
+struct make_unsigned<T const> {
+    using type = typename make_unsigned<T>::type const;
+};
+template <typename T>
+struct make_unsigned<T volatile> {
+    using type = typename make_unsigned<T>::type volatile;
+};
+template <typename T>
+struct make_unsigned<T const volatile> {
+    using type = typename make_unsigned<T>::type const volatile;
+};
+template <>
+struct make_unsigned<bool> {};
+template <>
+struct make_unsigned<unsigned char> {
+    using type = unsigned char;
+};
+template <>
+struct make_unsigned<signed char> {
+    using type = unsigned char;
+};
+template <>
+struct make_unsigned<unsigned short> {
+    using type = unsigned short;
+};
+template <>
+struct make_unsigned<signed short> {
+    using type = unsigned short;
+};
+template <>
+struct make_unsigned<unsigned int> {
+    using type = unsigned int;
+};
+template <>
+struct make_unsigned<signed int> {
+    using type = unsigned int;
+};
+template <>
+struct make_unsigned<unsigned long> {
+    using type = unsigned long;
+};
+template <>
+struct make_unsigned<signed long> {
+    using type = unsigned long;
+};
+
+#    ifdef UTL_SUPPORTS_INT128
+template <>
+struct make_unsigned<__uint128_t> {
+    using type = __uint128_t;
+};
+template <>
+struct make_unsigned<__int128_t> {
+    using type = __uint128_t;
+};
+#    endif
+
+template <typename T>
+using make_unsigned_t = typename make_unsigned<T>::type;
+
+UTL_NAMESPACE_END
+
+#    define UTL_TRAIT_SUPPORTED_make_unsigned \
+        UTL_TRAIT_SUPPORTED_is_integral&& UTL_TRAIT_SUPPORTED_is_enum
+
+#  endif // ifdef UTL_BUILTIN_make_unsigned
+
+#endif // ifdef UTL_USE_STD_TYPE_TRAITS

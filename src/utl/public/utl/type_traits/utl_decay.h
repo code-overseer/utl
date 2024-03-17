@@ -53,8 +53,8 @@ UTL_NAMESPACE_END
 
 #    include "utl/type_traits/utl_enable_if.h"
 #    include "utl/type_traits/utl_is_function.h"
-#    include "utl/type_traits/utl_modify_x_cv.h"
-#    include "utl/type_traits/utl_modify_x_reference.h"
+#    include "utl/type_traits/utl_remove_cv.h"
+#    include "utl/type_traits/utl_remove_reference.h"
 
 UTL_NAMESPACE_BEGIN
 

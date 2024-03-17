@@ -82,6 +82,8 @@ UTL_INLINE_CXX17 constexpr bool is_base_of_v = is_base_of<T>::value;
 
 UTL_NAMESPACE_END
 
+#    define UTL_TRAIT_SUPPORTED_is_base_of 0
+
 #  endif // ifdef UTL_BUILTIN_is_base_of
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS

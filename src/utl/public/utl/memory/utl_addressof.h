@@ -3,8 +3,11 @@
 #pragma once
 
 #include "utl/base_preprocessor.h"
+#include "utl/type_traits/utl_add_lvalue_reference.h"
+#include "utl/type_traits/utl_constants.h"
+#include "utl/type_traits/utl_copy_cvref.h"
 #include "utl/type_traits/utl_is_object.h"
-#include "utl/type_traits/utl_modify_x_reference.h"
+#include "utl/type_traits/utl_remove_reference.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -31,6 +34,8 @@ template <typename T>
 struct is_addressof_constexpr : true_type {};
 
 #else // ifdef UTL_BUILTIN_addressof
+
+#  include "utl/type_traits/utl_logical_traits.h"
 
 namespace details {
 namespace addressof {
