@@ -25,10 +25,10 @@ UTL_PRAGMA_WARN(
 #    undef UTL_USE_STD_exchange
 #  endif // defined(UTL_USE_STD_exchange) && UTL_USE_STD_exchange
 
-#  include "utl/type_traits/assignment_traits/utl_is_assignable.h"
-#  include "utl/type_traits/assignment_traits/utl_is_nothrow_assignable.h"
-#  include "utl/type_traits/constructor_traits/utl_is_move_constructible.h"
-#  include "utl/type_traits/constructor_traits/utl_is_nothrow_move_constructible.h"
+#  include "utl/type_traits/utl_is_assignable.h"
+#  include "utl/type_traits/utl_is_move_constructible.h"
+#  include "utl/type_traits/utl_is_nothrow_assignable.h"
+#  include "utl/type_traits/utl_is_nothrow_move_constructible.h"
 #  include "utl/utility/utl_forward.h"
 #  include "utl/utility/utl_move.h"
 
