@@ -50,8 +50,8 @@ UTL_NAMESPACE_END
 
 #  elif defined(UTL_BUILTIN_reference_binds_to_temporary)
 
+#    include "utl/type_traits/utl_is_convertible.h"
 #    include "utl/type_traits/utl_is_same.h"
-#    include "utl/type_traits/utl_is_x_convertible.h"
 #    include "utl/type_traits/utl_remove_cv.h"
 #    include "utl/type_traits/utl_remove_cvref.h"
 

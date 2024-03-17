@@ -9,7 +9,7 @@
 #include "utl/type_traits/utl_copy_cvref.h"
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_has_type.h"
-#include "utl/type_traits/utl_is_x_convertible.h"
+#include "utl/type_traits/utl_is_convertible.h"
 #include "utl/type_traits/utl_merge_cv.h"
 #include "utl/type_traits/utl_remove_cvref.h"
 #include "utl/type_traits/utl_remove_reference.h"
