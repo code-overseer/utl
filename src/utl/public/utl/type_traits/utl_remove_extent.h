@@ -10,24 +10,22 @@
 
 UTL_NAMESPACE_BEGIN
 
-using std::remove_all_extent;
 using std::remove_extent;
 
 #  ifdef UTL_CXX14
 
-using std::remove_all_extent_t;
 using std::remove_extent_t;
 
 #  else // UTL_CXX14
 
 template <typename T>
 using remove_extent_t = typename remove_extent<T>::type;
-template <typename T>
-using remove_all_extent_t = typename remove_all_extent<T>::type;
 
 #  endif // UTL_CXX14
 
 UTL_NAMESPACE_END
+
+#  define UTL_TRAIT_SUPPORTED_remove_extent 1
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
@@ -55,8 +53,6 @@ UTL_NAMESPACE_END
 
 #  else // ifdef UTL_BUILTIN_remove_extent
 
-#    include "utl/type_traits/utl_modify_x_reference.h"
-
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
@@ -78,27 +74,6 @@ UTL_NAMESPACE_END
 
 #  endif // ifdef UTL_BUILTIN_remove_extent
 
-UTL_NAMESPACE_BEGIN
-
-template <typename T>
-struct remove_all_extent {
-    using type = T;
-};
-template <typename T>
-using remove_all_extent_t = typename remove_all_extent<T>::type;
-
-template <typename T>
-struct remove_all_extent<T[]> {
-    using type = remove_all_extent_t<T>;
-};
-template <typename T, size_t N>
-struct remove_all_extent<T[N]> {
-    using type = remove_all_extent_t<T>;
-};
-
-UTL_NAMESPACE_END
+#  define UTL_TRAIT_SUPPORTED_remove_extent 1
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
-
-#define UTL_TRAIT_SUPPORTED_remove_extent 1
-#define UTL_TRAIT_SUPPORTED_remove_all_extent 1

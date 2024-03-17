@@ -59,7 +59,7 @@ UTL_NAMESPACE_END
 
 #    include "utl/type_traits/assignment_traits/utl_is_assignable.h"
 #    include "utl/type_traits/utl_declval.h"
-#    include "utl/type_traits/utl_is_x_reference.h"
+#    include "utl/type_traits/utl_is_reference.h"
 UTL_NAMESPACE_BEGIN
 
 namespace details {

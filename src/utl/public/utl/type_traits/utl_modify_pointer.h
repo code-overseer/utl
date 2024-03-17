@@ -63,7 +63,7 @@ UTL_NAMESPACE_END
 
 #  else // ifdef UTL_BUILTIN_add_pointer
 
-#    include "utl/type_traits/utl_modify_x_reference.h"
+#    include "utl/type_traits/utl_remove_reference.h"
 
 UTL_NAMESPACE_BEGIN
 

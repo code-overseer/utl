@@ -8,8 +8,8 @@
 #include "utl/tuple/utl_tuple_traits.h"
 #include "utl/type_traits/utl_boolean_testable.h"
 #include "utl/type_traits/utl_logical_traits.h"
-#include "utl/type_traits/utl_modify_x_reference.h"
 #include "utl/type_traits/utl_remove_cvref.h"
+#include "utl/type_traits/utl_remove_reference.h"
 #include "utl/utility/utl_sequence.h"
 
 #define TT_SCOPE UTL_SCOPE tuple_traits::

@@ -8,7 +8,8 @@
 #include "utl/preprocessor/utl_standard.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_integral.h"
-#include "utl/type_traits/utl_make_x_signed.h"
+#include "utl/type_traits/utl_make_signed.h"
+#include "utl/type_traits/utl_make_unsigned.h"
 
 #ifndef UTL_CXX20
 

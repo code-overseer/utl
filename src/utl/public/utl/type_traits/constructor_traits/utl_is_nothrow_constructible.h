@@ -62,7 +62,7 @@ UTL_NAMESPACE_END
 
 #    include "utl/type_traits/constructor_traits/utl_is_constructible.h"
 #    include "utl/type_traits/utl_declval.h"
-#    include "utl/type_traits/utl_is_x_reference.h"
+#    include "utl/type_traits/utl_is_reference.h"
 UTL_NAMESPACE_BEGIN
 
 namespace details {
@@ -94,8 +94,8 @@ auto nothrow_impl(nothrow_branch_t<false, true>) noexcept -> false_type;
 #    endif
 
 template <typename T, typename... Args>
-using nothrow_impl_t =
-    decltype(nothrow_impl<T, Args...>(nothrow_branch_t<UTL_TRAIT_VALUE(is_constructible, T, Args),
+using nothrow_impl_t = decltype(nothrow_impl<T, Args...>(
+    nothrow_branch_t<UTL_TRAIT_VALUE(is_constructible, T, Args...),
         UTL_TRAIT_VALUE(is_reference, T)>{}));
 
 #    undef UTL_TRAIT_VALUE

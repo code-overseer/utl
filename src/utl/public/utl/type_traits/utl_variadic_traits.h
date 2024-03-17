@@ -12,8 +12,9 @@
 #include "utl/type_traits/constructor_traits/utl_is_move_constructible.h"
 #include "utl/type_traits/constructor_traits/utl_is_nothrow_copy_constructible.h"
 #include "utl/type_traits/constructor_traits/utl_is_nothrow_move_constructible.h"
+#include "utl/type_traits/utl_add_lvalue_reference.h"
+#include "utl/type_traits/utl_add_rvalue_reference.h"
 #include "utl/type_traits/utl_logical_traits.h"
-#include "utl/type_traits/utl_modify_x_reference.h"
 // reference_constructs_from_temporary
 #include "utl/type_traits/utl_std_traits.h"
 #include "utl/utility/utl_sequence.h"
