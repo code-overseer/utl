@@ -158,32 +158,6 @@ UTL_INLINE_CXX17 constexpr bool is_pointer_interconvertible_base_of_v =
 #  define UTL_TRAIT_DEFINED_is_pointer_interconvertible_base_of 1
 #endif /* ifdef UTL_BUILTIN_is_pointer_interconvertible_base_of */
 
-#ifdef UTL_BUILTIN_reference_constructs_from_temporary
-template <typename T, typename U>
-struct reference_constructs_from_temporary :
-    bool_constant<UTL_BUILTIN_reference_constructs_from_temporary(T, U)> {};
-#  define UTL_TRAIT_SUPPORTED_reference_constructs_from_temporary 1
-
-#  ifdef UTL_CXX14
-template <typename T, typename U>
-UTL_INLINE_CXX17 constexpr bool reference_constructs_from_temporary_v =
-    UTL_BUILTIN_reference_constructs_from_temporary(T, U);
-#  endif
-
-#else /* ifdef UTL_BUILTIN_reference_constructs_from_temporary */
-template <typename, typename>
-struct reference_constructs_from_temporary : false_type {};
-
-#  ifdef UTL_CXX14
-template <typename T, typename U>
-UTL_INLINE_CXX17 constexpr bool reference_constructs_from_temporary_v =
-    reference_constructs_from_temporary<T, U>::value;
-#  endif
-
-#  define UTL_TRAIT_SUPPORTED_reference_constructs_from_temporary 0
-#  define UTL_TRAIT_DEFINED_reference_constructs_from_temporary 1
-#endif /* ifdef UTL_BUILTIN_reference_constructs_from_temporary */
-
 UTL_NAMESPACE_END
 
 #include "utl/type_traits/utl_traits_support.h"

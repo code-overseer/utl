@@ -103,6 +103,8 @@ using std::is_nothrow_convertible_v;
 
 #else // defined(UTL_USE_STD_TYPE_TRAITS) && defined(UTL_CXX20)
 
+#  include "utl/type_traits/utl_declval.h"
+
 UTL_NAMESPACE_BEGIN
 
 namespace details {
