@@ -18,14 +18,14 @@ constexpr T* addressof(T&&) = delete;
 
 template <typename T>
 UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr enable_if_t<is_object<remove_reference_t<T>>::value, T*> addressof(
+constexpr enable_if_t<UTL_TRAIT_VALUE(is_object, remove_reference_t<T>), T*> addressof(
     T& arg UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
     return UTL_BUILTIN_addressof(arg);
 }
 
 template <typename T>
 UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr enable_if_t<!is_object<remove_reference_t<T>>::value, T*> addressof(
+constexpr enable_if_t<!UTL_TRAIT_VALUE(is_object, remove_reference_t<T>), T*> addressof(
     T& arg UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
     return &arg;
 }
@@ -58,8 +58,8 @@ struct natively_invocable<T, void_t<decltype(&declval<add_lvalue_reference_t<T>>
     true_type {};
 
 template <typename T>
-struct has_overload :
-    disjunction<negation<natively_invocable<T>>, has_adl_overload<T>, has_member_overload<T>> {};
+using has_overload =
+    disjunction<negation<natively_invocable<T>>, has_adl_overload<T>, has_member_overload<T>>{};
 } // namespace addressof
 } // namespace details
 

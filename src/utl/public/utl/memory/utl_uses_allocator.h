@@ -43,10 +43,10 @@ using impl = R;
 
 struct allocator_arg_t {
     explicit constexpr allocator_arg_t() noexcept = default;
-    template <typename T UTL_REQUIRES_CXX11(is_same<T, ::std::allocator_arg_t>::value)>
+    template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_VALUE(is_same, T, ::std::allocator_arg_t))>
     UTL_REQUIRES_CXX20(same_as<T, ::std::allocator_arg_t>)
     constexpr allocator_arg_t(T) noexcept {}
-    template <typename T UTL_REQUIRES_CXX11(is_same<T, ::std::allocator_arg_t>::value)>
+    template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_VALUE(is_same, T, ::std::allocator_arg_t))>
     UTL_REQUIRES_CXX20(same_as<T, ::std::allocator_arg_t>)
     constexpr operator T() const noexcept {
         return {};

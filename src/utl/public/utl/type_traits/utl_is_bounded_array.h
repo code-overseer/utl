@@ -12,16 +12,7 @@ UTL_NAMESPACE_BEGIN
 
 using std::is_bounded_array;
 
-#  ifdef UTL_CXX17
-
 using std::is_bounded_array_v;
-
-#  elif defined(UTL_CXX14) // ifdef UTL_CXX17
-
-template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_bounded_array_v = is_bounded_array<T>::value;
-
-#  endif // ifdef UTL_CXX17
 
 UTL_NAMESPACE_END
 

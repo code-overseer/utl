@@ -84,17 +84,10 @@ auto nothrow_impl(nothrow_branch_t<false, false>) noexcept -> false_type;
 template <typename T, typename U>
 auto nothrow_impl(nothrow_branch_t<false, true>) noexcept -> false_type;
 
-#    ifdef UTL_CXX14
-#      define UTL_TRAIT_VALUE(TRAIT, ...) TRAIT##_v<__VA_ARGS__>
-#    else
-#      define UTL_TRAIT_VALUE(TRAIT, ...) TRAIT<__VA_ARGS__>::value
-#    endif
-
 template <typename T, typename U>
 using nothrow_impl_t = decltype(nothrow_impl<T, U>(
     nothrow_branch_t<UTL_TRAIT_VALUE(is_assignable, T, Args), UTL_TRAIT_VALUE(is_reference, T)>{}));
 
-#    undef UTL_TRAIT_VALUE
 } // namespace assignable
 } // namespace details
 

@@ -55,12 +55,6 @@ UTL_NAMESPACE_END
 #    include "utl/type_traits/utl_remove_cv.h"
 #    include "utl/type_traits/utl_remove_cvref.h"
 
-#    ifdef UTL_CXX14
-#      define UTL_TRAIT_VALUE(TRAIT, ...) TRAIT##_v<__VA_ARGS__>
-#    else
-#      define UTL_TRAIT_VALUE(TRAIT, ...) TRAIT<__VA_ARGS__>::value
-#    endif
-
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
@@ -119,8 +113,6 @@ UTL_INLINE_CXX17 constexpr bool reference_constructs_from_temporary_v =
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
-
-#    undef UTL_TRAIT_VALUE
 
 #    define UTL_TRAIT_SUPPORTED_reference_constructs_from_temporary 1
 
