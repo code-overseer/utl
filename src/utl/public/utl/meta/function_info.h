@@ -19,9 +19,11 @@ namespace function_info {
 template <typename F, typename = void>
 struct function_type;
 template <typename F>
-struct function_type<F*, enable_if_t<is_function<F>::value>> : UTL_SCOPE function_type<F> {};
+struct function_type<F*, enable_if_t<UTL_TRAIT_VALUE(is_function, F)>> :
+    UTL_SCOPE function_type<F> {};
 template <typename F>
-struct function_type<F&, enable_if_t<is_function<F>::value>> : UTL_SCOPE function_type<F> {};
+struct function_type<F&, enable_if_t<UTL_TRAIT_VALUE(is_function, F)>> :
+    UTL_SCOPE function_type<F> {};
 } // namespace function_info
 } // namespace details
 

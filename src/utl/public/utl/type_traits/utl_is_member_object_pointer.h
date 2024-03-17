@@ -58,12 +58,6 @@ UTL_NAMESPACE_END
 
 #    include "utl/type_traits/utl_is_function.h"
 
-#    ifdef UTL_CXX14
-#      define UTL_TRAIT_VALUE(TRAIT, ...) TRAIT##_v<__VA_ARGS__>
-#    else
-#      define UTL_TRAIT_VALUE(TRAIT, ...) TRAIT<__VA_ARGS__>::value
-#    endif
-
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
@@ -71,8 +65,6 @@ struct is_member_object_pointer : false_type {};
 
 template <typename T, typename U>
 struct is_member_object_pointer<T U::*> : bool_constant<!UTL_TRAIT_VALUE(is_function, T)> {};
-
-#    undef UTL_TRAIT_VALUE
 
 #    ifdef UTL_CXX14
 template <typename T>
