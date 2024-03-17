@@ -30,7 +30,7 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  include "utl/type_traits/assignment_traits/utl_is_nothrow_assignable.h"
+#  include "utl/type_traits/utl_is_nothrow_assignable.h"
 
 #  ifdef UTL_BUILTIN_is_nothrow_assignable
 

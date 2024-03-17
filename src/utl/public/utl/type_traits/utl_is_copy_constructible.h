@@ -29,7 +29,7 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  include "utl/type_traits/constructor_traits/utl_is_constructible.h"
+#  include "utl/type_traits/utl_is_constructible.h"
 
 #  ifdef UTL_BUILTIN_is_constructible
 

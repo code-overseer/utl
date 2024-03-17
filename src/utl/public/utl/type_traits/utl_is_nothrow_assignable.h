@@ -57,8 +57,8 @@ UTL_NAMESPACE_END
 
 #  else // ifdef UTL_BUILTIN_is_nothrow_assignable
 
-#    include "utl/type_traits/assignment_traits/utl_is_assignable.h"
 #    include "utl/type_traits/utl_declval.h"
+#    include "utl/type_traits/utl_is_assignable.h"
 #    include "utl/type_traits/utl_is_reference.h"
 UTL_NAMESPACE_BEGIN
 

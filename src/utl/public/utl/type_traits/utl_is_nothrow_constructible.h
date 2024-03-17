@@ -60,8 +60,8 @@ UTL_NAMESPACE_END
 
 #  else // ifdef UTL_BUILTIN_is_nothrow_constructible
 
-#    include "utl/type_traits/constructor_traits/utl_is_constructible.h"
 #    include "utl/type_traits/utl_declval.h"
+#    include "utl/type_traits/utl_is_constructible.h"
 #    include "utl/type_traits/utl_is_reference.h"
 UTL_NAMESPACE_BEGIN
 
