@@ -43,7 +43,7 @@ protected:
     void release() noexcept { released_ = true; }
 
     ~impl() noexcept(noexcept(callable())) {
-        if (!released_ && static_cast<Impl*>(this)->should_invoke()) {
+        if (!released_) {
             callable();
         }
     }

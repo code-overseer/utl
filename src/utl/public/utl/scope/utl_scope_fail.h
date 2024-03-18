@@ -16,15 +16,21 @@ class scope_fail : private details::scope::impl<scope_fail<F>, F> {
     friend base_type;
 
 public:
-    template <typename Fn, typename = enable_if_t<is_constructible<F, Fn&&>::value>>
-    scope_fail(Fn&& func) noexcept(is_nothrow_constructible<F, Fn&&>::value)
+    template <typename Fn, typename = enable_if_t<UTL_TRAIT_VALUE(is_constructible, F, Fn&&)>>
+    explicit scope_fail(Fn&& func) noexcept(UTL_TRAIT_VALUE(is_nothrow_constructible, F, Fn&&))
         : base_type(forward<Fn>(func))
         , exceptions_(uncaught_exceptions()) {}
-    scope_fail(move_t&& other) noexcept(is_nothrow_move_constructible<F>::value)
+    scope_fail(move_t&& other) noexcept(UTL_TRAIT_VALUE(is_nothrow_move_constructible, F))
         : base_type(move(other))
         , exceptions_(other.exceptions_) {}
 
     using base_type::release;
+
+    ~scope_fail() noexcept {
+        if (!should_invoke()) {
+            release();
+        }
+    }
 
 private:
     bool should_invoke() const noexcept { return exceptions_ < uncaught_exceptions(); }
@@ -34,22 +40,25 @@ private:
 template <typename Fn>
 explicit scope_fail(Fn&& f) -> scope_fail<decay_t<Fn>>;
 
-template <typename Fn, typename = enable_if_t<is_constructible<scope_fail<decay_t<Fn>>, Fn>::value>>
-scope_fail<decay_t<Fn>> make_scope_fail(Fn&& f) noexcept(
-    is_nothrow_constructible<scope_fail<decay_t<Fn>>, declval<Fn>()>) {
+template <typename Fn>
+auto make_scope_fail(Fn&& f) noexcept(
+    UTL_TRAIT_VALUE(is_nothrow_constructible, scope_fail<decay_t<Fn>>, Fn))
+    -> enable_if_t<UTL_TRAIT_VALUE(is_constructible, scope_fail<decay_t<Fn>>, Fn),
+        scope_fail<decay_t<Fn>>> {
     return scope_fail<decay_t<Fn>>{forward<Fn>(f)};
 }
 
 namespace details {
 namespace scope {
-struct fail_proxy_t {
-    template <typename Fn,
-        typename = enable_if_t<is_constructible<scope_fail<decay_t<Fn>>, Fn>::value>>
-    scope_fail<decay_t<Fn>> operator->*(Fn&& f) const
-        noexcept(is_nothrow_constructible<scope_fail<decay_t<Fn>>, declval<Fn>()>) {
+UTL_INLINE_CXX17 constexpr struct fail_proxy_t {
+    template <typename Fn>
+    auto operator->*(Fn&& f) const
+        noexcept(UTL_TRAIT_VALUE(is_nothrow_constructible, scope_fail<decay_t<Fn>>, Fn))
+            -> enable_if_t<UTL_TRAIT_VALUE(is_constructible, scope_fail<decay_t<Fn>>, Fn),
+                scope_fail<decay_t<Fn>>> {
         return scope_fail<decay_t<Fn>>{forward<Fn>(f)};
     }
-} fail_proxy;
+} fail_proxy = {};
 } // namespace scope
 } // namespace details
 
