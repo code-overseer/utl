@@ -54,8 +54,8 @@ struct success_proxy_t {
 } // namespace scope
 } // namespace details
 
-#  define UTL_ON_SCOPE_SUCCESS() \
-      auto UTL_UNIQUE_VAR(ScopeSuccess) = UTL_SCOPE details::scope::success_proxy->*[&]()
+#  define UTL_ON_SCOPE_SUCCESS \
+      const auto UTL_UNIQUE_VAR(ScopeSuccess) = UTL_SCOPE details::scope::success_proxy->*[&]()
 
 #else
 template <typename F>

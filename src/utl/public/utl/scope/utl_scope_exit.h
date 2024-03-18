@@ -51,7 +51,7 @@ struct exit_proxy_t {
 } // namespace scope
 } // namespace details
 
-#define UTL_ON_SCOPE_FAIL() \
-    auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::exit_proxy->*[&]()
+#define UTL_ON_SCOPE_EXIT \
+    const auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::exit_proxy->*[&]()
 
 UTL_NAMESPACE_END

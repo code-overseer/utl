@@ -53,8 +53,8 @@ struct fail_proxy_t {
 } // namespace scope
 } // namespace details
 
-#  define UTL_ON_SCOPE_FAIL() \
-      auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::fail_proxy->*[&]()
+#  define UTL_ON_SCOPE_FAIL \
+      const auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::fail_proxy->*[&]()
 #else
 template <typename F>
 class scope_fail {
