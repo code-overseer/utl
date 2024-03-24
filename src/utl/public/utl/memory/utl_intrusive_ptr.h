@@ -5,11 +5,12 @@
 #include "utl/atomic.h"
 #include "utl/base_preprocessor.h"
 #include "utl/compare/utl_pointer_comparable.h"
+#include "utl/exception.h"
 #include "utl/memory/utl_addressof.h"
+#include "utl/memory/utl_reference_counter.h"
 #include "utl/type_traits/declval.h"
 #include "utl/utility/utl_exchange.h"
 #include "utl/utility/utl_forward.h"
-#include "utl_reference_counter.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -41,10 +42,13 @@ class intrusive_ptr : private pointer_comparable<intrusive_ptr<T>> {
      * @return The result of executing the callable.
      */
     template <typename F>
-    static UTL_CONSTEXPR_CXX14 auto iff_notnull(T* ptr, F&& func) noexcept
+    static UTL_CONSTEXPR_CXX14 auto iff_notnull(T* ptr, F&& func) noexcept(!utl::with_exceptions)
         -> decltype(declval<F>()((T*)nullptr)) {
-        UTL_ASSERT(ptr != nullptr);
-        return forward<F>(func)(ptr);
+        if (ptr != nullptr) {
+            return forward<F>(func)(ptr);
+        }
+        UTL_THROW(
+            utl::internal_exception("intrusive_ptr operation failed due to nullptr argument"));
     }
 
 public:
@@ -65,7 +69,7 @@ public:
      * @note The pointer to the object cannot be null; an exception is throw (if enabled), or
      * an assertion (if enabled) will be raised otherwise.
      */
-    UTL_CONSTEXPR_CXX14 intrusive_ptr(adopt_object_t, T* ptr) noexcept
+    UTL_CONSTEXPR_CXX14 intrusive_ptr(adopt_object_t, T* ptr) noexcept(!utl::with_exceptions)
         : resource_(iff_notnull(ptr, [](T* ptr) { return ptr; })) {}
 
     /**
@@ -79,7 +83,7 @@ public:
      * @note The pointer to the object cannot be null; an exception is throw (if enabled), or
      * an assertion (if enabled) will be raised otherwise.
      */
-    UTL_CONSTEXPR_CXX14 intrusive_ptr(retain_object_t, T* ptr) noexcept
+    UTL_CONSTEXPR_CXX14 intrusive_ptr(retain_object_t, T* ptr) noexcept(!utl::with_exceptions)
         : resource_(iff_notnull(ptr, [](T* ptr) {
             increment(*ptr);
             return ptr;
@@ -89,7 +93,11 @@ public:
      * Copy constructor
      */
     UTL_CONSTEXPR_CXX14 intrusive_ptr(intrusive_ptr const& other) noexcept
-        : intrusive_ptr(retain_object, other.resource_) {}
+        : resource_(other.resource_) {
+        if (resource_ != nullptr) {
+            increment(*resource_);
+        }
+    }
 
     /**
      * Copy assignment
@@ -172,7 +180,7 @@ public:
      * @param retain_object_t Tag type indicating retention of ownership.
      * @param ptr The pointer to the object to retain.
      */
-    UTL_CONSTEXPR_CXX14 void reset(retain_object_t, T* ptr) noexcept {
+    UTL_CONSTEXPR_CXX14 void reset(retain_object_t, T* ptr) noexcept(!utl::with_exceptions) {
         reset();
         iff_notnull(ptr, [this](T* ptr) {
             increment(*ptr);
@@ -186,7 +194,7 @@ public:
      * @param adopt_object_t Tag type indicating adoption of ownership.
      * @param ptr The pointer to the object to adopt.
      */
-    UTL_CONSTEXPR_CXX14 void reset(adopt_object_t, T* other) noexcept {
+    UTL_CONSTEXPR_CXX14 void reset(adopt_object_t, T* other) noexcept(!utl::with_exceptions) {
         reset();
         iff_notnull(ptr, [this](T* ptr) { resource_ = ptr; });
     }
