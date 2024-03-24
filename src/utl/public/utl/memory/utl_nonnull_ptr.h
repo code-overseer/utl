@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/base_preprocessor.h"
+#include "utl/exception/utl_program_exception.h"
 #include "utl/memory/utl_addressof.h"
 
 UTL_NAMESPACE_BEGIN
@@ -27,8 +28,14 @@ public:
      * Constructs a nonnull_ptr from a raw pointer.
      *
      * @param ptr A pointer to the object. It must be non-null.
+     *
+     * @throws utl::program_exception<void> If the pointer is null exceptions are enabled
      */
-    constexpr nonnull_ptr(T* ptr) noexcept : ptr_(ptr) { UTL_ASSERT(ptr_ != nullptr); }
+    constexpr nonnull_ptr(T* ptr) noexcept(!utl::with_exceptions) : ptr_(ptr) {
+        UTL_THROW_IF(ptr_ == nullptr,
+            utl::program_exception<void>(
+                "[UTL] nonnull_ptr construction failed, Reason=[Pointer argument cannot be null]"));
+    }
 
     /**
      * Constructs a nonnull_ptr from a reference.

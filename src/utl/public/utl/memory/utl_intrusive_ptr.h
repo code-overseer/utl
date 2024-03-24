@@ -5,7 +5,7 @@
 #include "utl/atomic.h"
 #include "utl/base_preprocessor.h"
 #include "utl/compare/utl_pointer_comparable.h"
-#include "utl/exception.h"
+#include "utl/exception/utl_program_exception.h"
 #include "utl/memory/utl_addressof.h"
 #include "utl/memory/utl_reference_counter.h"
 #include "utl/type_traits/declval.h"
@@ -45,11 +45,11 @@ class intrusive_ptr : private pointer_comparable<intrusive_ptr<T>> {
     template <typename F>
     static UTL_CONSTEXPR_CXX14 auto iff_notnull(T* ptr, F&& func) noexcept(!utl::with_exceptions)
         -> decltype(declval<F>()((T*)nullptr)) {
-        if (ptr != nullptr) {
-            return forward<F>(func)(ptr);
-        }
-        UTL_THROW(utl::program_exception<void>(
-            "[UTL] intrusive_ptr operation failed, Reason=[Unexpected nullptr argument]"));
+        UTL_THROW_IF(ptr == nullptr,
+            utl::program_exception<void>(
+                "[UTL] intrusive_ptr operation failed, Reason=[Unexpected nullptr argument]"));
+
+        return forward<F>(func)(ptr);
     }
 
 public:
