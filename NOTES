@@ -1,7 +1,6 @@
 * Supporting modules will probably be a massive PITA
 * TODO: hide private symbols, put the visibility macros in utl_abi
 * TODO: Maybe move all the type_traits builtins to a single file
-* TODO: Add clang-format so I don't have to keep regexing things
 * TODO: defined some sort of standardization for #if and #ifdef checks
-* TODO: Add indentation to preprocessor logics 
 * TODO: Find stable impementation of type traits introduced in C++20 and remove support for buggy implementations
+* TODO: Maybe remove utl ordering and just use <compare>, the header is not particularly large
