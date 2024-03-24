@@ -34,12 +34,13 @@ class intrusive_ptr : private pointer_comparable<intrusive_ptr<T>> {
     /**
      * Helper function to conditionally execute a function if the pointer is not null.
      *
-     * TODO: Throw exception if enabled
-     *
      * @tparam F The type of the callable.
      * @param ptr The pointer to check.
      * @param func The callable to execute if the pointer is not null.
+     *
      * @return The result of executing the callable.
+     *
+     * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
     template <typename F>
     static UTL_CONSTEXPR_CXX14 auto iff_notnull(T* ptr, F&& func) noexcept(!utl::with_exceptions)
@@ -47,8 +48,8 @@ class intrusive_ptr : private pointer_comparable<intrusive_ptr<T>> {
         if (ptr != nullptr) {
             return forward<F>(func)(ptr);
         }
-        UTL_THROW(
-            utl::internal_exception("intrusive_ptr operation failed due to nullptr argument"));
+        UTL_THROW(utl::program_exception<void>(
+            "[UTL] intrusive_ptr operation failed, Reason=[Unexpected nullptr argument]"));
     }
 
 public:
@@ -66,8 +67,8 @@ public:
      * @param ptr The pointer to the object to adopt.
      *
      * @note Adoption transfers ownership without incrementing the reference count.
-     * @note The pointer to the object cannot be null; an exception is throw (if enabled), or
-     * an assertion (if enabled) will be raised otherwise.
+     *
+     * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
     UTL_CONSTEXPR_CXX14 intrusive_ptr(adopt_object_t, T* ptr) noexcept(!utl::with_exceptions)
         : resource_(iff_notnull(ptr, [](T* ptr) { return ptr; })) {}
@@ -80,8 +81,9 @@ public:
      * @param ptr The pointer to the object to retain.
      *
      * @note Retention of ownership involves incrementing the reference count of the object.
-     * @note The pointer to the object cannot be null; an exception is throw (if enabled), or
-     * an assertion (if enabled) will be raised otherwise.
+     * @note The pointer to the object cannot be null
+     *
+     * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
     UTL_CONSTEXPR_CXX14 intrusive_ptr(retain_object_t, T* ptr) noexcept(!utl::with_exceptions)
         : resource_(iff_notnull(ptr, [](T* ptr) {
@@ -155,7 +157,7 @@ public:
      * Releases ownership of the managed object.
      * Resets the intrusive_ptr to hold a null pointer and returns the previous raw pointer.
      */
-    constexpr T* release() noexcept { return exchange(resource_, nullptr); }
+    UTL_CONSTEXPR_CXX14 T* release() noexcept { return exchange(resource_, nullptr); }
 
     /**
      * Conversion operator to implicitly convert intrusive_ptr to boolean indicating non-nullness.
@@ -179,6 +181,8 @@ public:
      *
      * @param retain_object_t Tag type indicating retention of ownership.
      * @param ptr The pointer to the object to retain.
+     *
+     * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
     UTL_CONSTEXPR_CXX14 void reset(retain_object_t, T* ptr) noexcept(!utl::with_exceptions) {
         reset();
@@ -193,6 +197,8 @@ public:
      *
      * @param adopt_object_t Tag type indicating adoption of ownership.
      * @param ptr The pointer to the object to adopt.
+     *
+     * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
     UTL_CONSTEXPR_CXX14 void reset(adopt_object_t, T* other) noexcept(!utl::with_exceptions) {
         reset();
@@ -226,10 +232,10 @@ private:
  *
  * @tparam T The const-qualified type of the managed object.
  *
- * @note This specialization deliberately disallows many operations that involve const-qualified
- *       raw pointers that are present in the non-const implementation. This restriction is due to
- *       the fact that there is no guarantee that the constructed object is not const, and allowing
- *       const-qualified versions may introduce undefined behaviors as the act of
+ * @note This specialization deliberately disallows many const-qualified raw pointers versions of
+ *       operations that are present in the non-const implementation. This restriction is due to
+ *       the lack of guarantee that the constructed object is not const, and allowing
+ *       const-qualified versions of the operations may introduce undefined behaviors as the act of
  *       incrementing/decrementing the reference count modifies the object.
  */
 template <typename T>
@@ -264,7 +270,7 @@ public:
      * Releases ownership of the const-qualified managed object.
      * Resets the `intrusive_ptr` to hold a null pointer and returns the previous raw pointer.
      */
-    constexpr T const* release() noexcept { return base_type::release(); }
+    UTL_CONSTEXPR_CXX14 T const* release() noexcept { return base_type::release(); }
 
     /**
      * Copy constructor
@@ -292,6 +298,15 @@ public:
     UTL_CONSTEXPR_CXX14 intrusive_ptr& operator=(intrusive_ptr<T const>&& other) noexcept {
         base_type::operator=(static_cast<base_type&&>(other));
         return *this;
+    }
+
+    /**
+     * Swaps the contents of this intrusive_ptr with another intrusive_ptr instance.
+     *
+     * @param other The intrusive_ptr to swap with.
+     */
+    UTL_CONSTEXPR_CXX14 void swap(intrusive_ptr& other) noexcept {
+        base_type::swap(static_cast<base_type&>(other));
     }
 };
 
