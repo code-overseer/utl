@@ -200,7 +200,7 @@ public:
      *
      * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
-    UTL_CONSTEXPR_CXX14 void reset(adopt_object_t, T* other) noexcept(!utl::with_exceptions) {
+    UTL_CONSTEXPR_CXX14 void reset(adopt_object_t, T* ptr) noexcept(!utl::with_exceptions) {
         reset();
         iff_notnull(ptr, [this](T* ptr) { resource_ = ptr; });
     }
