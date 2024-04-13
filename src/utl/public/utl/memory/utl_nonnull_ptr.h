@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "utl/base_preprocessor.h"
 #include "utl/exception/utl_program_exception.h"
 #include "utl/memory/utl_addressof.h"
+#include "utl/preprocessor/utl_config.h"
 
 UTL_NAMESPACE_BEGIN
 

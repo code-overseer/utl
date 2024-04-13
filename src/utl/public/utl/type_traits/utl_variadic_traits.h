@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "utl/base_preprocessor.h"
 #include "utl/memory/utl_uses_allocator.h"
+#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_add_lvalue_reference.h"
 #include "utl/type_traits/utl_add_rvalue_reference.h"
 #include "utl/type_traits/utl_is_copy_assignable.h"

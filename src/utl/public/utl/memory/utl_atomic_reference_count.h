@@ -3,7 +3,7 @@
 #pragma once
 
 #include "utl/atomic.h"
-#include "utl/base_preprocessor.h"
+#include "utl/preprocessor/utl_config.h"
 #include "utl_reference_countable_destroy.h"
 
 UTL_NAMESPACE_BEGIN

@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "utl/base_preprocessor.h"
 #include "utl/preprocessor/utl_assertion.h"
 #include "utl/preprocessor/utl_attributes.h"
+#include "utl/preprocessor/utl_config.h"
 #include "utl/preprocessor/utl_namespace.h"
 
 #ifdef UTL_WITH_EXCEPTIONS

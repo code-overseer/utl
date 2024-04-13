@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "utl/base_preprocessor.h"
 #include "utl/exception/utl_exception_base.h"
+#include "utl/preprocessor/utl_config.h"
 
 #include <string.h>
 
