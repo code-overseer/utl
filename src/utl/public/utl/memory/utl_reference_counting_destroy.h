@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "utl/base_preprocessor.h"
+#include "utl/preprocessor/utl_config.h"
 #include "utl_is_reference_countable.h"
 
 UTL_NAMESPACE_BEGIN

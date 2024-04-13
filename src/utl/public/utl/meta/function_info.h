@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/base_preprocessor.h"
+#include "utl/preprocessor/utl_config.h"
 #include "utl/tuple/utl_tuple_fwd.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_function.h"

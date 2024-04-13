@@ -68,6 +68,9 @@
 #elif UTL_HAS_ATTRIBUTE(const)
 #  define UTL_NONSTD_ATTRIBUTE_CONST __attribute__((const))
 #  define UTL_NONSTD_ATTRIBUTE_CONST_DEFINED
+#elif defined(UTL_COMPILER_MSVC)
+#  define UTL_NONSTD_ATTRIBUTE_CONST __declspec(noalias)
+#  define UTL_NONSTD_ATTRIBUTE_CONST_DEFINED
 #endif /* UTL_HAS_CPP_ATTRIBUTE(gnu::const) */
 
 #if UTL_HAS_CPP_ATTRIBUTE(msvc::intrinsic)

@@ -16,7 +16,7 @@ CXX := c++
 CXX_FLAGS := -std=c++17 -fPIC -I$(PUBLIC_DIR) -I$(PRIVATE_DIR) -DUTL_BUILD_TESTS
 LINKER_FLAGS := -lm
 OBJECTS := $(addsuffix .o, $(basename $(MODULE_SRCS:$(MODULE_ROOT)/%=%)))
-OBJECT_PATHS := $(addprefix '$(INTERMEDIATE_DIR)/',$(OBJECTS))
+OBJECT_PATHS := $(addprefix $(INTERMEDIATE_DIR)/,$(OBJECTS))
 DEPENDENCIES := $(OBJECTS:.o=.d)
 PREPROCESSED := $(OBJECTS:.o=.prep.cpp)
 

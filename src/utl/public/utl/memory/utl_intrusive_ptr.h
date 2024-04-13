@@ -3,11 +3,11 @@
 #pragma once
 
 #include "utl/atomic.h"
-#include "utl/base_preprocessor.h"
 #include "utl/compare/utl_pointer_comparable.h"
 #include "utl/exception/utl_program_exception.h"
 #include "utl/memory/utl_addressof.h"
 #include "utl/memory/utl_reference_counter.h"
+#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/declval.h"
 #include "utl/utility/utl_exchange.h"
 #include "utl/utility/utl_forward.h"
@@ -200,7 +200,7 @@ public:
      *
      * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
-    UTL_CONSTEXPR_CXX14 void reset(adopt_object_t, T* other) noexcept(!utl::with_exceptions) {
+    UTL_CONSTEXPR_CXX14 void reset(adopt_object_t, T* ptr) noexcept(!utl::with_exceptions) {
         reset();
         iff_notnull(ptr, [this](T* ptr) { resource_ = ptr; });
     }

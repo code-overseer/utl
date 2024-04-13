@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/base_preprocessor.h"
+#include "utl/preprocessor/utl_config.h"
 #include "utl/utility/utl_as_const.h"
 #include "utl/utility/utl_cpp_standard.h"
 #include "utl/utility/utl_declval.h"

@@ -28,6 +28,12 @@
 #  define UTL_SUPPORTS_BFLOAT16
 #endif
 
+#ifdef __cpp_char8_t
+#  if __cpp_char8_t >= 201811L
+#    define UTL_SUPPORTS_CHAR8_T
+#  endif
+#endif
+
 #include "utl/preprocessor/utl_builtins.h"
 #include "utl/preprocessor/utl_compiler.h"
 #include "utl/preprocessor/utl_exceptions.h"
@@ -35,3 +41,9 @@
 #include "utl/preprocessor/utl_pragma.h"
 #include "utl/preprocessor/utl_standard.h"
 #include "utl/preprocessor/utl_target.h"
+
+#ifdef UTL_COMPILER_MSVC
+#  define UTL_RESTRICT __restrict
+#else
+#  define UTL_RESTRICT __restrict__
+#endif
