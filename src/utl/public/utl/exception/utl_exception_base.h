@@ -13,12 +13,12 @@
 #  define UTL_RETHROW throw
 #  define UTL_TRY try
 #  define UTL_CATCH(...) catch (__VA_ARGS__)
-#  define UTL_THROW_IF(Condition, ...) \
-      do {                             \
-          if (Condition) {             \
-              UTL_THROW(__VA_ARGS__);  \
-          }                            \
-      } while (0)
+#  define UTL_THROW_IF(CONDITION, ...)       \
+      [&](bool UTL_THROW_IF__lambda_param) { \
+        if (UTL_THROW_IF__lambda_param) {    \
+            UTL_THROW(__VA_ARGS__);          \
+        }                                    \
+      }(CONDITION)
 
 UTL_NAMESPACE_BEGIN
 UTL_INLINE_CXX17 constexpr bool with_exceptions = true;
@@ -70,8 +70,8 @@ UTL_NAMESPACE_END
       UTL_BUILTIN_unreachable()
 #  define UTL_TRY if UTL_CONSTEXPR_CXX17 (1)
 
-#  define UTL_THROW_IF(Condition, ...)                                                     \
-      UTL_ASSERT(!(Condition) && UTL_SCOPE details::exception::always_false(__VA_ARGS__)); \
+#  define UTL_THROW_IF(CONDITION, ...)                                                     \
+      UTL_ASSERT(!(CONDITION) && UTL_SCOPE details::exception::always_false(__VA_ARGS__)); \
       UTL_BUILTIN_unreachable()
 
 #  define UTL_CATCH(...) else if (UTL_SCOPE always_false([](__VA_ARGS__) -> void {}))
