@@ -104,6 +104,12 @@ UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) size_t safe_ctzll(uint64_t x) no
 #  endif
 }
 
+template <typename T>
+UTL_ATTRIBUTES(NODISCARD, CONST)
+constexpr T min(T l, T r) noexcept {
+    return l < r ? l : r;
+}
+
 namespace x86 {
 #  ifdef UTL_SIMD_X86_AVX512
 
@@ -164,18 +170,17 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     static constexpr size_t register_size = sizeof(register_t);
     register_t needles = _mm_set1_epi8(*reinterpret_cast<char const*>(value));
     T const* const end = ptr + bytes;
-    size_t idx = npos;
     do {
         register_t haystack = _mm_lddqu_si128((register_t const*)ptr);
         int const mask = _mm_movemask_epi8(_mm_cmpeq_epi8(haystack, needles));
-        idx = safe_ctz(to_unsigned(mask));
+        size_t const idx = safe_ctz(to_unsigned(mask));
         if (idx != npos) {
-            break;
+            return const_cast<T*>(ptr + idx);
         }
         ptr += register_size;
     } while (ptr < end);
 
-    return idx < bytes ? str + idx : nullptr;
+    return nullptr;
 }
 
 #  endif // elif defined(UTL_SIMD_X86_SSE4_2)
@@ -194,16 +199,16 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     svuint8_t const indices = svindex_u8(0, 1);
     size_t idx = npos;
     do {
-        uint8_t const count = bytes < register_size ? (uint8_t)bytes : (uint8_t)register_size;
+        uint8_t const count = min((uint8_t)(end - ptr), (uint8_t)register_size);
         svbool_t const active = svcmplt_u8(indices, svdup_n_u8(count));
         svuint8_t haystack = svld1_u8(active, reinterpret_cast<uint8_t const*>(ptr));
         svbool_t const eq = svcmpeq_n_u8(active, haystack, needles);
         if (svptest_any(eq)) {
-            return ptr + svlastb_u8(svbrka_b_z(active, eq), indices);
+            uint8_t const idx = svlastb_u8(svbrka_b_z(active, eq), indices);
+            return const_cast<T*>(ptr + idx);
         }
-        bytes -= count;
         ptr += count;
-    } while (bytes > 0);
+    } while (ptr < end);
 
     return nullptr;
 }
@@ -217,7 +222,7 @@ UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) uint16_t movemask(uint8x16_t reg
     using bits_t = decltype(seq::bw_ls(ones_t{}, exp_t{}));
     uint8x16_t masks = vld1q_u8(seq::to_array(bits_t{}));
     uint8x16_t reduction =
-        vreinterpretq_u8_u64(vpaddlq_u32(vpaddlq_u8(vpaddlq_u8(vandq_u8(masks, reg)))));
+        vreinterpretq_u8_u64(vpaddlq_u32(vpaddlq_u16(vpaddlq_u8(vandq_u8(masks, reg)))));
     uint16_t output;
     vst1q_lane_u8((uint8_t*)output, reduction, 0);
     vst1q_lane_u8((uint8_t*)output + 1, reduction, 8);
@@ -232,18 +237,17 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     static constexpr size_t register_size = sizeof(register_t);
     register_t needles = vdupq_n_u8(*reinterpret_cast<uint8_t const*>(value));
     T const* const end = ptr + bytes;
-    size_t idx = npos;
     do {
         register_t haystack = vld1q_u8((register_t const*)ptr);
         uint16_t const mask = movemask(vceqq_u8(haystack, needles));
-        idx = safe_ctz((uint32_t)mask);
+        size_t const idx = safe_ctz((uint32_t)mask);
         if (idx != npos) {
-            break;
+            return ptr + idx;
         }
         ptr += register_size;
     } while (ptr < end);
 
-    return idx < bytes ? str + idx : nullptr;
+    return nullptr;
 }
 
 #  endif
