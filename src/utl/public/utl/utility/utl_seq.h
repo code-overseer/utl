@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attributes.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_declval.h"
 #include "utl_sequence.h"
 
 #include <cstdint>
@@ -15,7 +14,7 @@ namespace seq {
 namespace details {
 template <typename T>
 UTL_ATTRIBUTES(NODISCARD)
-UTL_CONSTEVAL_CXX20 T pow(T n, size_t p) noexcept {
+UTL_CONSTEVAL T pow(T n, size_t p) noexcept {
     return !p ? 1 : ((p & 1) ? n : 1) * pow(n * n, p >> 1);
 }
 } // namespace details
@@ -167,7 +166,7 @@ constexpr auto pow(sequence_t<T, Is...>, sequence_t<size_t, Js...>)
 
 template <size_t N, typename T, T I>
 UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr auto repeat(scalar_t<T, I>) -> decltype(bw_or(zero<N, T>, val<T, I>)) noexcept {
+constexpr auto repeat(scalar_t<T, I>) -> decltype(bw_or(zero<N, T>, scalar_t<T, I>)) noexcept {
     return {};
 }
 template <size_t N, typename T, T... Is>

@@ -5,7 +5,7 @@
 #if defined(UTL_ARCH_x86)
 
 #  if defined(__SSE4_2__) | defined(__AVX__) | defined(__AVX2__) | defined(__AVX512F__)
-#    define UTL_SIMD_INTRINSICS_SUPPORTED
+#    define UTL_SUPPORTS_SIMD_INTRINSICS
 #  endif
 /* Use SSE4.2 as a minimum SIMD support */
 #  ifdef __SSE4_2__
@@ -26,7 +26,7 @@
 
 #elif defined(UTL_ARCH_ARM)
 #  if defined(__ARM_NEON) | defined(__ARM_FEATURE_SVE) | defined(__ARM_FEATURE_SVE2)
-#    define UTL_SIMD_INTRINSICS_SUPPORTED
+#    define UTL_SUPPORTS_SIMD_INTRINSICS
 #  endif
 
 #  ifdef __ARM_NEON
