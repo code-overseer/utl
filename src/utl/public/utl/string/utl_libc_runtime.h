@@ -119,21 +119,35 @@ template <UTL_CONCEPT_CXX20(exact_size<1>) T,
 T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     using register_t = __m512i;
     static constexpr size_t register_size = sizeof(register_t);
-    char to_copy;
-    __m256i needles = _mm512_set1_epi8(*reinterpret_cast<uint8_t const*>(&value));
-    T const* const end = ptr + bytes;
-    size_t idx = npos;
-    do {
-        register_t haystack = _mm512_lddqu_si512((register_t const*)ptr);
-        __mmask64 mask = _mm512_cmpeq_epu8_mask(haystack, needles);
-        idx = safe_ctzll(_cvtmask64_u64(mask));
-        if (idx != npos) {
-            break;
-        }
-        ptr += register_size;
-    } while (ptr < end);
+    __m256i needles = _mm512_set1_epi8(*reinterpret_cast<char const*>(&value));
 
-    return idx < bytes ? str + idx : nullptr;
+    for (T const* const end = ptr + bytes; ptr < end; ptr += register_size) {
+        register_t haystack = _mm512_loadu_si512(ptr);
+        __mmask64 mask = _mm512_cmpeq_epu8_mask(haystack, needles);
+        size_t const idx = safe_ctzll(_cvtmask64_u64(mask));
+        if (idx != npos) {
+            return const_cast<T*>(ptr + idx);
+        }
+    }
+
+    return nullptr;
+}
+
+size_t strlen(char const* src) noexcept {
+    using register_t = __m512i;
+    static constexpr size_t register_size = sizeof(register_t);
+    register_t zvec = _mm512_setzero_si512();
+
+    for (size_t offset = 0; true; offset += register_size) {
+        register_t value = _mm512_loadu_si512((register_t const*)src + offset);
+        __mmask64 mask = _mm512_cmpeq_epu8_mask(value, zvec);
+        size_t const idx = safe_ctzll(_cvtmask64_u64(mask));
+        if (idx != npos) {
+            return offset + idx;
+        }
+    }
+
+    UTL_BUILTIN_unreachable();
 }
 
 #  elif defined(UTL_SIMD_X86_AVX2)
@@ -144,20 +158,34 @@ template <UTL_CONCEPT_CXX20(exact_size<1>) T,
 T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     using register_t = __m256i;
     static constexpr size_t register_size = sizeof(register_t);
-    register_t needles = _mm256_set1_epi8(*reinterpret_cast<uint8_t const*>(&value));
-    T const* const end = ptr + bytes;
-    size_t idx = npos;
-    do {
-        register_t haystack = _mm256_lddqu_si256((register_t const*)ptr);
+    register_t needles = _mm256_set1_epi8(*reinterpret_cast<char const*>(&value));
+    for (T const* const end = ptr + bytes; ptr < end; ptr += register_size) {
+        register_t haystack = _mm256_loadu_epi8(ptr);
         int const mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(haystack, needles));
-        idx = safe_ctz(to_unsigned(mask));
+        size_t const idx = safe_ctz(to_unsigned(mask));
         if (idx != npos) {
-            break;
+            return const_cast<T*>(ptr + idx);
         }
-        ptr += register_size;
-    } while (ptr < end);
+    }
 
-    return idx < bytes ? str + idx : nullptr;
+    return nullptr;
+}
+
+size_t strlen(char const* src) noexcept {
+    using register_t = __m256i;
+    static constexpr size_t register_size = sizeof(register_t);
+    register_t zvec = _mm256_setzero_si256();
+
+    for (size_t offset = 0; true; offset += register_size) {
+        register_t value = _mm256_loadu_epi8(src + offset);
+        int const mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(value, zvec));
+        size_t const idx = safe_ctz(to_unsigned(mask));
+        if (idx != npos) {
+            return offset + idx;
+        }
+    }
+
+    UTL_BUILTIN_unreachable();
 }
 
 #  elif defined(UTL_SIMD_X86_SSE4_2)
@@ -168,19 +196,34 @@ template <UTL_CONCEPT_CXX20(exact_size<1>) T,
 T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     using register_t = __m128i;
     static constexpr size_t register_size = sizeof(register_t);
-    register_t needles = _mm_set1_epi8(*reinterpret_cast<uint8_t const*>(&value));
-    T const* const end = ptr + bytes;
-    do {
-        register_t haystack = _mm_lddqu_si128((register_t const*)ptr);
+    register_t needles = _mm_set1_epi8(*reinterpret_cast<char const*>(&value));
+    for (T const* const end = ptr + bytes; ptr < end; ptr += register_size) {
+        register_t haystack = _mm_loadu_epi8((register_t const*)ptr);
         int const mask = _mm_movemask_epi8(_mm_cmpeq_epi8(haystack, needles));
         size_t const idx = safe_ctz(to_unsigned(mask));
         if (idx != npos) {
             return const_cast<T*>(ptr + idx);
         }
-        ptr += register_size;
-    } while (ptr < end);
+    }
 
     return nullptr;
+}
+
+size_t strlen(char const* src) noexcept {
+    using register_t = __m128i;
+    static constexpr size_t register_size = sizeof(register_t);
+    register_t zvec = _mm_setzero_si128();
+
+    for (size_t offset = 0; true; offset += register_size) {
+        register_t value = _mm_loadu_epi8((register_t const*)src + offset);
+        int const mask = _mm_movemask_epi8(_mm_cmpeq_epi8(value, zvec));
+        size_t const idx = safe_ctz(to_unsigned(mask));
+        if (idx != npos) {
+            return offset + idx;
+        }
+    }
+
+    UTL_BUILTIN_unreachable();
 }
 
 #  endif // elif defined(UTL_SIMD_X86_SSE4_2)
@@ -213,6 +256,23 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     return nullptr;
 }
 
+size_t strlen(char const* src) noexcept {
+    using register_t = svuint8_t;
+    register_t zvec = svdup_n_u8(0);
+
+    size_t const register_size = svcntb();
+    for (size_t offset = 0; true; offset += register_size) {
+        svbool_t active = svptrue_b8();
+        register_t value = svld1_u8(active, (uint8_t const*)src + offset);
+        svbool_t const is_zero = svcmpeq_n_u8(active, haystack, zvec);
+        if (svptest_any(is_zero)) {
+            return offset + svlastb_u8(svbrka_b_z(active, eq), indices);
+        }
+    }
+
+    UTL_BUILTIN_unreachable();
+}
+
 #  elif defined(UTL_SIMD_ARM_NEON)
 
 UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) uint16_t movemask(uint8x16_t reg) noexcept {
@@ -233,11 +293,12 @@ template <UTL_CONCEPT_CXX20(exact_size<1>) T,
     UTL_CONCEPT_CXX20(exact_size<1>)
         U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
 T* memchr(T const* ptr, U value, size_t bytes) noexcept {
-    static constexpr size_t register_size = sizeof(uint8x16_t);
-    uint8x16_t needles = vdupq_n_u8(*reinterpret_cast<uint8_t const*>(&value));
+    using register_t = uint8x16_t;
+    static constexpr size_t register_size = sizeof(register_t);
+    register_t needles = vdupq_n_u8(*reinterpret_cast<uint8_t const*>(&value));
     T const* const end = ptr + bytes;
     do {
-        uint8x16_t haystack = vld1q_u8((uint8_t const*)ptr);
+        register_t haystack = vld1q_u8((uint8_t const*)ptr);
         uint16_t const mask = movemask(vceqq_u8(haystack, needles));
         size_t const idx = safe_ctz((uint32_t)mask);
         if (idx != npos) {
@@ -247,6 +308,23 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     } while (ptr < end);
 
     return nullptr;
+}
+
+size_t strlen(char const* src) noexcept {
+    using register_t = uint8x16_t;
+    static constexpr size_t register_size = sizeof(register_t);
+    register_t zvec = vdupq_n_u8(0);
+
+    for (size_t offset = 0; true; offset += register_size) {
+        register_t value = vld1q_u8((uint8_t const*)src + offset);
+        uint16_t const mask = movemask(vceqq_u8(value, zvec));
+        size_t const idx = safe_ctz((uint32_t)mask);
+        if (idx != npos) {
+            return offset + idx;
+        }
+    }
+
+    UTL_BUILTIN_unreachable();
 }
 
 #  endif
