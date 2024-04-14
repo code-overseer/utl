@@ -120,7 +120,7 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     using register_t = __m512i;
     static constexpr size_t register_size = sizeof(register_t);
     char to_copy;
-    __m256i needles = _mm512_set1_epi8(*reinterpret_cast<char const*>(value));
+    __m256i needles = _mm512_set1_epi8(*reinterpret_cast<uint8_t const*>(&value));
     T const* const end = ptr + bytes;
     size_t idx = npos;
     do {
@@ -144,7 +144,7 @@ template <UTL_CONCEPT_CXX20(exact_size<1>) T,
 T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     using register_t = __m256i;
     static constexpr size_t register_size = sizeof(register_t);
-    register_t needles = _mm256_set1_epi8(*reinterpret_cast<char const*>(value));
+    register_t needles = _mm256_set1_epi8(*reinterpret_cast<uint8_t const*>(&value));
     T const* const end = ptr + bytes;
     size_t idx = npos;
     do {
@@ -168,7 +168,7 @@ template <UTL_CONCEPT_CXX20(exact_size<1>) T,
 T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     using register_t = __m128i;
     static constexpr size_t register_size = sizeof(register_t);
-    register_t needles = _mm_set1_epi8(*reinterpret_cast<char const*>(value));
+    register_t needles = _mm_set1_epi8(*reinterpret_cast<uint8_t const*>(&value));
     T const* const end = ptr + bytes;
     do {
         register_t haystack = _mm_lddqu_si128((register_t const*)ptr);
@@ -193,7 +193,7 @@ template <UTL_CONCEPT_CXX20(exact_size<1>) T,
     UTL_CONCEPT_CXX20(exact_size<1>)
         U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
 T* memchr(T const* ptr, U value, size_t bytes) noexcept {
-    svuint8_t const needles = svdup_n_u8(*reinterpret_cast<uint8_t const*>(value));
+    svuint8_t const needles = svdup_n_u8(*reinterpret_cast<uint8_t const*>(&value));
     T const* const end = ptr + bytes;
     size_t const register_size = svcntb(); // max 255 (SVE has a maximum 2048-bit vector)
     svuint8_t const indices = svindex_u8(0, 1);
@@ -233,16 +233,15 @@ template <UTL_CONCEPT_CXX20(exact_size<1>) T,
     UTL_CONCEPT_CXX20(exact_size<1>)
         U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
 T* memchr(T const* ptr, U value, size_t bytes) noexcept {
-    using register_t = uint8x16_t;
-    static constexpr size_t register_size = sizeof(register_t);
-    register_t needles = vdupq_n_u8(*reinterpret_cast<uint8_t const*>(value));
+    static constexpr size_t register_size = sizeof(uint8x16_t);
+    uint8x16_t needles = vdupq_n_u8(*reinterpret_cast<uint8_t const*>(&value));
     T const* const end = ptr + bytes;
     do {
-        register_t haystack = vld1q_u8((register_t const*)ptr);
+        uint8x16_t haystack = vld1q_u8((uint8_t const*)ptr);
         uint16_t const mask = movemask(vceqq_u8(haystack, needles));
         size_t const idx = safe_ctz((uint32_t)mask);
         if (idx != npos) {
-            return ptr + idx;
+            return const_cast<T*>(ptr + idx);
         }
         ptr += register_size;
     } while (ptr < end);
