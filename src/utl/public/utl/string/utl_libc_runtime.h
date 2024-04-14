@@ -126,7 +126,8 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
         __mmask64 mask = _mm512_cmpeq_epu8_mask(haystack, needles);
         size_t const idx = safe_ctzll(_cvtmask64_u64(mask));
         if (idx != npos) {
-            return const_cast<T*>(ptr + idx);
+            ptr += idx;
+            return ptr < end ? const_cast<T*>(ptr) : nullptr;
         }
     }
 
@@ -139,7 +140,7 @@ size_t strlen(char const* src) noexcept {
     register_t zvec = _mm512_setzero_si512();
 
     for (size_t offset = 0; true; offset += register_size) {
-        register_t value = _mm512_loadu_si512((register_t const*)src + offset);
+        register_t value = _mm512_loadu_si512(src + offset);
         __mmask64 mask = _mm512_cmpeq_epu8_mask(value, zvec);
         size_t const idx = safe_ctzll(_cvtmask64_u64(mask));
         if (idx != npos) {
@@ -164,7 +165,8 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
         int const mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(haystack, needles));
         size_t const idx = safe_ctz(to_unsigned(mask));
         if (idx != npos) {
-            return const_cast<T*>(ptr + idx);
+            ptr += idx;
+            return ptr < end ? const_cast<T*>(ptr) : nullptr;
         }
     }
 
@@ -198,11 +200,12 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     static constexpr size_t register_size = sizeof(register_t);
     register_t needles = _mm_set1_epi8(*reinterpret_cast<char const*>(&value));
     for (T const* const end = ptr + bytes; ptr < end; ptr += register_size) {
-        register_t haystack = _mm_loadu_epi8((register_t const*)ptr);
+        register_t haystack = _mm_loadu_epi8(ptr);
         int const mask = _mm_movemask_epi8(_mm_cmpeq_epi8(haystack, needles));
         size_t const idx = safe_ctz(to_unsigned(mask));
         if (idx != npos) {
-            return const_cast<T*>(ptr + idx);
+            ptr += idx;
+            return ptr < end ? const_cast<T*>(ptr) : nullptr;
         }
     }
 
@@ -215,7 +218,7 @@ size_t strlen(char const* src) noexcept {
     register_t zvec = _mm_setzero_si128();
 
     for (size_t offset = 0; true; offset += register_size) {
-        register_t value = _mm_loadu_epi8((register_t const*)src + offset);
+        register_t value = _mm_loadu_epi8(src + offset);
         int const mask = _mm_movemask_epi8(_mm_cmpeq_epi8(value, zvec));
         size_t const idx = safe_ctz(to_unsigned(mask));
         if (idx != npos) {
@@ -247,8 +250,8 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
         svuint8_t haystack = svld1_u8(active, reinterpret_cast<uint8_t const*>(ptr));
         svbool_t const eq = svcmpeq_n_u8(active, haystack, needles);
         if (svptest_any(eq)) {
-            uint8_t const idx = svlastb_u8(svbrka_b_z(active, eq), indices);
-            return const_cast<T*>(ptr + idx);
+            ptr += svlastb_u8(svbrka_b_z(active, eq), indices);
+            return ptr < end ? const_cast<T*>(ptr) : nullptr;
         }
         ptr += count;
     } while (ptr < end);
@@ -302,7 +305,8 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
         uint16_t const mask = movemask(vceqq_u8(haystack, needles));
         size_t const idx = safe_ctz((uint32_t)mask);
         if (idx != npos) {
-            return const_cast<T*>(ptr + idx);
+            ptr += idx;
+            return ptr < end ? const_cast<T*>(ptr) : nullptr;
         }
         ptr += register_size;
     } while (ptr < end);
