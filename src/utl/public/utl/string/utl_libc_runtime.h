@@ -78,7 +78,7 @@ UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) size_t safe_ctz(uint32_t x) noex
 #  elif defined(UTL_COMPILER_MSVC)
     return x ? (size_t)_BitScanForward(x) : npos;
 #  else
-#    error "Unsupported platform CTZ intrinsic not provided, defined UTL_DISABLE_SIMD_LIBC"
+#    error "Unsupported platform CTZ intrinsic not provided, please define UTL_DISABLE_SIMD_LIBC"
 #  endif
 }
 
@@ -100,7 +100,7 @@ UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) size_t safe_ctzll(uint64_t x) no
 #  elif defined(UTL_COMPILER_MSVC)
     return x ? (size_t)_BitScanForward64(x) : npos;
 #  else
-#    error "Unsupported platform CTZ intrinsic not provided, defined UTL_DISABLE_SIMD_LIBC"
+#    error "Unsupported platform CTZ intrinsic not provided, please define UTL_DISABLE_SIMD_LIBC"
 #  endif
 }
 
@@ -261,8 +261,8 @@ size_t strlen(char const* src) noexcept {
     register_t zvec = svdup_n_u8(0);
 
     size_t const register_size = svcntb();
+    svbool_t const active = svptrue_b8();
     for (size_t offset = 0; true; offset += register_size) {
-        svbool_t active = svptrue_b8();
         register_t value = svld1_u8(active, (uint8_t const*)src + offset);
         svbool_t const is_zero = svcmpeq_n_u8(active, haystack, zvec);
         if (svptest_any(is_zero)) {
