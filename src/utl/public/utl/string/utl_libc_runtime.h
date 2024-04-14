@@ -269,8 +269,6 @@ using arm::strncmp;
 
 using simd::memchr;
 using simd::memcmp;
-using simd::memcpy;
-using simd::memmove;
 using simd::strchr;
 using simd::strcmp;
 using simd::strlen;
