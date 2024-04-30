@@ -5,7 +5,6 @@
 #define UTL_TRAIT_SUPPORTED_is_trivial 1
 #define UTL_TRAIT_SUPPORTED_is_trivially_copyable 1
 #define UTL_TRAIT_SUPPORTED_is_standard_layout 1
-#define UTL_TRAIT_SUPPORTED_is_empty 1
 #define UTL_TRAIT_SUPPORTED_is_polymorphic 1
 #define UTL_TRAIT_SUPPORTED_is_abstract 1
 

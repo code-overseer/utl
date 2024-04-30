@@ -84,7 +84,6 @@
 UTL_NAMESPACE_BEGIN
 
 using ::std::is_abstract;
-using ::std::is_empty;
 using ::std::is_polymorphic;
 using ::std::is_standard_layout;
 using ::std::is_trivial;
