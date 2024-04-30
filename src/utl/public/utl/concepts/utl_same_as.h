@@ -7,17 +7,9 @@
 
 #ifdef UTL_CXX20
 UTL_NAMESPACE_BEGIN
-namespace concepts {
-namespace details {
-template <typename T>
-struct proxy_t {};
-} // namespace details
-} // namespace concepts
 
 template <typename T, typename U>
-concept same_as = requires(void (*f)(concepts::details::proxy_t<T>*),
-                      concepts::details::proxy_t<U>* u) { f(u); } &&
-    requires(void (*f)(concepts::details::proxy_t<U>*), concepts::details::proxy_t<T>* t) { f(t); };
+concept same_as = is_same_v<T, U>;
 
 UTL_NAMESPACE_END
 #endif

@@ -2,34 +2,26 @@
 
 #pragma once
 
+#include "utl/bit/utl_countr_zero.h"
 #include "utl/preprocessor/utl_config.h"
 #include "utl/string/utl_libc_common.h"
+#include "utl/type_traits/utl_is_same.h"
+#include "utl/type_traits/utl_is_trivially_copyable.h"
+#include "utl/type_traits/utl_is_unsigned.h"
+#include "utl/type_traits/utl_remove_cv.h"
+#include "utl/type_traits/utl_signed_type.h"
+#include "utl/type_traits/utl_unsigned_type.h"
 #include "utl/utility/utl_seq.h"
 #include "utl/utility/utl_signs.h"
-
-#ifdef UTL_COMPILER_MSVC
-#  include <string.h>
-#endif
-
-#ifdef UTL_SIMD_X86_AVX512
-#  include <immintrin.h>
-#elif defined(UTL_SIMD_X86_AVX2)
-#  include <immintrin.h>
-#elif defined(UTL_SIMD_X86_SSE4_2)
-#  include <immintrin.h>
-#endif // elif defined(UTL_SIMD_X86_SSE4_2)
-#ifdef UTL_SIMD_ARM_SVE
-#  include <arm_sve.h>
-#elif defined(UTL_SIMD_ARM_NEON)
-#  include <arm_neon.h>
-#endif
 
 UTL_NAMESPACE_BEGIN
 
 namespace libc {
 namespace runtime {
 namespace standard {
-template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
+
+template <UTL_CONCEPT_CXX20(trivially_copyable)
+        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
 T* memcpy(T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
     return (T*)__builtin_memcpy(dst, src, byte_count(src, count));
@@ -38,7 +30,8 @@ T* memcpy(T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count)
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
+template <UTL_CONCEPT_CXX20(trivially_copyable)
+        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
 T* memmove(T* dst, T const* src, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
     return (T*)__builtin_memmove(dst, src, byte_count(dst, count));
@@ -50,6 +43,7 @@ T* memmove(T* dst, T const* src, element_count_t count) noexcept {
 template <UTL_CONCEPT_CXX20(exact_size<1>) T,
     UTL_CONCEPT_CXX20(exact_size<1>)
         U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
+UTL_ATTRIBUTE(NODISCARD, PURE)
 T* memchr(T const* ptr, U value, size_t bytes) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_char_memchr)
     return (T*)__builtin_char_memchr(ptr, value, bytes);
@@ -57,51 +51,164 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     return (T*)::memchr(ptr, value, bytes);
 #endif
 }
+
+template <typename T, typename U>
+UTL_ATTRIBUTE(NODISCARD, PURE)
+int memcmp(T const* lhs, U const* rhs, element_count_t count) noexcept {
+    static_assert(is_trivially_lexicographically_comparable<T, U>::value,
+        "Types must be lexicographically comparable");
+#if UTL_HAS_BUILTIN(__builtin_char_memchr)
+    return __builtin_memcmp(lhs, rhs, byte_count(lhs, count));
+#else
+    return ::memcmp(lhs, rhs, byte_count(lhs, count));
+#endif
+}
+
+UTL_ATTRIBUTES(NODISCARD, PURE)
+size_t strlen(char const* str) noexcept {
+#if UTL_HAS_BUILTIN(__builtin_strlen)
+    return __builtin_strlen(str);
+#else
+    return ::strlen(str);
+#endif
+}
+
+UTL_ATTRIBUTES(NODISCARD, PURE)
+size_t strlen(wchar_t const* str) noexcept {
+#if UTL_HAS_BUILTIN(__builtin_wcslen)
+    return __builtin_wcslen(str);
+#else
+    return ::wcslen(str);
+#endif
+}
+
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+size_t strlen(CharType const* str) noexcept {
+    size_t count = 0;
+    while (*str) {
+        ++str;
+        ++count;
+    }
+
+    return count;
+}
+
+UTL_ATTRIBUTES(NODISCARD, PURE)
+T* strchr(char const* str, char const ch) noexcept {
+#if UTL_HAS_BUILTIN(__builtin_strchr)
+    return (T*)__builtin_strchr(str, ch);
+#else
+    return (T*)::strchr(str, ch);
+#endif
+}
+
+UTL_ATTRIBUTES(NODISCARD, PURE)
+wchar_t* strchr(wchar_t const* str, wchar_t const ch) noexcept {
+#if UTL_HAS_BUILTIN(__builtin_wcschr)
+    return __builtin_wcschr(str, ch);
+#else
+    return ::wcschr(str, ch);
+#endif
+}
+
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+T* strchr(CharType const* str, CharType const ch) noexcept {
+    while (*str != ch) {
+        if (!*str) {
+            return nullptr;
+        }
+        ++str;
+    }
+
+    return (T*)str;
+}
+
+UTL_ATTRIBUTE(NODISCARD, PURE)
+int strcmp(char const* left, char const* right) noexcept {
+#if UTL_HAS_BUILTIN(__builtin_strcmp)
+    return __builtin_strcmp(left, right);
+#else
+    return ::strcmp(left, right);
+#endif
+}
+
+UTL_ATTRIBUTE(NODISCARD, PURE)
+int strcmp(wchar_t const* left, wchar_t const* right) noexcept {
+#if UTL_HAS_BUILTIN(__builtin_wcscmp)
+    return __builtin_wcscmp(left, right);
+#else
+    return ::wcscmp(left, right);
+#endif
+}
+
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTE(NODISCARD, PURE)
+int strcmp(CharType const* left, CharType const* right) noexcept {
+    while (*left == *right) {
+        if (!*left && !*right) {
+            return 0;
+        }
+
+        ++left;
+        ++right;
+    }
+
+    return (*left < *right) ? -1 : 1;
+}
+
+UTL_ATTRIBUTE(NODISCARD, PURE)
+int strncmp(char const* left, char const* right, size_t len) noexcept {
+#if UTL_HAS_BUILTIN(__builtin_strcmp)
+    return __builtin_strncmp(left, right, len);
+#else
+    return ::strncmp(left, right, len);
+#endif
+}
+
+UTL_ATTRIBUTE(NODISCARD, PURE)
+int strncmp(wchar_t const* left, wchar_t const* right, size_t len) noexcept {
+#if UTL_HAS_BUILTIN(__builtin_wcscmp)
+    return __builtin_wcsncmp(left, right, len);
+#else
+    return ::wcsncmp(left, right, len);
+#endif
+}
+
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTE(NODISCARD, PURE)
+int strncmp(T const* left, T const* right, size_t len) noexcept {
+    while (len) {
+        if (*left != *right) {
+            return (*left < *right) ? -1 : 1;
+        }
+
+        if (!*left && !*right) {
+            return 0;
+        }
+
+        ++left;
+        ++right;
+        --len;
+    }
+
+    return 0;
+}
 } // namespace standard
 
 #if defined(UTL_SUPPORTS_SIMD_INTRINSICS) && !defined(UTL_DISABLE_SIMD_LIBC)
 namespace simd {
-static constexpr size_t npos = (size_t)-1;
-/**
- * @brief Calculates the number of trailing zeros in an integer.
- *
- * This function calculates the number of trailing zeros (ctz) in the binary representation of the
- * given integer. It provides a safe implementation across different platforms.
- *
- * @param x The integer value for which to calculate the number of trailing zeros.
- * @return The number of trailing zeros in the binary representation of the integer.
- *         If the input integer is zero, it returns the maximum value of size_t (npos).
- */
-UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) size_t safe_ctz(uint32_t x) noexcept {
-#  if UTL_HAS_BUILTIN(__builtin_ctz)
-    return x ? (size_t)__builtin_ctz(x) : npos;
-#  elif defined(UTL_COMPILER_MSVC)
-    return x ? (size_t)_BitScanForward(x) : npos;
-#  else
-#    error "Unsupported platform CTZ intrinsic not provided, please define UTL_DISABLE_SIMD_LIBC"
-#  endif
-}
+UTL_INLINE_CXX17 constexpr size_t npos = (size_t)-1;
 
-/**
- * @brief Calculates the number of trailing zeros in a 64-bit integer.
- *
- * This function calculates the number of trailing zeros (ctz) in the binary representation of the
- * given 64-bit integer. It provides a safe implementation across different platforms.
- *
- * @param x The 64-bit integer value for which to calculate the number of trailing zeros.
- * @return The number of trailing zeros in the binary representation of the 64-bit integer.
- *         If the input integer is zero, it returns the maximum value of size_t (npos).
- * @note This function is marked as NODISCARD, CONST, and ALWAYS_INLINE.
- * @note This function is noexcept.
- */
-UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) size_t safe_ctzll(uint64_t x) noexcept {
-#  if UTL_HAS_BUILTIN(__builtin_ctz)
-    return x ? (size_t)__builtin_ctzll(x) : npos;
-#  elif defined(UTL_COMPILER_MSVC)
-    return x ? (size_t)_BitScanForward64(x) : npos;
-#  else
-#    error "Unsupported platform CTZ intrinsic not provided, please define UTL_DISABLE_SIMD_LIBC"
-#  endif
+template <typename T>
+UTL_ATTRIBUTES(NODISCARD, CONST)
+UTL_CONSTEVAL size_t bit_count() noexcept {
+    return sizeof(T) * CHAR_BIT;
 }
 
 template <typename T>
@@ -111,21 +218,64 @@ constexpr T min(T l, T r) noexcept {
 }
 
 namespace x86 {
-#  ifdef UTL_SIMD_X86_AVX512
+#  if defined(UTL_SIMD_X86_AVX512) && !defined(UTL_DISABLE_AVX512_LIBC)
+
+namespace mm512 {
+template <UTL_CONCEPT_CXX20(exact_size<1>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 1>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m512i set1(CharType const ch) noexcept {
+    return _mm512_set1_epi8(*reinterpret_cast<char const*>(&ch));
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<2>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 2>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m512i set1(CharType const ch) noexcept {
+    return _mm512_set1_epi16(*reinterpret_cast<short const*>(&ch));
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<4>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 4>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m512i set1(CharType const ch) noexcept {
+    return _mm512_set1_epi32(*reinterpret_cast<int const*>(&ch));
+}
+template <UTL_CONCEPT_CXX20(exact_size<1>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 1>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__mmask64 cmpeq(__m512i left, __m512i right) noexcept {
+    return _mm512_cmpeq_epu8_mask(left, right);
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<2>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 2>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__mmask64 cmpeq(__m512i left, __m512i right) noexcept {
+    return _mm512_cmpeq_epu16_mask(left, right);
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<4>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 4>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__mmask64 cmpeq(__m512i left, __m512i right) noexcept {
+    return _mm512_cmpeq_epu32_mask(left, right);
+}
+} // namespace mm512
 
 template <UTL_CONCEPT_CXX20(exact_size<1>) T,
     UTL_CONCEPT_CXX20(exact_size<1>)
         U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
 T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     using register_t = __m512i;
-    static constexpr size_t register_size = sizeof(register_t);
-    __m256i needles = _mm512_set1_epi8(*reinterpret_cast<char const*>(&value));
+    static constexpr size_t char_per_register = sizeof(register_t);
+    register_t needles = _mm512_set1_epi8(*reinterpret_cast<char const*>(&value));
 
-    for (T const* const end = ptr + bytes; ptr < end; ptr += register_size) {
+    for (T const* const end = ptr + bytes; ptr < end; ptr += char_per_register) {
         register_t haystack = _mm512_loadu_si512(ptr);
         __mmask64 mask = _mm512_cmpeq_epu8_mask(haystack, needles);
-        size_t const idx = safe_ctzll(_cvtmask64_u64(mask));
-        if (idx != npos) {
+        size_t const idx = countr_zero(_cvtmask64_u64(mask));
+        if (idx < bit_count<uint64_t>()) {
             ptr += idx;
             return ptr < end ? const_cast<T*>(ptr) : nullptr;
         }
@@ -134,37 +284,107 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     return nullptr;
 }
 
-size_t strlen(char const* src) noexcept {
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+size_t strlen(CharType const* src) noexcept {
     using register_t = __m512i;
-    static constexpr size_t register_size = sizeof(register_t);
+    static constexpr size_t char_per_register = sizeof(register_t) / sizeof(CharType);
     register_t zvec = _mm512_setzero_si512();
 
-    for (size_t offset = 0; true; offset += register_size) {
+    for (size_t offset = 0;; offset += char_per_register) {
         register_t value = _mm512_loadu_si512(src + offset);
-        __mmask64 mask = _mm512_cmpeq_epu8_mask(value, zvec);
-        size_t const idx = safe_ctzll(_cvtmask64_u64(mask));
-        if (idx != npos) {
-            return offset + idx;
+        __mmask64 mask = mm512::cmpeq<CharType>(value, zvec);
+        size_t const idx = countr_zero(_cvtmask64_u64(mask));
+        if (idx < bit_count<uint64_t>()) {
+            return offset + idx / sizeof(CharType);
         }
     }
 
     UTL_BUILTIN_unreachable();
 }
 
-#  elif defined(UTL_SIMD_X86_AVX2)
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+CharType* strchr(CharType const* str, CharType const ch) noexcept {
+    using register_t = __m512i;
+    static constexpr size_t char_per_register = sizeof(register_t) / sizeof(CharType);
+    register_t const needles = mm512::set1(*reinterpret_cast<CharType const*>(&value));
+    register_t const zvec = _mm512_setzero_si512();
+
+    for (size_t offset = 0;; offset += char_per_register) {
+        register_t value = _mm512_loadu_si512(str + offset);
+        __mmask64 end_mask = mm512::cmpeq<CharType>(value, zvec);
+        __mmask64 ch_mask = mm512::cmpeq<CharType>(value, needles);
+        size_t const idx = countr_zero(_cvtmask64_u64(_kor_mask64(end_mask, ch_mask)));
+        if (idx < bit_count<uint64_t>()) {
+            str += offset + idx / sizeof(CharType);
+            return *str == ch ? const_cast<CharType*>(str) : nullptr;
+        }
+    }
+
+    UTL_BUILTIN_unreachable();
+}
+
+#  elif defined(UTL_SIMD_X86_AVX2) && !defined(UTL_DISABLE_AVX_LIBC)
+
+namespace mm256 {
+template <UTL_CONCEPT_CXX20(exact_size<1>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 1>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m256i set1(CharType const ch) noexcept {
+    _mm256_set1_epi8(*reinterpret_cast<char const*>(&ch));
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<2>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 2>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m256i set1(CharType const ch) noexcept {
+    _mm256_set1_epi16(*reinterpret_cast<short const*>(&ch));
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<4>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 4>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m256i set1(CharType const ch) noexcept {
+    _mm256_set1_epi32(*reinterpret_cast<int const*>(&ch));
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<1>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 1>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m256i cmpeq(__m256i left, __m256i right) noexcept {
+    return _mm256_cmpeq_epi8(left, right);
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<2>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 2>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m256i cmpeq(__m256i left, __m256i right) noexcept {
+    return _mm256_cmpeq_epi16(left, right);
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<4>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 4>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m256i cmpeq(__m256i left, __m256i right) noexcept {
+    return _mm256_cmpeq_epi32(left, right);
+}
+} // namespace mm256
 
 template <UTL_CONCEPT_CXX20(exact_size<1>) T,
     UTL_CONCEPT_CXX20(exact_size<1>)
         U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
 T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     using register_t = __m256i;
-    static constexpr size_t register_size = sizeof(register_t);
-    register_t needles = _mm256_set1_epi8(*reinterpret_cast<char const*>(&value));
-    for (T const* const end = ptr + bytes; ptr < end; ptr += register_size) {
-        register_t haystack = _mm256_loadu_epi8(ptr);
+    static constexpr size_t char_per_register = sizeof(register_t);
+    register_t needles = mm256_set1_epi8(*reinterpret_cast<char const*>(&value));
+    for (T const* const end = ptr + bytes; ptr < end; ptr += char_per_register) {
+        register_t haystack = _mm256_loadu_si256((register_t const*)(ptr));
         int const mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(haystack, needles));
-        size_t const idx = safe_ctz(to_unsigned(mask));
-        if (idx != npos) {
+        size_t const idx = countr_zero(to_unsigned(mask));
+        if (idx < bit_count<decltype(mask)>()) {
             ptr += idx;
             return ptr < end ? const_cast<T*>(ptr) : nullptr;
         }
@@ -173,17 +393,43 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     return nullptr;
 }
 
-size_t strlen(char const* src) noexcept {
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+size_t strlen(CharType const* str) noexcept {
     using register_t = __m256i;
-    static constexpr size_t register_size = sizeof(register_t);
+    static constexpr size_t char_per_register = sizeof(register_t) / sizeof(CharType);
     register_t zvec = _mm256_setzero_si256();
 
-    for (size_t offset = 0; true; offset += register_size) {
-        register_t value = _mm256_loadu_epi8(src + offset);
-        int const mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(value, zvec));
-        size_t const idx = safe_ctz(to_unsigned(mask));
-        if (idx != npos) {
-            return offset + idx;
+    for (size_t offset = 0;; offset += char_per_register) {
+        register_t value = _mm256_loadu_si256((register_t const*)(str + offset));
+        int const mask = _mm256_movemask_epi8(mm256::cmpeq<CharType>(value, zvec));
+        size_t const idx = countr_zero(to_unsigned(mask));
+        if (idx < bit_count<uint64_t>()) {
+            return offset + idx / sizeof(CharType);
+        }
+    }
+
+    UTL_BUILTIN_unreachable();
+}
+
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+CharType* strchr(CharType const* str, CharType const ch) noexcept {
+    using register_t = __m256i;
+    static constexpr size_t char_per_register = sizeof(register_t) / sizeof(CharType);
+    register_t const needles = mm256::set1(*reinterpret_cast<CharType const*>(&value));
+    register_t const zvec = _mm256_setzero_si256();
+
+    for (size_t offset = 0;; offset += char_per_register) {
+        register_t value = _mm256_loadu_si256((register_t const*)(str + offset));
+        int const mask = _mm256_movemask_epi8(_mm256_or_si256(
+            mm256::cmpeq<CharType>(value, zvec), mm256::cmpeq<CharType>(value, needles)));
+        size_t const idx = countr_zero(to_unsigned(mask));
+        if (idx < bit_count<uint32_t>()) {
+            str += offset + idx / sizeof(CharType);
+            return *str == ch ? const_cast<CharType*>(str) : nullptr;
         }
     }
 
@@ -192,18 +438,62 @@ size_t strlen(char const* src) noexcept {
 
 #  elif defined(UTL_SIMD_X86_SSE4_2)
 
+namespace mm128 {
+template <UTL_CONCEPT_CXX20(exact_size<1>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 1>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m128i set1(CharType const ch) noexcept {
+    _mm128_set1_epi8(*reinterpret_cast<char const*>(&ch));
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<2>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 2>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m128i set1(CharType const ch) noexcept {
+    _mm128_set1_epi16(*reinterpret_cast<short const*>(&ch));
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<4>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 4>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m128i set1(CharType const ch) noexcept {
+    _mm128_set1_epi32(*reinterpret_cast<int const*>(&ch));
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<1>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 1>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m128i cmpeq(__m128i left, __m128i right) noexcept {
+    return _mm_cmpeq_epi8(left, right);
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<2>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 2>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m128i cmpeq(__m128i left, __m128i right) noexcept {
+    return _mm_cmpeq_epi16(left, right);
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<4>)
+        CharType UTL_REQUIRES_CXX11(exact_size<CharType, 4>::value)>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+__m128i cmpeq(__m128i left, __m128i right) noexcept {
+    return _mm_cmpeq_epi32(left, right);
+}
+} // namespace mm128
+
 template <UTL_CONCEPT_CXX20(exact_size<1>) T,
     UTL_CONCEPT_CXX20(exact_size<1>)
         U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
 T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     using register_t = __m128i;
-    static constexpr size_t register_size = sizeof(register_t);
+    static constexpr size_t char_per_register = sizeof(register_t);
     register_t needles = _mm_set1_epi8(*reinterpret_cast<char const*>(&value));
-    for (T const* const end = ptr + bytes; ptr < end; ptr += register_size) {
-        register_t haystack = _mm_loadu_epi8(ptr);
+    for (T const* const end = ptr + bytes; ptr < end; ptr += char_per_register) {
+        register_t haystack = _mm_loadu_si128((register_t const*)(ptr));
         int const mask = _mm_movemask_epi8(_mm_cmpeq_epi8(haystack, needles));
-        size_t const idx = safe_ctz(to_unsigned(mask));
-        if (idx != npos) {
+        size_t const idx = countr_zero(to_unsigned(mask));
+        if (idx < bit_count<uint32_t>()) {
             ptr += idx;
             return ptr < end ? const_cast<T*>(ptr) : nullptr;
         }
@@ -212,17 +502,43 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     return nullptr;
 }
 
-size_t strlen(char const* src) noexcept {
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+size_t strlen(CharType const* src) noexcept {
     using register_t = __m128i;
-    static constexpr size_t register_size = sizeof(register_t);
+    static constexpr size_t char_per_register = sizeof(register_t) / sizeof(CharType);
     register_t zvec = _mm_setzero_si128();
 
-    for (size_t offset = 0; true; offset += register_size) {
-        register_t value = _mm_loadu_epi8(src + offset);
-        int const mask = _mm_movemask_epi8(_mm_cmpeq_epi8(value, zvec));
-        size_t const idx = safe_ctz(to_unsigned(mask));
-        if (idx != npos) {
-            return offset + idx;
+    for (size_t offset = 0;; offset += char_per_register) {
+        register_t value = _mm_loadu_si128((register_t const*)(src + offset));
+        int const mask = _mm_movemask_epi8(mm128::cmpeq<CharType>(value, zvec));
+        size_t const idx = countr_zero(to_unsigned(mask));
+        if (idx < bit_count<uint32_t>()) {
+            return offset + idx / sizeof(CharType);
+        }
+    }
+
+    UTL_BUILTIN_unreachable();
+}
+
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+CharType* strchr(CharType const* str, CharType const ch) noexcept {
+    using register_t = __m128i;
+    static constexpr size_t char_per_register = sizeof(register_t) / sizeof(CharType);
+    register_t const needles = mm128::set1(*reinterpret_cast<CharType const*>(&value));
+    register_t const zvec = _mm_setzero_si128();
+
+    for (size_t offset = 0;; offset += char_per_register) {
+        register_t value = _mm_loadu_si128((register_t const*)(str + offset));
+        int const mask = _mm_movemask_epi8(_mm_or_si128(
+            mm128::cmpeq<CharType>(value, zvec), mm128::cmpeq<CharType>(value, needles)));
+        size_t const idx = countr_zero(to_unsigned(mask));
+        if (idx < bit_count<uint32_t>()) {
+            str += offset + idx / sizeof(CharType);
+            return *str == ch ? const_cast<CharType*>(str) : nullptr;
         }
     }
 
@@ -233,24 +549,24 @@ size_t strlen(char const* src) noexcept {
 } // namespace x86
 
 namespace arm {
-#  ifdef UTL_SIMD_ARM_SVE
+#  if defined(UTL_SIMD_ARM_SVE) && !defined(UTL_DISABLE_SVE_LIBC)
 
 template <UTL_CONCEPT_CXX20(exact_size<1>) T,
     UTL_CONCEPT_CXX20(exact_size<1>)
         U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
 T* memchr(T const* ptr, U value, size_t bytes) noexcept {
-    svuint8_t const needles = svdup_n_u8(*reinterpret_cast<uint8_t const*>(&value));
+    using element_t = uint8_t;
+    auto const needles = sve::dup(*((element_t const*)(&value)));
+    auto const indices = sve::range(element_t(0), element_t(1));
     T const* const end = ptr + bytes;
-    size_t const register_size = svcntb(); // max 255 (SVE has a maximum 2048-bit vector)
-    svuint8_t const indices = svindex_u8(0, 1);
-    size_t idx = npos;
+    size_t const register_width = sve::length<element_t>();
     do {
-        uint8_t const count = min((uint8_t)(end - ptr), (uint8_t)register_size);
-        svbool_t const active = svcmplt_u8(indices, svdup_n_u8(count));
-        svuint8_t haystack = svld1_u8(active, reinterpret_cast<uint8_t const*>(ptr));
-        svbool_t const eq = svcmpeq_n_u8(active, haystack, needles);
-        if (svptest_any(eq)) {
-            ptr += svlastb_u8(svbrka_b_z(active, eq), indices);
+        auto const count = sve::dup((element_t)min<size_t>(end - ptr, register_width));
+        sve::predicate const active = sve::cmplt(sve::all_true<element_t>(), indices, count);
+        auto const haystack = sve::load<element_t>(active, ptr);
+        sve::predicate const is_needle = sve::cmpeq(active, haystack, needle);
+        if (sve::test_any(active, is_needle)) {
+            ptr += sve::last(sve::break_after_true(active, is_needle), indices);
             return ptr < end ? const_cast<T*>(ptr) : nullptr;
         }
         ptr += count;
@@ -259,72 +575,182 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
     return nullptr;
 }
 
-size_t strlen(char const* src) noexcept {
-    using register_t = svuint8_t;
-    register_t zvec = svdup_n_u8(0);
-
-    size_t const register_size = svcntb();
-    svbool_t const active = svptrue_b8();
-    for (size_t offset = 0; true; offset += register_size) {
-        register_t value = svld1_u8(active, (uint8_t const*)src + offset);
-        svbool_t const is_zero = svcmpeq_n_u8(active, haystack, zvec);
-        if (svptest_any(is_zero)) {
-            return offset + svlastb_u8(svbrka_b_z(active, eq), indices);
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+size_t strlen(CharType const* const src) noexcept {
+    using element_t = unsigned_type_t<CharType>;
+    size_t const window_size = sve::length<element_t>();
+    auto const active = sve::all_true<element_t>();
+    for (size_t offset = 0;; offset += window_size) {
+        auto const window = sve::load<element_t>(active, src + offset);
+        auto const is_zero = sve::cmpeq(active, window, sve::zero<element_t>());
+        if (sve::test_any(active, is_zero)) {
+            auto const indices = sve::range(element_t(0), element_t(1));
+            return offset + sve::last(sve::break_after_true(active, is_zero), indices);
         }
     }
 
     UTL_BUILTIN_unreachable();
 }
 
-#  elif defined(UTL_SIMD_ARM_NEON)
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+size_t strchr(CharType const* str, CharType const ch) noexcept {
+    using element_t = unsigned_type_t<CharType>;
+    size_t const window_size = sve::length<element_t>();
+    sve::predicate const active = sve::all_true<element_t>();
+    auto const needles = sve::dup(*((element_t const*)&ch));
+    for (;; str += window_size) {
+        auto const window = sve::load<element_t>(active, str);
+        sve::predicate const is_zero = sve::cmpeq(active, window, sve::zero<element_t>());
+        sve::predicate const is_ch = sve::cmpeq(active, window, needles);
+        sve::predicate const mask = sve::bw_or(active, is_zero, is_ch);
+        if (sve::test_any(active, mask)) {
+            auto const indices = sve::range(element_t(0), element_t(1));
+            str += sve::last(sve::break_after_true(active, mask), indices);
+            return *str == ch ? const_cast<CharType*>(src) : nullptr;
+        }
+    }
 
-UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) uint16_t movemask(uint8x16_t reg) noexcept {
-    static constexpr size_t elements = 16;
-    using exp_t = decltype(seq::tile<2>(seq::range_t<uint8_t, 8>{}));
-    using ones_t = decltype(seq::repeat<elements>(seq::scalar_t<uint8_t, 1>{}));
-    using bits_t = decltype(seq::bw_ls(ones_t{}, exp_t{}));
-    uint8x16_t masks = vld1q_u8(seq::to_array(bits_t{}));
-    uint8x16_t reduction =
-        vreinterpretq_u8_u64(vpaddlq_u32(vpaddlq_u16(vpaddlq_u8(vandq_u8(masks, reg)))));
-    uint16_t output;
-    vst1q_lane_u8((uint8_t*)output, reduction, 0);
-    vst1q_lane_u8((uint8_t*)output + 1, reduction, 8);
-    return output;
+    UTL_BUILTIN_unreachable();
 }
+
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+int strcmp(CharType const* lhs, CharType const* rhs) noexcept {
+    using element_t = signed_type_t<CharType>;
+    size_t const window_size = sve::length<element_t>();
+    for (sve::predicate active = sve::all_true<element_t>();;
+         lhs += window_size, rhs += window_size) {
+        auto const left = sve::load<element_t>(active, lhs);
+        auto const right = sve::load<element_t>(active, rhs);
+
+        sve::predicate const is_ended =
+            sve::cmpeq(active, sve::mul(active, left, right), sve::zero<element_t>());
+        active = sve::break_after_true(active, is_ended);
+
+        auto const diff = sve::cmpeq(active, left, right);
+        sve::predicate const has_diff = sve::cmpne(active, diff, sve::zero<element_t>());
+        if (sve::test_any(sve::bw_or(active, is_ended, has_diff))) {
+            return sve::last(sve::break_after_true(active, has_diff), diff);
+        }
+    }
+
+    UTL_BUILTIN_unreachable();
+}
+
+#  elif defined(UTL_SIMD_ARM_NEON) && !defined(UTL_DISABLE_NEON_LIBC)
+
+namespace details {
+template <size_t N>
+UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE)
+UTL_CONSTEXPR_CXX14 size_t countr_zero(uint64_t a[N]) noexcept {
+    for (auto i = 0; i < N; ++i) {
+        if (a[i]) {
+            return i * bit_count<uint64_t>() + countr_zero(a[i]);
+        }
+    }
+
+    return bit_count<uint64_t>() * N;
+}
+
+} // namespace details
 
 template <UTL_CONCEPT_CXX20(exact_size<1>) T,
     UTL_CONCEPT_CXX20(exact_size<1>)
         U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
 T* memchr(T const* ptr, U value, size_t bytes) noexcept {
-    using register_t = uint8x16_t;
-    static constexpr size_t register_size = sizeof(register_t);
-    register_t needles = vdupq_n_u8(*reinterpret_cast<uint8_t const*>(&value));
+    using element_t = uint8_t;
     T const* const end = ptr + bytes;
+    auto const needles = neon::qregister::dup<uint8_t>(*(uint8_t const*)(&value));
     do {
-        register_t haystack = vld1q_u8((uint8_t const*)ptr);
-        uint16_t const mask = movemask(vceqq_u8(haystack, needles));
-        size_t const idx = safe_ctz((uint32_t)mask);
-        if (idx != npos) {
-            ptr += idx;
-            return ptr < end ? const_cast<T*>(ptr) : nullptr;
+        auto const window = neon::qregister::load<element_t>(ptr);
+        auto const result = neon::qregister::store_as<uint64_t>(window == needles);
+        size_t const window_offset =
+            details::countr_zero(result.as_native()) / bit_count<element_t>();
+        if (window_offset < neon::qregister::length<element_t>()) {
+            ptr += window_offset;
+            return ptr < end ? const_cast<char*>(ptr) : nullptr;
         }
-        ptr += register_size;
+        ptr += neon::qregister::length<element_t>();
     } while (ptr < end);
 
     return nullptr;
 }
 
-size_t strlen(char const* src) noexcept {
-    using register_t = uint8x16_t;
-    static constexpr size_t register_size = sizeof(register_t);
-    register_t zvec = vdupq_n_u8(0);
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+size_t strlen(CharType const* str) noexcept {
+    using element_t = unsigned_type_t<sizeof(CharType)>;
+    auto const zvec = neon::qregister::zero<element_t>();
 
-    for (size_t offset = 0; true; offset += register_size) {
-        register_t value = vld1q_u8((uint8_t const*)src + offset);
-        uint16_t const mask = movemask(vceqq_u8(value, zvec));
-        size_t const idx = safe_ctz((uint32_t)mask);
-        if (idx != npos) {
-            return offset + idx;
+    for (size_t offset = 0;; offset += neon::qregister::length<element_t>()) {
+        auto const window = neon::qregister::load<element_t>(str + offset);
+        auto const result = neon::qregister::store_as<uint64_t>(window == zvec);
+        size_t const window_offset =
+            details::countr_zero(result.as_native()) / bit_count<element_t>();
+        if (window_offset < neon::qregister::length<element_t>()) {
+            return offset + window_offset;
+        }
+    }
+
+    UTL_BUILTIN_unreachable();
+}
+
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+CharType* strchr(CharType const* str, CharType const ch) noexcept {
+    using element_t = unsigned_type_t<sizeof(CharType)>;
+    auto const zvec = neon::qregister::zero<element_t>();
+    auto const needles = neon::qregister::dup<element_t>(*((element_t const*)&ch));
+
+    for (;; str += neon::qregister::length<element_t>()) {
+        register_t const window = neon::qregister::load<element_t>(str + offset);
+        auto const result =
+            neon::qregister::store_as<uint64_t>((window == zvec) | (window == needles));
+        size_t const window_offset =
+            details::countr_zero(result.as_native()) / bit_count<element_t>();
+        if (window_offset < neon::qregister::length<element_t>()) {
+            str += window_offset;
+            return *str == ch ? const_cast<char*>(str) : nullptr;
+        }
+    }
+
+    UTL_BUILTIN_unreachable();
+}
+
+template <UTL_CONCEPT_CXX20(string_char)
+        CharType UTL_REQUIRES_CXX11(is_string_char<CharType>::value)>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+int strcmp(CharType const* lhs, CharType const* rhs) noexcept {
+    // use signed element
+    using element_t = signed_type_t<sizeof(CharType)>;
+    static constexpr size_t elements = neon::qregister::length<element_t>();
+
+    auto const zvec = neon::qregister::zero<element_t>();
+    for (;; lhs += elements, rhs += elements) {
+        auto const left = neon::qregister::load<element_t>(lhs);
+        auto const right = neon::qregister::load<element_t>(rhs);
+        auto const is_neq = neon::qregister::store_as<uint64_t>(left - right);
+        auto const is_end = neon::qregister::store_as<uint64_t>((left * right) == zvec);
+        size_t const first_neq = details::countr_zero(is_neq.as_native()) / bit_count<element_t>();
+        size_t const first_zero = details::countr_zero(is_end.as_native()) / bit_count<element_t>();
+        if (first_zero < first_neq) {
+            // If first_zero < first_neq: both left and right are zero in the same location
+            // If only one side is zero, then we have first_zero == first_neq
+            return 0;
+        }
+
+        if (first_neq < elements) {
+            static_assert(UTL_SCOPE little_endian(), "Platform must be little endian");
+            element_t const* val =
+                reinterpret_cast<element_t const*>(is_neq.as_native()) + first_neq;
+            return *val;
         }
     }
 

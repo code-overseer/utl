@@ -11,25 +11,27 @@ namespace libc {
 namespace compile_time {
 namespace recursive {
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
+template <typename T>
 UTL_CONSTEVAL T* memcpy(T* dst, T const* src, element_count_t count, T* org) noexcept {
     return count == 0 ? org : ((*dst = *src), memcpy(dst + 1, src + 1, count - 1, org));
 }
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
+template <typename T>
 UTL_CONSTEVAL T* reverse_memcpy(T* dst, T const* src, element_count_t count, T* org) noexcept {
     return count == 0 ? org : ((*--dst = *--src), memcpy(dst, src, count - 1, org));
 }
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
+template <typename T>
 UTL_CONSTEVAL T* memmove(T* dst, T const* src, element_count_t count) noexcept {
     return is_pointer_in_range(src, src + count, dst)
         ? reverse_memcpy(dst + count, src + count, count, dst)
         : memcpy(dst, src, count, dst);
 }
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
-UTL_CONSTEVAL int memcmp(T const* left, T const* right, element_count_t count) noexcept {
+template <typename T, typename U>
+UTL_CONSTEVAL int memcmp(T const* lhs, U const* rhs, element_count_t count) noexcept {
+    static_assert(is_trivially_lexicographically_comparable<T, U>::value,
+        "Types must be lexicographically comparable");
     return count == 0      ? 0
         : (*left < *right) ? -1
         : (*right < *left) ? 1
@@ -51,8 +53,8 @@ UTL_CONSTEVAL size_t strlen(T const* str, size_t r = 0) noexcept {
 }
 
 template <typename T>
-UTL_CONSTEVAL T* strchr(T const* str, T const ch, size_t len = strlen(str)) noexcept {
-    return len == 0 ? nullptr : *str == ch ? const_cast<T*>(str) : strchr(str + 1, ch, len - 1);
+UTL_CONSTEVAL T* strchr(T const* str, T const ch) noexcept {
+    return *str == ch ? const_cast<T*>(str) : !*str ? nullptr : strchr(str + 1, ch);
 }
 
 template <typename T>
@@ -65,15 +67,16 @@ UTL_CONSTEVAL int strcmp(T const* left, T const* right) noexcept {
 
 template <typename T>
 UTL_CONSTEVAL int strncmp(T const* left, T const* right, size_t len) noexcept {
-    return !*left && !*right || len == 0 ? 0
-        : (*left < *right)               ? -1
-        : (*right < *left)               ? 1
-                                         : strcmp(left + 1, right + 1, len - 1);
+    return len == 0 || (!*left && !*right) ? 0
+        : (*left < *right)                 ? -1
+        : (*right < *left)                 ? 1
+                                           : strcmp(left + 1, right + 1, len - 1);
 }
 
 } // namespace recursive
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
+template <UTL_CONCEPT_CXX20(trivially_copyable)
+        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
 UTL_CONSTEVAL T* memcpy(T* dst, T const* src, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
     return __builtin_memcpy(dst, src, byte_count(src, count)), dst;
@@ -82,7 +85,8 @@ UTL_CONSTEVAL T* memcpy(T* dst, T const* src, element_count_t count) noexcept {
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
+template <UTL_CONCEPT_CXX20(trivially_copyable)
+        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
 UTL_CONSTEVAL T* memmove(T* dst, T const* src, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memmove)
     return __builtin_memmove(dst, src, byte_count(src, count)), dst;
@@ -91,8 +95,10 @@ UTL_CONSTEVAL T* memmove(T* dst, T const* src, element_count_t count) noexcept {
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
-UTL_CONSTEVAL int memcmp(T const* left, T const* right, element_count_t count) noexcept {
+template <typename T, typename U>
+UTL_CONSTEVAL int memcmp(T const* left, U const* right, element_count_t count) noexcept {
+    static_assert(is_trivially_lexicographically_comparable<T, U>::value,
+        "Types must be lexicographically comparable");
 #if UTL_HAS_BUILTIN(__builtin_char_memcmp)
     return __builtin_memcmp(left, right, byte_count(left, count));
 #else
