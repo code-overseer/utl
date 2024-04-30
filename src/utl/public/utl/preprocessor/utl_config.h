@@ -34,6 +34,7 @@
 #  endif
 #endif
 
+#include "utl/preprocessor/utl_attributes.h"
 #include "utl/preprocessor/utl_builtins.h"
 #include "utl/preprocessor/utl_compiler.h"
 #include "utl/preprocessor/utl_exceptions.h"
