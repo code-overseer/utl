@@ -6,6 +6,8 @@
 #include "utl/preprocessor/utl_config.h"
 #include "utl/string/utl_libc.h"
 
+#include <wchar.h>
+
 UTL_NAMESPACE_BEGIN
 template <typename T>
 struct char_traits {
@@ -24,7 +26,7 @@ struct char_traits {
     UTL_ATTRIBUTES(NODISCARD, PURE)
     static constexpr int compare(
         char_type const* lhs, char_type const* rhs, size_t length) noexcept {
-        return libc::strncmp(lhs, rhs, element_count_t(length));
+        return libc::strncmp(lhs, rhs, libc::element_count_t(length));
     }
 
     UTL_ATTRIBUTES(NODISCARD, PURE)
@@ -33,20 +35,20 @@ struct char_traits {
     UTL_ATTRIBUTES(NODISCARD, PURE)
     static constexpr char_type const* find(
         char_type const* str, size_t length, char_type const ch) noexcept {
-        return libc::strnchr(str, ch, element_count_t(length));
+        return libc::strnchr(str, ch, libc::element_count_t(length));
     }
 
     static constexpr char_type* move(char_type* s1, char_type const* s2, size_t length) noexcept {
-        return libc::memmove(s1, s2, element_count_t(length));
+        return libc::memmove(s1, s2, libc::element_count_t(length));
     }
 
     static constexpr char_type* copy(
         char_type* UTL_RESTRICT dst, char_type const* UTL_RESTRICT src, size_t length) noexcept {
-        return libc::memcpy(dst, src, element_count_t(length));
+        return libc::memcpy(dst, src, libc::element_count_t(length));
     }
 
     static constexpr char_type* assign(char_type* str, size_t length, char_type ch) noexcept {
-        return libc::strnset(str, ch, element_count_t(length));
+        return libc::strnset(str, ch, libc::element_count_t(length));
     }
 
     UTL_ATTRIBUTES(NODISCARD, CONST)

@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "utl/make_unsigned/utl_common.h"
+#include "utl/type_traits/utl_common.h"
 
 #ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  include <make_unsigned>
+#  include <type_traits>
 
 UTL_NAMESPACE_BEGIN
 
@@ -27,7 +27,7 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  include "utl/make_unsigned/utl_constants.h"
+#  include "utl/type_traits/utl_constants.h"
 
 #  ifndef UTL_DISABLE_BUILTIN_make_unsigned
 #    define UTL_DISABLE_BUILTIN_make_unsigned 0
@@ -55,14 +55,14 @@ UTL_NAMESPACE_END
 
 #  else // ifdef UTL_BUILTIN_make_unsigned
 
-#    include "utl/make_unsigned/utl_is_enum.h"
-#    include "utl/make_unsigned/utl_is_integral.h"
-#    include "utl/make_unsigned/utl_logical_traits.h"
+#    include "utl/type_traits/utl_is_enum.h"
+#    include "utl/type_traits/utl_is_integral.h"
+#    include "utl/type_traits/utl_logical_traits.h"
 
 UTL_NAMESPACE_BEGIN
 
 namespace details {
-namespace make_unsigned {
+namespace type_traits {
 
 template <size_t I>
 struct unsigned_table_entry;
@@ -94,12 +94,12 @@ template <typename T, size_t Idx>
 struct find_unsigned<T, Idx, true> :
     conditional_t<sizeof(T) == sizeof(unsigned_table_entry_t<Idx>), unsigned_table_entry<Idx>,
         find_unsigned<T, Idx + 1>> {};
-} // namespace make_unsigned
+} // namespace type_traits
 } // namespace details
 
 template <typename T>
 struct make_unsigned {
-    using type = details::make_unsigned::find_unsigned_t<T>;
+    using type = details::type_traits::find_unsigned_t<T>;
 };
 template <typename T>
 struct make_unsigned<T const> {

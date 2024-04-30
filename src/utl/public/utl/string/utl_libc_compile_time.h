@@ -34,7 +34,7 @@ UTL_CONSTEVAL T* memmove(T* dst, T const* src, element_count_t count) noexcept {
 }
 
 template <typename T, typename U>
-UTL_CONSTEVAL int memcmp(T const* lhs, U const* rhs, element_count_t count) noexcept {
+UTL_CONSTEVAL int memcmp(T const* left, U const* right, element_count_t count) noexcept {
     static_assert(is_trivially_lexicographically_comparable<T, U>::value,
         "Types must be lexicographically comparable");
     return count == 0      ? 0
@@ -147,7 +147,7 @@ template <UTL_CONCEPT_CXX20(exact_size<1>) T,
     UTL_CONCEPT_CXX20(exact_size<1>)
         U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
 UTL_CONSTEVAL T* memchr(T const* str, U value, size_t bytes) noexcept {
-    return recuresive::memchr(str, as_byte(value), bytes);
+    return recursive::memchr(str, as_byte(value), bytes);
 }
 
 UTL_CONSTEVAL size_t strlen(char const* str) noexcept {
@@ -192,7 +192,7 @@ UTL_CONSTEVAL T* strchr(T const* str, T const ch) noexcept {
     return recursive::strchr(str, ch);
 }
 
-UTL_CONSTEVAL int strcmp(char const* left, char const* rhs) noexcept {
+UTL_CONSTEVAL int strcmp(char const* left, char const* right) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_strcmp)
     return __builtin_strcmp(left, right);
 #else
@@ -200,7 +200,7 @@ UTL_CONSTEVAL int strcmp(char const* left, char const* rhs) noexcept {
 #endif
 }
 
-UTL_CONSTEVAL int strcmp(wchar_t const* left, wchar_t const* rhs) noexcept {
+UTL_CONSTEVAL int strcmp(wchar_t const* left, wchar_t const* right) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_wcscmp)
     return __builtin_wcscmp(left, right);
 #else

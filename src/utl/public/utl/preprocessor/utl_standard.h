@@ -37,13 +37,14 @@
 #  endif /* UTL_CXX >= 201703L */
 
 #  if UTL_CXX >= 202002L
-#    define UTL_CONSTEXPR_CXX20 constexpr
 #    define UTL_CXX20
-#    define UTL_CONSTEVAL_CXX20 consteval
-#    define UTL_CONSTEVAL_VOID_CXX20 consteval
+#    define UTL_CONSTEXPR_CXX20 constexpr
+#    define UTL_CONSTEVAL consteval
+#    define UTL_CONSTEVAL_CXX14 consteval
 #    define UTL_EXPLICIT_IF(...) explicit(__VA_ARGS__)
 #    define UTL_IMPLICIT_IF(...) explicit(!(__VA_ARGS__))
 
+#    define UTL_ENABLE_IF_CXX11(TYPE, ...) TYPE
 #    define UTL_REQUIRES_CXX11(...)
 #    define UTL_REQUIRES_CXX20(...) requires (__VA_ARGS__)
 #    define UTL_CONCEPT_CXX20(...) __VA_ARGS__
@@ -51,10 +52,11 @@
 #  else /* UTL_CXX >= 202002L */
 
 #    define UTL_CONSTEXPR_CXX20
-#    define UTL_CONSTEVAL_CXX20 constexpr
-#    define UTL_CONSTEVAL_VOID_CXX20 UTL_CONSTEXPR_CXX14
+#    define UTL_CONSTEVAL constexpr
+#    define UTL_CONSTEVAL_CXX14 UTL_CONSTEXPR_CXX14
 #    define UTL_EXPLICIT_IF(...)
 #    define UTL_IMPLICIT_IF(...) explicit
+#    define UTL_ENABLE_IF_CXX11(TYPE, ...) UTL_SCOPE enable_if_t<(__VA_ARGS__), TYPE>
 #    define UTL_REQUIRES_CXX11(...) , UTL_SCOPE enable_if_t<(__VA_ARGS__), int> = __LINE__
 #    define UTL_REQUIRES_CXX20(...)
 #    define UTL_CONCEPT_CXX20(...) typename
@@ -74,8 +76,8 @@
 #  define UTL_INLINE_CXX17
 #  define UTL_CONSTEXPR_CXX17 const
 #  define UTL_CONSTEXPR_CXX20 const
-#  define UTL_CONSTEVAL_CXX20 const
-#  define UTL_CONSTEVAL_VOID_CXX20
+#  define UTL_CONSTEVAL const
+#  define UTL_CONSTEVAL_CXX14
 #  define UTL_CONSTEXPR_CXX23 const
 
 #endif /* ifdef UTL_CXX */

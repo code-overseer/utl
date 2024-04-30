@@ -46,7 +46,7 @@ class obscure {
     friend class UTL_SCOPE partial_ordering;
     friend class UTL_SCOPE weak_ordering;
     struct zero_t {
-        UTL_CONSTEVAL_CXX20 zero_t(zero_t*) noexcept {}
+        UTL_CONSTEVAL zero_t(zero_t*) noexcept {}
     };
 };
 } // namespace compare

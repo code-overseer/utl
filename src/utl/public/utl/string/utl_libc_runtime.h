@@ -2,19 +2,14 @@
 
 #pragma once
 
-#include "utl/bit/utl_countr_zero.h"
 #include "utl/preprocessor/utl_config.h"
 #include "utl/string/utl_libc_common.h"
-#include "utl/type_traits/utl_is_same.h"
-#include "utl/type_traits/utl_is_trivially_copyable.h"
-#include "utl/type_traits/utl_is_unsigned.h"
-#include "utl/type_traits/utl_remove_cv.h"
-#include "utl/type_traits/utl_signed_type.h"
-#include "utl/type_traits/utl_unsigned_type.h"
 #include "utl/utility/utl_seq.h"
 #include "utl/utility/utl_signs.h"
 
 UTL_NAMESPACE_BEGIN
+
+#define UTL_LIBC_PURE UTL_ATTRIBUTES(NODISCARD, PURE)
 
 namespace libc {
 namespace runtime {
@@ -54,8 +49,7 @@ T* memset(T* dst, T const value, element_count_t count) noexcept {
 template <UTL_CONCEPT_CXX20(exact_size<1>) T,
     UTL_CONCEPT_CXX20(exact_size<1>)
         U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
-UTL_ATTRIBUTE(NODISCARD, PURE)
-T* memchr(T const* ptr, U value, size_t bytes) noexcept {
+UTL_LIBC_PURE T* memchr(T const* ptr, U value, size_t bytes) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_char_memchr)
     return (T*)__builtin_char_memchr(ptr, as_byte(value), bytes);
 #else
@@ -64,8 +58,7 @@ T* memchr(T const* ptr, U value, size_t bytes) noexcept {
 }
 
 template <typename T, typename U>
-UTL_ATTRIBUTE(NODISCARD, PURE)
-int memcmp(T const* lhs, U const* rhs, element_count_t count) noexcept {
+UTL_LIBC_PURE int memcmp(T const* lhs, U const* rhs, element_count_t count) noexcept {
     static_assert(is_trivially_lexicographically_comparable<T, U>::value,
         "Types must be lexicographically comparable");
 #if UTL_HAS_BUILTIN(__builtin_char_memchr)
@@ -75,8 +68,7 @@ int memcmp(T const* lhs, U const* rhs, element_count_t count) noexcept {
 #endif
 }
 
-UTL_ATTRIBUTES(NODISCARD, PURE)
-size_t strlen(char const* str) noexcept {
+UTL_LIBC_PURE size_t strlen(char const* str) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_strlen)
     return __builtin_strlen(str);
 #else
@@ -84,8 +76,7 @@ size_t strlen(char const* str) noexcept {
 #endif
 }
 
-UTL_ATTRIBUTES(NODISCARD, PURE)
-size_t strlen(wchar_t const* str) noexcept {
+UTL_LIBC_PURE size_t strlen(wchar_t const* str) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_wcslen)
     return __builtin_wcslen(str);
 #else
@@ -94,8 +85,7 @@ size_t strlen(wchar_t const* str) noexcept {
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_ATTRIBUTES(NODISCARD, PURE)
-size_t strlen(T const* str) noexcept {
+UTL_LIBC_PURE size_t strlen(T const* str) noexcept {
     size_t count = 0;
     while (*str) {
         ++str;
@@ -105,17 +95,15 @@ size_t strlen(T const* str) noexcept {
     return count;
 }
 
-UTL_ATTRIBUTES(NODISCARD, PURE)
-T* strchr(char const* str, char const ch) noexcept {
+UTL_LIBC_PURE char* strchr(char const* str, char const ch) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_strchr)
-    return (T*)__builtin_strchr(str, ch);
+    return __builtin_strchr(str, ch);
 #else
-    return (T*)::strchr(str, ch);
+    return ::strchr(str, ch);
 #endif
 }
 
-UTL_ATTRIBUTES(NODISCARD, PURE)
-wchar_t* strchr(wchar_t const* str, wchar_t const ch) noexcept {
+UTL_LIBC_PURE wchar_t* strchr(wchar_t const* str, wchar_t const ch) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_wcschr)
     return __builtin_wcschr(str, ch);
 #else
@@ -124,9 +112,8 @@ wchar_t* strchr(wchar_t const* str, wchar_t const ch) noexcept {
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_ATTRIBUTES(NODISCARD, PURE)
-T* strnchr(T const* str, T const ch, element_count_t count) noexcept {
-    size_t len = count;
+UTL_LIBC_PURE T* strnchr(T const* str, T const ch, element_count_t count) noexcept {
+    size_t len = size_t(count);
     while (len) {
         if (*str == ch) {
             return const_cast<T*>(str);
@@ -143,8 +130,7 @@ T* strnchr(T const* str, T const ch, element_count_t count) noexcept {
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_ATTRIBUTES(NODISCARD, PURE)
-T* strchr(T const* str, T const ch) noexcept {
+UTL_LIBC_PURE T* strchr(T const* str, T const ch) noexcept {
     while (*str != ch) {
         if (!*str) {
             return nullptr;
@@ -155,7 +141,7 @@ T* strchr(T const* str, T const ch) noexcept {
     return (T*)str;
 }
 
-UTL_ATTRIBUTE(NODISCARD, PURE)
+UTL_LIBC_PURE
 int strcmp(char const* left, char const* right) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_strcmp)
     return __builtin_strcmp(left, right);
@@ -164,7 +150,7 @@ int strcmp(char const* left, char const* right) noexcept {
 #endif
 }
 
-UTL_ATTRIBUTE(NODISCARD, PURE)
+UTL_LIBC_PURE
 int strcmp(wchar_t const* left, wchar_t const* right) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_wcscmp)
     return __builtin_wcscmp(left, right);
@@ -174,8 +160,7 @@ int strcmp(wchar_t const* left, wchar_t const* right) noexcept {
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_ATTRIBUTE(NODISCARD, PURE)
-int strcmp(T const* left, T const* right) noexcept {
+UTL_LIBC_PURE int strcmp(T const* left, T const* right) noexcept {
     while (*left == *right) {
         if (!*left && !*right) {
             return 0;
@@ -188,7 +173,7 @@ int strcmp(T const* left, T const* right) noexcept {
     return (*left < *right) ? -1 : 1;
 }
 
-UTL_ATTRIBUTE(NODISCARD, PURE)
+UTL_LIBC_PURE
 int strncmp(char const* left, char const* right, element_count_t len) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_strcmp)
     return __builtin_strncmp(left, right, (size_t)len);
@@ -197,7 +182,7 @@ int strncmp(char const* left, char const* right, element_count_t len) noexcept {
 #endif
 }
 
-UTL_ATTRIBUTE(NODISCARD, PURE)
+UTL_LIBC_PURE
 int strncmp(wchar_t const* left, wchar_t const* right, element_count_t len) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_wcscmp)
     return __builtin_wcsncmp(left, right, (size_t)len);
@@ -207,8 +192,7 @@ int strncmp(wchar_t const* left, wchar_t const* right, element_count_t len) noex
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_ATTRIBUTE(NODISCARD, PURE)
-int strncmp(T const* left, T const* right, element_count_t elements) noexcept {
+UTL_LIBC_PURE int strncmp(T const* left, T const* right, element_count_t elements) noexcept {
     size_t len = (size_t)elements;
     while (len) {
         if (*left != *right) {
@@ -228,8 +212,7 @@ int strncmp(T const* left, T const* right, element_count_t elements) noexcept {
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_ATTRIBUTE(NODISCARD, PURE)
-T* strnset(T* dst, T const val, element_count_t elements) noexcept {
+UTL_LIBC_PURE T* strnset(T* dst, T const val, element_count_t elements) noexcept {
     size_t len = (size_t)elements;
     if (!len) {
         return dst;
@@ -243,7 +226,7 @@ T* strnset(T* dst, T const val, element_count_t elements) noexcept {
 
     T* ptr = dst;
     do {
-        size_t const copy_size = min<T>(len, buffer_count);
+        size_t const copy_size = len < buffer_count ? len : buffer_count;
         memcpy(ptr, buffer, byte_count<T>(copy_size));
         len -= copy_size;
         ptr += copy_size;
@@ -267,4 +250,5 @@ using standard::strnset;
 } // namespace runtime
 } // namespace libc
 
+#undef UTL_LIBC_PURE
 UTL_NAMESPACE_END

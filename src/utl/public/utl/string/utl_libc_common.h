@@ -6,6 +6,10 @@
 #include "utl/string/utl_is_string_char.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_empty.h"
+#include "utl/type_traits/utl_is_same.h"
+#include "utl/type_traits/utl_is_unsigned.h"
+#include "utl/type_traits/utl_remove_cv.h"
+#include "utl/type_traits/utl_std_traits.h" // is_trivially_copyable
 
 #include <string.h>
 
