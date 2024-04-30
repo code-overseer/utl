@@ -166,7 +166,7 @@ UTL_CONSTEVAL size_t strlen(wchar_t const* str) noexcept {
 #endif
 }
 
-template <typename T>
+template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
 UTL_CONSTEVAL size_t strlen(T const* str) noexcept {
     return recursive::strlen(str);
 }
@@ -187,7 +187,7 @@ UTL_CONSTEVAL wchar_t* strchr(wchar_t const* str, wchar_t const ch) noexcept {
 #endif
 }
 
-template <typename T>
+template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
 UTL_CONSTEVAL T* strchr(T const* str, T const ch) noexcept {
     return recursive::strchr(str, ch);
 }
@@ -208,7 +208,7 @@ UTL_CONSTEVAL int strcmp(wchar_t const* left, wchar_t const* rhs) noexcept {
 #endif
 }
 
-template <typename T>
+template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
 UTL_CONSTEVAL int strcmp(T const* left, T const* right) noexcept {
     return recursive::strcmp(left, right);
 }
@@ -229,17 +229,17 @@ UTL_CONSTEVAL int strncmp(wchar_t const* left, wchar_t const* right, element_cou
 #endif
 }
 
-template <typename T>
+template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
 UTL_CONSTEVAL int strncmp(T const* left, T const* right, element_count_t len) noexcept {
     return recursive::strncmp(left, right, len);
 }
 
-template <typename T>
+template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
 UTL_CONSTEVAL T* strnset(T* dst, T const val, element_count_t max_len) noexcept {
     return recursive::strnset(dst, val, max_len, dst);
 }
 
-template <typename T>
+template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
 UTL_CONSTEVAL T* strnchr(T const* str, T const val, element_count_t max_len) noexcept {
     return recursive::strnchr(str, val, max_len);
 }
