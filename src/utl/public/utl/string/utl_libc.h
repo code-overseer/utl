@@ -3,9 +3,9 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
-#include "utl/string/utl_compile_time_libc.h"
 #include "utl/string/utl_constant_p.h"
-#include "utl/string/utl_runtime_libc.h"
+#include "utl/string/utl_libc_compile_time.h"
+#include "utl/string/utl_libc_runtime.h"
 
 UTL_NAMESPACE_BEGIN
 
