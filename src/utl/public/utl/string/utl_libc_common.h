@@ -62,11 +62,6 @@ constexpr T* operator+(T* ptr, element_count_t offset) noexcept {
     return ptr + (size_t)offset;
 }
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
-unsigned char as_byte(T val) noexcept {
-    return *((unsigned char const*)&val);
-}
-
 template <typename T, typename U>
 struct is_trivially_lexicographically_comparable :
     bool_constant<is_same<remove_cv_t<T>, remove_cv_t<U>>::value && sizeof(T) == 1 &&
@@ -81,6 +76,11 @@ concept trivially_copyable = UTL_SCOPE is_trivially_copyable_v<T>;
 template <typename T, size_t N>
 using exact_size = bool_constant<!is_empty<T>::value && (sizeof(T) == N)>;
 #endif
+
+template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
+unsigned char as_byte(T val) noexcept {
+    return *((unsigned char const*)&val);
+}
 } // namespace libc
 
 UTL_NAMESPACE_END
