@@ -27,17 +27,14 @@ class basic_short_string;
 namespace details {
 namespace string {
 
-template <typename A using buffer_type = compressed_pair<storage_union, allocator_type>;
-template <typename CharType>
-struct standard_size;
-template <>
-struct standard_size<char> {
-    static constexpr size_t value = 32 - sizeof(size_t) - sizeof(CharType);
-};
-
 template <typename CharType>
 struct standard_size {
-    static constexpr size_t value = (64 - sizeof(size_t)) / sizeof(CharType) - sizeof(CharType);
+    static constexpr size_t value = (48 - sizeof(size_t)) / sizeof(CharType) - 1;
+};
+
+template <>
+struct standard_size<char> {
+    static constexpr size_t value = 32 - sizeof(size_t) - sizeof(char);
 };
 
 #ifdef UTL_SUPPORTS_CHAR8_T

@@ -40,6 +40,16 @@ namespace libc {
 enum class element_count_t : size_t {
 };
 
+UTL_ATTRIBUTES(NODISCARD, CONST)
+constexpr element_count_t min(element_count_t l, element_count_t r) noexcept {
+    return (size_t)l < (size_t)r ? l : r;
+}
+
+UTL_ATTRIBUTES(NODISCARD, CONST)
+constexpr element_count_t max(element_count_t l, element_count_t r) noexcept {
+    return (size_t)l > (size_t)r ? l : r;
+}
+
 template <typename T>
 constexpr size_t byte_count(element_count_t c) noexcept {
     return sizeof(T) * size_t(c);

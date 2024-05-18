@@ -24,7 +24,7 @@ public:
         memcpy(msg_ptr_, msg, length);
     }
 
-    ~program_exception() noexcept {
+    virtual ~program_exception() noexcept {
         if (msg_ptr_ != msg_buffer_) {
             delete[] msg_ptr_;
         }

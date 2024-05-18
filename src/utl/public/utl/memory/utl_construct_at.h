@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "utl/base_preprocessor.h"
+#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_declval.h"
-#include "utl/type_traits/utl_forward.h"
+#include "utl/utility/utl_forward.h"
 
 #ifdef UTL_CXX20
 #  if defined(UTL_COMPILER_CLANG) | defined(UTL_COMPILER_ICX)

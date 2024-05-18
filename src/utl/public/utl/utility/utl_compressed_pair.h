@@ -36,12 +36,12 @@ struct element {
     constexpr element(value_initialize_t) noexcept(is_nothrow_default_constructible<T>::value)
         : value() {}
     template <typename... Args>
-    constexpr element(Args&&... args) : value(forward<Args>(args)) {}
+    constexpr element(Args&&... args) : value(forward<Args>(args)...) {}
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr reference get() noexcept { return value; }
+    constexpr reference get() & noexcept { return value; }
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr const_reference get() const noexcept { return value; }
+    constexpr const_reference get() const& noexcept { return value; }
     UTL_ATTRIBUTES(NODISCARD, CONST)
     constexpr value_type&& get() && noexcept { return move(value); }
     UTL_ATTRIBUTES(NODISCARD, CONST)
@@ -62,10 +62,10 @@ struct element<T, Idx, enable_if_t<optimizable<T>::value>> : private T {
         : value_type() {}
     template <typename... Args>
     constexpr element(Args&&... args) noexcept(is_nothrow_constructible<T, Args...>::value)
-        : value_type(forward<Args>(args)) {}
+        : value_type(forward<Args>(args)...) {}
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr reference get() noexcept& { return *this; }
+    constexpr reference get() & noexcept { return *this; }
     UTL_ATTRIBUTES(NODISCARD, CONST)
     constexpr const_reference get() const& noexcept { return *this; }
     UTL_ATTRIBUTES(NODISCARD, CONST)

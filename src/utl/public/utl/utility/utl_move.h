@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attributes.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_pragma.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_is_copy_constructible.h"
+#include "utl/type_traits/utl_is_nothrow_move_constructible.h"
 
 #if defined(UTL_CXX14) && defined(UTL_USE_STD_move) && UTL_USE_STD_move
 #  include <utility>

@@ -23,6 +23,7 @@ public:
      * Deleted default constructor to enforce initialization with a non-null pointer.
      */
     constexpr nonnull_ptr() noexcept = delete;
+    constexpr nonnull_ptr(decltype(nullptr)) = delete;
 
     /**
      * Constructs a nonnull_ptr from a raw pointer.

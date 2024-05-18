@@ -2,12 +2,13 @@
 
 #pragma once
 
+#include "utl/memory/utl_addressof.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_is_function.h"
+#include "utl/type_traits/utl_is_pointer.h"
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/type_traits/utl_void_t.h"
-#include "utl/utility/utl_addressof.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -41,10 +42,10 @@ struct pointer_to_arg<void> {
 };
 
 template <typename T, typename U, typename = void>
-using has_rebind : false_type{};
+struct has_rebind : false_type {};
 
 template <typename T, typename U>
-using has_rebind<T, U, void_t<typename T::template rebind<U>>> : true_type{};
+struct has_rebind<T, U, void_t<typename T::template rebind<U>>> : true_type {};
 
 template <typename Ptr, typename T, bool = has_rebind<Ptr, T>::value>
 struct rebind_impl;
@@ -65,8 +66,8 @@ struct rebind_impl<Template<T, Args...>, U, false> {
 };
 
 template <typename From, typename To>
-struct rebind_impl<From*, U, false> {
-    using type = U*;
+struct rebind_impl<From*, To, false> {
+    using type = To*;
 };
 
 template <typename Ptr, bool = has_element_type<Ptr>::value>
@@ -122,7 +123,7 @@ struct has_to_address : false_type {};
 
 template <typename Ptr>
 struct has_to_address<Ptr,
-    decltype((void)ULT_SCOPE pointer_traits<Ptr>::to_address(declval<Ptr const&>()))> :
+    void_t<decltype(UTL_SCOPE pointer_traits<Ptr>::to_address(declval<Ptr const&>()))>> :
     true_type {};
 
 template <typename Ptr, typename = void>
@@ -132,28 +133,28 @@ template <typename Ptr>
 struct has_arrow_operator<Ptr, decltype((void)declval<Ptr const&>().operator->())> : true_type {};
 
 struct to_address_t {
-    template <typename T, enable_if_t<!is_pointer<T>::value && has_to_address<T>::value, int = 0>>
-    UTL_ATTRIBUTE(NODISCARD, FLATTEN)
-    inline constexpr auto operator()(T const& ptr) const noexcept
-        -> decltype(pointer_traits<U>::to_address(ptr)) {
-        return ULT_SCOPE pointer_traits<U>::to_address(ptr);
-    };
-
-    template <typename T,
-        enable_if_t<!is_pointer<T>::value && !has_to_address<T>::value &&
-                has_arrow_operator<T>::value,
-            int = 1>>
-    UTL_ATTRIBUTE(NODISCARD, FLATTEN)
-    inline constexpr auto operator()(T const& ptr) const noexcept
-        -> decltype(this->operator()(ptr.operator->())) {
-        return this->operator()(ptr.operator->());
-    }
-
     template <typename T>
     UTL_ATTRIBUTES(NODISCARD, CONST)
     inline constexpr T* operator()(T* ptr) const noexcept {
         static_assert(!is_function<T>::value, "T cannot be a function");
         return ptr;
+    }
+
+    template <typename T, enable_if_t<!is_pointer<T>::value && has_to_address<T>::value, int> = 0>
+    UTL_ATTRIBUTE(NODISCARD)
+    inline constexpr auto operator()(T const& ptr) const noexcept
+        -> decltype(UTL_SCOPE pointer_traits<T>::to_address(ptr)) {
+        return UTL_SCOPE pointer_traits<T>::to_address(ptr);
+    };
+
+    template <typename T,
+        enable_if_t<!is_pointer<T>::value && !has_to_address<T>::value &&
+                has_arrow_operator<T>::value,
+            int> = 1>
+    UTL_ATTRIBUTE(NODISCARD)
+    inline constexpr auto operator()(T const& ptr) const noexcept
+        -> decltype(this->operator()(ptr.operator->())) {
+        return this->operator()(ptr.operator->());
     }
 };
 } // namespace pointer_traits

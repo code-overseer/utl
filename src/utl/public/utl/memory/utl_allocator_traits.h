@@ -2,12 +2,20 @@
 
 #pragma once
 
-#include "utl/memory/utl_constructs_at.h"
+#include "utl/compare/utl_compare_traits.h"
+#include "utl/memory/utl_construct_at.h"
 #include "utl/memory/utl_pointer_traits.h"
+#include "utl/type_traits/utl_is_empty.h"
+#include "utl/type_traits/utl_is_nothrow_copy_assignable.h"
+#include "utl/type_traits/utl_is_nothrow_copy_constructible.h"
+#include "utl/type_traits/utl_is_nothrow_move_assignable.h"
+#include "utl/type_traits/utl_is_nothrow_move_constructible.h"
+#include "utl/type_traits/utl_is_same.h"
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/type_traits/utl_make_unsigned.h"
 #include "utl/utility/utl_forward.h"
 #include "utl/utility/utl_move.h"
+#include "utl/utility/utl_swap.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -63,7 +71,7 @@ using pointer_t = typename pointer<Alloc>::type;
 
 template <typename Alloc, typename = void>
 struct difference_type {
-    using type = typename pointer_traits<pointer_t<alloc>>::difference_type;
+    using type = typename UTL_SCOPE pointer_traits<pointer_t<Alloc>>::difference_type;
 };
 
 template <typename Alloc>
@@ -138,9 +146,9 @@ concept implements_reallocate = requires(T& alloc, result_type_t<T> r, size_type
 template <typename T UTL_REQUIRES_CXX11(!implements_reallocate<T>::value)>
 UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
     T& allocator, result_type_t<T> arg, size_type_t<T> size) {
-    auto dst = alloc.allocate(new_size);
+    auto dst = allocator.allocate(size);
     memcpy(to_address(dst), to_address(arg.ptr), arg.size);
-    alloc.deallocate(arg.ptr, arg.size);
+    allocator.deallocate(arg.ptr, arg.size);
 }
 
 template <UTL_CONCEPT_CXX20(implements_reallocate)
@@ -203,10 +211,11 @@ concept implements_reallocate_at_least = requires(T& alloc, result_type_t<T> r, 
 
 #endif
 
-template <typename T, UTL_REQUIRES_CXX11(!implements_reallocate_at_least<T>::value)>
+template <UTL_CONCEPT_CXX20(implements_reallocate_at_least)
+        T UTL_REQUIRES_CXX11(!implements_reallocate_at_least<T>::value)>
 UTL_CONSTEXPR_CXX20 result_type_t<T> reallocate_at_least(
     T& allocator, result_type_t<T> arg, size_type_t<T> new_size) {
-    return UTL_SCOPE detials::allocator::reallocate(allocator, new_size);
+    return UTL_SCOPE details::allocator::reallocate(allocator, new_size);
 }
 
 template <UTL_CONCEPT_CXX20(implements_reallocate_at_least)
@@ -237,8 +246,8 @@ struct allocator_traits {
         details::allocator::selectable_copy_construction<allocator_type>;
     using is_always_equal = details::allocator::is_always_equal<allocator_type>;
     using allocation_result = allocation_result<pointer, size_type>;
-    using nothrow_move_assignable = propagate_on_container_move_assignment::value ||
-        is_always_equal::value&& UTL_SCOPE is_nothrow_move_assignable<allocator_type>;
+    using nothrow_move_assignable = bool_constant<propagate_on_container_move_assignment::value ||
+        is_always_equal::value && UTL_SCOPE is_nothrow_move_assignable<allocator_type>::value>;
 
     static_assert(UTL_SCOPE is_nothrow_copy_constructible<allocator_type>::value,
         "Alloc must be nothrow copy constructible");
@@ -279,7 +288,7 @@ struct allocator_traits {
     }
 
     UTL_ATTRIBUTE(NODISCARD)
-    static UTL_CONSTEXPR_CXX20 static allocation_result reallocate_at_least(
+    static UTL_CONSTEXPR_CXX20 allocation_result reallocate_at_least(
         allocator_type& alloc, allocation_result arg, size_type new_size) {
         return details::allocator::reallocate_at_least(alloc, arg, new_size);
     }

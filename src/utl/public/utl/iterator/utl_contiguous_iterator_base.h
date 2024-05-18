@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "utl/base_preprocessor.h"
 #include "utl/memory/utl_pointer_traits.h"
+#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_base_of.h"
 #include "utl/type_traits/utl_is_convertible.h"
@@ -11,12 +11,17 @@
 
 UTL_NAMESPACE_BEGIN
 
+#define UTL_ITERATOR_CONST UTL_ATTRIBUTES(NODISCARD, CONST)
+#define UTL_ITERATOR_PURE UTL_ATTRIBUTES(NODISCARD, PURE)
+
 template <typename It, typename ValueType>
 class contiguous_iterator_base {
     using value_type = ValueType;
     using difference_type = typename pointer_traits<value_type*>::difference_type;
     using size_type = decltype(sizeof(0));
+    using pointer = remove_const_t<value_type>*;
 
+    UTL_ITERATOR_CONST
     static constexpr value_type* get_ptr(It it) noexcept {
         static_assert(is_base_of<contiguous_iterator_base, It>::value, "Invalid iterator type");
         return ((contiguous_iterator_base const&)it).ptr_;
@@ -27,33 +32,33 @@ class contiguous_iterator_base {
         ((contiguous_iterator_base&)it).ptr_ = value;
     }
 
-    UTL_ATTRIBUTE(NODISCARD)
+    UTL_ITERATOR_CONST
     friend constexpr value_type* as_ptr(contiguous_iterator_base it) noexcept { return it.ptr_; }
 
 public:
-    UTL_ATTRIBUTE(NODISCARD) constexpr value_type& operator*() const noexcept { return *ptr_; }
+    UTL_ITERATOR_PURE constexpr value_type& operator*() const noexcept { return *ptr_; }
 
-    UTL_ATTRIBUTE(NODISCARD) constexpr value_type* operator->() const noexcept { return ptr_; }
+    UTL_ITERATOR_PURE constexpr value_type* operator->() const noexcept { return ptr_; }
 
-    UTL_ATTRIBUTE(NODISCARD)
+    UTL_ITERATOR_CONST
     friend constexpr It operator+(It it, difference_type offset) noexcept {
         set_ptr(it, get_ptr(it) + offset);
         return it;
     }
 
-    UTL_ATTRIBUTE(NODISCARD)
+    UTL_ITERATOR_CONST
     friend constexpr It operator+(difference_type offset, It it) noexcept {
         set_ptr(it, get_ptr(it) + offset);
         return it;
     }
 
-    UTL_ATTRIBUTE(NODISCARD)
+    UTL_ITERATOR_CONST
     friend constexpr It operator-(It it, difference_type offset) noexcept {
         set_ptr(it, get_ptr(it) - offset);
         return it;
     }
 
-    UTL_ATTRIBUTE(NODISCARD)
+    UTL_ITERATOR_CONST
     friend constexpr difference_type operator-(It left, It right) noexcept {
         return get_ptr(left) - get_ptr(right);
     }
@@ -90,44 +95,44 @@ public:
         return before;
     }
 
-    UTL_ATTRIBUTE(NODISCARD)
+    UTL_ITERATOR_PURE
     constexpr value_type& operator[](difference_type offset) const noexcept {
-        return *(it + offset);
+        return *(ptr_ + offset);
     }
 
-    UTL_ATTRIBUTE(NODISCARD)
-    friend constexpr bool operator==(It const& left, It const& right) const noexcept {
+    UTL_ITERATOR_PURE
+    friend constexpr bool operator==(It const& left, It const& right) noexcept {
         return get_ptr(left) == get_ptr(right);
     }
 
-    UTL_ATTRIBUTE(NODISCARD)
-    friend constexpr bool operator!=(It const& left, It const& right) const noexcept {
+    UTL_ITERATOR_PURE
+    friend constexpr bool operator!=(It const& left, It const& right) noexcept {
         return get_ptr(left) != get_ptr(right);
     }
 
-    UTL_ATTRIBUTE(NODISCARD)
-    friend constexpr bool operator<(It const& left, It const& right) const noexcept {
+    UTL_ITERATOR_PURE
+    friend constexpr bool operator<(It const& left, It const& right) noexcept {
         return get_ptr(left) < get_ptr(right);
     }
 
-    UTL_ATTRIBUTE(NODISCARD)
-    friend constexpr bool operator>(It const& left, It const& right) const noexcept {
+    UTL_ITERATOR_PURE
+    friend constexpr bool operator>(It const& left, It const& right) noexcept {
         return get_ptr(left) > get_ptr(right);
     }
 
-    UTL_ATTRIBUTE(NODISCARD)
-    friend constexpr bool operator<=(It const& left, It const& right) const noexcept {
+    UTL_ITERATOR_PURE
+    friend constexpr bool operator<=(It const& left, It const& right) noexcept {
         return get_ptr(left) <= get_ptr(right);
     }
 
-    UTL_ATTRIBUTE(NODISCARD)
-    friend constexpr bool operator>=(It const& left, It const& right) const noexcept {
+    UTL_ITERATOR_PURE
+    friend constexpr bool operator>=(It const& left, It const& right) noexcept {
         return get_ptr(left) >= get_ptr(right);
     }
 
 #ifdef UTL_CXX20
-    UTL_ATTRIBUTE(NODISCARD)
-    friend constexpr auto operator<=>(It const& left, It const& right) const noexcept {
+    UTL_ITERATOR_PURE
+    friend constexpr auto operator<=>(It const& left, It const& right) noexcept {
         return get_ptr(left) <=> get_ptr(right);
     }
 #endif
@@ -157,7 +162,10 @@ protected:
     }
 
 private:
-    remove_const_t<value_type>* ptr_ = nullptr;
+    pointer ptr_ = nullptr;
 };
+
+#undef UTL_ITERATOR_PURE
+#undef UTL_ITERATOR_CONST
 
 UTL_NAMESPACE_END
