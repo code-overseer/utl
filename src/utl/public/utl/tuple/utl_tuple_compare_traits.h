@@ -6,7 +6,7 @@
 #include "utl/preprocessor/utl_namespace.h"
 #include "utl/preprocessor/utl_standard.h"
 #include "utl/tuple/utl_tuple_traits.h"
-#include "utl/type_traits/utl_boolean_testable.h"
+#include "utl/type_traits/utl_is_boolean_testable.h"
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/type_traits/utl_remove_cvref.h"
 #include "utl/type_traits/utl_remove_reference.h"
