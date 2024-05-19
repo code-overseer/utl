@@ -93,6 +93,26 @@ using size_type_t = typename size_type<Alloc>::type;
 template <typename Alloc>
 using result_type_t = allocation_result<pointer_t<Alloc>, size_type_t<Alloc>>;
 
+template <typename Alloc, typename T, typename = void>
+struct has_rebind : false_type {};
+
+template <typename Alloc, typename T>
+struct has_rebind<Alloc, T, void_t<typename Alloc::template rebind<T>::other>> : true_type {};
+
+template <typename Alloc, typename T, bool = has_rebind<Alloc, T>::value>
+struct rebind;
+
+template <typename Alloc, typename T>
+struct rebind<Alloc, T, true> {
+    using type = typename Alloc::template rebind<T>::other;
+};
+
+template <typename To, template <typename, typename...> class Alloc, typename From,
+    typename... Args>
+struct rebind<Alloc<From, Args...>, To, false> {
+    using type = Alloc<To, Args...>;
+};
+
 template <typename T, typename U>
 constexpr T& assign(T& dst, U&&, false_type) noexcept {
     return dst;
@@ -256,6 +276,11 @@ struct allocator_traits {
     using allocation_result = allocation_result<pointer, size_type>;
     using nothrow_move_assignable = bool_constant<propagate_on_container_move_assignment::value ||
         is_always_equal::value && UTL_SCOPE is_nothrow_move_assignable<allocator_type>::value>;
+
+    template <typename T>
+    using rebind_alloc = typename details::allocator::rebind<Alloc, T>::type;
+    template <typename T>
+    using rebind_traits = allocator_traits<rebind_alloc<T>>;
 
     static_assert(UTL_SCOPE is_nothrow_copy_constructible<allocator_type>::value,
         "Alloc must be nothrow copy constructible");
