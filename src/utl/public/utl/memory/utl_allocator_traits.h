@@ -3,8 +3,10 @@
 #pragma once
 
 #include "utl/compare/utl_compare_traits.h"
-#include "utl/memory/utl_construct_at.h"
+#include "utl/memory/utl_allocator_fwd.h"
 #include "utl/memory/utl_pointer_traits.h"
+#include "utl/string/utl_libc.h"
+#include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_is_empty.h"
 #include "utl/type_traits/utl_is_nothrow_copy_assignable.h"
 #include "utl/type_traits/utl_is_nothrow_copy_constructible.h"
@@ -13,17 +15,12 @@
 #include "utl/type_traits/utl_is_same.h"
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/type_traits/utl_make_unsigned.h"
+#include "utl/type_traits/utl_void_t.h"
 #include "utl/utility/utl_forward.h"
 #include "utl/utility/utl_move.h"
 #include "utl/utility/utl_swap.h"
 
 UTL_NAMESPACE_BEGIN
-
-template <typename pointer, typename size_type>
-struct allocation_result {
-    pointer ptr;
-    size_type size;
-};
 
 namespace details {
 namespace allocator {
@@ -96,6 +93,26 @@ using size_type_t = typename size_type<Alloc>::type;
 template <typename Alloc>
 using result_type_t = allocation_result<pointer_t<Alloc>, size_type_t<Alloc>>;
 
+template <typename Alloc, typename T, typename = void>
+struct has_rebind : false_type {};
+
+template <typename Alloc, typename T>
+struct has_rebind<Alloc, T, void_t<typename Alloc::template rebind<T>::other>> : true_type {};
+
+template <typename Alloc, typename T, bool = has_rebind<Alloc, T>::value>
+struct rebind;
+
+template <typename Alloc, typename T>
+struct rebind<Alloc, T, true> {
+    using type = typename Alloc::template rebind<T>::other;
+};
+
+template <typename To, template <typename, typename...> class Alloc, typename From,
+    typename... Args>
+struct rebind<Alloc<From, Args...>, To, false> {
+    using type = Alloc<To, Args...>;
+};
+
 template <typename T, typename U>
 constexpr T& assign(T& dst, U&&, false_type) noexcept {
     return dst;
@@ -142,19 +159,30 @@ concept implements_reallocate = requires(T& alloc, result_type_t<T> r, size_type
 };
 
 #endif
+template <typename T>
+UTL_CONSTEXPR_CXX20 pointer_t<T> fallback_reallocate(
+    T& allocator, result_type_t<T> arg, size_type_t<T> size) {
+    auto dst = allocator.allocate(size);
+    libc::unsafe::memcpy(to_address(dst), to_address(arg.ptr), arg.size);
+    allocator.deallocate(arg.ptr, arg.size);
+    return dst;
+}
 
 template <typename T UTL_REQUIRES_CXX11(!implements_reallocate<T>::value)>
 UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
     T& allocator, result_type_t<T> arg, size_type_t<T> size) {
-    auto dst = allocator.allocate(size);
-    memcpy(to_address(dst), to_address(arg.ptr), arg.size);
-    allocator.deallocate(arg.ptr, arg.size);
+    return fallback_reallocate(allocator, arg, size);
 }
 
 template <UTL_CONCEPT_CXX20(implements_reallocate)
         T UTL_REQUIRES_CXX11(implements_reallocate<T>::value)>
 UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
     T& allocator, result_type_t<T> arg, size_type_t<T> size) {
+#ifdef UTL_CXX20
+    if (UTL_BUILTIN_is_constant_evaluated()) {
+        return fallback_reallocate(allocator, arg, size);
+    }
+#endif
     return allocator.reallocate(arg, size);
 }
 
@@ -249,6 +277,11 @@ struct allocator_traits {
     using nothrow_move_assignable = bool_constant<propagate_on_container_move_assignment::value ||
         is_always_equal::value && UTL_SCOPE is_nothrow_move_assignable<allocator_type>::value>;
 
+    template <typename T>
+    using rebind_alloc = typename details::allocator::rebind<Alloc, T>::type;
+    template <typename T>
+    using rebind_traits = allocator_traits<rebind_alloc<T>>;
+
     static_assert(UTL_SCOPE is_nothrow_copy_constructible<allocator_type>::value,
         "Alloc must be nothrow copy constructible");
     static_assert(UTL_SCOPE is_nothrow_move_constructible<allocator_type>::value,
@@ -303,20 +336,23 @@ struct allocator_traits {
         return details::allocator::assign(dst, move(src), propagate_on_container_move_assignment{});
     }
 
+    UTL_ATTRIBUTE(NODISCARD)
     static UTL_CONSTEXPR_CXX14 allocator_type select_on_container_copy_construction(
         allocator_type const& p) noexcept {
         return details::allocator::copy(p, selectable_copy_construction{});
     }
 
     template <typename T = allocator_type>
-    static constexpr enable_if_t<is_same<T, allocator_type>::value && is_always_equal::value, bool>
-    equals(T const&, T const&) noexcept {
+    UTL_ATTRIBUTE(NODISCARD)
+    static constexpr enable_if_t<is_same<T, allocator_type>::value && is_always_equal::value,
+        bool> equals(T const&, T const&) noexcept {
         return true;
     }
 
     template <typename T = allocator_type>
-    static constexpr enable_if_t<is_same<T, allocator_type>::value && !is_always_equal::value, bool>
-    equals(T const& left, T const& right) noexcept {
+    UTL_ATTRIBUTE(NODISCARD)
+    static constexpr enable_if_t<is_same<T, allocator_type>::value && !is_always_equal::value,
+        bool> equals(T const& left, T const& right) noexcept {
         return left == right;
     }
 };

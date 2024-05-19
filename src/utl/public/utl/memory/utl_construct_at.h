@@ -15,9 +15,8 @@
 namespace std {
 /* UTL_UNDEFINED_BEHAVIOUR */
 template <typename T, typename... Args>
-inline constexpr T* utl_construct_at_utl(T* location, Args&&... args) noexcept(
+inline constexpr T* utl_construct_at_impl(T* location, Args&&... args) noexcept(
     noexcept(::new((void*)0) T(declval<Args>()...))) {
-    UTL_ASSERT_CXX14(location != nullptr);
     return ::new ((void*)(location)) T(forward<Args>(args)...);
 }
 } // namespace std
@@ -27,7 +26,7 @@ template <typename T, typename... Args>
 inline constexpr T* construct_at(T* location, Args&&... args) noexcept(
     noexcept(::new((void*)0) T(declval<Args>()...))) {
     UTL_ASSERT_CXX14(location != nullptr);
-    return ::std::utl_construct_at_utl(location, forward<Args>(args)...);
+    return ::std::utl_construct_at_impl(location, forward<Args>(args)...);
 }
 UTL_NAMESPACE_END
 #    define UTL_CONSTEXPR_CONSTRUCTS_AT constexpr

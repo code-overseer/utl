@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_attribute_list.h"
+#include "utl/preprocessor/utl_builtins.h"
 #include "utl/preprocessor/utl_compiler.h"
 
 #ifdef __has_cpp_attribute
@@ -110,6 +111,15 @@
 #  endif
 #endif
 
+#if UTL_HAS_CPP_ATTRIBUTE(clang::malloc)
+#  define UTL_ATTRIBUTE_MALLOC clang::malloc
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::malloc)
+#  define UTL_ATTRIBUTE_MALLOC gnu::malloc
+#elif UTL_HAS_ATTRIBUTE(malloc)
+#  define UTL_NONSTD_ATTRIBUTE_MALLOC __attribute__((malloc))
+#  define UTL_NONSTD_ATTRIBUTE_MALLOC_DEFINED
+#endif /* UTL_HAS_CPP_ATTRIBUTE(clang::malloc) */
+
 #ifndef UTL_NODISCARD
 #  define UTL_NODISCARD
 #endif /* ifndef UTL_NODISCARD */
@@ -137,4 +147,7 @@
 #endif /* ifndef UTL_ATTRIBUTE_NO_UNIQUE_ADDRESS */
 #ifndef UTL_ATTRIBUTE_ALWAYS_INLINE
 #  define UTL_ATTRIBUTE_ALWAYS_INLINE
+#endif /* #ifndef UTL_ATTRIBUTE_ALWAYS_INLINE */
+#ifndef UTL_ATTRIBUTE_MALLOC
+#  define UTL_ATTRIBUTE_MALLOC
 #endif /* #ifndef UTL_ATTRIBUTE_ALWAYS_INLINE */
