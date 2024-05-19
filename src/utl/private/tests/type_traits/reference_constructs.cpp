@@ -1,5 +1,8 @@
 // Copyright 2023-2024 Bryan Wong
 
+// Portions of this file are derived from GCC, which is copyrighted by
+// the Free Software Foundation, Inc.
+
 #include "utl/preprocessor/utl_traits_check.h"
 #include "utl/type_traits/utl_reference_constructs_from_temporary.h"
 

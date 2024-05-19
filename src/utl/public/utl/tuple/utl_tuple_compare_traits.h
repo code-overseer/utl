@@ -6,7 +6,7 @@
 #include "utl/preprocessor/utl_namespace.h"
 #include "utl/preprocessor/utl_standard.h"
 #include "utl/tuple/utl_tuple_traits.h"
-#include "utl/type_traits/utl_boolean_testable.h"
+#include "utl/type_traits/utl_is_boolean_testable.h"
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/type_traits/utl_remove_cvref.h"
 #include "utl/type_traits/utl_remove_reference.h"
@@ -165,7 +165,7 @@ struct all_have_nothrow_gteq : details::all_have_nothrow_gteq_impl<T, U> {};
 
 } // namespace compare_ops
 
-#ifdef UTL_CXX20
+#if UTL_CXX20
 
 namespace details {
 namespace compare_traits {
@@ -210,7 +210,7 @@ template <typename T, typename U = T, typename Cat = std::partial_ordering>
 struct is_all_nothrow_three_way_comparable_with :
     details::compare_traits::all_nothrow_three_way_comparable_with_test_t<T, U, Cat> {};
 
-#else // ifdef UTL_CXX20
+#else // UTL_CXX20
 
 UTL_NAMESPACE_BEGIN
 
@@ -222,7 +222,7 @@ struct is_all_nothrow_three_way_comparable_with : false_type {};
 
 UTL_NAMESPACE_END
 
-#endif // ifdef UTL_CXX20
+#endif // UTL_CXX20
 
 UTL_NAMESPACE_END
 

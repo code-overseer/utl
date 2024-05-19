@@ -12,6 +12,7 @@
 #include "utl/type_traits/utl_is_nothrow_copy_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_move_assignable.h"
 #include "utl/type_traits/utl_is_nothrow_move_constructible.h"
+#include "utl/type_traits/utl_is_pointer.h"
 #include "utl/type_traits/utl_is_same.h"
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/type_traits/utl_make_unsigned.h"
@@ -162,20 +163,17 @@ concept implements_reallocate = requires(T& alloc, result_type_t<T> r, size_type
 template <typename T>
 UTL_CONSTEXPR_CXX20 pointer_t<T> fallback_reallocate(
     T& allocator, result_type_t<T> arg, size_type_t<T> size) {
+    static_assert(
+        is_pointer<pointer_t<T>>::value, "Only raw pointers can use the fallback reallocation");
     auto dst = allocator.allocate(size);
-    libc::unsafe::memcpy(to_address(dst), to_address(arg.ptr), arg.size);
+    auto blessed = libc::unsafe::memcpy(to_address(dst), to_address(arg.ptr), arg.size);
     allocator.deallocate(arg.ptr, arg.size);
-    return dst;
-}
-
-template <typename T UTL_REQUIRES_CXX11(!implements_reallocate<T>::value)>
-UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
-    T& allocator, result_type_t<T> arg, size_type_t<T> size) {
-    return fallback_reallocate(allocator, arg, size);
+    return blessed;
 }
 
 template <UTL_CONCEPT_CXX20(implements_reallocate)
-        T UTL_REQUIRES_CXX11(implements_reallocate<T>::value)>
+        T UTL_REQUIRES_CXX11(implements_reallocate<T>::value&& is_pointer<pointer_t<T>>::value)>
+UTL_REQUIRES_CXX20(is_pointer_v<pointer_t<T>>)
 UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
     T& allocator, result_type_t<T> arg, size_type_t<T> size) {
 #ifdef UTL_CXX20
@@ -184,6 +182,20 @@ UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
     }
 #endif
     return allocator.reallocate(arg, size);
+}
+
+template <UTL_CONCEPT_CXX20(implements_reallocate)
+        T UTL_REQUIRES_CXX11(implements_reallocate<T>::value && !is_pointer<pointer_t<T>>::value)>
+UTL_REQUIRES_CXX20(!is_pointer_v<pointer_t<T>>)
+UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
+    T& allocator, result_type_t<T> arg, size_type_t<T> size) {
+    return allocator.reallocate(arg, size);
+}
+
+template <typename T UTL_REQUIRES_CXX11(!implements_reallocate<T>::value)>
+UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
+    T& allocator, result_type_t<T> arg, size_type_t<T> size) {
+    return fallback_reallocate(allocator, arg, size);
 }
 
 #ifndef UTL_CXX20

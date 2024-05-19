@@ -12,17 +12,17 @@ UTL_NAMESPACE_BEGIN
 
 using std::is_trivially_default_constructible;
 
-#  ifdef UTL_CXX17
+#  if UTL_CXX17
 
 using std::is_trivially_default_constructible_v;
 
-#  elif defined(UTL_CXX14) // ifdef UTL_CXX17
+#  elif UTL_CXX14 // if UTL_CXX17
 
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_trivially_default_constructible_v =
-    is_trivially_default_constructible<T, Args...>::value;
+    is_trivially_default_constructible<T>::value;
 
-#  endif // ifdef UTL_CXX17
+#  endif // if UTL_CXX17
 
 UTL_NAMESPACE_END
 
@@ -40,7 +40,7 @@ template <typename T>
 struct is_trivially_default_constructible :
     bool_constant<UTL_BUILTIN_is_trivially_constructible(T)> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_trivially_default_constructible_v =
     UTL_BUILTIN_is_trivially_constructible(T);
@@ -57,7 +57,7 @@ UTL_NAMESPACE_BEGIN
 template <typename T>
 struct is_trivially_default_constructible : is_trivially_constructible<T> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_trivially_default_constructible_v =
     is_trivially_constructible_v<T>;
@@ -71,3 +71,14 @@ UTL_NAMESPACE_END
 #  endif // ifdef UTL_BUILTIN_is_trivially_constructible
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
+
+#ifdef UTL_BUILTIN_is_trivially_constructible
+#  define UTL_TRAIT_is_trivially_default_constructible(TYPE) \
+      UTL_BUILTIN_is_trivially_constructible(TYPE)
+#elif UTL_CXX14
+#  define UTL_TRAIT_is_trivially_default_constructible(TYPE) \
+      UTL_SCOPE is_trivially_default_constructible_v<TYPE>
+#else
+#  define UTL_TRAIT_is_trivially_default_constructible(TYPE) \
+      UTL_SCOPE is_trivially_default_constructible<TYPE>::value
+#endif

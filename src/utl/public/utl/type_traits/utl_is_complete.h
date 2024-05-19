@@ -24,9 +24,15 @@ false_type is_complete(float);
 template <typename T, typename R = decltype(type_traits::details::is_complete<T>(0))>
 struct is_complete : R {};
 
-#ifdef UTL_CXX14
+#if UTL_CXX14
 template <typename T, typename R = decltype(type_traits::details::is_complete<T>(0))>
 UTL_INLINE_CXX17 constexpr bool is_complete_v = R::value;
 #endif // UTL_CXX14
 
 UTL_NAMESPACE_END
+
+#ifdef UTL_CXX14
+#  define UTL_TRAIT_is_complete(...) UTL_SCOPE is_complete_v<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_is_complete(...) UTL_SCOPE is_complete<__VA_ARGS__>::value
+#endif

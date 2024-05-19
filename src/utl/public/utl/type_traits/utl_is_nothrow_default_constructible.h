@@ -12,17 +12,17 @@ UTL_NAMESPACE_BEGIN
 
 using std::is_nothrow_default_constructible;
 
-#  ifdef UTL_CXX17
+#  if UTL_CXX17
 
 using std::is_nothrow_default_constructible_v;
 
-#  elif defined(UTL_CXX14) // ifdef UTL_CXX17
+#  elif UTL_CXX14 // if UTL_CXX17
 
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_nothrow_default_constructible_v =
-    is_nothrow_default_constructible<T, Args...>::value;
+    is_nothrow_default_constructible<T>::value;
 
-#  endif // ifdef UTL_CXX17
+#  endif // if UTL_CXX17
 
 UTL_NAMESPACE_END
 
@@ -39,7 +39,7 @@ UTL_NAMESPACE_BEGIN
 template <typename T>
 struct is_nothrow_default_constructible : bool_constant<UTL_BUILTIN_is_nothrow_constructible(T)> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_nothrow_default_constructible_v =
     UTL_BUILTIN_is_nothrow_constructible(T);
@@ -56,7 +56,7 @@ UTL_NAMESPACE_BEGIN
 template <typename T>
 struct is_nothrow_default_constructible : is_nothrow_constructible<T> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_nothrow_default_constructible_v = is_nothrow_constructible_v<T>;
 #    endif // UTL_CXX14
@@ -69,3 +69,11 @@ UTL_NAMESPACE_END
 #  endif // ifdef UTL_BUILTIN_is_nothrow_constructible
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
+
+#if UTL_CXX14
+#  define UTL_TRAIT_is_nothrow_default_constructible(TYPE) \
+      UTL_SCOPE is_nothrow_default_constructible_v<TYPE>
+#else
+#  define UTL_TRAIT_is_nothrow_default_constructible(TYPE) \
+      UTL_SCOPE is_nothrow_default_constructible<TYPE>::value
+#endif

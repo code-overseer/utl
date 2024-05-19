@@ -14,7 +14,7 @@
 #include "utl/type_traits/utl_remove_cvref.h"
 #include "utl/type_traits/utl_remove_reference.h"
 
-#if defined(UTL_USE_STD_TYPE_TRAITS) && defined(UTL_CXX20)
+#if defined(UTL_USE_STD_TYPE_TRAITS) && UTL_CXX20
 
 #  include <type_traits>
 
@@ -28,7 +28,7 @@ using std::common_reference_t;
 
 UTL_NAMESPACE_END
 
-#else // defined(UTL_USE_STD_TYPE_TRAITS) && defined(UTL_CXX20)
+#else // defined(UTL_USE_STD_TYPE_TRAITS) && UTL_CXX20
 
 UTL_STD_NAMESPACE_BEGIN
 /* UTL_UNDEFINED_BEHAVIOUR */
@@ -165,4 +165,6 @@ struct common_reference<T, U, Vs...> : details::common_reference::impl_gt_2<T, U
 
 UTL_NAMESPACE_END
 
-#endif // defined(UTL_USE_STD_TYPE_TRAITS) && defined(UTL_CXX20)
+#endif // defined(UTL_USE_STD_TYPE_TRAITS) && UTL_CXX20
+
+#define UTL_TRAIT_SUPPORTED_common_reference 1

@@ -136,11 +136,15 @@ struct is_boolean_testable :
     conjunction<details::bool_testable::castable<T, bool>, details::bool_testable::negatable<T>,
         details::bool_testable::conjunctable<T>, details::bool_testable::disjunctable<T>> {};
 
-#ifdef UTL_CXX20
-
+#if UTL_CXX14
 template <typename T>
-concept boolean_testable = is_boolean_testable<T>::value;
-
-#endif // ifdef UTL_CXX20
+UTL_INLINE_CXX17 constexpr bool is_boolean_testable_v = is_boolean_testable<T>::value;
+#endif
 
 UTL_NAMESPACE_END
+
+#if defined(UTL_CXX14)
+#  define UTL_TRAIT_is_boolean_testable(TYPE) UTL_SCOPE is_boolean_testable_v<TYPE>
+#else
+#  define UTL_TRAIT_is_boolean_testable(TYPE) UTL_SCOPE is_boolean_testable<TYPE>::value
+#endif
