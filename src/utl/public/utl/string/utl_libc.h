@@ -11,19 +11,45 @@ UTL_NAMESPACE_BEGIN
 #define UTL_LIBC_PURE UTL_ATTRIBUTES(NODISCARD, PURE)
 
 namespace libc {
-template <UTL_CONCEPT_CXX20(trivially_copyable<T>)
-        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
+
+namespace unsafe {
+template <typename T>
 constexpr T* memcpy(
     T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count) noexcept {
     return UTL_CONSTANT_P(src + count != dst) ? compile_time::memcpy(dst, src, count)
                                               : runtime::memcpy(dst, src, count);
 }
 
-template <UTL_CONCEPT_CXX20(trivially_copyable<T>)
-        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
+template <typename T>
 constexpr T* memmove(T* dst, T const* src, element_count_t count) noexcept {
     return UTL_CONSTANT_P(src + count != dst) ? compile_time::memmove(dst, src, count)
                                               : runtime::memmove(dst, src, count);
+}
+
+template <typename T, typename U>
+UTL_LIBC_PURE constexpr int memcmp(T const* lhs, U const* rhs, element_count_t count) noexcept {
+    return UTL_CONSTANT_P(src + count != dst) ? compile_time::memcmp(lhs, rhs, count)
+                                              : runtime::memcmp(lhs, rhs, count);
+}
+
+template <typename T>
+constexpr T* memset(T* dst, T const src, element_count_t count) noexcept {
+    return UTL_CONSTANT_P(src != *(dst + count - 1)) ? compile_time::memset(dst, src, count)
+                                                     : runtime::memset(dst, src, count);
+}
+} // namespace unsafe
+
+template <UTL_CONCEPT_CXX20(trivially_copyable<T>)
+        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
+constexpr T* memcpy(
+    T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count) noexcept {
+    return unsafe::memcpy(dst, src, count);
+}
+
+template <UTL_CONCEPT_CXX20(trivially_copyable<T>)
+        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
+constexpr T* memmove(T* dst, T const* src, element_count_t count) noexcept {
+    return unsafe::memmove(dst, src, count);
 }
 
 template <UTL_CONCEPT_CXX20(exact_size<1>) T,
@@ -38,19 +64,14 @@ template <UTL_CONCEPT_CXX20(trivially_copyable)
         T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value&& exact_size<T, 1>::value)>
 UTL_REQUIRES_CXX20(exact_size<T, 1>)
 constexpr T* memset(T* dst, T const src, element_count_t count) noexcept {
-#if UTL_HAS_BUILTIN(__builtin_memset)
-    return __builtin_memset(dst, as_byte(src), byte_count<T>(count)), dst;
-#else
-    return recursive::memset(dst, as_byte(src), count, dst);
-#endif
+    return unsafe::memset(dst, src, count);
 }
 
 template <typename T, typename U>
 UTL_LIBC_PURE constexpr int memcmp(T const* lhs, U const* rhs, element_count_t count) noexcept {
     static_assert(is_trivially_lexicographically_comparable<T, U>::value,
         "Types must be lexicographically comparable");
-    return UTL_CONSTANT_P(src + count != dst) ? compile_time::memcmp(lhs, rhs, count)
-                                              : runtime::memcmp(lhs, rhs, count);
+    return unsafe::memcmp(lhs, rhs, count);
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
