@@ -54,8 +54,8 @@
 #  define UTL_MSVC_SUPPORTS__is_trivially_assignable 1
 #  define UTL_MSVC_SUPPORTS__is_trivially_destructible 1
 #  define UTL_MSVC_SUPPORTS__is_nothrow_constructible 1
-#  define UTL_MSVC_SUPPORTS__is_base_of
-#  define UTL_MSVC_SUPPORTS__underlying_type
+#  define UTL_MSVC_SUPPORTS__is_base_of 1
+#  define UTL_MSVC_SUPPORTS__underlying_type 1
 
 #  define __is_convertible __is_convertible_to
 
