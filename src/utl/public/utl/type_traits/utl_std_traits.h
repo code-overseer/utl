@@ -14,6 +14,7 @@
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_extent.h"
+#include "utl/type_traits/utl_is_aggregate.h"
 #include "utl/type_traits/utl_is_arithmetic.h"
 #include "utl/type_traits/utl_is_assignable.h"
 #include "utl/type_traits/utl_is_base_of.h"
@@ -26,6 +27,7 @@
 #include "utl/type_traits/utl_is_copy_assignable.h"
 #include "utl/type_traits/utl_is_copy_constructible.h"
 #include "utl/type_traits/utl_is_default_constructible.h"
+#include "utl/type_traits/utl_is_destructible.h"
 #include "utl/type_traits/utl_is_enum.h"
 #include "utl/type_traits/utl_is_explicitly_constructible.h"
 #include "utl/type_traits/utl_is_floating_point.h"
@@ -45,6 +47,7 @@
 #include "utl/type_traits/utl_is_nothrow_copy_assignable.h"
 #include "utl/type_traits/utl_is_nothrow_copy_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_default_constructible.h"
+#include "utl/type_traits/utl_is_nothrow_destructible.h"
 #include "utl/type_traits/utl_is_nothrow_move_assignable.h"
 #include "utl/type_traits/utl_is_nothrow_move_constructible.h"
 #include "utl/type_traits/utl_is_null_pointer.h"
@@ -60,6 +63,7 @@
 #include "utl/type_traits/utl_is_trivially_copy_assignable.h"
 #include "utl/type_traits/utl_is_trivially_copy_constructible.h"
 #include "utl/type_traits/utl_is_trivially_default_constructible.h"
+#include "utl/type_traits/utl_is_trivially_destructible.h"
 #include "utl/type_traits/utl_is_trivially_move_assignable.h"
 #include "utl/type_traits/utl_is_trivially_move_constructible.h"
 #include "utl/type_traits/utl_is_union.h"
@@ -88,10 +92,6 @@ using ::std::is_polymorphic;
 using ::std::is_standard_layout;
 using ::std::is_trivial;
 using ::std::is_trivially_copyable;
-
-using ::std::is_destructible;
-using ::std::is_nothrow_destructible;
-using ::std::is_trivially_destructible;
 
 using ::std::has_virtual_destructor;
 

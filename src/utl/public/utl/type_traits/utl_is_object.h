@@ -12,12 +12,12 @@ UTL_NAMESPACE_BEGIN
 
 using std::is_object;
 
-#  ifdef UTL_CXX17
+#  if UTL_CXX17
 using std::is_object_v;
-#  elif defined(UTL_CXX14) // ifdef UTL_CXX17
+#  elif UTL_CXX14 // if UTL_CXX17
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_object_v = is_object<T>::value;
-#  endif                   // ifdef UTL_CXX17
+#  endif          // if UTL_CXX17
 
 UTL_NAMESPACE_END
 
@@ -42,7 +42,7 @@ UTL_NAMESPACE_BEGIN
 template <typename T>
 struct is_object : bool_constant<UTL_BUILTIN_is_object(T)> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_object_v = UTL_BUILTIN_is_object(T);
 #    endif // UTL_CXX14
@@ -53,10 +53,10 @@ UTL_NAMESPACE_END
 
 #  else // ifdef UTL_BUILTIN_is_object
 
+#    include "utl/type_traits/utl_is_array.h"
 #    include "utl/type_traits/utl_is_class.h"
 #    include "utl/type_traits/utl_is_scalar.h"
 #    include "utl/type_traits/utl_is_union.h"
-#    include "utl/type_traits/utl_is_xarray.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -65,7 +65,7 @@ struct is_object :
     bool_constant<is_scalar<T>::value || is_array<T>::value || is_union<T>::value ||
         is_class<T>::value> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_object_v = is_object<T>::value;
 #    endif // UTL_CXX14
@@ -79,3 +79,11 @@ UTL_NAMESPACE_END
 #  endif // ifdef UTL_BUILTIN_is_object
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
+
+#ifdef UTL_BUILTIN_is_object
+#  define UTL_TRAIT_is_object(...) UTL_BUILTIN_is_object(__VA_ARGS__)
+#elif UTL_CXX14
+#  define UTL_TRAIT_is_object(...) UTL_SCOPE is_object_v<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_is_object(...) UTL_SCOPE is_object<__VA_ARGS__>::value
+#endif

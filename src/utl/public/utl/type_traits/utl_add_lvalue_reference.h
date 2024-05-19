@@ -12,7 +12,7 @@ UTL_NAMESPACE_BEGIN
 
 using std::add_lvalue_reference;
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 
 using std::add_lvalue_reference_t;
 
@@ -22,8 +22,6 @@ using add_lvalue_reference_t = typename add_lvalue_reference<T>::type;
 #  endif // ifdef UTL_CXX14
 
 UTL_NAMESPACE_END
-
-#  define UTL_TRAIT_SUPPORTED_add_lvalue_reference 1
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
@@ -58,7 +56,7 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace lvalue_reference {
 template <typename T>
-T&& impl(int) noexcept;
+T& impl(int) noexcept;
 template <typename T>
 T impl(float) noexcept;
 } // namespace lvalue_reference
@@ -75,7 +73,6 @@ using add_lvalue_reference_t = decltype(details::lvalue_reference::impl<T>(0));
 UTL_NAMESPACE_END
 
 #  endif // ifdef UTL_BUILTIN_add_lvalue_reference
+#endif   // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  define UTL_TRAIT_SUPPORTED_add_lvalue_reference 1
-
-#endif // ifdef UTL_USE_STD_TYPE_TRAITS
+#define UTL_TRAIT_SUPPORTED_add_lvalue_reference 1
