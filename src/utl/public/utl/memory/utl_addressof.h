@@ -6,6 +6,7 @@
 #include "utl/type_traits/utl_add_lvalue_reference.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_copy_cvref.h"
+#include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_object.h"
 #include "utl/type_traits/utl_remove_reference.h"
 

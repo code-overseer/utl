@@ -55,8 +55,25 @@
 #elif defined(UTL_COMPILER_MSVC) /* UTL_HAS_BUILTIN(__builtin_unreachable) */
 #  define UTL_BUILTIN_unreachable() __assume(0)
 #else /* UTL_HAS_BUILTIN(__builtin_unreachable) */
-#  error "Compiler does not contain an 'unreachable' intrinsic"
+#  define UTL_BUILTIN_unreachable() \
+      static_assert(false, "`unreachable` is not supported on this compiler")
 #endif /* UTL_HAS_BUILTIN(__builtin_unreachable) */
+
+#if UTL_HAS_BUILTIN(__builtin_is_constant_evaluated)
+#  define UTL_BUILTIN_is_constant_evaluated() __builtin_is_constant_evaluated()
+#elif UTL_COMPILER_MSVC_AT_LEAST(1925) /* UTL_HAS_BUILTIN(__builtin_is_constant_evaluated) */
+#  define UTL_BUILTIN_is_constant_evaluated() __builtin_is_constant_evaluated()
+#endif /* UTL_HAS_BUILTIN(__builtin_is_constant_evaluated) */
+
+#if UTL_HAS_BUILTIN(__builtin_assume)
+#  define UTL_BUILTIN_assume(...) __builtin_assume(__VA_ARGS__)
+#elif defined(UTL_COMPILER_MSVC) /* UTL_HAS_BUILTIN(__builtin_unreachable) */
+#  define UTL_BUILTIN_assume(...) __assume(__VA_ARGS__)
+#elif UTL_HAS_BUILTIN(__builtin_unreachable)
+#  define UTL_BUILTIN_assume(...) (__VA_ARGS__) ? (void)0 : __builtin_unreachable()
+#else
+#  define UTL_BUILTIN_assume(...) (void)0
+#endif /* UTL_HAS_BUILTIN(__builtin_assume) */
 
 #if UTL_HAS_BUILTIN(__is_layout_compatible) || UTL_COMPILER_GCC_AT_LEAST(12, 0, 0) || \
     UTL_COMPILER_MSVC_AT_LEAST(1929)
@@ -67,9 +84,4 @@
     UTL_COMPILER_GCC_AT_LEAST(12, 0, 0) || UTL_COMPILER_MSVC_AT_LEAST(1929)
 #  define UTL_BUILTIN_is_pointer_interconvertible_base_of(...) \
       __is_pointer_interconvertible_base_of(__VA_ARGS__)
-#endif
-
-#if UTL_HAS_BUILTIN(__reference_constructs_from_temporary) || UTL_COMPILER_GCC_AT_LEAST(13, 0, 0)
-#  define UTL_BUILTIN_is_pointer_interconvertible_base_of(...) \
-      __reference_constructs_from_temporary(__VA_ARGS__)
 #endif

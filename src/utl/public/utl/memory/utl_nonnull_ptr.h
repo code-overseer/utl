@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "utl/compare/utl_pointer_comparable.h"
+#include "utl/concepts.h" // convertible_to
 #include "utl/exception/utl_program_exception.h"
 #include "utl/memory/utl_addressof.h"
 #include "utl/preprocessor/utl_config.h"
@@ -9,9 +11,9 @@
 UTL_NAMESPACE_BEGIN
 
 /**
- * Smart pointer class representing a non-null pointer.
+ * Observer pointer class (non-owning) representing a non-null pointer.
  *
- * This class represents a smart pointer that ensures its underlying pointer is always non-null.
+ * This class represents a pointer that ensures its underlying pointer is always non-null.
  * It is intended to be used in scenarios where null pointers are not allowed or indicate an error.
  *
  * @tparam T The type of the pointer's target.
@@ -23,19 +25,25 @@ public:
      * Deleted default constructor to enforce initialization with a non-null pointer.
      */
     constexpr nonnull_ptr() noexcept = delete;
+    constexpr nonnull_ptr(decltype(nullptr)) = delete;
 
     /**
      * Constructs a nonnull_ptr from a raw pointer.
      *
      * @param ptr A pointer to the object. It must be non-null.
      *
-     * @throws utl::program_exception<void> If the pointer is null exceptions are enabled
+     * @throws utl::program_exception<void> If the pointer is null and exceptions are enabled
      */
-    constexpr nonnull_ptr(T* ptr) noexcept(!utl::with_exceptions) : ptr_(ptr) {
-        UTL_THROW_IF(ptr_ == nullptr,
-            utl::program_exception<void>(
-                "[UTL] nonnull_ptr construction failed, Reason=[Pointer argument cannot be null]"));
+    UTL_CONSTEXPR_CXX14 nonnull_ptr(T* ptr) noexcept(!utl::with_exceptions) : ptr_(ptr) {
+        UTL_THROW_IF(ptr == nullptr,
+            utl::program_exception<void>("[UTL] nonnull_ptr construction failed, "
+                                         "Reason=[Pointer argument cannot be null]"));
     }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<T*>) U,
+        UTL_REQUIRES_CXX11(is_convertible<U, T*>::value)>
+    UTL_CONSTEXPR_CXX14 nonnull_ptr(U&& obj) noexcept(!utl::with_exceptions)
+        : nonnull_ptr((T*)obj) {}
 
     /**
      * Constructs a nonnull_ptr from a reference.
@@ -47,15 +55,15 @@ public:
     /**
      * Conversion operator to implicitly convert nonnull_ptr to the underlying raw pointer.
      */
-    constexpr operator T*() const { return ptr_; }
+    constexpr operator T*() const { return get(); }
 
     /**
      * Default copy and move operations.
      */
     constexpr nonnull_ptr(nonnull_ptr const&) noexcept = default;
-    constexpr nonnull_ptr& operator=(nonnull_ptr const&) noexcept = default;
     constexpr nonnull_ptr(nonnull_ptr&&) noexcept = default;
-    constexpr nonnull_ptr& operator=(nonnull_ptr&&) noexcept = default;
+    UTL_CONSTEXPR_CXX14 nonnull_ptr& operator=(nonnull_ptr const&) noexcept = default;
+    UTL_CONSTEXPR_CXX14 nonnull_ptr& operator=(nonnull_ptr&&) noexcept = default;
 
     /**
      * Dereference operators to access the object pointed to by the nonnull_ptr.
@@ -66,7 +74,7 @@ public:
     /**
      * Returns the underlying raw pointer.
      */
-    constexpr T* get() const noexcept { return ptr_; }
+    constexpr T* get() const noexcept { return UTL_BUILTIN_assume(ptr_ != nullptr), ptr_; }
 
     /**
      * Conversion operator to convert nonnull_ptr to boolean indicating non-nullness.
@@ -76,5 +84,10 @@ public:
 private:
     T* ptr_;
 };
+
+#ifdef UTL_CXX17
+template <typename T>
+explicit nonnull_ptr(T* p) -> nonnull_ptr<T>;
+#endif
 
 UTL_NAMESPACE_END

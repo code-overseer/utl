@@ -10,15 +10,20 @@
 #ifdef UTL_WITH_EXCEPTIONS
 #  include <exception>
 #  define UTL_THROW(...) throw(__VA_ARGS__)
-#  define UTL_RETHROW throw
+#  define UTL_RETHROW(...) throw
 #  define UTL_TRY try
 #  define UTL_CATCH(...) catch (__VA_ARGS__)
-#  define UTL_THROW_IF(CONDITION, ...)       \
-      [&](bool UTL_THROW_IF__lambda_param) { \
-        if (UTL_THROW_IF__lambda_param) {    \
-            UTL_THROW(__VA_ARGS__);          \
-        }                                    \
-      }(CONDITION)
+
+#  ifdef UTL_CXX17
+#    define UTL_THROW_IF(CONDITION, ...)       \
+        [&](bool UTL_THROW_IF__lambda_param) { \
+        if (UTL_THROW_IF__lambda_param) {      \
+            UTL_THROW(__VA_ARGS__);            \
+        }                                      \
+        }(CONDITION)
+#  else
+#    define UTL_THROW_IF(CONDITION, ...) ((CONDITION) ? UTL_THROW(__VA_ARGS__) : (void)0)
+#  endif
 
 UTL_NAMESPACE_BEGIN
 UTL_INLINE_CXX17 constexpr bool with_exceptions = true;
@@ -46,7 +51,6 @@ public:
 UTL_INLINE_CXX17 constexpr bool with_exceptions = false;
 namespace details {
 namespace exception {
-
 template <typename... A>
 UTL_ATTRIBUTES(NODISCARD, CONST)
 constexpr bool always_false(A&&...) noexcept {
@@ -65,8 +69,8 @@ UTL_NAMESPACE_END
 #  define UTL_THROW(...)                                                   \
       UTL_ASSERT(UTL_SCOPE details::exception::always_false(__VA_ARGS__)); \
       UTL_BUILTIN_unreachable()
-#  define UTL_RETHROW    \
-      UTL_ASSERT(false); \
+#  define UTL_RETHROW(...)            \
+      UTL_ASSERT(false, __VA_ARGS__); \
       UTL_BUILTIN_unreachable()
 #  define UTL_TRY if UTL_CONSTEXPR_CXX17 (1)
 
