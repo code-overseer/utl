@@ -8,10 +8,6 @@
 #define UTL_TRAIT_SUPPORTED_is_polymorphic 1
 #define UTL_TRAIT_SUPPORTED_is_abstract 1
 
-#define UTL_TRAIT_SUPPORTED_is_destructible 1
-#define UTL_TRAIT_SUPPORTED_is_trivially_destructible 1
-#define UTL_TRAIT_SUPPORTED_is_nothrow_destructible 1
-
 #define UTL_TRAIT_SUPPORTED_has_virtual_destructor 1
 
 #define UTL_TRAIT_SUPPORTED_common_type 1
