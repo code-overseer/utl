@@ -7,14 +7,16 @@
 #include "utl/preprocessor/utl_config.h"
 #include "utl/preprocessor/utl_namespace.h"
 
-#ifdef UTL_WITH_EXCEPTIONS
+#if UTL_WITH_EXCEPTIONS
+#  include "utl/type_traits/utl_constants.h"
+
 #  include <exception>
 #  define UTL_THROW(...) throw(__VA_ARGS__)
 #  define UTL_RETHROW(...) throw
 #  define UTL_TRY try
 #  define UTL_CATCH(...) catch (__VA_ARGS__)
 
-#  ifdef UTL_CXX17
+#  if UTL_CXX17
 #    define UTL_THROW_IF(CONDITION, ...)       \
         [&](bool UTL_THROW_IF__lambda_param) { \
         if (UTL_THROW_IF__lambda_param) {      \
@@ -27,20 +29,17 @@
 
 UTL_NAMESPACE_BEGIN
 UTL_INLINE_CXX17 constexpr bool with_exceptions = true;
-namespace details {
-namespace exception {
-template <bool B = UTL_SCOPE with_exceptions>
-struct throws {
-    static constexpr bool value = !B;
-};
-} // namespace exception
-} // namespace details
 
-#  define UTL_THROWS(...) noexcept(UTL_SCOPE details::exception::throws<(__VA_ARGS__)>::value)
+#  define UTL_THROWS()
+#  define UTL_NOEXCEPT(...) noexcept(UTL_SCOPE bool_constant<(__VA_ARGS__)>::value)
+
+#  if UTL_THROWABLE_FUNCTION_NOEXCEPT
+#    error `UTL_THROWABLE_FUNCTION_NOEXCEPT` cannot be set when exceptions are enabled
+#  endif
 
 using std::exception;
 using std::exception_ptr;
-#  ifdef UTL_CXX17
+#  if UTL_CXX17
 using std::uncaught_exceptions;
 #  else
 using std::uncaught_exception;
@@ -54,6 +53,7 @@ using std::terminate;
 UTL_NAMESPACE_END
 
 #else // UTL_WITH_EXCEPTIONS
+
 UTL_NAMESPACE_BEGIN
 class exception {
 public:
@@ -77,6 +77,14 @@ constexpr bool always_true(A&&...) noexcept {
 } // namespace details
 
 UTL_NAMESPACE_END
+
+#  if UTL_THROWABLE_FUNCTION_NOEXCEPT
+#    define UTL_THROWS() noexcept
+#    define UTL_NOEXCEPT(...) noexcept
+#  else
+#    define UTL_THROWS()
+#    define UTL_NOEXCEPT(...)
+#  endif
 
 #  define UTL_THROW(...)                                                   \
       UTL_ASSERT(UTL_SCOPE details::exception::always_false(__VA_ARGS__)); \

@@ -43,7 +43,7 @@ class intrusive_ptr : private pointer_comparable<intrusive_ptr<T>> {
      * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
     template <typename F>
-    static UTL_CONSTEXPR_CXX14 auto iff_notnull(T* ptr, F&& func) noexcept(!utl::with_exceptions)
+    static UTL_CONSTEXPR_CXX14 auto iff_notnull(T* ptr, F&& func) UTL_THROWS()
         -> decltype(declval<F>()((T*)nullptr)) {
         UTL_THROW_IF(ptr == nullptr,
             utl::program_exception<void>(
@@ -70,7 +70,7 @@ public:
      *
      * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
-    UTL_CONSTEXPR_CXX14 intrusive_ptr(adopt_object_t, T* ptr) noexcept(!utl::with_exceptions)
+    UTL_CONSTEXPR_CXX14 intrusive_ptr(adopt_object_t, T* ptr) UTL_THROWS()
         : resource_(iff_notnull(ptr, [](T* ptr) { return ptr; })) {}
 
     /**
@@ -85,7 +85,7 @@ public:
      *
      * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
-    UTL_CONSTEXPR_CXX14 intrusive_ptr(retain_object_t, T* ptr) noexcept(!utl::with_exceptions)
+    UTL_CONSTEXPR_CXX14 intrusive_ptr(retain_object_t, T* ptr) UTL_THROWS()
         : resource_(iff_notnull(ptr, [](T* ptr) {
             increment(*ptr);
             return ptr;
@@ -94,8 +94,7 @@ public:
     /**
      * Copy constructor
      */
-    UTL_CONSTEXPR_CXX14 intrusive_ptr(intrusive_ptr const& other) noexcept
-        : resource_(other.resource_) {
+    UTL_CONSTEXPR_CXX14 intrusive_ptr(intrusive_ptr const& other) noexcept : resource_(other.resource_) {
         if (resource_ != nullptr) {
             increment(*resource_);
         }
@@ -136,7 +135,9 @@ public:
     /**
      * Destructor
      */
-    UTL_CONSTEXPR_CXX20 ~intrusive_ptr() noexcept { reset(); }
+    UTL_CONSTEXPR_CXX20 ~intrusive_ptr() noexcept {
+        reset();
+    }
 
     /**
      * Dereference operator to access the object pointed to by the intrusive_ptr.
@@ -157,7 +158,9 @@ public:
      * Releases ownership of the managed object.
      * Resets the intrusive_ptr to hold a null pointer and returns the previous raw pointer.
      */
-    UTL_CONSTEXPR_CXX14 T* release() noexcept { return exchange(resource_, nullptr); }
+    UTL_CONSTEXPR_CXX14 T* release() noexcept {
+        return exchange(resource_, nullptr);
+    }
 
     /**
      * Conversion operator to implicitly convert intrusive_ptr to boolean indicating non-nullness.
@@ -184,7 +187,7 @@ public:
      *
      * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
-    UTL_CONSTEXPR_CXX14 void reset(retain_object_t, T* ptr) noexcept(!utl::with_exceptions) {
+    UTL_CONSTEXPR_CXX14 void reset(retain_object_t, T* ptr) UTL_THROWS() {
         reset();
         iff_notnull(ptr, [this](T* ptr) {
             increment(*ptr);
@@ -200,7 +203,7 @@ public:
      *
      * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
-    UTL_CONSTEXPR_CXX14 void reset(adopt_object_t, T* ptr) noexcept(!utl::with_exceptions) {
+    UTL_CONSTEXPR_CXX14 void reset(adopt_object_t, T* ptr) UTL_THROWS() {
         reset();
         iff_notnull(ptr, [this](T* ptr) { resource_ = ptr; });
     }
@@ -270,7 +273,9 @@ public:
      * Releases ownership of the const-qualified managed object.
      * Resets the `intrusive_ptr` to hold a null pointer and returns the previous raw pointer.
      */
-    UTL_CONSTEXPR_CXX14 T const* release() noexcept { return base_type::release(); }
+    UTL_CONSTEXPR_CXX14 T const* release() noexcept {
+        return base_type::release();
+    }
 
     /**
      * Copy constructor
