@@ -43,7 +43,7 @@ class intrusive_ptr : private pointer_comparable<intrusive_ptr<T>> {
      * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
     template <typename F>
-    static UTL_CONSTEXPR_CXX14 auto iff_notnull(T* ptr, F&& func) UTL_THROWS()
+    static UTL_CONSTEXPR_CXX14 auto iff_notnull(T* ptr, F&& func) UTL_THROWS
         -> decltype(declval<F>()((T*)nullptr)) {
         UTL_THROW_IF(ptr == nullptr,
             utl::program_exception<void>(
@@ -70,7 +70,7 @@ public:
      *
      * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
-    UTL_CONSTEXPR_CXX14 intrusive_ptr(adopt_object_t, T* ptr) UTL_THROWS()
+    UTL_CONSTEXPR_CXX14 intrusive_ptr(adopt_object_t, T* ptr) UTL_THROWS
         : resource_(iff_notnull(ptr, [](T* ptr) { return ptr; })) {}
 
     /**
@@ -85,7 +85,7 @@ public:
      *
      * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
-    UTL_CONSTEXPR_CXX14 intrusive_ptr(retain_object_t, T* ptr) UTL_THROWS()
+    UTL_CONSTEXPR_CXX14 intrusive_ptr(retain_object_t, T* ptr) UTL_THROWS
         : resource_(iff_notnull(ptr, [](T* ptr) {
             increment(*ptr);
             return ptr;
@@ -187,7 +187,7 @@ public:
      *
      * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
-    UTL_CONSTEXPR_CXX14 void reset(retain_object_t, T* ptr) UTL_THROWS() {
+    UTL_CONSTEXPR_CXX14 void reset(retain_object_t, T* ptr) UTL_THROWS {
         reset();
         iff_notnull(ptr, [this](T* ptr) {
             increment(*ptr);
@@ -203,7 +203,7 @@ public:
      *
      * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
      */
-    UTL_CONSTEXPR_CXX14 void reset(adopt_object_t, T* ptr) UTL_THROWS() {
+    UTL_CONSTEXPR_CXX14 void reset(adopt_object_t, T* ptr) UTL_THROWS {
         reset();
         iff_notnull(ptr, [this](T* ptr) { resource_ = ptr; });
     }

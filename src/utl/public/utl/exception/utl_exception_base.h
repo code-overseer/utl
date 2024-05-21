@@ -30,8 +30,8 @@
 UTL_NAMESPACE_BEGIN
 UTL_INLINE_CXX17 constexpr bool with_exceptions = true;
 
-#  define UTL_THROWS()
-#  define UTL_NOEXCEPT(...) noexcept(UTL_SCOPE bool_constant<(__VA_ARGS__)>::value)
+#  define UTL_THROWS
+#  define UTL_NOEXCEPT(...) noexcept(__VA_ARGS__)
 
 #  if UTL_THROWABLE_FUNCTION_NOEXCEPT
 #    error `UTL_THROWABLE_FUNCTION_NOEXCEPT` cannot be set when exceptions are enabled
@@ -60,7 +60,6 @@ public:
     virtual char const* what() const noexcept { return nullptr; }
 };
 UTL_INLINE_CXX17 constexpr bool with_exceptions = false;
-#  define UTL_THROWS(...) noexcept
 namespace details {
 namespace exception {
 template <typename... A>
@@ -79,11 +78,11 @@ constexpr bool always_true(A&&...) noexcept {
 UTL_NAMESPACE_END
 
 #  if UTL_THROWABLE_FUNCTION_NOEXCEPT
-#    define UTL_THROWS() noexcept
+#    define UTL_THROWS noexcept
 #    define UTL_NOEXCEPT(...) noexcept
 #  else
-#    define UTL_THROWS()
-#    define UTL_NOEXCEPT(...)
+#    define UTL_THROWS
+#    define UTL_NOEXCEPT(...) noexcept(__VA_ARGS__)
 #  endif
 
 #  define UTL_THROW(...)                                                   \
