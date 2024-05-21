@@ -8,7 +8,6 @@
 #include "utl/preprocessor/utl_namespace.h"
 
 #if UTL_WITH_EXCEPTIONS
-#  include "utl/type_traits/utl_constants.h"
 
 #  include <exception>
 #  define UTL_THROW(...) throw(__VA_ARGS__)
