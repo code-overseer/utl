@@ -21,7 +21,7 @@ UTL_NAMESPACE_BEGIN
     UTL_ATTRIBUTES(NODISCARD, ALWAYS_INLINE) UTL_START_LIFETIME_OPTIMIZE
 
 #if !UTL_COMPILER_CLANG && !UTL_COMPILER_ICC && !UTL_COMPILER_ICX
-#  define UTL_STRICT_LIFETIME_IMPLEMENTATION 1
+#  define UTL_START_LIFETIME_DETERMINATE 1
 #endif
 
 namespace details {
@@ -35,7 +35,7 @@ namespace lifetime {
  */
 UTL_START_LIFETIME_ATTRIBUTES inline void* entangle_storage(void* p, size_t n) noexcept {
     using byte_type = unsigned char;
-#if UTL_STRICT_LIFETIME_IMPLEMENTATION
+#if UTL_START_LIFETIME_DETERMINATE
     /* UTL_UNDEFINED_BEHAVIOUR */
     // May be undefined behaviour if p points to a const object with automatic, static or
     // thread-local storage
