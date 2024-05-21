@@ -70,7 +70,7 @@
 #elif defined(UTL_COMPILER_MSVC) /* UTL_HAS_BUILTIN(__builtin_unreachable) */
 #  define UTL_BUILTIN_assume(...) __assume(__VA_ARGS__)
 #elif UTL_HAS_BUILTIN(__builtin_unreachable)
-#  define UTL_BUILTIN_assume(...) (__VA_ARGS__) ? (void)0 : __builtin_unreachable()
+#  define UTL_BUILTIN_assume(...) ((__VA_ARGS__) ? (void)0 : __builtin_unreachable())
 #else
 #  define UTL_BUILTIN_assume(...) (void)0
 #endif /* UTL_HAS_BUILTIN(__builtin_assume) */

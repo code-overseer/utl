@@ -22,11 +22,10 @@
 #  define UTL_ALLOC_DELETE(...) ::operator delete(__VA_ARGS__)
 #endif
 
-#if UTL_HAS_BUILTIN(__declspec) || UTL_IS_RESERVED_IDENTIFIER(__declspec) || \
-    defined(UTL_COMPILER_MSVC)
-#  define UTL_ALLOCATOR_SPEC __declspec(allocator, restrict)
+#if UTL_HAS_BUILTIN(__declspec) || UTL_IS_RESERVED_IDENTIFIER(__declspec) || UTL_COMPILER_MSVC
+#  define UTL_ALLOCATOR_ATTRIBUTE __declspec(allocator, restrict) UTL_ATTRIBUTE(MALLOC)
 #else
-#  define UTL_ALLOCATOR_SPEC
+#  define UTL_ALLOCATOR_ATTRIBUTE UTL_ATTRIBUTE(MALLOC)
 #endif
 
 UTL_NAMESPACE_BEGIN
@@ -48,8 +47,7 @@ inline constexpr bool is_overaligned_for_new(size_t alignment) noexcept {
     return alignment > default_new_alignment;
 }
 
-UTL_ALLOCATOR_SPEC
-UTL_ATTRIBUTE(MALLOC)
+UTL_ALLOCATOR_ATTRIBUTE
 inline void* allocate(size_t size, size_t alignment = default_new_alignment) {
     if (is_overaligned_for_new(alignment)) {
 #if UTL_SUPPORTS_ALIGNED_ALLOCATION
@@ -103,7 +101,7 @@ void deallocate(typename type_identity<T>::type* ptr, size_t count) noexcept {
 } // namespace runtime
 
 namespace compile_time {
-#ifdef UTL_CXX20
+#if UTL_CXX20
 template <typename T>
 inline constexpr ::std::allocator<T> allocator_v = {};
 
@@ -148,7 +146,7 @@ constexpr void deallocate(typename type_identity<T>::type* ptr, size_t count) no
 template <typename T>
 UTL_CONSTEXPR_CXX20 T* allocate(size_t count) {
     static_assert(sizeof(T) > 0, "Incomplete type cannot be allocated");
-#ifdef UTL_CXX20
+#if UTL_CXX20
     return compile_time::allocate<T>(count);
 #else
     return runtime::allocate<T>(count);
@@ -158,7 +156,7 @@ UTL_CONSTEXPR_CXX20 T* allocate(size_t count) {
 template <typename T>
 UTL_CONSTEXPR_CXX20 void deallocate(typename type_identity<T>::type* ptr, size_t count) noexcept {
     static_assert(sizeof(T) > 0, "Incomplete type cannot be deallocated");
-#ifdef UTL_CXX20
+#if UTL_CXX20
     compile_time::deallocate<T>(ptr, count);
 #else
     runtime::deallocate<T>(ptr, count);
@@ -197,22 +195,19 @@ public:
         return *this;
     }
 
-    UTL_ATTRIBUTES(NODISCARD)
-    UTL_CONSTEXPR_CXX20 pointer allocate(size_type count) noexcept(!utl::with_exceptions) {
+    UTL_NODISCARD UTL_CONSTEXPR_CXX20 pointer allocate(size_type count) UTL_THROWS {
         UTL_THROW_IF(count > memory::max_size<T>::value,
             program_exception<void>("[UTL] allocator::allocate operation failed, Reason=[element "
                                     "count limit exceeded]"));
 
         UTL_TRY {
             return memory::allocate<value_type>(count);
-        }
-        UTL_CATCH(...) {
+        } UTL_CATCH(...) {
             UTL_RETHROW("Allocation failed");
         }
     }
 
-    UTL_ATTRIBUTE(NODISCARD)
-    UTL_CONSTEXPR_CXX20 result_type allocate_at_least(size_type count) noexcept(
+    UTL_NODISCARD UTL_CONSTEXPR_CXX20 result_type allocate_at_least(size_type count) noexcept(
         !utl::with_exceptions) {
         return {allocate(count), count};
     }
@@ -229,4 +224,4 @@ UTL_NAMESPACE_END
 
 #undef UTL_ALLOC_DELETE
 #undef UTL_ALLOC_NEW
-#undef UTL_ALLOCATOR_SPEC
+#undef UTL_ALLOCATOR_ATTRIBUTE

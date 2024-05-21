@@ -34,16 +34,15 @@ public:
      *
      * @throws utl::program_exception<void> If the pointer is null and exceptions are enabled
      */
-    UTL_CONSTEXPR_CXX14 nonnull_ptr(T* ptr) noexcept(!utl::with_exceptions) : ptr_(ptr) {
+    UTL_CONSTEXPR_CXX14 nonnull_ptr(T* ptr) UTL_THROWS : ptr_(ptr) {
         UTL_THROW_IF(ptr == nullptr,
             utl::program_exception<void>("[UTL] nonnull_ptr construction failed, "
                                          "Reason=[Pointer argument cannot be null]"));
     }
 
-    template <UTL_CONCEPT_CXX20(convertible_to<T*>) U,
-        UTL_REQUIRES_CXX11(is_convertible<U, T*>::value)>
-    UTL_CONSTEXPR_CXX14 nonnull_ptr(U&& obj) noexcept(!utl::with_exceptions)
-        : nonnull_ptr((T*)obj) {}
+    template <UTL_CONCEPT_CXX20(convertible_to<T*>) U UTL_REQUIRES_CXX11(
+        is_convertible<U, T*>::value)>
+    UTL_CONSTEXPR_CXX14 nonnull_ptr(U&& obj) UTL_THROWS : nonnull_ptr((T*)obj) {}
 
     /**
      * Constructs a nonnull_ptr from a reference.
@@ -85,7 +84,7 @@ private:
     T* ptr_;
 };
 
-#ifdef UTL_CXX17
+#if UTL_CXX17
 template <typename T>
 explicit nonnull_ptr(T* p) -> nonnull_ptr<T>;
 #endif
