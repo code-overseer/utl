@@ -27,6 +27,17 @@
 
 UTL_NAMESPACE_BEGIN
 UTL_INLINE_CXX17 constexpr bool with_exceptions = true;
+namespace details {
+namespace exception {
+template <bool B = UTL_SCOPE with_exceptions>
+struct throws {
+    static constexpr bool value = !B;
+};
+} // namespace exception
+} // namespace details
+
+#  define UTL_THROWS(...) noexcept(UTL_SCOPE details::exception::throws<(__VA_ARGS__)>::value)
+
 using std::exception;
 using std::exception_ptr;
 #  ifdef UTL_CXX17
@@ -49,6 +60,7 @@ public:
     virtual char const* what() const noexcept { return nullptr; }
 };
 UTL_INLINE_CXX17 constexpr bool with_exceptions = false;
+#  define UTL_THROWS(...) noexcept
 namespace details {
 namespace exception {
 template <typename... A>
