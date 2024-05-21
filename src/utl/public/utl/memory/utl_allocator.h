@@ -195,7 +195,7 @@ public:
         return *this;
     }
 
-    UTL_ATTRIBUTES(NODISCARD) UTL_CONSTEXPR_CXX20 pointer allocate(size_type count) UTL_THROWS {
+    UTL_NODISCARD UTL_CONSTEXPR_CXX20 pointer allocate(size_type count) UTL_THROWS {
         UTL_THROW_IF(count > memory::max_size<T>::value,
             program_exception<void>("[UTL] allocator::allocate operation failed, Reason=[element "
                                     "count limit exceeded]"));
@@ -207,8 +207,8 @@ public:
         }
     }
 
-    UTL_ATTRIBUTE(NODISCARD)
-    UTL_CONSTEXPR_CXX20 result_type allocate_at_least(size_type count) noexcept(!utl::with_exceptions) {
+    UTL_NODISCARD UTL_CONSTEXPR_CXX20 result_type allocate_at_least(size_type count) noexcept(
+        !utl::with_exceptions) {
         return {allocate(count), count};
     }
 
