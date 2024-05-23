@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -59,8 +59,7 @@ struct is_move_constructible : is_constructible<T, add_rvalue_reference_t<T>> {}
 
 #    if UTL_CXX14
 template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_move_constructible_v =
-    is_constructible_v<T, add_rvalue_reference_t<T>>;
+UTL_INLINE_CXX17 constexpr bool is_move_constructible_v = is_constructible_v<T, add_rvalue_reference_t<T>>;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END

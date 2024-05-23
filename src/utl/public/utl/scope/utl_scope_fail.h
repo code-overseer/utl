@@ -7,7 +7,7 @@
 
 UTL_NAMESPACE_BEGIN
 
-#ifdef UTL_CXX17
+#if UTL_CXX17
 template <typename F>
 class scope_fail : private details::scope::impl<scope_fail<F>, F> {
     using base_type = details::scope::impl<scope_fail<F>, F>;
@@ -64,11 +64,12 @@ UTL_INLINE_CXX17 constexpr struct fail_proxy_t {
 
 #  define UTL_ON_SCOPE_FAIL \
       const auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::fail_proxy->*[&]()
-#else
+
+#else   // if UTL_CXX17
 template <typename F>
 class scope_fail {
     static_assert(sizeof(F) == 0, "scope_fail is unsupported prior to C++17");
 };
-#endif
+#endif   // if UTL_CXX17
 
 UTL_NAMESPACE_END

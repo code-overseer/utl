@@ -20,7 +20,7 @@ struct has_type_impl<T, void_t<typename T::type>> : true_type {};
 template <typename T>
 struct has_type : type_traits::details::has_type_impl<T> {};
 
-#ifdef UTL_CXX14
+#if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool has_type_v = has_type<T>::value;
 #endif // UTL_CXX14

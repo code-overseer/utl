@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attributes.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_pragma.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
 
-#if defined(UTL_CXX20) && defined(UTL_USE_STD_swap) && UTL_USE_STD_swap
+#if UTL_CXX20 && UTL_USE_STD_swap
 
 #  include <type_traits>
 #  include <utility>
@@ -20,12 +17,12 @@ using std::swap;
 
 UTL_NAMESPACE_END
 
-#else // defined(UTL_CXX20) && defined(UTL_USE_STD_swap) && UTL_USE_STD_swap
+#else // UTL_CXX20 && UTL_USE_STD_swap
 
-#  if defined(UTL_USE_STD_swap) && UTL_USE_STD_swap
+#  if UTL_USE_STD_swap
 UTL_PRAGMA_WARN("C++ < 20 does not implement a constexpr swap, `UTL_USE_STD_swap` ignored")
 #    undef UTL_USE_STD_swap
-#  endif // defined(UTL_USE_STD_swap) && UTL_USE_STD_swap
+#  endif // UTL_USE_STD_swap
 
 #  include "utl/type_traits/utl_declval.h"
 #  include "utl/type_traits/utl_enable_if.h"
@@ -97,8 +94,7 @@ namespace utility {
 namespace details {
 using UTL_SCOPE swap;
 struct swap_cpo_t {
-    template <typename T,
-        typename U UTL_REQUIRES_CXX11(
+    template <typename T, typename U UTL_REQUIRES_CXX11(
             decltype(swap(declval<T&>(), declval<U&>()), true_type{})::value)>
     UTL_REQUIRES_CXX20(requires { swap(declval<T&>(), declval<U&>()); })
     UTL_ATTRIBUTES(FLATTEN) inline UTL_CONSTEXPR_CXX14 void operator()(T& l, U& r) const
@@ -153,4 +149,4 @@ struct is_nothrow_swappable : is_nothrow_swappable_with<T&, T&> {};
 
 UTL_NAMESPACE_END
 
-#endif // defined(UTL_CXX20) && defined(UTL_USE_STD_swap)
+#endif // UTL_CXX20 && defined(UTL_USE_STD_swap)

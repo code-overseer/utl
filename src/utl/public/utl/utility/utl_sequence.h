@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attributes.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_pragma.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
 
-#if defined(UTL_CXX14) && defined(UTL_USE_STD_sequence_utility) && UTL_USE_STD_sequence_utility
+#if UTL_CXX14 && UTL_USE_STD_sequence_utility
 
 #  include <utility>
 
@@ -20,12 +17,12 @@ using std::make_index_sequence;
 
 UTL_NAMESPACE_END
 
-#else // defined(UTL_CXX14) && defined(UTL_USE_STD_sequence_utility) && UTL_USE_STD_sequence_utility
+#else // UTL_CXX14 && UTL_USE_STD_sequence_utility
 
-#  if defined(UTL_USE_STD_sequence_utility) && UTL_USE_STD_sequence_utility
+#  if UTL_USE_STD_sequence_utility
 UTL_PRAGMA_WARN("The current standard does not implement integer_sequence, "
                 "`UTL_USE_STD_sequence_utility` ignored")
-#  endif // defined(UTL_USE_STD_sequence_utility) && UTL_USE_STD_sequence_utility
+#  endif // UTL_USE_STD_sequence_utility
 
 UTL_NAMESPACE_BEGIN
 
@@ -90,5 +87,5 @@ using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
 
 UTL_NAMESPACE_END
 
-#endif // defined(UTL_CXX14) && defined(UTL_USE_STD_sequence_utility) &&
+#endif // UTL_CXX14 && defined(UTL_USE_STD_sequence_utility) &&
        // UTL_USE_STD_sequence_utility

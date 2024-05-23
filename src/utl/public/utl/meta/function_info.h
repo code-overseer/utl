@@ -296,7 +296,7 @@ struct argument_list<R(A...) const volatile&&> : type_identity<type_list<A...>> 
 template <typename R, typename... A>
 struct argument_list<R(A...) volatile&&> : type_identity<type_list<A...>> {};
 
-#ifdef UTL_CXX17
+#if UTL_CXX17
 
 template <typename R, typename... A>
 struct function_type<R(A...) noexcept> {
@@ -545,7 +545,7 @@ struct argument_list<R(A...) const volatile && noexcept> : type_identity<type_li
 template <typename R, typename... A>
 struct argument_list<R(A...) volatile && noexcept> : type_identity<type_list<A...>> {};
 
-#endif // ifdef UTL_CXX17
+#endif // if UTL_CXX17
 
 } // namespace functional
 

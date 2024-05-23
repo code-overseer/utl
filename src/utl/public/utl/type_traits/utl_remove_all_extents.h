@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -12,7 +12,7 @@ UTL_NAMESPACE_BEGIN
 
 using std::remove_all_extents;
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 
 using std::remove_all_extents_t;
 
@@ -28,10 +28,6 @@ using remove_all_extents_t = typename remove_all_extents<T>::type;
 UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
-
-#  ifndef UTL_DISABLE_BUILTIN_remove_all_extents
-#    define UTL_DISABLE_BUILTIN_remove_all_extents 0
-#  endif
 
 #  if UTL_SHOULD_USE_BUILTIN(remove_all_extents)
 #    define UTL_BUILTIN_remove_all_extents(...) __remove_all_extents(__VA_ARGS__)

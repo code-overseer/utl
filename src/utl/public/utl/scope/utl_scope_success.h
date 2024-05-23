@@ -7,7 +7,7 @@
 
 UTL_NAMESPACE_BEGIN
 
-#ifdef UTL_CXX17
+#if UTL_CXX17
 template <typename F>
 class scope_success : private details::scope::impl<scope_success<F>, F> {
     using base_type = details::scope::impl<scope_success<F>, F>;

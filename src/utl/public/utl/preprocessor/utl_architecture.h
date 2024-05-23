@@ -3,11 +3,11 @@
 #pragma once
 
 #if defined(__x86_64__) || defined(_M_X64)
-#  define UTL_ARCH_x86_64
-#  define UTL_ARCH_x86
+#  define UTL_ARCH_x86_64 1
+#  define UTL_ARCH_x86 1
 #  define UTL_ARCH_WIDTH 64
 #elif defined(__aarch64__) || defined(_M_ARM64)
-#  define UTL_ARCH_ARM
+#  define UTL_ARCH_ARM 1
 #  define UTL_ARCH_WIDTH 64
 #elif defined(i386) || defined(__i386__) || defined(__i386) || defined(_M_IX86)
 #  error "Unsupported Architecture"

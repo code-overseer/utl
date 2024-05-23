@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attributes.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_pragma.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
 
-#if defined(UTL_CXX14) && defined(UTL_USE_STD_forward) && UTL_USE_STD_forward
+#if UTL_CXX14 && UTL_USE_STD_forward
 
 #  include <utility>
 
@@ -17,12 +14,12 @@ using std::forward;
 
 UTL_NAMESPACE_END
 
-#else // defined(UTL_CXX14) && defined(UTL_USE_STD_forward) && UTL_USE_STD_forward
+#else // UTL_CXX14 && UTL_USE_STD_forward
 
-#  if defined(UTL_USE_STD_forward) && UTL_USE_STD_forward
+#  if UTL_USE_STD_forward
 UTL_PRAGMA_WARN(
     "The current standard does not implement a constexpr forward, `UTL_USE_STD_forward` ignored")
-#  endif // defined(UTL_USE_STD_forward) && UTL_USE_STD_forward
+#  endif // UTL_USE_STD_forward
 
 #  include "utl/type_traits/utl_is_lvalue_reference.h"
 #  include "utl/type_traits/utl_remove_reference.h"
@@ -44,9 +41,9 @@ constexpr T&& forward(remove_reference_t<T>&& t UTL_ATTRIBUTE(LIFETIMEBOUND)) no
 
 UTL_NAMESPACE_END
 
-#endif // defined(UTL_CXX14) && defined(UTL_USE_STD_forward) && UTL_USE_STD_forward
+#endif // UTL_CXX14 && UTL_USE_STD_forward
 
-#if defined(UTL_CXX23) && defined(UTL_USE_STD_forward_like) && UTL_USE_STD_forward_like
+#if UTL_CXX23 && UTL_USE_STD_forward_like
 
 #  include <utility>
 
@@ -56,16 +53,16 @@ using std::forward_like;
 
 UTL_NAMESPACE_END
 
-#else // defined(UTL_CXX23) && defined(UTL_USE_STD_forward_like) && UTL_USE_STD_forward_like
+#else // UTL_CXX23 && UTL_USE_STD_forward_like
 
 #  include "utl/type_traits/utl_add_rvalue_reference.h"
 #  include "utl/type_traits/utl_copy_cvref.h"
 #  include "utl/type_traits/utl_remove_reference.h"
 
-#  if defined(UTL_USE_STD_forward_like) && UTL_USE_STD_forward_like
+#  if UTL_USE_STD_forward_like
 UTL_PRAGMA_WARN(
     "The current standard does not implement forward_like, `UTL_USE_STD_forward_like` ignored")
-#  endif // defined(UTL_USE_STD_forward_like) && UTL_USE_STD_forward_like
+#  endif // UTL_USE_STD_forward_like
 
 UTL_NAMESPACE_BEGIN
 
@@ -77,4 +74,4 @@ constexpr auto forward_like(U&& u UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept
 }
 
 UTL_NAMESPACE_END
-#endif   // defined(UTL_CXX23) && defined(UTL_USE_STD_forward_like) && UTL_USE_STD_forward_like
+#endif   // UTL_CXX23 && UTL_USE_STD_forward_like

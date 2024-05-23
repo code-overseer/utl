@@ -3,13 +3,13 @@
 #include "utl/preprocessor/utl_compiler.h"
 #include "utl/preprocessor/utl_target.h"
 
-#if defined(UTL_COMPILER_MSVC) && !UTL_COMPILER_MSVC_AT_LEAST(1925)
+#if UTL_COMPILER_MSVC && !UTL_COMPILER_MSVC_AT_LEAST(1925)
 #  define UTL_PRAGMA(ARG) __pragma(ARG)
 #else
 #  define UTL_PRAGMA(ARG) _Pragma(#ARG)
 #endif
 
-#ifdef UTL_TARGET_APPLE
+#if UTL_TARGET_APPLE
 /* Apple supposedly silently ignores the region token */
 #  define UTL_SUPPORTS_PRAGMA_REGION
 #  define UTL_BEGIN_REGION(LABEL) UTL_PRAGMA(region LABEL)
@@ -31,11 +31,11 @@
 #  define UTL_END_REGION(_)
 #endif
 
-#if defined(UTL_COMPILER_CLANG) || defined(UTL_COMPILER_ICX)
+#if UTL_COMPILER_CLANG || UTL_COMPILER_ICX
 
 #  define UTL_PRAGMA_WARN(x) UTL_PRAGMA(message #x)
 
-#elif defined(UTL_COMPILER_GCC)
+#elif UTL_COMPILER_GCC
 
 #  if UTL_COMPILER_GCC_AT_LEAST(9, 1, 0)
 #    define UTL_PRAGMA_WARN(x) UTL_PRAGMA(GCC warning #x)
@@ -43,7 +43,7 @@
 #    define UTL_PRAGMA_WARN(x) UTL_PRAGMA(GCC message #x)
 #  endif
 
-#elif defined(UTL_COMPILER_MSVC)
+#elif UTL_COMPILER_MSVC
 
 #  define UTL_WARN_PRIVATE_STR2(x) #x
 #  define UTL_WARN_PRIVATE_STR1(x) UTL_WARN_PRIVATE_STR2(x)

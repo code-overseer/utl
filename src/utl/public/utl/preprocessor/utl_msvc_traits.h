@@ -6,10 +6,6 @@
 
 #if UTL_COMPILER_MSVC
 
-#  define __has_builtin(NAME) UTL_MSVC_HAS_BUILTIN(NAME)
-
-#  define UTL_MSVC_HAS_BUILTIN(NAME) UTL_MSVC_SUPPORTS##NAME
-
 #  if UTL_COMPILER_MSVC_AT_LEAST(1915)
 #    define UTL_MSVC_SUPPORTS__is_aggregate 1
 #  endif

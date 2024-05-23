@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attributes.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_pragma.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
 
-#if defined(UTL_CXX20) && defined(UTL_USE_STD_cmp_utility) && UTL_USE_STD_cmp_utility
+#if UTL_CXX20 && UTL_USE_STD_cmp_utility
 
 #  include <utility>
 
@@ -23,7 +20,7 @@ using std::in_range;
 
 UTL_NAMESPACE_END
 
-#else // defined(UTL_CXX20) && defined(UTL_USE_STD_cmp_utility) && UTL_USE_STD_cmp_utility
+#else // UTL_CXX20 && UTL_USE_STD_cmp_utility
 
 #  include "utl/limits.h"
 #  include "utl/type_traits/utl_enable_if.h"
@@ -32,13 +29,13 @@ UTL_NAMESPACE_END
 #  include "utl/type_traits/utl_is_unsigned.h"
 #  include "utl/utility/utl_signs.h"
 
-#  if defined(UTL_USE_STD_cmp_utility) && UTL_USE_STD_cmp_utility
+#  if UTL_USE_STD_cmp_utility
 UTL_PRAGMA_WARN(
     "The current standard does not implement cmp_x functions, `UTL_USE_STD_cmp_utility` ignored")
 #    undef UTL_USE_STD_cmp_utility
-#  endif // defined(UTL_USE_STD_cmp_utility) && UTL_USE_STD_cmp_utility
+#  endif // UTL_USE_STD_cmp_utility
 
-#  ifndef UTL_CXX17
+#  if !UTL_CXX17
 
 UTL_NAMESPACE_BEGIN
 
@@ -86,7 +83,7 @@ constexpr enable_if_t<is_unsigned<L>::value && is_signed<R>::value, bool> cmp_le
 
 UTL_NAMESPACE_END
 
-#  elif !defined(UTL_CXX20) // ifndef UTL_CXX17
+#  elif !UTL_CXX20 // if !UTL_CXX17
 
 UTL_NAMESPACE_BEGIN
 
@@ -118,7 +115,7 @@ constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool> cmp_
 
 UTL_NAMESPACE_END
 
-#  else // elif !defined(UTL_CXX20)
+#  else // elif !UTL_CXX20
 
 #    include "utl/concepts.h"
 
@@ -150,9 +147,9 @@ constexpr bool cmp_less(L l, R r) noexcept {
 
 UTL_NAMESPACE_END
 
-#  endif // ifndef UTL_CXX17
+#  endif // if !UTL_CXX17
 
-#  ifndef UTL_CXX20
+#  if !UTL_CXX20
 
 UTL_NAMESPACE_BEGIN
 
@@ -232,4 +229,4 @@ UTL_NAMESPACE_END
 
 #  endif // UTL_CXX20
 
-#endif // defined(UTL_CXX20) && defined(UTL_USE_STD_cmp_utility) && UTL_USE_STD_cmp_utility
+#endif // UTL_CXX20 && UTL_USE_STD_cmp_utility

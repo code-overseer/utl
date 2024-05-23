@@ -2,16 +2,13 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attributes.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_pragma.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_integral.h"
 #include "utl/type_traits/utl_make_signed.h"
 #include "utl/type_traits/utl_make_unsigned.h"
 
-#ifndef UTL_CXX20
+#if !UTL_CXX20
 
 UTL_NAMESPACE_BEGIN
 
@@ -29,7 +26,7 @@ constexpr enable_if_t<is_integral<T>::value, make_signed_t<T>> to_signed(T val) 
 
 UTL_NAMESPACE_END
 
-#else // ifndef UTL_CXX20
+#else // if !UTL_CXX20
 
 #  include "utl/concepts.h"
 

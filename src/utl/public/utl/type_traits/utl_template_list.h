@@ -67,7 +67,7 @@ struct template_concat<List<Ts...>, List<Us...>> {
 template <typename T, typename U>
 using template_concat_t = typename template_concat<T, U>::type;
 
-#ifdef UTL_CXX17
+#if UTL_CXX17
 
 template <auto... V>
 struct auto_list;
@@ -96,6 +96,6 @@ struct template_count<value_constant<T, Value>, List<Value, Tail...>> :
 template <auto V>
 using auto_constant = value_constant<decltype(V), V>;
 
-#endif // ifdef UTL_CXX17
+#endif // if UTL_CXX17
 
 UTL_NAMESPACE_END

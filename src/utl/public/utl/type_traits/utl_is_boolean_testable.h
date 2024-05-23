@@ -143,7 +143,7 @@ UTL_INLINE_CXX17 constexpr bool is_boolean_testable_v = is_boolean_testable<T>::
 
 UTL_NAMESPACE_END
 
-#if defined(UTL_CXX14)
+#if UTL_CXX14
 #  define UTL_TRAIT_is_boolean_testable(TYPE) UTL_SCOPE is_boolean_testable_v<TYPE>
 #else
 #  define UTL_TRAIT_is_boolean_testable(TYPE) UTL_SCOPE is_boolean_testable<TYPE>::value

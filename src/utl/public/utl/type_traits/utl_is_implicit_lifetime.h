@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#if defined(UTL_USE_STD_TYPE_TRAITS) && defined(UTL_CXX23)
+#if UTL_USE_STD_TYPE_TRAITS && UTL_CXX23
 
 #  include <type_traits>
 
@@ -17,10 +17,6 @@ using std::is_implicit_lifetime_v;
 UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
-
-#  ifndef UTL_DISABLE_BUILTIN_is_implicit_lifetime
-#    define UTL_DISABLE_BUILTIN_is_implicit_lifetime 0
-#  endif
 
 #  if UTL_SHOULD_USE_BUILTIN(is_implicit_lifetime)
 #    define UTL_BUILTIN_is_implicit_lifetime(...) __is_implicit_lifetime(__VA_ARGS__)
@@ -57,7 +53,7 @@ struct is_implicit_lifetime :
             UTL_TRAIT_is_trivially_copy_constructible(T) ||
             UTL_TRAIT_is_trivially_move_constructible(T))> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_implicit_lifetime_v = UTL_TRAIT_is_trivially_destructible(T) &&
     (UTL_TRAIT_is_aggregate(T) || UTL_TRAIT_is_trivially_default_constructible(T) ||

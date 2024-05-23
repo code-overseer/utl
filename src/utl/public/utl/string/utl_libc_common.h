@@ -13,20 +13,20 @@
 
 #include <string.h>
 
-#ifdef UTL_DISABLE_SSE_LIBC
+#if UTL_DISABLE_SSE_LIBC
 #  define UTL_DISABLE_SIMD_LIBC
 #elif defined(UTL_DISABLE_AVX_LIBC)
 #  define UTL_DISABLE_AVX512_LIBC
 #endif
 
-#ifndef UTL_DISABLE_SIMD_LIBC
-#  if defined(UTL_SUPPORTS_SIMD_INTRINSICS) && defined(UTL_ARCH_x86)
+#if !UTL_DISABLE_SIMD_LIBC
+#  if UTL_SUPPORTS_SIMD_INTRINSICS && UTL_ARCH_x86
 #    include <immintrin.h>
 #  endif // defined(UTL_SUPPORTS_SIMD_INTRINSICS) && defined(UTL_ARCH_x86)
 
-#  if defined(UTL_SIMD_ARM_SVE) && !defined(UTL_DISABLE_SVE_LIBC)
+#  if UTL_SIMD_ARM_SVE && !UTL_DISABLE_SVE_LIBC
 #    include <arm_sve.h>
-#  elif defined(UTL_SIMD_ARM_NEON) && !defined(UTL_DISABLE_NEON_LIBC)
+#  elif UTL_SIMD_ARM_NEON && !UTL_DISABLE_NEON_LIBC
 #    include <arm_neon.h>
 #  else
 #    define UTL_DISABLE_SIMD_LIBC
@@ -71,7 +71,7 @@ struct is_trivially_lexicographically_comparable :
     bool_constant<is_same<remove_cv_t<T>, remove_cv_t<U>>::value && sizeof(T) == 1 &&
         is_unsigned<T>::value> {};
 
-#ifdef UTL_CXX20
+#if UTL_CXX20
 template <typename T, size_t N>
 concept exact_size = !is_empty_v<T> && (sizeof(T) == N);
 template <typename T>

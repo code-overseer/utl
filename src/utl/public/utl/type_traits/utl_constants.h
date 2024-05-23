@@ -31,7 +31,7 @@ using bool_constant = integral_constant<bool, B>;
 using true_type = bool_constant<true>;
 using false_type = bool_constant<false>;
 
-#ifdef UTL_CXX14
+#if UTL_CXX14
 template <typename T, T N>
 UTL_INLINE_CXX17 constexpr T integral_constant_v = N;
 

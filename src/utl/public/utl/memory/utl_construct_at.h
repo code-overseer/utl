@@ -6,7 +6,7 @@
 #include "utl/type_traits/utl_declval.h"
 #include "utl/utility/utl_forward.h"
 
-#ifdef UTL_CXX20
+#if UTL_CXX20
 #  if defined(UTL_COMPILER_CLANG) | defined(UTL_COMPILER_ICX)
 #    include <new>
 /**
@@ -59,7 +59,7 @@ UTL_NAMESPACE_END
 #      define UTL_CONSTEXPR_CONSTRUCTS_AT constexpr
 #    endif // UTL_HAS_CPP_ATTRIBUTE(msvc::constexpr)
 #  endif   // if defined(UTL_COMPILER_CLANG) | defined(UTL_COMPILER_ICX)
-#endif     // ifdef UTL_CXX20
+#endif     // if UTL_CXX20
 
 #ifndef UTL_CONSTEXPR_CONSTRUCTS_AT
 #  include <new>

@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -12,26 +12,22 @@ UTL_NAMESPACE_BEGIN
 
 using std::is_signed;
 
-#  ifdef UTL_CXX17
+#  if UTL_CXX17
 
 using std::is_signed_v;
 
-#  elif defined(UTL_CXX14) // ifdef UTL_CXX17
+#  elif UTL_CXX14 // if UTL_CXX17
 
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_signed_v = is_signed<T>::value;
 
-#  endif // ifdef UTL_CXX17
+#  endif // if UTL_CXX17
 
 UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #  include "utl/type_traits/utl_constants.h"
-
-#  ifndef UTL_DISABLE_BUILTIN_is_signed
-#    define UTL_DISABLE_BUILTIN_is_signed 0
-#  endif
 
 #  if UTL_SHOULD_USE_BUILTIN(is_signed)
 #    define UTL_BUILTIN_is_signed(...) __is_signed(__VA_ARGS__)
@@ -44,7 +40,7 @@ UTL_NAMESPACE_BEGIN
 template <typename T>
 struct is_signed : bool_constant<UTL_BUILTIN_is_signed(T)> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_signed_v = UTL_BUILTIN_is_signed(T);
 #    endif // UTL_CXX14
@@ -63,7 +59,7 @@ UTL_NAMESPACE_BEGIN
 template <typename T>
 struct is_signed : conjunction<is_arithmetic<T>, bool_constant<(T(-1) < T(0))>> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_signed_v = is_signed<T>::value;
 #    endif // UTL_CXX14
@@ -75,3 +71,11 @@ UTL_NAMESPACE_END
 #  endif // ifdef UTL_BUILTIN_is_signed
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
+
+#ifdef UTL_BUILTIN_is_signed
+#  define UTL_TRAIT_is_signed(...) UTL_BUILTIN_is_signed(__VA_ARGS__)
+#elif UTL_CXX14
+#  define UTL_TRAIT_is_signed(...) UTL_SCOPE is_signed_v<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_is_signed(...) UTL_SCOPE is_signed<__VA_ARGS__>::value
+#endif

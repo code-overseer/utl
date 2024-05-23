@@ -11,7 +11,7 @@
 #elif UTL_HAS_BUILTIN(__builtin_constant_p)
 #  define UTL_CONSTANT_P(...) __builtin_constant_p(__VA_ARGS__)
 
-#elif defined(UTL_COMPILER_MSVC)
+#elif UTL_COMPILER_MSVC
 UTL_NAMESPACE_BEGIN
 namespace details {
 UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)

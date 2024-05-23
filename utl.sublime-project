@@ -20,6 +20,9 @@
 			"style": "File"
 		}
 	},
+	"syntax_override": {
+		".*\\.(h|cpp)$": ["C++", "UTL"]
+	},
 	"build_systems":
 	[
 		{
@@ -30,19 +33,18 @@
 			[
 				{
 					"name": "Compile Tests",
-					"shell_cmd": "make -C $project_path/src/utl compile"
+					"shell_cmd": "make -C $project_path/src/utl compile -j8"
 				},
 				{
 					"name": "Preprocess Tests",
-					"shell_cmd": "make -C $project_path/src/utl preprocess"
+					"shell_cmd": "make -C $project_path/src/utl preprocess -j8"
 				},
 				{
 					"name": "Print Build Variables",
-					"shell_cmd": "make -C $project_path/src/utl print"	
+					"shell_cmd": "make -C $project_path/src/utl print -j8"	
 				}
 			]
 		}
 	]
-
 
 }

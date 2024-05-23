@@ -24,7 +24,7 @@ public:
 private:
 };
 
-#ifdef UTL_CXX17
+#if UTL_CXX17
 
 template <typename Fn>
 explicit scope_exit(Fn&& f) -> scope_exit<decay_t<Fn>>;

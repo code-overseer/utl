@@ -6,7 +6,7 @@
 
 #if defined(__cpp_exceptions)
 #  define UTL_WITH_EXCEPTIONS 1
-#elif defined(UTL_COMPILER_MSVC) && defined(_CPPUNWIND)
+#elif UTL_COMPILER_MSVC && defined(_CPPUNWIND)
 #  if _CPPUNWIND
 #    define UTL_WITH_EXCEPTIONS 1
 #  endif

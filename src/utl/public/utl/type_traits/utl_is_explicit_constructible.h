@@ -6,7 +6,7 @@
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_is_constructible.h"
 #include "utl/type_traits/utl_is_convertible.h"
-#include "utl/type_traits/utl_is_implicitly_constructible.h"
+#include "utl/type_traits/utl_is_implicit_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_constructible.h"
 #include "utl/type_traits/utl_logical_traits.h"
 
@@ -41,4 +41,30 @@ struct is_nothrow_explicit_constructible :
     conjunction<is_explicit_constructible<TTarget, TArgs...>,
         is_nothrow_constructible<TTarget, TArgs...>> {};
 
+#if UTL_CXX14
+template <typename TTarget, typename... TArgs>
+UTL_INLINE_CXX17 constexpr bool is_explicit_constructible_v =
+    details::constructible::is_explicit<TTarget, TArgs...>::value;
+
+template <typename TTarget, typename... TArgs>
+UTL_INLINE_CXX17 constexpr bool is_nothrow_explicit_constructible_v =
+    is_nothrow_explicit_constructible<TTarget, TArgs...>::value;
+#endif
+
 UTL_NAMESPACE_END
+
+#if UTL_CXX14
+#  define UTL_TRAIT_is_explicit_constructible(...) \
+      UTL_SCOPE is_explicit_constructible_v<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_is_explicit_constructible(...) \
+      UTL_SCOPE is_explicit_constructible<__VA_ARGS__>::value
+#endif
+
+#if UTL_CXX14
+#  define UTL_TRAIT_is_nothrow_explicit_constructible(...) \
+      UTL_SCOPE is_nothrow_explicit_constructible_v<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_is_nothrow_explicit_constructible(...) \
+      UTL_SCOPE is_nothrow_explicit_constructible<__VA_ARGS__>::value
+#endif

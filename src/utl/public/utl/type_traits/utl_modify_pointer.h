@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -13,7 +13,7 @@ UTL_NAMESPACE_BEGIN
 using std::add_pointer;
 using std::remove_pointer;
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 
 using std::add_pointer_t;
 using std::remove_pointer_t;
@@ -30,14 +30,6 @@ using remove_pointer_t = typename remove_pointer<T>::type;
 UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
-
-#  ifndef UTL_DISABLE_BUILTIN_add_pointer
-#    define UTL_DISABLE_BUILTIN_add_pointer 0
-#  endif
-
-#  ifndef UTL_DISABLE_BUILTIN_remove_pointer
-#    define UTL_DISABLE_BUILTIN_remove_pointer 0
-#  endif
 
 #  if UTL_SHOULD_USE_BUILTIN(add_pointer)
 #    define UTL_BUILTIN_add_pointer(...) __add_pointer(__VA_ARGS__)

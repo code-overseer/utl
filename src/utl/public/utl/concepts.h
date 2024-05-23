@@ -4,7 +4,7 @@
 
 #include "utl/preprocessor/utl_config.h"
 
-#ifdef UTL_CXX20
+#if UTL_CXX20
 
 #  include <concepts>
 

@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -12,17 +12,16 @@ UTL_NAMESPACE_BEGIN
 
 using std::is_nothrow_constructible;
 
-#  ifdef UTL_CXX17
+#  if UTL_CXX17
 
 using std::is_nothrow_constructible_v;
 
-#  elif defined(UTL_CXX14) // ifdef UTL_CXX17
+#  elif UTL_CXX14 // if UTL_CXX17
 
 template <typename T, typename... Args>
-UTL_INLINE_CXX17 constexpr bool is_nothrow_constructible_v =
-    is_nothrow_constructible<T, Args...>::value;
+UTL_INLINE_CXX17 constexpr bool is_nothrow_constructible_v = is_nothrow_constructible<T, Args...>::value;
 
-#  endif // ifdef UTL_CXX17
+#  endif // if UTL_CXX17
 
 UTL_NAMESPACE_END
 
@@ -31,10 +30,6 @@ UTL_NAMESPACE_END
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #  include "utl/type_traits/utl_constants.h"
-
-#  ifndef UTL_DISABLE_BUILTIN_is_nothrow_constructible
-#    define UTL_DISABLE_BUILTIN_is_nothrow_constructible 0
-#  endif // ifndef UTL_DISABLE_BUILTIN_is_nothrow_constructible
 
 #  if UTL_SHOULD_USE_BUILTIN(is_nothrow_constructible)
 #    define UTL_BUILTIN_is_nothrow_constructible(...) __is_nothrow_constructible(__VA_ARGS__)
@@ -48,7 +43,7 @@ template <typename T, typename... Args>
 struct is_nothrow_constructible :
     bool_constant<UTL_BUILTIN_is_nothrow_constructible(T, Args...)> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T, typename... Args>
 UTL_INLINE_CXX17 constexpr bool is_nothrow_constructible_v =
     UTL_BUILTIN_is_nothrow_constructible(T, Args...);
@@ -98,10 +93,9 @@ using nothrow_impl_t = decltype(nothrow_impl<T, Args...>(
 template <typename T, typename... Args>
 struct is_nothrow_constructible : details::constructible::nothrow_impl_t<T, Args...> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T, typename... Args>
-UTL_INLINE_CXX17 constexpr bool is_nothrow_constructible_v =
-    is_nothrow_constructible<T, Args...>::value;
+UTL_INLINE_CXX17 constexpr bool is_nothrow_constructible_v = is_nothrow_constructible<T, Args...>::value;
 #    endif // UTL_CXX14
 
 #    define UTL_TRAIT_SUPPORTED_is_nothrow_constructible 1

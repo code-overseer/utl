@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -12,12 +12,12 @@ UTL_NAMESPACE_BEGIN
 
 using std::is_union;
 
-#  ifdef UTL_CXX17
+#  if UTL_CXX17
 using std::is_union_v;
-#  elif defined(UTL_CXX14) // ifdef UTL_CXX17
+#  elif UTL_CXX14 // if UTL_CXX17
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_union_v = is_union<T>::value;
-#  endif                   // ifdef UTL_CXX17
+#  endif          // if UTL_CXX17
 
 UTL_NAMESPACE_END
 
@@ -26,10 +26,6 @@ UTL_NAMESPACE_END
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #  include "utl/type_traits/utl_constants.h"
-
-#  ifndef UTL_DISABLE_BUILTIN_is_union
-#    define UTL_DISABLE_BUILTIN_is_union 0
-#  endif
 
 #  if UTL_SHOULD_USE_BUILTIN(is_union)
 #    define UTL_BUILTIN_is_union(...) __is_union(__VA_ARGS__)
@@ -42,7 +38,7 @@ UTL_NAMESPACE_BEGIN
 template <typename T>
 struct is_union : bool_constant<UTL_BUILTIN_is_union(T)> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_union_v = UTL_BUILTIN_is_union(T);
 #    endif // UTL_CXX14
@@ -60,7 +56,7 @@ UTL_NAMESPACE_BEGIN
 template <typename T>
 struct is_union : undefined_trait<T> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_union_v = is_union<T>::value;
 #    endif // UTL_CXX14
@@ -70,3 +66,11 @@ UTL_NAMESPACE_END
 #  endif // ifdef UTL_BUILTIN_is_union
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
+
+#ifdef UTL_BUILTIN_is_union
+#  define UTL_TRAIT_is_union(...) UTL_BUILTIN_is_union(__VA_ARGS__)
+#elif UTL_CXX14
+#  define UTL_TRAIT_is_union(...) UTL_SCOPE is_union_v<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_is_union(...) UTL_SCOPE is_union<__VA_ARGS__>::value
+#endif

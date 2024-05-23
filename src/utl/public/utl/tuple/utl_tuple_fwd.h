@@ -31,7 +31,7 @@ struct tuple_element;
 template <typename T>
 struct is_tuple;
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 
 template <typename T>
 UTL_INLINE_CXX17 constexpr size_t tuple_size_v = tuple_size<T>::value;
