@@ -25,7 +25,7 @@ UTL_NAMESPACE_END
 
 #  define UTL_TUPLE_PRIVATE_HEADER_GUARD
 
-#  if !defined(UTL_CXX20)
+#  if !UTL_CXX20
 #    include "utl_tuple_cpp17.h"
 #  else
 #    include "utl_tuple_latest.h"
