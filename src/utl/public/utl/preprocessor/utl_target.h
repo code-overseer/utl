@@ -65,20 +65,24 @@
 
 #endif /* if UTL_COMPILER_CLANG */
 
-#if UTL_TARGET_APPLE && !defined(UTL_TARGET_UNIX)
+#if UTL_TARGET_APPLE && !UTL_TARGET_UNIX
 #  define UTL_TARGET_UNIX 1
 #endif /* if UTL_TARGET_APPLE && !defined(UTL_TARGET_UNIX) */
 
-#if UTL_TARGET_LINUX && !defined(UTL_TARGET_UNIX)
+#if UTL_TARGET_LINUX && !UTL_TARGET_UNIX
 #  define UTL_TARGET_UNIX 1
 #endif /* if UTL_TARGET_LINUX && !defined(UTL_TARGET_UNIX) */
 
-#if UTL_TARGET_SONY && !defined(UTL_TARGET_BSD)
-#  define UTL_TARGET_BSD 1
-#  define UTL_TARGET_UNIX 1
+#if UTL_TARGET_SONY
+#  if !UTL_TARGET_BSD
+#    define UTL_TARGET_BSD 1
+#  endif
+#  if !UTL_TARGET_UNIX
+#    define UTL_TARGET_UNIX 1
+#  endif
 #endif /* if UTL_TARGET_SONY && !defined(UTL_TARGET_BSD) */
 
-#if UTL_TARGET_BSD && !defined(UTL_TARGET_UNIX)
+#if UTL_TARGET_BSD && !UTL_TARGET_UNIX
 #  define UTL_TARGET_UNIX 1
 #endif /* if UTL_TARGET_BSD && !defined(UTL_TARGET_UNIX) */
 

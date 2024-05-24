@@ -7,7 +7,7 @@
 #include "utl/utility/utl_forward.h"
 
 #if UTL_CXX20
-#  if defined(UTL_COMPILER_CLANG) | defined(UTL_COMPILER_ICX)
+#  if UTL_COMPILER_CLANG | UTL_COMPILER_ICX
 #    include <new>
 /**
  * The Clang frontend allows constexpr placement new within the std namespace
@@ -31,7 +31,7 @@ inline constexpr T* construct_at(T* location, Args&&... args) noexcept(
 UTL_NAMESPACE_END
 #    define UTL_CONSTEXPR_CONSTRUCTS_AT constexpr
 
-#  elif defined(UTL_COMPILER_GCC)
+#  elif UTL_COMPILER_GCC
 
 #    include <bits/stl_construct.h>
 /**
@@ -42,7 +42,7 @@ using std::construct_at;
 UTL_NAMESPACE_END
 #    define UTL_CONSTEXPR_CONSTRUCTS_AT constexpr
 
-#  elif defined(UTL_COMPILER_MSVC)
+#  elif UTL_COMPILER_MSVC
 /**
  * MSVC uses a constexpr attribute to allow constexpr placement-new
  */
@@ -58,7 +58,7 @@ inline constexpr T* construct_at(T* location, Args&&... args) noexcept(
 UTL_NAMESPACE_END
 #      define UTL_CONSTEXPR_CONSTRUCTS_AT constexpr
 #    endif // UTL_HAS_CPP_ATTRIBUTE(msvc::constexpr)
-#  endif   // if defined(UTL_COMPILER_CLANG) | defined(UTL_COMPILER_ICX)
+#  endif   // if UTL_COMPILER_CLANG | UTL_COMPILER_ICX
 #endif     // if UTL_CXX20
 
 #ifndef UTL_CONSTEXPR_CONSTRUCTS_AT

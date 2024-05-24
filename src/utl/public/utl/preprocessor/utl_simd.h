@@ -2,7 +2,9 @@
 
 #pragma once
 
-#if defined(UTL_ARCH_x86)
+#include "utl/preprocessor/utl_architecture.h"
+
+#if UTL_ARCH_x86
 
 /* Use SSE4.2 as a minimum SIMD support */
 #  ifdef __SSE4_2__
@@ -22,7 +24,7 @@
 #    define UTL_SIMD_X86_AVX512 1
 #  endif
 
-#elif defined(UTL_ARCH_ARM)
+#elif UTL_ARCH_ARM
 
 #  ifdef __ARM_NEON
 #    define UTL_SIMD_ARM_NEON 1

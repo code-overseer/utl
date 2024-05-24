@@ -37,4 +37,4 @@ constexpr enable_if_t<is_enum<Enum>::value, underlying_type_t<Enum>> to_underlyi
 
 UTL_NAMESPACE_END
 
-#endif // UTL_CXX23 && defined(UTL_USE_STD_SWAP)
+#endif // UTL_CXX23 && UTL_USE_STD_to_underlying

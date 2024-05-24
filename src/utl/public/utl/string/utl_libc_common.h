@@ -14,22 +14,22 @@
 #include <string.h>
 
 #if UTL_DISABLE_SSE_LIBC
-#  define UTL_DISABLE_SIMD_LIBC
-#elif defined(UTL_DISABLE_AVX_LIBC)
-#  define UTL_DISABLE_AVX512_LIBC
+#  define UTL_DISABLE_SIMD_LIBC 1
+#elif UTL_DISABLE_AVX_LIBC
+#  define UTL_DISABLE_AVX512_LIBC 1
 #endif
 
 #if !UTL_DISABLE_SIMD_LIBC
 #  if UTL_SUPPORTS_SIMD_INTRINSICS && UTL_ARCH_x86
 #    include <immintrin.h>
-#  endif // defined(UTL_SUPPORTS_SIMD_INTRINSICS) && defined(UTL_ARCH_x86)
+#  endif // UTL_SUPPORTS_SIMD_INTRINSICS && UTL_ARCH_x86
 
 #  if UTL_SIMD_ARM_SVE && !UTL_DISABLE_SVE_LIBC
 #    include <arm_sve.h>
 #  elif UTL_SIMD_ARM_NEON && !UTL_DISABLE_NEON_LIBC
 #    include <arm_neon.h>
 #  else
-#    define UTL_DISABLE_SIMD_LIBC
+#    define UTL_DISABLE_SIMD_LIBC 1
 #  endif
 #endif
 

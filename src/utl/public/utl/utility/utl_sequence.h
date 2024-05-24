@@ -87,5 +87,4 @@ using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
 
 UTL_NAMESPACE_END
 
-#endif // UTL_CXX14 && defined(UTL_USE_STD_sequence_utility) &&
-       // UTL_USE_STD_sequence_utility
+#endif // UTL_CXX14 && UTL_USE_STD_sequence_utility

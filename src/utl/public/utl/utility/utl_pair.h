@@ -4,7 +4,7 @@
 
 /** TODO cleanup this implementation and support allocator_arg **/
 
-#if defined(UTL_USE_STDPAIR) && UTL_USE_STDPAIR
+#if UTL_USE_STDPAIR
 
 #  include "utl/preprocessor/utl_namespace.h"
 
@@ -22,7 +22,7 @@ using std::tuple_size;
 
 UTL_NAMESPACE_END
 
-#else // defined(UTL_USE_STDPAIR) && UTL_USE_STDPAIR
+#else // UTL_USE_STDPAIR
 
 #  include "utl/compare/utl_compare_traits.h"
 #  include "utl/preprocessor/utl_config.h"
@@ -660,7 +660,7 @@ constexpr pair<unwrap_reference_t<decay_t<T>>, unwrap_reference_t<decay_t<U>>> m
         forward<T>(t), forward<U>(u)};
 }
 
-#endif // defined(UTL_USE_STDPAIR) && UTL_USE_STDPAIR
+#endif // UTL_USE_STDPAIR
 
 UTL_NAMESPACE_END
 

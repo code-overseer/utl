@@ -149,4 +149,4 @@ struct is_nothrow_swappable : is_nothrow_swappable_with<T&, T&> {};
 
 UTL_NAMESPACE_END
 
-#endif // UTL_CXX20 && defined(UTL_USE_STD_swap)
+#endif // UTL_CXX20 && UTL_USE_STD_swap

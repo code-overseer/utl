@@ -2,9 +2,9 @@
 
 #pragma once
 
-#if defined(UTL_USE_STD_tuple) && UTL_USE_STD_tuple
+#if UTL_USE_STD_tuple
 
-#else // defined(UTL_USE_STD_tuple) && UTL_USE_STD_tuple
+#else // UTL_USE_STD_tuple
 
 UTL_STD_NAMESPACE_BEGIN
 /* UTL_UNDEFINED_BEHAVIOUR */
@@ -48,7 +48,7 @@ class tuple;
 
 UTL_NAMESPACE_END
 
-#endif // defined(UTL_USE_STD_tuple) && UTL_USE_STD_tuple
+#endif // UTL_USE_STD_tuple
 
 #if UTL_CXX14
 #  define UTL_TRAIT_tuple_size(...) UTL_SCOPE tuple_size_v<__VA_ARGS__>

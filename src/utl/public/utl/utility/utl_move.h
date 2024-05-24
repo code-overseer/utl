@@ -14,7 +14,7 @@ using std::move_if_noexcept;
 
 UTL_NAMESPACE_END
 
-#else // UTL_CXX14 && defined(UTL_USE_STD_move)
+#else // UTL_CXX14 && UTL_USE_STD_move
 
 #  if UTL_USE_STD_move
 UTL_PRAGMA_WARN(

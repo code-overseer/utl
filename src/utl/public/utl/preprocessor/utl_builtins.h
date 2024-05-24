@@ -50,7 +50,7 @@
 #  define UTL_BUILTIN_unreachable() __builtin_unreachable()
 #elif UTL_COMPILER_ICC_AT_LEAST(1300)
 #  define UTL_BUILTIN_unreachable() __builtin_unreachable()
-#elif defined(UTL_COMPILER_MSVC) /* UTL_HAS_BUILTIN(__builtin_unreachable) */
+#elif UTL_COMPILER_MSVC /* UTL_HAS_BUILTIN(__builtin_unreachable) */
 #  define UTL_BUILTIN_unreachable() __assume(0)
 #else /* UTL_HAS_BUILTIN(__builtin_unreachable) */
 
@@ -69,7 +69,7 @@ void abort(void);
 
 #if UTL_HAS_BUILTIN(__builtin_assume)
 #  define UTL_BUILTIN_assume(...) __builtin_assume(__VA_ARGS__)
-#elif defined(UTL_COMPILER_MSVC) /* UTL_HAS_BUILTIN(__builtin_unreachable) */
+#elif UTL_COMPILER_MSVC /* UTL_HAS_BUILTIN(__builtin_unreachable) */
 #  define UTL_BUILTIN_assume(...) __assume(__VA_ARGS__)
 #elif UTL_HAS_BUILTIN(__builtin_unreachable)
 #  define UTL_BUILTIN_assume(...) ((__VA_ARGS__) ? (void)0 : __builtin_unreachable())
