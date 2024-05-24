@@ -8,8 +8,15 @@
 #if UTL_CXX20
 UTL_NAMESPACE_BEGIN
 
+namespace details {
+namespace concepts {
 template <typename T, typename U>
-concept same_as = UTL_TRAIT_is_same(T, U);
+concept same = UTL_TRAIT_is_same(T, U);
+}
+} // namespace details
+
+template <typename T, typename U>
+concept same_as = details::concepts::same<T, U> && details::concepts::same<U, T>;
 
 UTL_NAMESPACE_END
 #endif
