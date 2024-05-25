@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -16,20 +16,16 @@ using std::add_lvalue_reference;
 
 using std::add_lvalue_reference_t;
 
-#  else  // ifdef UTL_CXX14
+#  else  // if UTL_CXX14
 template <typename T>
 using add_lvalue_reference_t = typename add_lvalue_reference<T>::type;
-#  endif // ifdef UTL_CXX14
+#  endif // if UTL_CXX14
 
 UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #  include "utl/type_traits/utl_constants.h"
-
-#  ifndef UTL_DISABLE_BUILTIN_add_lvalue_reference
-#    define UTL_DISABLE_BUILTIN_add_lvalue_reference 0
-#  endif // ifndef UTL_DISABLE_BUILTIN_add_lvalue_reference
 
 #  if UTL_SHOULD_USE_BUILTIN(add_lvalue_reference)
 #    define UTL_BUILTIN_add_lvalue_reference(...) __add_lvalue_reference(__VA_ARGS__)

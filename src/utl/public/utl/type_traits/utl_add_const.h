@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -12,7 +12,7 @@ UTL_NAMESPACE_BEGIN
 
 using std::add_const;
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 
 using std::add_const_t;
 
@@ -27,7 +27,7 @@ UTL_NAMESPACE_END
 
 #  define UTL_TRAIT_SUPPORTED_add_const 1
 
-#else // ifdef UTL_USE_STD_TYPE_TRAITS
+#else // if UTL_USE_STD_TYPE_TRAITS
 
 UTL_NAMESPACE_BEGIN
 
@@ -43,4 +43,4 @@ UTL_NAMESPACE_END
 
 #  define UTL_TRAIT_SUPPORTED_add_const 1
 
-#endif // ifdef UTL_USE_STD_TYPE_TRAITS
+#endif // if UTL_USE_STD_TYPE_TRAITS

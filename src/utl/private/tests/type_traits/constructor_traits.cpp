@@ -1,7 +1,7 @@
 // Copyright 2023-2024 Bryan Wong
 
-#include "utl/type_traits/utl_is_explicitly_constructible.h"
-#include "utl/type_traits/utl_is_implicitly_constructible.h"
+#include "utl/type_traits/utl_is_explicit_constructible.h"
+#include "utl/type_traits/utl_is_implicit_constructible.h"
 
 #include <initializer_list>
 

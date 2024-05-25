@@ -4,7 +4,7 @@
 
 /** TODO cleanup this implementation and support allocator_arg **/
 
-#if defined(UTL_USE_STDPAIR) && UTL_USE_STDPAIR
+#if UTL_USE_STDPAIR
 
 #  include "utl/preprocessor/utl_namespace.h"
 
@@ -22,12 +22,10 @@ using std::tuple_size;
 
 UTL_NAMESPACE_END
 
-#else // defined(UTL_USE_STDPAIR) && UTL_USE_STDPAIR
+#else // UTL_USE_STDPAIR
 
 #  include "utl/compare/utl_compare_traits.h"
-#  include "utl/preprocessor/utl_attributes.h"
-#  include "utl/preprocessor/utl_namespace.h"
-#  include "utl/preprocessor/utl_standard.h"
+#  include "utl/preprocessor/utl_config.h"
 #  include "utl/tuple/utl_tuple_traits.h"
 #  include "utl/type_traits/utl_common_reference.h"
 #  include "utl/type_traits/utl_common_type.h"
@@ -230,10 +228,8 @@ public:
 
     constexpr pair(pair const&) noexcept(traits::is_nothrow_copy_constructible) = default;
     constexpr pair(pair&&) noexcept(traits::is_nothrow_move_constructible) = default;
-    UTL_CONSTEXPR_CXX14 pair& operator=(pair const&) noexcept(
-        traits::is_nothrow_copy_assignable) = default;
-    UTL_CONSTEXPR_CXX14 pair& operator=(pair&&) noexcept(
-        traits::is_nothrow_move_assignable) = default;
+    UTL_CONSTEXPR_CXX14 pair& operator=(pair const&) noexcept(traits::is_nothrow_copy_assignable) = default;
+    UTL_CONSTEXPR_CXX14 pair& operator=(pair&&) noexcept(traits::is_nothrow_move_assignable) = default;
 
     template <typename U0 = T0, typename U1 = T1,
         typename V = defer<bool_constant<traits::is_const_copy_assignable>, T0, T1>>
@@ -267,9 +263,8 @@ public:
     }
 
     template <typename U0 = T0, typename U1 = T1>
-    UTL_CONSTEXPR_CXX14
-        enable_if_t<traits::template is_const_swappable_with<U0 const&, U1 const&>::value>
-        swap(pair<U0, U1> const& other) const
+    UTL_CONSTEXPR_CXX14 enable_if_t<traits::template is_const_swappable_with<U0 const&, U1 const&>::value>
+    swap(pair<U0, U1> const& other) const
         noexcept(traits::template is_nothrow_const_swappable_with<U0 const&, U1 const&>::value) {
         using UTL_SCOPE swap;
         swap(first, other.first);
@@ -549,33 +544,30 @@ public:
 
 public:
     template <typename U0, typename U1>
-    UTL_CONSTEXPR_CXX14
-        enable_if_t<traits::template is_assignable<U0 const&, U1 const&>::value, pair&>
-        operator=(pair<U0, U1> const& p) noexcept(
-            traits::template is_nothrow_assignable<U0 const&, U1 const&>::value) {
+    UTL_CONSTEXPR_CXX14 enable_if_t<traits::template is_assignable<U0 const&, U1 const&>::value, pair&>
+    operator=(pair<U0, U1> const& p) noexcept(
+        traits::template is_nothrow_assignable<U0 const&, U1 const&>::value) {
         return assign(p.first, p.second);
     }
 
     template <typename U0, typename U1>
-    UTL_CONSTEXPR_CXX14
-        enable_if_t<traits::template is_const_assignable<U0 const&, U1 const&>::value, pair const&>
-        operator=(pair<U0, U1> const& p) const
+    UTL_CONSTEXPR_CXX14 enable_if_t<traits::template is_const_assignable<U0 const&, U1 const&>::value,
+        pair const&>
+    operator=(pair<U0, U1> const& p) const
         noexcept(traits::template is_nothrow_const_assignable<U0 const&, U1 const&>::value) {
         return assign(p.first, p.second);
     }
 
 public:
     template <typename U0, typename U1>
-    UTL_CONSTEXPR_CXX14 enable_if_t<traits::template is_assignable<U0&&, U1&&>::value, pair&>
-    operator=(pair<U0, U1>&& p) noexcept(
-        traits::template is_nothrow_assignable<U0&&, U1&&>::value) {
+    UTL_CONSTEXPR_CXX14 enable_if_t<traits::template is_assignable<U0&&, U1&&>::value, pair&> operator=(
+        pair<U0, U1>&& p) noexcept(traits::template is_nothrow_assignable<U0&&, U1&&>::value) {
         return assign(move(p).first, move(p).second);
     }
 
     template <typename U0, typename U1>
-    UTL_CONSTEXPR_CXX14
-        enable_if_t<traits::template is_const_assignable<U0&&, U1&&>::value, pair const&>
-        operator=(pair<U0, U1>&& p) const
+    UTL_CONSTEXPR_CXX14 enable_if_t<traits::template is_const_assignable<U0&&, U1&&>::value, pair const&>
+    operator=(pair<U0, U1>&& p) const
         noexcept(traits::template is_nothrow_const_assignable<U0&&, U1&&>::value) {
         return assign(move(p).first, move(p).second);
     }
@@ -668,11 +660,11 @@ constexpr pair<unwrap_reference_t<decay_t<T>>, unwrap_reference_t<decay_t<U>>> m
         forward<T>(t), forward<U>(u)};
 }
 
-#endif // defined(UTL_USE_STDPAIR) && UTL_USE_STDPAIR
+#endif // UTL_USE_STDPAIR
 
 UTL_NAMESPACE_END
 
-#ifndef UTL_CXX20
+#if !UTL_CXX20
 
 UTL_NAMESPACE_BEGIN
 
@@ -715,7 +707,7 @@ struct basic_common_reference<pair<T0, T1>, pair<U0, U1>, TQual, UQual> :
 
 } // namespace std
 
-#else  // ifndef UTL_CXX20
+#else  // if !UTL_CXX20
 
 namespace std {
 template <typename T0, typename T1, typename U0, typename U1>
@@ -735,7 +727,7 @@ struct basic_common_reference<pair<T0, T1>, pair<U0, U1>, TQual, UQual> {
         pair<common_reference_t<TQual<T0>, UQual<U0>>, common_reference_t<TQual<T1>, UQual<U1>>>;
 };
 } // namespace std
-#endif // ifndef UTL_CXX20
+#endif // if !UTL_CXX20
 
 UTL_STD_NAMESPACE_BEGIN
 template <typename T0, typename T1>

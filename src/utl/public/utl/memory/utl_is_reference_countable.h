@@ -50,7 +50,7 @@ struct is_reference_countable<reference_count<T>> : true_type {};
 template <typename T>
 struct is_reference_countable<T const> : is_reference_countable<T> {};
 
-#ifdef UTL_CXX20
+#if UTL_CXX20
 
 /**
  * Concept to check if a type is reference countable.

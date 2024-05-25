@@ -117,7 +117,7 @@ public:
     UTL_CONSTEXPR_CXX14 storage& operator=(storage const&) noexcept(
         traits::is_nothrow_copy_assignable) = default;
 
-#ifdef UTL_ENFORCE_NONMOVABILIITY
+#if UTL_ENFORCE_NONMOVABILIITY
     constexpr storage(move_construct_t&&) noexcept(traits::is_nothrow_move_constructible) = delete;
     UTL_CONSTEXPR_CXX14 storage& operator=(move_assign_t&&) noexcept(
         traits::is_nothrow_move_assignable) = delete;
@@ -256,7 +256,7 @@ struct storage<T, Tail...> : variadic_traits<T, Tail...> {
     UTL_CONSTEXPR_CXX14 storage& operator=(storage const&) noexcept(
         traits::is_nothrow_copy_assignable) = default;
 
-#ifdef UTL_ENFORCE_NONMOVABILIITY
+#if UTL_ENFORCE_NONMOVABILIITY
     constexpr storage(move_construct_t&&) noexcept(traits::is_nothrow_move_constructible) = delete;
     UTL_CONSTEXPR_CXX14 storage& operator=(move_assign_t&&) noexcept(
         traits::is_nothrow_move_assignable) = delete;
@@ -734,7 +734,7 @@ public:
     explicit constexpr tuple(tuple<UTypes...>&&) noexcept(
         traits::template is_nothrow_constructible<UTypes&&...>::value) = delete;
 
-#ifdef UTL_ENFORCE_NONMOVABILIITY
+#if UTL_ENFORCE_NONMOVABILIITY
     /**
      * Non-standard overload
      */
@@ -781,7 +781,7 @@ public:
     explicit constexpr tuple(tuple<UTypes...> const&&) noexcept(
         traits::template is_nothrow_constructible<UTypes const&&...>::value) = delete;
 
-#ifdef UTL_ENFORCE_NONMOVABILIITY
+#if UTL_ENFORCE_NONMOVABILIITY
     /**
      * Non-standard overload
      */
@@ -1063,7 +1063,7 @@ public:
             other) noexcept(traits::template is_nothrow_constructible_with_allocator<Alloc,
         UTypes&&...>::value) = delete;
 
-#ifdef UTL_ENFORCE_NONMOVABILIITY
+#if UTL_ENFORCE_NONMOVABILIITY
     /**
      * Non-standard overload
      */
@@ -1122,7 +1122,7 @@ public:
             other) noexcept(traits::template is_nothrow_constructible_with_allocator<Alloc,
         UTypes const&&...>::value) = delete;
 
-#ifdef UTL_ENFORCE_NONMOVABILIITY
+#if UTL_ENFORCE_NONMOVABILIITY
     /**
      * Non-standard overload
      */
@@ -1278,7 +1278,7 @@ public:
         return assign(move(other), index_sequence_for<Types...>{});
     }
 
-#ifdef UTL_ENFORCE_NONMOVABILIITY
+#if UTL_ENFORCE_NONMOVABILIITY
     /**
      * Non-standard overload
      */

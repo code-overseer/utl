@@ -11,6 +11,9 @@
 #ifdef UTL_NAMESPACE_BEGIN
 #  error "Cannot define UTL_NAMESPACE_BEGIN"
 #endif
+#ifdef UTL_NAMESPACE_END
+#  error "Cannot define UTL_NAMESPACE_END"
+#endif
 
 #define UTL_NAMESPACE_BEGIN namespace UTL_NS {
 

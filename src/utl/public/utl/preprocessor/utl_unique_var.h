@@ -5,8 +5,7 @@
 #include "utl/preprocessor/utl_compiler.h"
 #include "utl/preprocessor/utl_concatenation.h"
 
-#if defined(UTL_COMPILER_CLANG) | defined(UTL_COMPILER_GCC) | defined(UTL_COMPILER_MSVC) | \
-    defined(UTL_COMPILER_INTEL)
+#if UTL_COMPILER_CLANG | UTL_COMPILER_GCC | UTL_COMPILER_MSVC | UTL_COMPILER_INTEL
 
 #  define UTL_UNIQUE_VAR(var) UTL_CONCAT(var, __COUNTER__)
 
@@ -15,4 +14,4 @@
 /* On unrecognized platforms, use __LINE__ */
 #  define UTL_UNIQUE_VAR(var) UTL_CONCAT(var, __LINE__)
 
-#endif /* ifdef UTL_COMPILER_CLANG */
+#endif /* if UTL_COMPILER_CLANG */

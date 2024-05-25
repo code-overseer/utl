@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attributes.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_pragma.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
 
-#if defined(UTL_CXX14) && defined(UTL_USE_STD_move) && UTL_USE_STD_move
+#if UTL_CXX14 && UTL_USE_STD_move
 #  include <utility>
 
 UTL_NAMESPACE_BEGIN
@@ -17,9 +14,9 @@ using std::move_if_noexcept;
 
 UTL_NAMESPACE_END
 
-#else // defined(UTL_CXX14) && defined(UTL_USE_STD_move)
+#else // UTL_CXX14 && UTL_USE_STD_move
 
-#  if defined(UTL_USE_STD_move) && UTL_USE_STD_move
+#  if UTL_USE_STD_move
 UTL_PRAGMA_WARN(
     "The current standard does not implement a constexpr move, `UTL_USE_STD_move` ignored")
 #  endif
@@ -51,4 +48,4 @@ constexpr details::utility::move_if_noexcept_result_t<T> move_if_noexcept(
 
 UTL_NAMESPACE_END
 
-#endif // defined(UTL_CXX14) && defined(UTL_USE_STD_move) && UTL_USE_STD_move
+#endif // UTL_CXX14 && UTL_USE_STD_move

@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -12,7 +12,7 @@ UTL_NAMESPACE_BEGIN
 
 using std::remove_const;
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 
 using std::remove_const_t;
 
@@ -28,10 +28,6 @@ UTL_NAMESPACE_END
 #  define UTL_TRAIT_SUPPORTED_remove_const 1
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
-
-#  ifndef UTL_DISABLE_BUILTIN_remove_const
-#    define UTL_DISABLE_BUILTIN_remove_const 0
-#  endif // ifndef UTL_DISABLE_BUILTIN_remove_const
 
 #  if UTL_SHOULD_USE_BUILTIN(remove_const)
 #    define UTL_BUILTIN_add_const(...) __remove_const(__VA_ARGS__)

@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attributes.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_pragma.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
 
-#if defined(UTL_CXX17) && defined(UTL_USE_STD_as_const) && UTL_USE_STD_as_const
+#if UTL_CXX17 && UTL_USE_STD_as_const
 
 #  include <utility>
 
@@ -17,12 +14,12 @@ using std::as_const
 
     UTL_NAMESPACE_END
 
-#else // defined(UTL_CXX17) && defined(UTL_USE_STD_as_const) && UTL_USE_STD_as_const
+#else // if UTL_CXX17 && UTL_USE_STD_as_const
 
-#  if defined(UTL_USE_STD_as_const) && UTL_USE_STD_as_const
+#  if UTL_USE_STD_as_const
 UTL_PRAGMA_WARN(
     "The current standard does not implement constexpr as_const, `UTL_USE_STD_as_const` ignored")
-#  endif // defined(UTL_USE_STD_as_const) && UTL_USE_STD_as_const
+#  endif // if UTL_CXX17 && UTL_USE_STD_as_const
 
 UTL_NAMESPACE_BEGIN
 
@@ -43,4 +40,4 @@ constexpr T const& as_const(T& value UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
 
 UTL_NAMESPACE_END
 
-#endif // defined(UTL_CXX17) && defined(UTL_USE_STD_as_const) && UTL_USE_STD_as_const
+#endif // UTL_CXX17 && UTL_USE_STD_as_const

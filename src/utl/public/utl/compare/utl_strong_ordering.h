@@ -22,7 +22,7 @@ public:
 
     constexpr operator partial_ordering() const { return partial_ordering(order_t(value)); }
     constexpr operator weak_ordering() const { return weak_ordering(order_t(value)); }
-#ifdef UTL_CXX20
+#if UTL_CXX20
     template <same_as<std::strong_ordering> T>
     constexpr strong_ordering(T p) noexcept
         : value(p == T::less           ? less
@@ -66,7 +66,7 @@ public:
 
 #undef UTL_ORDERING_COMPARISONS
 
-#ifdef UTL_CXX20
+#if UTL_CXX20
     UTL_ATTRIBUTES(NODISCARD, CONST)
     friend constexpr strong_ordering operator<=>(strong_ordering l, zero_t) noexcept { return l; }
 

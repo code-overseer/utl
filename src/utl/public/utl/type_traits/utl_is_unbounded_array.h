@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#if defined(UTL_USE_STD_TYPE_TRAITS) && UTL_CXX20
+#if UTL_USE_STD_TYPE_TRAITS && UTL_CXX20
 
 #  include <type_traits>
 
@@ -25,7 +25,7 @@ UTL_INLINE_CXX17 constexpr bool is_unbounded_array_v = is_unbounded_array<T>::va
 
 UTL_NAMESPACE_END
 
-#else // defined(UTL_USE_STD_TYPE_TRAITS) && UTL_CXX20
+#else // UTL_USE_STD_TYPE_TRAITS && UTL_CXX20
 
 #  include "utl/type_traits/utl_constants.h"
 
@@ -43,7 +43,7 @@ UTL_INLINE_CXX17 constexpr bool is_unbounded_array_v = is_unbounded_array<T>::va
 
 UTL_NAMESPACE_END
 
-#endif // defined(UTL_USE_STD_TYPE_TRAITS) && UTL_CXX20
+#endif // UTL_USE_STD_TYPE_TRAITS && UTL_CXX20
 
 #define UTL_TRAIT_SUPPORTED_is_unbounded_array 1
 

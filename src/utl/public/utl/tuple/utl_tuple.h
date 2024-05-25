@@ -2,7 +2,7 @@
 
 #pragma once
 
-#if defined(UTL_USE_STD_tuple) && UTL_USE_STD_tuple
+#if UTL_USE_STD_tuple
 
 #  include "utl/preprocessor/utl_namespace.h"
 
@@ -19,13 +19,13 @@ using std::tuple_size;
 
 UTL_NAMESPACE_END
 
-#else // defined(UTL_USE_STD_tuple) && UTL_USE_STD_tuple
+#else // UTL_USE_STD_tuple
 
 #  include "utl/preprocessor/utl_standard.h"
 
 #  define UTL_TUPLE_PRIVATE_HEADER_GUARD
 
-#  if !defined(UTL_CXX20)
+#  if !UTL_CXX20
 #    include "utl_tuple_cpp17.h"
 #  else
 #    include "utl_tuple_latest.h"
@@ -44,4 +44,4 @@ UTL_NAMESPACE_END
 
 #  undef UTL_TUPLE_PRIVATE_HEADER_GUARD
 
-#endif // defined(UTL_USE_STD_tuple) && UTL_USE_STD_tuple
+#endif // UTL_USE_STD_tuple

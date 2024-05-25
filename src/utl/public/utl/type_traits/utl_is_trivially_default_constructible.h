@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -59,8 +59,7 @@ struct is_trivially_default_constructible : is_trivially_constructible<T> {};
 
 #    if UTL_CXX14
 template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_trivially_default_constructible_v =
-    is_trivially_constructible_v<T>;
+UTL_INLINE_CXX17 constexpr bool is_trivially_default_constructible_v = is_trivially_constructible_v<T>;
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END

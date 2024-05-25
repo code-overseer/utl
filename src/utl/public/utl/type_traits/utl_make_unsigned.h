@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -12,14 +12,14 @@ UTL_NAMESPACE_BEGIN
 
 using std::make_unsigned;
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 
 using std::make_unsigned_t;
 
-#  else  // ifdef UTL_CXX14
+#  else  // if UTL_CXX14
 template <typename T>
 using make_unsigned_t = typename make_unsigned<T>::type;
-#  endif // ifdef UTL_CXX14
+#  endif // if UTL_CXX14
 
 UTL_NAMESPACE_END
 
@@ -28,10 +28,6 @@ UTL_NAMESPACE_END
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #  include "utl/type_traits/utl_constants.h"
-
-#  ifndef UTL_DISABLE_BUILTIN_make_unsigned
-#    define UTL_DISABLE_BUILTIN_make_unsigned 0
-#  endif // ifndef UTL_DISABLE_BUILTIN_make_unsigned
 
 #  if UTL_SHOULD_USE_BUILTIN(make_unsigned)
 #    define UTL_BUILTIN_make_unsigned(...) __make_unsigned(__VA_ARGS__)

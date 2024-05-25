@@ -8,7 +8,7 @@
 #define UTL_ASSERT(...)
 #define UTL_ASSERT_MSG(...)
 
-#ifdef UTL_CXX14
+#if UTL_CXX14
 #  define UTL_ASSERT_CXX14(...) UTL_ASSERT(__VA_ARGS__)
 #  define UTL_ASSERT_MSG_CXX14(...) UTL_ASSERT_MSG(__VA_ARGS__)
 #else

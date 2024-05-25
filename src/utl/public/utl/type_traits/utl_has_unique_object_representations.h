@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#if defined(UTL_USE_STD_TYPE_TRAITS) && defined(UTL_CXX17)
+#if UTL_USE_STD_TYPE_TRAITS && UTL_CXX17
 
 #  include <type_traits>
 
@@ -17,10 +17,6 @@ using std::has_unique_object_representations_v;
 UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
-
-#  ifndef UTL_DISABLE_BUILTIN_has_unique_object_representations
-#    define UTL_DISABLE_BUILTIN_has_unique_object_representations 0
-#  endif
 
 #  if UTL_SHOULD_USE_BUILTIN(has_unique_object_representations)
 #    define UTL_BUILTIN_has_unique_object_representations(...) \
@@ -39,7 +35,7 @@ struct has_unique_object_representations {
     static constexpr bool value = UTL_BUILTIN_has_unique_object_representations(T);
 };
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool has_unique_object_representations_v =
     UTL_BUILTIN_has_unique_object_representations(T);

@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -31,10 +31,6 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  ifndef UTL_DISABLE_BUILTIN_is_trivially_destructible
-#    define UTL_DISABLE_BUILTIN_is_trivially_destructible 0
-#  endif // ifndef UTL_DISABLE_BUILTIN_is_trivially_destructible
-
 #  if UTL_SHOULD_USE_BUILTIN(is_trivially_destructible)
 #    define UTL_BUILTIN_is_trivially_destructible(...) __is_trivially_destructible(__VA_ARGS__)
 #  endif // UTL_SHOULD_USE_BUILTIN(is_trivially_destructible)
@@ -48,8 +44,7 @@ struct is_trivially_destructible : bool_constant<UTL_BUILTIN_is_trivially_destru
 
 #    if UTL_CXX14
 template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_trivially_destructible_v =
-    UTL_BUILTIN_is_trivially_destructible(T);
+UTL_INLINE_CXX17 constexpr bool is_trivially_destructible_v = UTL_BUILTIN_is_trivially_destructible(T);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END

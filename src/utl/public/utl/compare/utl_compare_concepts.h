@@ -4,7 +4,7 @@
 
 #include "utl/preprocessor/utl_namespace.h"
 #include "utl/preprocessor/utl_standard.h"
-#ifdef UTL_CXX20
+#if UTL_CXX20
 
 #  include "utl/compare/utl_compare_traits.h"
 #  include "utl/type_traits/utl_common_reference.h"

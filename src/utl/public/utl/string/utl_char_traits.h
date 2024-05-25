@@ -19,7 +19,7 @@ struct char_traits {
     using off_type = decltype((pointer)0 - (pointer)0);
     using pos_type = size_t;
     using state_type = mbstate_t;
-#ifdef UTL_CXX20
+#if UTL_CXX20
     using comparison_category = strong_ordering;
 #endif
 

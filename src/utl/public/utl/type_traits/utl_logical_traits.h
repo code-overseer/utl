@@ -35,7 +35,7 @@ struct conjunction<Head, Tail...> : conditional_t<Head::value, conjunction<Tail.
 template <typename T>
 struct negation : bool_constant<!T::value> {};
 
-#ifdef UTL_CXX14
+#if UTL_CXX14
 template <typename... Ts>
 UTL_INLINE_CXX17 constexpr bool disjunction_v = disjunction<Ts...>::value;
 template <typename... Ts>
@@ -50,3 +50,13 @@ UTL_NAMESPACE_END
 #define UTL_TRAIT_SUPPORTED_disjunction 1
 #define UTL_TRAIT_SUPPORTED_conjunction 1
 #define UTL_TRAIT_SUPPORTED_negation 1
+
+#if UTL_CXX14
+#  define UTL_TRAIT_conjunction(...) UTL_SCOPE conjunction_v<__VA_ARGS__>
+#  define UTL_TRAIT_disjunction(...) UTL_SCOPE disjunction_v<__VA_ARGS__>
+#  define UTL_TRAIT_negation(...) UTL_SCOPE negation_v<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_conjunction(...) UTL_SCOPE conjunction<__VA_ARGS__>::value
+#  define UTL_TRAIT_disjunction(...) UTL_SCOPE disjunction<__VA_ARGS__>::value
+#  define UTL_TRAIT_negation(...) UTL_SCOPE negation<__VA_ARGS__>::value
+#endif

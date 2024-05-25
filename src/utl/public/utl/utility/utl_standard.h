@@ -13,17 +13,17 @@ enum class standard : long {
     cpp17 = 201703L,
     cpp20 = 202002L,
     cpp23 = 202302L,
-#ifdef UTL_CXX23
+#if UTL_CXX23
     current = cpp23
-#elif defined(UTL_CXX20) // ifdef UTL_CXX23
+#elif UTL_CXX20 // if UTL_CXX23
     current = cpp20
-#elif defined(UTL_CXX17) // ifdef UTL_CXX23
+#elif UTL_CXX17 // if UTL_CXX23
     current = cpp17
-#elif defined(UTL_CXX14) // ifdef UTL_CXX23
+#elif UTL_CXX14 // if UTL_CXX23
     current = cpp14
-#else                    // ifdef UTL_CXX23
+#else           // if UTL_CXX23
     current = cpp11
-#endif                   // ifdef UTL_CXX23
+#endif          // if UTL_CXX23
 };
 
 UTL_NAMESPACE_END
