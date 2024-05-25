@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#if defined(UTL_USE_STD_TYPE_TRAITS) && UTL_CXX14
+#if UTL_USE_STD_TYPE_TRAITS && UTL_CXX14
 
 #  include <type_traits>
 
@@ -26,10 +26,6 @@ UTL_NAMESPACE_END
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #  include "utl/type_traits/utl_constants.h"
-
-#  ifndef UTL_DISABLE_BUILTIN_is_final
-#    define UTL_DISABLE_BUILTIN_is_final 0
-#  endif // ifndef UTL_DISABLE_BUILTIN_is_final
 
 #  if UTL_SHOULD_USE_BUILTIN(is_final)
 #    define UTL_BUILTIN_is_final(...) __is_final(__VA_ARGS__)

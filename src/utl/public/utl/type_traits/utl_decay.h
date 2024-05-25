@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -12,7 +12,7 @@ UTL_NAMESPACE_BEGIN
 
 using std::decay;
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 
 using std::decay_t;
 
@@ -26,10 +26,6 @@ using decay_t = typename decay<T>::type;
 UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
-
-#  ifndef UTL_DISABLE_BUILTIN_decay
-#    define UTL_DISABLE_BUILTIN_decay 0
-#  endif
 
 #  if UTL_SHOULD_USE_BUILTIN(decay)
 #    define UTL_BUILTIN_decay(...) __decay(__VA_ARGS__)

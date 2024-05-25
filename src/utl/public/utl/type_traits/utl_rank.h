@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -12,12 +12,12 @@ UTL_NAMESPACE_BEGIN
 
 using std::rank;
 
-#  ifdef UTL_CXX17
+#  if UTL_CXX17
 using std::rank_v;
-#  elif defined(UTL_CXX14) // UTL_CXX17
+#  elif UTL_CXX14 // UTL_CXX17
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool rank_v = rank<T>::value;
-#  endif                   // UTL_CXX17
+#  endif          // UTL_CXX17
 
 UTL_NAMESPACE_END
 
@@ -43,7 +43,7 @@ UTL_NAMESPACE_BEGIN
 template <typename T>
 struct rank : size_constant<UTL_BUILTIN_array_rank(T)> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr size_t rank_v = UTL_BUILTIN_array_rank(T);
 #    endif // UTL_CXX14
@@ -61,7 +61,7 @@ struct rank<T[]> : size_constant<rank<T>::value + 1> {};
 template <typename T, size_t N>
 struct rank<T[N]> : size_constant<rank<T>::value + 1> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr size_t rank_v = rank<T>::value;
 #    endif // UTL_CXX14

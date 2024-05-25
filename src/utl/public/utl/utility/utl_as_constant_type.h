@@ -2,11 +2,9 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attributes.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
 
-#ifdef UTL_CXX17
+#if UTL_CXX17
 
 #  include "utl/type_traits/utl_constants.h"
 
@@ -33,4 +31,4 @@ using integral_constant_t = decltype(as_integral_constant<V>());
 
 UTL_NAMESPACE_END
 
-#endif // ifdef UTL_CXX17
+#endif // if UTL_CXX17

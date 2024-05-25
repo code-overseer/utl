@@ -4,7 +4,7 @@
 
 #include "utl/preprocessor/utl_compiler.h"
 
-#ifdef UTL_COMPILER_MSVC
+#if UTL_COMPILER_MSVC
 #  ifdef __cplusplus
 #    define UTL_CXX _MSVC_LANG
 #  endif
@@ -76,8 +76,8 @@
 #  define UTL_INLINE_CXX17
 #  define UTL_CONSTEXPR_CXX17 const
 #  define UTL_CONSTEXPR_CXX20 const
-#  define UTL_CONSTEVAL const
-#  define UTL_CONSTEVAL_CXX14
 #  define UTL_CONSTEXPR_CXX23 const
+#  define UTL_CONSTEVAL
+#  define UTL_CONSTEVAL_CXX14
 
 #endif /* ifdef UTL_CXX */

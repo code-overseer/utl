@@ -5,7 +5,7 @@
 #include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_is_boolean_testable.h"
 
-#ifdef UTL_CXX20
+#if UTL_CXX20
 UTL_NAMESPACE_BEGIN
 
 template <typename T>

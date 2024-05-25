@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -12,24 +12,20 @@ UTL_NAMESPACE_BEGIN
 
 using std::make_signed;
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 
 using std::make_signed_t;
 
-#  else  // ifdef UTL_CXX14
+#  else  // if UTL_CXX14
 template <typename T>
 using make_signed_t = typename make_signed<T>::type;
-#  endif // ifdef UTL_CXX14
+#  endif // if UTL_CXX14
 
 UTL_NAMESPACE_END
 
 #  define UTL_TRAIT_SUPPORTED_make_signed 1
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
-
-#  ifndef UTL_DISABLE_BUILTIN_make_signed
-#    define UTL_DISABLE_BUILTIN_make_signed 0
-#  endif // ifndef UTL_DISABLE_BUILTIN_make_signed
 
 #  if UTL_SHOULD_USE_BUILTIN(make_signed)
 #    define UTL_BUILTIN_make_signed(...) __make_signed(__VA_ARGS__)

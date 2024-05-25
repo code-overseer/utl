@@ -69,7 +69,7 @@
 #elif UTL_HAS_ATTRIBUTE(const)
 #  define UTL_NONSTD_ATTRIBUTE_CONST __attribute__((const))
 #  define UTL_NONSTD_ATTRIBUTE_CONST_DEFINED
-#elif defined(UTL_COMPILER_MSVC)
+#elif UTL_COMPILER_MSVC
 #  define UTL_NONSTD_ATTRIBUTE_CONST __declspec(noalias)
 #  define UTL_NONSTD_ATTRIBUTE_CONST_DEFINED
 #endif /* UTL_HAS_CPP_ATTRIBUTE(gnu::const) */
@@ -104,7 +104,7 @@
 #  define UTL_NONSTD_ATTRIBUTE_ALWAYS_INLINE __attribute__((always_inline))
 #  define UTL_NONSTD_ATTRIBUTE_ALWAYS_INLINE_DEFINED
 #endif /* UTL_HAS_CPP_ATTRIBUTE(clang::always_inline) */
-#if defined(UTL_COMPILER_MSVC)
+#if UTL_COMPILER_MSVC
 #  if !defined(UTL_ATTRIBUTE_ALWAYS_INLINE) && !defined(UTL_NONSTD_ATTRIBUTE_ALWAYS_INLINE)
 #    define UTL_NONSTD_ATTRIBUTE_ALWAYS_INLINE __forceinline
 #    define UTL_NONSTD_ATTRIBUTE_ALWAYS_INLINE_DEFINED

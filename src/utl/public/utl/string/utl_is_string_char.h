@@ -25,16 +25,16 @@ struct is_string_char<char16_t> : true_type {};
 template <>
 struct is_string_char<char32_t> : true_type {};
 
-#ifdef UTL_SUPPORTS_CHAR8_T
+#if UTL_SUPPORTS_CHAR8_T
 template <>
 struct is_string_char<char8_t> : true_type {};
 #endif
-#ifdef UTL_CXX14
+#if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_string_char_v = is_string_char<T>::value;
 #endif
 
-#ifdef UTL_CXX20
+#if UTL_CXX20
 template <typename T>
 concept string_char = is_string_char_v<T>;
 #endif

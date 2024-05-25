@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -12,7 +12,7 @@ UTL_NAMESPACE_BEGIN
 
 using std::remove_volatile;
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 
 using std::remove_volatile_t;
 
@@ -28,10 +28,6 @@ UTL_NAMESPACE_END
 #  define UTL_TRAIT_SUPPORTED_remove_volatile 1
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
-
-#  ifndef UTL_DISABLE_BUILTIN_remove_volatile
-#    define UTL_DISABLE_BUILTIN_remove_volatile 0
-#  endif // ifndef UTL_DISABLE_BUILTIN_remove_volatile
 
 #  if UTL_SHOULD_USE_BUILTIN(remove_volatile)
 #    define UTL_BUILTIN_add_volatile(...) __remove_volatile(__VA_ARGS__)

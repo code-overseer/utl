@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attributes.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_pragma.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
 
-#if defined(UTL_CXX23) && defined(UTL_USE_STD_exchange) && UTL_USE_STD_exchange
+#if UTL_CXX23 && UTL_USE_STD_exchange
 
 #  include <utility>
 
@@ -17,13 +14,13 @@ using std::exchange
 
     UTL_NAMESPACE_END
 
-#else // defined(UTL_CXX23) && defined(UTL_USE_STD_exchange) && UTL_USE_STD_exchange
+#else // UTL_CXX23 && UTL_USE_STD_exchange
 
-#  if defined(UTL_USE_STD_exchange) && UTL_USE_STD_exchange
+#  if UTL_USE_STD_exchange
 UTL_PRAGMA_WARN(
     "The current standard does not implement constexpr exchange, `UTL_USE_STD_exchange` ignored")
 #    undef UTL_USE_STD_exchange
-#  endif // defined(UTL_USE_STD_exchange) && UTL_USE_STD_exchange
+#  endif // UTL_USE_STD_exchange
 
 #  include "utl/type_traits/utl_is_assignable.h"
 #  include "utl/type_traits/utl_is_move_constructible.h"
@@ -45,4 +42,4 @@ exchange(T& obj, U&& new_value) noexcept(
 
 UTL_NAMESPACE_END
 
-#endif // defined(UTL_CXX23) && defined(UTL_USE_STD_exchange) && UTL_USE_STD_exchange
+#endif // UTL_CXX23 && UTL_USE_STD_exchange

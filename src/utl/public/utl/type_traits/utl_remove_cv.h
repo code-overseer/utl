@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -12,7 +12,7 @@ UTL_NAMESPACE_BEGIN
 
 using std::remove_cv;
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 
 using std::remove_cv_t;
 
@@ -28,10 +28,6 @@ UTL_NAMESPACE_END
 #  define UTL_TRAIT_SUPPORTED_remove_cv 1
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
-
-#  ifndef UTL_DISABLE_BUILTIN_remove_cv
-#    define UTL_DISABLE_BUILTIN_remove_cv 0
-#  endif // ifndef UTL_DISABLE_BUILTIN_remove_cv
 
 #  if UTL_SHOULD_USE_BUILTIN(remove_cv)
 #    define UTL_BUILTIN_add_cv(...) __remove_cv(__VA_ARGS__)

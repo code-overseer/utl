@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -27,10 +27,6 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  ifndef UTL_DISABLE_BUILTIN_is_compound
-#    define UTL_DISABLE_BUILTIN_is_compound 0
-#  endif // ifndef UTL_DISABLE_BUILTIN_is_compound
-
 #  if UTL_SHOULD_USE_BUILTIN(is_compound)
 #    define UTL_BUILTIN_is_compound(...) __is_compound(__VA_ARGS__)
 #  endif // UTL_SHOULD_USE_BUILTIN(is_compound)
@@ -42,7 +38,7 @@ UTL_NAMESPACE_BEGIN
 template <typename T>
 struct is_compound : bool_constant<UTL_BUILTIN_is_compound(T)> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_compound_v = UTL_BUILTIN_is_compound(T);
 #    endif // UTL_CXX14

@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -12,14 +12,14 @@ UTL_NAMESPACE_BEGIN
 
 using std::add_rvalue_reference;
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 
 using std::add_rvalue_reference_t;
 
-#  else  // ifdef UTL_CXX14
+#  else  // if UTL_CXX14
 template <typename T>
 using add_rvalue_reference_t = typename add_rvalue_reference<T>::type;
-#  endif // ifdef UTL_CXX14
+#  endif // if UTL_CXX14
 
 UTL_NAMESPACE_END
 
@@ -28,10 +28,6 @@ UTL_NAMESPACE_END
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #  include "utl/type_traits/utl_constants.h"
-
-#  ifndef UTL_DISABLE_BUILTIN_add_rvalue_reference
-#    define UTL_DISABLE_BUILTIN_add_rvalue_reference 0
-#  endif // ifndef UTL_DISABLE_BUILTIN_add_rvalue_reference
 
 #  if UTL_SHOULD_USE_BUILTIN(add_rvalue_reference)
 #    define UTL_BUILTIN_add_rvalue_reference(...) __add_rvalue_reference(__VA_ARGS__)

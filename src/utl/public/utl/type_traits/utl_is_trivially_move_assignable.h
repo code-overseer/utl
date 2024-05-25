@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -19,8 +19,7 @@ using std::is_trivially_move_assignable_v;
 #  elif UTL_CXX14 // if UTL_CXX17
 
 template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_trivially_move_assignable_v =
-    is_trivially_move_assignable<T>::value;
+UTL_INLINE_CXX17 constexpr bool is_trivially_move_assignable_v = is_trivially_move_assignable<T>::value;
 
 #  endif // if UTL_CXX17
 

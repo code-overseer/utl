@@ -29,11 +29,11 @@
 #include "utl/type_traits/utl_is_default_constructible.h"
 #include "utl/type_traits/utl_is_destructible.h"
 #include "utl/type_traits/utl_is_enum.h"
-#include "utl/type_traits/utl_is_explicitly_constructible.h"
+#include "utl/type_traits/utl_is_explicit_constructible.h"
 #include "utl/type_traits/utl_is_floating_point.h"
 #include "utl/type_traits/utl_is_function.h"
 #include "utl/type_traits/utl_is_fundamental.h"
-#include "utl/type_traits/utl_is_implicitly_constructible.h"
+#include "utl/type_traits/utl_is_implicit_constructible.h"
 #include "utl/type_traits/utl_is_integral.h"
 #include "utl/type_traits/utl_is_lvalue_reference.h"
 #include "utl/type_traits/utl_is_member_function_pointer.h"
@@ -108,7 +108,7 @@ using underlying_type_t = typename underlying_type<T>::type;
 template <typename T, typename U>
 struct is_layout_compatible : bool_constant<UTL_BUILTIN_is_layout_compatible(T, U)> {};
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 template <typename T, typename U>
 UTL_INLINE_CXX17 constexpr bool is_layout_compatible_v = UTL_BUILTIN_is_layout_compatible(T, U);
 #  endif
@@ -120,7 +120,7 @@ struct is_layout_compatible : false_type {};
 template <typename T>
 struct is_layout_compatible<T, T> : true_type {};
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 template <typename T, typename U>
 UTL_INLINE_CXX17 constexpr bool is_layout_compatible_v = is_layout_compatible<T, U>::value;
 #  endif
@@ -135,7 +135,7 @@ template <typename T, typename U>
 struct is_pointer_interconvertible_base_of :
     bool_constant<UTL_BUILTIN_is_pointer_interconvertible_base_of(T, U)> {};
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 template <typename T, typename U>
 UTL_INLINE_CXX17 constexpr bool is_pointer_interconvertible_base_of_v =
     UTL_BUILTIN_is_pointer_interconvertible_base_of(T, U);
@@ -148,7 +148,7 @@ struct is_pointer_interconvertible_base_of : false_type {};
 template <typename T>
 struct is_pointer_interconvertible_base_of<T, T> : true_type {};
 
-#  ifdef UTL_CXX14
+#  if UTL_CXX14
 template <typename T, typename U>
 UTL_INLINE_CXX17 constexpr bool is_pointer_interconvertible_base_of_v =
     is_pointer_interconvertible_base_of<T, U>::value;

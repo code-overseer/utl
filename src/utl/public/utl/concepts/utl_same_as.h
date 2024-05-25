@@ -2,22 +2,21 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_is_same.h"
 
-#ifdef UTL_CXX20
+#if UTL_CXX20
 UTL_NAMESPACE_BEGIN
-namespace concepts {
+
 namespace details {
-template <typename T>
-struct proxy_t {};
+namespace concepts {
+template <typename T, typename U>
+concept same = UTL_TRAIT_is_same(T, U);
+}
 } // namespace details
-} // namespace concepts
 
 template <typename T, typename U>
-concept same_as = requires(void (*f)(concepts::details::proxy_t<T>*),
-                      concepts::details::proxy_t<U>* u) { f(u); } &&
-    requires(void (*f)(concepts::details::proxy_t<U>*), concepts::details::proxy_t<T>* t) { f(t); };
+concept same_as = details::concepts::same<T, U> && details::concepts::same<U, T>;
 
 UTL_NAMESPACE_END
 #endif

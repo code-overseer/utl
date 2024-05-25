@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#if defined(UTL_USE_STD_TYPE_TRAITS) && defined(UTL_CXX20)
+#if UTL_USE_STD_TYPE_TRAITS && UTL_CXX20
 
 #  include <type_traits>
 
@@ -17,10 +17,6 @@ using std::remove_cvref_t;
 UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
-
-#  ifndef UTL_DISABLE_BUILTIN_remove_cvref
-#    define UTL_DISABLE_BUILTIN_remove_cvref 0
-#  endif
 
 #  if UTL_SHOULD_USE_BUILTIN(remove_cvref)
 #    define UTL_BUILTIN_remove_cvref(...) __remove_cvref(__VA_ARGS__)

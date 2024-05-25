@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -14,22 +14,18 @@ using std::is_floating_point;
 
 using std::is_floating_point;
 
-#  ifdef UTL_CXX17
+#  if UTL_CXX17
 using std::is_floating_point_v;
-#  elif defined(UTL_CXX14) // ifdef UTL_CXX17
+#  elif UTL_CXX14 // if UTL_CXX17
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_floating_point_v = is_floating_point<T>::value;
-#  endif                   // ifdef UTL_CXX17
+#  endif          // if UTL_CXX17
 
 UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #  include "utl/type_traits/utl_constants.h"
-
-#  ifndef UTL_DISABLE_BUILTIN_is_floating_point
-#    define UTL_DISABLE_BUILTIN_is_floating_point 0
-#  endif // ifndef UTL_DISABLE_BUILTIN_is_floating_point
 
 #  if UTL_SHOULD_USE_BUILTIN(is_floating_point)
 #    define UTL_BUILTIN_is_floating_point(...) __is_floating_point(__VA_ARGS__)
@@ -42,7 +38,7 @@ UTL_NAMESPACE_BEGIN
 template <typename T>
 struct is_floating_point : bool_constant<UTL_BUILTIN_is_floating_point(T)> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_floating_point_v = UTL_BUILTIN_is_floating_point(T);
 #    endif // UTL_CXX14
@@ -69,7 +65,7 @@ struct is_floating_point<T volatile> : is_floating_point<T> {};
 template <typename T>
 struct is_floating_point<T const volatile> : is_floating_point<T> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_floating_point_v = is_floating_point<T>::value;
 #    endif // UTL_CXX14
@@ -82,7 +78,7 @@ UTL_NAMESPACE_END
 
 #define UTL_TRAIT_SUPPORTED_is_floating_point 1
 
-#ifdef UTL_CXX23
+#if UTL_CXX23
 #  include <stdfloat>
 UTL_NAMESPACE_BEGIN
 #  ifdef UTL_SUPPORTS_FLOAT16
@@ -111,4 +107,12 @@ template <>
 struct is_floating_point<bfloat16> : true_type {};
 #  endif // ifdef UTL_SUPPORTS_BFLOAT16
 UTL_NAMESPACE_END
-#endif // ifdef UTL_CXX23
+#endif // if UTL_CXX23
+
+#ifdef UTL_BUILTIN_is_floating_point
+#  define UTL_TRAIT_is_floating_point(...) UTL_BUILTIN_is_floating_point(__VA_ARGS__)
+#elif UTL_CXX14
+#  define UTL_TRAIT_is_floating_point(...) UTL_SCOPE is_floating_point_v<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_is_floating_point(...) UTL_SCOPE is_floating_point<__VA_ARGS__>::value
+#endif

@@ -104,7 +104,7 @@ public:
      * Copy assignment
      */
     UTL_CONSTEXPR_CXX14 intrusive_ptr& operator=(intrusive_ptr const& other) noexcept {
-        if (addressof(other) != this) {
+        if (UTL_SCOPE addressof(other) != this) {
             reset();
             if (other) {
                 increment(*other.resource_);
@@ -125,7 +125,7 @@ public:
      * Move assignment
      */
     UTL_CONSTEXPR_CXX14 intrusive_ptr& operator=(intrusive_ptr&& other) noexcept {
-        if (addressof(other) != this) {
+        if (UTL_SCOPE addressof(other) != this) {
             reset();
             resource_ = exchange(other.resource_, nullptr);
         }

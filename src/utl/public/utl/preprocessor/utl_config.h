@@ -38,7 +38,6 @@
 #include "utl/preprocessor/utl_builtins.h"
 #include "utl/preprocessor/utl_compiler.h"
 #include "utl/preprocessor/utl_exceptions.h"
-#include "utl/preprocessor/utl_msvc_traits.h"
 #include "utl/preprocessor/utl_namespace.h"
 #include "utl/preprocessor/utl_pragma.h"
 #include "utl/preprocessor/utl_standard.h"
@@ -64,7 +63,7 @@
 #  define UTL_DEFAULT_NEW_ALIGNMENT __STDCPP_DEFAULT_NEW_ALIGNMENT__
 #endif
 
-#ifdef UTL_COMPILER_MSVC
+#if UTL_COMPILER_MSVC
 #  define UTL_RESTRICT __restrict
 #else
 #  define UTL_RESTRICT __restrict__

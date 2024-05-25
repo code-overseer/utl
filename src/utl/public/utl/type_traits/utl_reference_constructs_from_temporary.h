@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#if defined(UTL_USE_STD_TYPE_TRAITS) && defined(UTL_CXX23)
+#if UTL_USE_STD_TYPE_TRAITS && UTL_CXX23
 
 #  include <type_traits>
 
@@ -23,10 +23,6 @@ UTL_NAMESPACE_END
 #  include "utl/type_traits/utl_constants.h"
 #  include "utl/type_traits/utl_reference_binds_to_temporary.h"
 
-#  ifndef UTL_DISABLE_BUILTIN_reference_constructs_from_temporary
-#    define UTL_DISABLE_BUILTIN_reference_constructs_from_temporary 0
-#  endif
-
 #  if UTL_SHOULD_USE_BUILTIN(reference_constructs_from_temporary)
 #    define UTL_BUILTIN_reference_constructs_from_temporary(...) \
         __reference_constructs_from_temporary(__VA_ARGS__)
@@ -40,7 +36,7 @@ template <typename T, typename U>
 struct reference_constructs_from_temporary :
     bool_constant<UTL_BUILTIN_reference_constructs_from_temporary(T, U)> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T, typename U>
 UTL_INLINE_CXX17 constexpr bool reference_constructs_from_temporary_v =
     UTL_BUILTIN_reference_constructs_from_temporary(T, U);
@@ -79,19 +75,19 @@ remove_cv_t<U> make_type() noexcept;
 
 template <typename T, typename U>
 using constructs_from_impl = bool_constant<UTL_BUILTIN_reference_binds_to_temporary(T, U) ||
-    UTL_TRAIT_VALUE(is_convertible, remove_cvref_t<U>*, remove_cvref_t<T>*)>;
+    UTL_TRAIT_is_convertible(remove_cvref_t<U>*, remove_cvref_t<T>*)>;
 
 template <typename T, typename U, typename = void>
 struct constructs_from : false_type {};
 
 template <typename T, typename U>
 struct constructs_from<T, U&, decltype(init_ref<T>(make_type<U&>()))> :
-    bool_constant<!UTL_TRAIT_VALUE(is_same, remove_cvref_t<T>, remove_cv_t<U>) &&
+    bool_constant<!UTL_TRAIT_is_same(remove_cvref_t<T>, remove_cv_t<U>) &&
         constructs_from_impl<T, U&>::value> {};
 
 template <typename T, typename U>
 struct constructs_from<T, U&&, decltype(init_ref<T>(make_type<U&&>()))> :
-    bool_constant<!UTL_TRAIT_VALUE(is_same, remove_cvref_t<T>, remove_cv_t<U>) &&
+    bool_constant<!UTL_TRAIT_is_same(remove_cvref_t<T>, remove_cv_t<U>) &&
         constructs_from_impl<T, U&&>::value> {};
 
 template <typename T, typename U>
@@ -106,7 +102,7 @@ struct reference_constructs_from_temporary<T&, U> : details::dangling::construct
 template <typename T, typename U>
 struct reference_constructs_from_temporary<T&&, U> : details::dangling::constructs_from<T&&, U> {};
 
-#    ifdef UTL_CXX14
+#    if UTL_CXX14
 template <typename T, typename U>
 UTL_INLINE_CXX17 constexpr bool reference_constructs_from_temporary_v =
     reference_constructs_from_temporary<T, U>::value;
@@ -128,3 +124,14 @@ UTL_NAMESPACE_END
 #  endif
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
+
+#ifdef UTL_BUILTIN_reference_constructs_from_temporary
+#  define UTL_TRAIT_reference_constructs_from_temporary(...) \
+      UTL_BUILTIN_reference_constructs_from_temporary(__VA_ARGS__)
+#elif UTL_CXX14
+#  define UTL_TRAIT_reference_constructs_from_temporary(...) \
+      UTL_SCOPE reference_constructs_from_temporary_v<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_reference_constructs_from_temporary(...) \
+      UTL_SCOPE reference_constructs_from_temporary<__VA_ARGS__>::value
+#endif

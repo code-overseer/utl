@@ -9,7 +9,7 @@ UTL_NAMESPACE_BEGIN
 
 struct ignore_t {
     explicit constexpr ignore_t() noexcept = default;
-#ifdef UTL_CXX14
+#if UTL_CXX14
     template <typename T>
     constexpr void operator=(T&&) const noexcept {}
 #else

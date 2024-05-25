@@ -6,7 +6,7 @@
 #include "utl/type_traits/utl_is_copy_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_move_constructible.h"
 
-#if defined(UTL_CXX14) && defined(UTL_USE_STD_move) && UTL_USE_STD_move
+#if UTL_CXX14 && UTL_USE_STD_move
 #  include <utility>
 
 UTL_NAMESPACE_BEGIN
@@ -16,9 +16,9 @@ using std::move_if_noexcept;
 
 UTL_NAMESPACE_END
 
-#else // defined(UTL_CXX14) && defined(UTL_USE_STD_move)
+#else // UTL_CXX14 && UTL_USE_STD_move
 
-#  if defined(UTL_USE_STD_move) && UTL_USE_STD_move
+#  if UTL_USE_STD_move
 UTL_PRAGMA_WARN(
     "The current standard does not implement a constexpr move, `UTL_USE_STD_move` ignored")
 #  endif
@@ -35,7 +35,7 @@ namespace details {
 namespace utility {
 template <typename T>
 using move_if_noexcept_result_t =
-    conditional_t<!is_nothrow_move_constructible<T>::value && is_copy_constructible<T>::value,
+    conditional_t<!UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_copy_constructible(T),
         T const&, T&&>;
 
 } // namespace utility
@@ -50,4 +50,4 @@ constexpr details::utility::move_if_noexcept_result_t<T> move_if_noexcept(
 
 UTL_NAMESPACE_END
 
-#endif // defined(UTL_CXX14) && defined(UTL_USE_STD_move) && UTL_USE_STD_move
+#endif // UTL_CXX14 && UTL_USE_STD_move

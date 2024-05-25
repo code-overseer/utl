@@ -2,7 +2,7 @@
 
 #pragma once
 
-#ifdef UTL_CXX20
+#if UTL_CXX20
 
 #  include "utl/tuple/utl_tuple_traits.h"
 
@@ -23,4 +23,4 @@ concept tuple_like = requires { tuple_size<T>::value; } && tuple_traits::is_all_
 
 UTL_NAMESPACE_END
 
-#endif // ifdef UTL_CXX20
+#endif // if UTL_CXX20

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
-#ifdef UTL_CXX20
+#if UTL_CXX20
 #  include "utl_strong_ordering.h"
 #endif
 
@@ -31,7 +31,7 @@ class pointer_comparable {
         return lhs.get() == nullptr;
     }
 
-#ifdef UTL_CXX20
+#if UTL_CXX20
     friend constexpr strong_ordering operator<=>(T const& lhs, T const& rhs) noexcept {
         return lhs.get() <=> rhs.get();
     }

@@ -4,111 +4,115 @@
 
 #include "utl/preprocessor/utl_compiler.h"
 
-#if defined(UTL_COMPILER_CLANG)
+#if UTL_COMPILER_CLANG
 
 #  if defined(__CYGWIN__) || defined(_WIN32) || defined(_WIN64)
-#    define UTL_TARGET_MICROSOFT
+#    define UTL_TARGET_MICROSOFT 1
 #  elif defined(__APPLE__)
-#    define UTL_TARGET_APPLE
+#    define UTL_TARGET_APPLE 1
 #  elif defined(RENAME_TO_SONY_IDENTIFIER) /* NDA */
-#    define UTL_TARGET_SONY
+#    define UTL_TARGET_SONY 1
 #  elif defined(RENAME_TO_NINTENDO_IDENTIFIER) /* NDA */
-#    define UTL_TARGET_NINTENDO
+#    define UTL_TARGET_NINTENDO 1
 #  elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__NetBSD__) || \
       defined(__OpenBSD__)
-#    define UTL_TARGET_BSD
+#    define UTL_TARGET_BSD 1
 #  elif defined(__linux__)
-#    define UTL_TARGET_LINUX
+#    define UTL_TARGET_LINUX 1
 #  elif defined(__unix__)
-#    define UTL_TARGET_UNIX
+#    define UTL_TARGET_UNIX 1
 #  else
 #    error "Unrecognized target for Clang Compiler"
 #  endif
 
-#elif defined(UTL_COMPILER_GCC)
+#elif UTL_COMPILER_GCC
 
 #  if defined(__CYGWIN__) || defined(_WIN32) || defined(_WIN64)
-#    define UTL_TARGET_MICROSOFT
+#    define UTL_TARGET_MICROSOFT 1
 #  elif defined(__APPLE__)
-#    define UTL_TARGET_APPLE
+#    define UTL_TARGET_APPLE 1
 #  elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__NetBSD__) || \
       defined(__OpenBSD__)
-#    define UTL_TARGET_BSD
+#    define UTL_TARGET_BSD 1
 #  elif defined(__linux__)
-#    define UTL_TARGET_LINUX
+#    define UTL_TARGET_LINUX 1
 #  elif defined(__unix__)
-#    define UTL_TARGET_UNIX
+#    define UTL_TARGET_UNIX 1
 #  else
 #    error "Unrecognized target for GNU Compiler"
 #  endif
 
-#elif defined(UTL_COMPILER_MSVC)
+#elif UTL_COMPILER_MSVC
 
-#  define UTL_TARGET_MICROSOFT
+#  define UTL_TARGET_MICROSOFT 1
 
-#elif defined(UTL_COMPILER_INTEL)
+#elif UTL_COMPILER_ICC || UTL_COMPILER_ICX
 
 #  if defined(__CYGWIN__) || defined(_WIN32) || defined(_WIN64)
-#    define UTL_TARGET_MICROSOFT
+#    define UTL_TARGET_MICROSOFT 1
 #  elif defined(__APPLE__)
-#    define UTL_TARGET_APPLE
+#    define UTL_TARGET_APPLE 1
 #  elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__NetBSD__) || \
       defined(__OpenBSD__)
-#    define UTL_TARGET_BSD
+#    define UTL_TARGET_BSD 1
 #  elif defined(__linux__)
-#    define UTL_TARGET_LINUX
+#    define UTL_TARGET_LINUX 1
 #  elif defined(__unix__)
-#    define UTL_TARGET_UNIX
+#    define UTL_TARGET_UNIX 1
 #  else
 #    error "Unrecognized target for Intel Compiler"
 #  endif
 
-#endif /* ifdef UTL_COMPILER_CLANG */
+#endif /* if UTL_COMPILER_CLANG */
 
-#if defined(UTL_TARGET_APPLE) && !defined(UTL_TARGET_UNIX)
-#  define UTL_TARGET_UNIX
-#endif /* ifdef UTL_TARGET_APPLE && !defined(UTL_TARGET_UNIX) */
+#if UTL_TARGET_APPLE && !UTL_TARGET_UNIX
+#  define UTL_TARGET_UNIX 1
+#endif /* if UTL_TARGET_APPLE && !defined(UTL_TARGET_UNIX) */
 
-#if defined(UTL_TARGET_LINUX) && !defined(UTL_TARGET_UNIX)
-#  define UTL_TARGET_UNIX
-#endif /* ifdef UTL_TARGET_LINUX && !defined(UTL_TARGET_UNIX) */
+#if UTL_TARGET_LINUX && !UTL_TARGET_UNIX
+#  define UTL_TARGET_UNIX 1
+#endif /* if UTL_TARGET_LINUX && !defined(UTL_TARGET_UNIX) */
 
-#if defined(UTL_TARGET_SONY) && !defined(UTL_TARGET_BSD)
-#  define UTL_TARGET_BSD
-#  define UTL_TARGET_UNIX
-#endif /* ifdef UTL_TARGET_SONY && !defined(UTL_TARGET_BSD) */
+#if UTL_TARGET_SONY
+#  if !UTL_TARGET_BSD
+#    define UTL_TARGET_BSD 1
+#  endif
+#  if !UTL_TARGET_UNIX
+#    define UTL_TARGET_UNIX 1
+#  endif
+#endif /* if UTL_TARGET_SONY && !defined(UTL_TARGET_BSD) */
 
-#if defined(UTL_TARGET_BSD) && !defined(UTL_TARGET_UNIX)
-#  define UTL_TARGET_UNIX
-#endif /* ifdef UTL_TARGET_BSD && !defined(UTL_TARGET_UNIX) */
+#if UTL_TARGET_BSD && !UTL_TARGET_UNIX
+#  define UTL_TARGET_UNIX 1
+#endif /* if UTL_TARGET_BSD && !defined(UTL_TARGET_UNIX) */
 
-#ifdef UTL_TARGET_SONY
-#  if defined(RENAME_TO_PS4_IDENTIFIER) /* NDA */
-#    define UTL_TARGET_SONY_PS4
-#  elif defined(RENAME_TO_PS5_IDENTIFIER) /* NDA */
-#    define UTL_TARGET_SONY_PS5
+#if UTL_TARGET_SONY
+#  if RENAME_TO_PS4_IDENTIFIER /* NDA */
+#    define UTL_TARGET_SONY_PS4 1
+#  elif RENAME_TO_PS5_IDENTIFIER /* NDA */
+#    define UTL_TARGET_SONY_PS5 1
 #  else
 #    error "Unrecognized Sony target"
 #  endif
-#endif /* ifdef UTL_TARGET_SONY */
+#endif /* if UTL_TARGET_SONY */
 
-#ifdef UTL_TARGET_MICROSOFT
+#if UTL_TARGET_MICROSOFT
 
 #  if defined(__CYGWIN__)
-#    define UTL_TARGET_MICROSOFT_WINDOWS
-#    define UTL_TARGET_MICROSOFT_CYGWIN
+#    define UTL_TARGET_MICROSOFT_WINDOWS 1
+#    define UTL_TARGET_MICROSOFT_CYGWIN 1
 #  elif defined(_WIN32) || defined(_WIN64)
-#    define UTL_TARGET_MICROSOFT_WINDOWS
-#  elif defined(RENAME_TO_GDK_XBO_IDENTIFIER) /* NDA */
-#    define UTL_TARGET_MICROSOFT_GDK_XBO
-#  elif defined(RENAME_TO_GDK_XSX_IDENTIFIER) /* NDA */
-#    define UTL_TARGET_MICROSOFT_GDK_XSX
+#    define UTL_TARGET_MICROSOFT_WINDOWS 1
+#  elif RENAME_TO_GDK_XBO_IDENTIFIER /* NDA */
+#    define UTL_TARGET_MICROSOFT_GDK_XBO 1
+#  elif RENAME_TO_GDK_XSX_IDENTIFIER /* NDA */
+#    define UTL_TARGET_MICROSOFT_GDK_XSX 1
 #  else
 #    error "Unrecognized Microsoft target"
 #  endif
 
-#  if defined(RENAME_TO_DESKTOP_GDK_IDENTIFIER) /* NDA */
-#    define UTL_TARGET_MICROSOFT_GDK_WINDOWS
+#  if RENAME_TO_DESKTOP_GDK_IDENTIFIER /* NDA */
+#    define UTL_TARGET_MICROSOFT_GDK_WINDOWS 1
 #  endif
 
-#endif /* ifdef UTL_TARGET_MICROSOFT */
+#endif /* if UTL_TARGET_MICROSOFT */

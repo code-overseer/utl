@@ -54,7 +54,7 @@ private:
     friend void decrement(reference_count& obj) noexcept {
         if (--obj.count_ < 1) {
             UTL_ASSERT(obj.count_ >= 0);
-            reference_counting::details::destroy(addressof(obj));
+            reference_counting::details::destroy(UTL_SCOPE addressof(obj));
         }
     }
 

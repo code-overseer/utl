@@ -4,7 +4,7 @@
 
 #include "utl/type_traits/utl_common.h"
 
-#ifdef UTL_USE_STD_TYPE_TRAITS
+#if UTL_USE_STD_TYPE_TRAITS
 
 #  include <type_traits>
 
@@ -30,10 +30,6 @@ UTL_NAMESPACE_END
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #  include "utl/type_traits/utl_constants.h"
-
-#  ifndef UTL_DISABLE_BUILTIN_is_nothrow_destructible
-#    define UTL_DISABLE_BUILTIN_is_nothrow_destructible 0
-#  endif // ifndef UTL_DISABLE_BUILTIN_is_nothrow_destructible
 
 #  if UTL_SHOULD_USE_BUILTIN(is_nothrow_destructible)
 #    define UTL_BUILTIN_is_nothrow_destructible(...) __is_nothrow_destructible(__VA_ARGS__)
