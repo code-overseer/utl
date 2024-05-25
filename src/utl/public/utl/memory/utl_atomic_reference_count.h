@@ -66,7 +66,7 @@ private:
         int const result = obj.count_.fetch_sub(1, memory_order_acq_rel);
         if (result <= 1) {
             UTL_ASSERT(result > 0);
-            reference_counting::details::destroy(addressof(obj));
+            reference_counting::details::destroy(UTL_SCOPE addressof(obj));
         }
     }
 

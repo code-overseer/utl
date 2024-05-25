@@ -49,7 +49,7 @@ public:
      *
      * @param ref A reference to the object.
      */
-    constexpr explicit nonnull_ptr(T& ref) noexcept : ptr_(addressof(ref)) {}
+    constexpr explicit nonnull_ptr(T& ref) noexcept : ptr_(UTL_SCOPE addressof(ref)) {}
 
     /**
      * Conversion operator to implicitly convert nonnull_ptr to the underlying raw pointer.

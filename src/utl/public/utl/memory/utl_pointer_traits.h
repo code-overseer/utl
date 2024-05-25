@@ -112,7 +112,9 @@ struct pointer_traits<T*> {
     using element_type = T;
     using difference_type = typename details::pointer_traits::diff_type<T*>::type;
 
-    static constexpr pointer pointer_to(element_type& ref) noexcept { return addressof(ref); }
+    static constexpr pointer pointer_to(element_type& ref) noexcept {
+        return UTL_SCOPE addressof(ref);
+    }
 };
 
 namespace details {
