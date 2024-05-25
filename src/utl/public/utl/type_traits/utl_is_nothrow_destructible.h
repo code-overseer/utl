@@ -83,7 +83,7 @@ UTL_INLINE_CXX17 constexpr bool is_nothrow_destructible_v =
 
 UTL_NAMESPACE_END
 
-#    define UTL_TRAIT_SUPPORTED_is_nothrow_destructible 1
+#    define UTL_TRAIT_SUPPORTED_is_nothrow_destructible UTL_TRAIT_SUPPORTED_is_destructible
 
 #  endif // ifdef UTL_BUILTIN_is_nothrow_destructible
 

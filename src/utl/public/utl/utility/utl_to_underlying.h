@@ -23,8 +23,7 @@ UTL_PRAGMA_WARN(
 
 #  include "utl/type_traits/utl_enable_if.h"
 #  include "utl/type_traits/utl_is_enum.h"
-// underlying_type
-#  include "utl/type_traits/utl_std_traits.h"
+#  include "utl/type_traits/utl_underlying_type.h"
 
 UTL_NAMESPACE_BEGIN
 

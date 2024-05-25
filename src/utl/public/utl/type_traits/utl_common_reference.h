@@ -8,7 +8,7 @@
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_copy_cvref.h"
 #include "utl/type_traits/utl_declval.h"
-#include "utl/type_traits/utl_has_type.h"
+#include "utl/type_traits/utl_has_member_type.h"
 #include "utl/type_traits/utl_is_convertible.h"
 #include "utl/type_traits/utl_merge_cv.h"
 #include "utl/type_traits/utl_remove_cvref.h"
@@ -136,7 +136,7 @@ template <>
 struct first_type<> {};
 
 template <typename T, typename... Ts>
-struct first_type<T, Ts...> : conditional_t<has_type<T>::value, T, first_type<Ts...>> {};
+struct first_type<T, Ts...> : conditional_t<has_member_type<T>::value, T, first_type<Ts...>> {};
 
 template <typename T, typename U>
 using impl = first_type<simple_common_ref<T, U>,

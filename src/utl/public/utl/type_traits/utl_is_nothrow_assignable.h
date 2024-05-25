@@ -102,3 +102,11 @@ UTL_NAMESPACE_END
 #  endif // ifdef UTL_BUILTIN_is_nothrow_assignable
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
+
+#ifdef UTL_BUILTIN_is_nothrow_assignable
+#  define UTL_TRAIT_is_nothrow_assignable(TYPE) UTL_BUILTIN_is_nothrow_assignable(TYPE)
+#elif UTL_CXX14
+#  define UTL_TRAIT_is_nothrow_assignable(TYPE) UTL_SCOPE is_nothrow_assignable_v<TYPE>
+#else
+#  define UTL_TRAIT_is_nothrow_assignable(TYPE) UTL_SCOPE is_nothrow_assignable<TYPE>::value
+#endif

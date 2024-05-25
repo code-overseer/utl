@@ -21,7 +21,7 @@
 #include "utl/tuple/utl_tuple_traits.h"
 #include "utl/type_traits/utl_common_reference.h"
 #include "utl/type_traits/utl_decay.h"
-#include "utl/type_traits/utl_has_type.h"
+#include "utl/type_traits/utl_has_member_type.h"
 #include "utl/type_traits/utl_template_list.h"
 #include "utl/type_traits/utl_unwrap_reference.h"
 #include "utl/type_traits/utl_variadic_proxy.h"
@@ -123,8 +123,7 @@ public:
         traits::is_nothrow_move_assignable) = delete;
 #else
     constexpr storage(storage&&) noexcept(traits::is_nothrow_move_constructible) = default;
-    UTL_CONSTEXPR_CXX14 storage& operator=(storage&&) noexcept(
-        traits::is_nothrow_move_assignable) = default;
+    UTL_CONSTEXPR_CXX14 storage& operator=(storage&&) noexcept(traits::is_nothrow_move_assignable) = default;
 #endif
 
     template <typename U, enable_if_t<!is_same<U, storage>::value, int> = 1>
@@ -216,8 +215,7 @@ public:
 
     template <size_t I>
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
-        -> enable_if_t<!I, T&&> {
+    UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) -> enable_if_t<!I, T&&> {
         return move(head);
     }
 
@@ -262,8 +260,7 @@ struct storage<T, Tail...> : variadic_traits<T, Tail...> {
         traits::is_nothrow_move_assignable) = delete;
 #else
     constexpr storage(storage&&) noexcept(traits::is_nothrow_move_constructible) = default;
-    UTL_CONSTEXPR_CXX14 storage& operator=(storage&&) noexcept(
-        traits::is_nothrow_move_assignable) = default;
+    UTL_CONSTEXPR_CXX14 storage& operator=(storage&&) noexcept(traits::is_nothrow_move_assignable) = default;
 #endif
 
     template <typename UHead, typename... UTail,
@@ -379,8 +376,7 @@ struct storage<T, Tail...> : variadic_traits<T, Tail...> {
 
     template <size_t I>
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
-        -> enable_if_t<!I, T&&> {
+    UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) -> enable_if_t<!I, T&&> {
         return move(head);
     }
 
@@ -520,8 +516,7 @@ public:
     UTL_CONSTEXPR_CXX14 tuple& operator=(tuple const& other) noexcept(
         traits::is_nothrow_copy_assignable) = default;
     constexpr tuple(tuple&&) noexcept(traits::is_nothrow_move_constructible) = default;
-    UTL_CONSTEXPR_CXX14 tuple& operator=(tuple&&) noexcept(
-        traits::is_nothrow_move_assignable) = default;
+    UTL_CONSTEXPR_CXX14 tuple& operator=(tuple&&) noexcept(traits::is_nothrow_move_assignable) = default;
 
     UTL_CONSTEXPR_CXX20 ~tuple() = default;
 

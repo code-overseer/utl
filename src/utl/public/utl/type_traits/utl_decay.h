@@ -81,6 +81,7 @@ struct decay_impl<T[N]> {
 template <typename T>
 struct decay : details::type_traits::decay_impl<remove_reference_t<T>> {};
 
+template <typename T>
 using decay_t = typename details::type_traits::decay_impl<remove_reference_t<T>>::type;
 
 UTL_NAMESPACE_END
