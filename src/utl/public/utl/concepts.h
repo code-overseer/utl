@@ -10,22 +10,14 @@
 
 UTL_NAMESPACE_BEGIN
 
-using std::assignable_from;
-using std::common_reference_with;
 using std::common_with;
-using std::default_initializable;
 using std::derived_from;
 using std::floating_point;
 using std::signed_integral;
 using std::unsigned_integral;
 
-using std::equality_comparable;
-using std::equality_comparable_with;
 using std::totally_ordered;
 using std::totally_ordered_with;
-
-using std::regular;
-using std::semiregular;
 
 using std::equivalence_relation;
 using std::invocable;
