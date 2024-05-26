@@ -22,6 +22,8 @@
 #include "utl/type_traits/utl_common_reference.h"
 #include "utl/type_traits/utl_decay.h"
 #include "utl/type_traits/utl_has_member_type.h"
+#include "utl/type_traits/utl_is_base_of.h"
+#include "utl/type_traits/utl_is_standard_layout.h"
 #include "utl/type_traits/utl_template_list.h"
 #include "utl/type_traits/utl_unwrap_reference.h"
 #include "utl/type_traits/utl_variadic_proxy.h"

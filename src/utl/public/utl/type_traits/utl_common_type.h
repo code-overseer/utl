@@ -45,7 +45,7 @@ namespace details {
 namespace common_type {
 
 template <typename T, typename U>
-using ternary_result_t = decltype(false ? declval<T>() : declval<U>());
+using ternary_result_t = decay_t<decltype(false ? declval<T>() : declval<U>())>;
 
 template <typename T, typename U, typename = void>
 struct impl_2 {};

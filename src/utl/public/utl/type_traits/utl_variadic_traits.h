@@ -12,6 +12,7 @@
 #include "utl/type_traits/utl_is_move_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_copy_assignable.h"
 #include "utl/type_traits/utl_is_nothrow_copy_constructible.h"
+#include "utl/type_traits/utl_is_nothrow_default_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_move_assignable.h"
 #include "utl/type_traits/utl_is_nothrow_move_constructible.h"
 #include "utl/type_traits/utl_logical_traits.h"

@@ -697,12 +697,12 @@ UTL_NAMESPACE_END
 namespace std {
 
 template <typename T0, typename T1, typename U0, typename U1>
-struct common_type<pair<T0, T1>, pair<U0, U1>> :
+struct common_type<UTL_SCOPE pair<T0, T1>, UTL_SCOPE pair<U0, U1>> :
     UTL_SCOPE details::pair::common_type_impl<T0, T1, U0, U1> {};
 
 template <typename T0, typename T1, typename U0, typename U1, template <typename> class TQual,
     template <typename> class UQual>
-struct basic_common_reference<pair<T0, T1>, pair<U0, U1>, TQual, UQual> :
+struct basic_common_reference<UTL_SCOPE pair<T0, T1>, UTL_SCOPE pair<U0, U1>, TQual, UQual> :
     UTL_SCOPE details::pair::basic_ref_impl<T0, T1, U0, U1, TQual, UQual> {};
 
 } // namespace std
