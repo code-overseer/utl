@@ -13,15 +13,13 @@ class scope_exit : private details::scope::impl<scope_exit<F>, F> {
     using move_t = conditional_t<is_movable::value, scope_exit, details::scope::invalid_t>;
 
 public:
-    template <typename Fn, typename = enable_if_t<UTL_TRAIT_VALUE(is_constructible, F, Fn&&)>>
-    explicit scope_exit(Fn&& func) noexcept(UTL_TRAIT_VALUE(is_nothrow_constructible, F, Fn&&))
+    template <typename Fn, typename = enable_if_t<UTL_TRAIT_is_constructible(F, Fn&&)>>
+    explicit scope_exit(Fn&& func) noexcept(UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
         : base_type(forward<Fn>(func)) {}
-    scope_exit(move_t&& other) noexcept(UTL_TRAIT_VALUE(is_nothrow_move_constructible, F))
+    scope_exit(move_t&& other) noexcept(UTL_TRAIT_is_nothrow_move_constructible(F))
         : base_type(move(other)) {}
 
     using base_type::release;
-
-private:
 };
 
 #if UTL_CXX17
