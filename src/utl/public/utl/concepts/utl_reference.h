@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "utl/concepts/utl_lvalue_reference.h"
+#include "utl/concepts/utl_rvalue_reference.h"
 #include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_is_reference.h"
 
@@ -9,7 +11,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-concept reference = UTL_TRAIT_is_reference(T);
+concept reference = lvalue_reference<T> || rvalue_reference<T> || UTL_TRAIT_is_reference(T);
 
 UTL_NAMESPACE_END
 #endif
