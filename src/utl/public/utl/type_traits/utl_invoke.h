@@ -156,6 +156,7 @@ template <typename R, typename F, typename... Args>
 using impl_t = decltype(resolve<R, F, Args...>(0));
 template <typename R, typename F, typename... Args>
 using nothrow_t = decltype(resolve_nothrow<R, F, Args...>(0));
+
 } // namespace invocable
 } // namespace details
 
@@ -199,3 +200,13 @@ UTL_NAMESPACE_END
 #  define UTL_TRAIT_is_nothrow_invocable_r(...) UTL_SCOPE is_nothrow_invocable_r<__VA_ARGS__>::value
 #  define UTL_TRAIT_is_nothrow_invocable(...) UTL_SCOPE is_nothrow_invocable<__VA_ARGS__>::value
 #endif
+
+UTL_NAMESPACE_BEGIN
+template <typename F, typename... Args>
+struct invoke_result :
+    enable_if<UTL_TRAIT_is_invocable(F, Args...),
+        decltype(details::invocable::invoke(declval<F>(), declval<Args>()...))> {};
+
+template <typename F, typename... Args>
+using invoke_result_t = typename invoke_result<F, Args...>::type;
+UTL_NAMESPACE_END
