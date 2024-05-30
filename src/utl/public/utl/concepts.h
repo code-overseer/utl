@@ -20,6 +20,7 @@
 #  include "utl/concepts/utl_floating_point.h"
 #  include "utl/concepts/utl_implicit_lifetime.h"
 #  include "utl/concepts/utl_integral.h"
+#  include "utl/concepts/utl_invocable.h"
 #  include "utl/concepts/utl_move_constructible.h"
 #  include "utl/concepts/utl_regular.h"
 #  include "utl/concepts/utl_same_as.h"
@@ -27,18 +28,5 @@
 #  include "utl/concepts/utl_signed_integral.h"
 #  include "utl/concepts/utl_totally_ordered.h"
 #  include "utl/concepts/utl_unsigned_integral.h"
-
-#  include <concepts>
-
-UTL_NAMESPACE_BEGIN
-
-using std::equivalence_relation;
-using std::invocable;
-using std::predicate;
-using std::regular_invocable;
-using std::relation;
-using std::strict_weak_order;
-
-UTL_NAMESPACE_END
 
 #endif
