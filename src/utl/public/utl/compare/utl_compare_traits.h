@@ -4,8 +4,7 @@
 
 #include "utl/compare/utl_partial_ordering.h"
 #include "utl/concepts.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_is_boolean_testable.h"
 #include "utl/type_traits/utl_logical_traits.h"
 

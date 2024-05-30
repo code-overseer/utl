@@ -27,7 +27,7 @@ concept with_common_type_impl =
     };
 
 template <typename T, typename U>
-concept with_common_type_impl = with_common_type<remove_cvref_t<T>, remove_cvref_t<U>>;
+concept with_common_type = with_common_type_impl<remove_cvref_t<T>, remove_cvref_t<U>>;
 
 template <typename T, typename U>
 concept weak = requires(remove_reference_t<T> const& t, remove_reference_t<U> const& u) {
