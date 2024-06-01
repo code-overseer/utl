@@ -133,97 +133,94 @@ public:
     using move_assign_t = conditional_t<is_move_assignable_v<T>, invalid_t, storage>;
     using move_construct_t = conditional_t<is_move_constructible_v<T>, invalid_t, storage>;
 
-    constexpr storage() noexcept(UTL_TRAIT_is_nothrow_default_constructible(T)) = default;
-    constexpr storage(storage const&) noexcept(
-        UTL_TRAIT_is_nothrow_copy_constructible(T)) = default;
+    constexpr storage() noexcept(is_nothrow_default_constructible_v<T>) = default;
+    constexpr storage(storage const&) noexcept(is_nothrow_copy_constructible_v<T>) = default;
     constexpr storage& operator=(storage const&) noexcept(
-        UTL_TRAIT_is_nothrow_copy_assignable(T)) = default;
+        is_nothrow_copy_assignable_v<T>) = default;
 
 #if UTL_ENFORCE_NONMOVABILIITY
-    constexpr storage(move_construct_t&&) noexcept(
-        UTL_TRAIT_is_nothrow_move_constructible(T)) = delete;
+    constexpr storage(move_construct_t&&) noexcept(is_nothrow_move_constructible_v<T>) = delete;
     constexpr storage& operator=(move_assign_t&&) noexcept(
-        UTL_TRAIT_is_nothrow_move_assignable(T)) = delete;
+        is_nothrow_move_assignable_v<T>) = delete;
 #else
-    constexpr storage(storage&&) noexcept(UTL_TRAIT_is_nothrow_move_constructible(T)) = default;
-    constexpr storage& operator=(storage&&) noexcept(
-        UTL_TRAIT_is_nothrow_move_assignable(T)) = default;
+    constexpr storage(storage&&) noexcept(is_nothrow_move_constructible_v<T>) = default;
+    constexpr storage& operator=(storage&&) noexcept(is_nothrow_move_assignable_v<T>) = default;
 #endif
 
     template <constructible_as<T> U>
-    constexpr storage(U&& head) noexcept(UTL_TRAIT_is_nothrow_constructible(T, U))
+    constexpr storage(U&& head) noexcept(is_nothrow_constructible_v<T, U>)
         : head(forward<U>(head)) {}
 
     template <allocator_usable_with<T> Alloc>
     requires constructible_from<T, allocator_arg_t, Alloc const&>
     constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
-        UTL_TRAIT_is_nothrow_constructible(T, allocator_arg_t, Alloc const&))
+        is_nothrow_constructible_v<T, allocator_arg_t, Alloc const&>)
         : head(allocator_arg, alloc) {}
 
     template <allocator_usable_with<T> Alloc>
     requires (!constructible_from<T, allocator_arg_t, Alloc const&> &&
         constructible_from<T, Alloc const&>)
     constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
-        UTL_TRAIT_is_nothrow_constructible(T, Alloc const&))
+        is_nothrow_constructible_v<T, Alloc const&>)
         : head(alloc) {}
 
     template <allocator_type Alloc>
     requires constructible_from<T>
     constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
-        UTL_TRAIT_is_nothrow_default_constructible(T))
+        is_nothrow_default_constructible_v<T>)
         : head() {}
 
     template <allocator_usable_with<T> Alloc, typename U>
     requires constructible_from<T, allocator_arg_t, Alloc const&, U>
     constexpr storage(allocator_arg_t, Alloc const& alloc, U&& other_head) noexcept(
-        UTL_TRAIT_is_nothrow_constructible(T, allocator_arg_t, Alloc const&, U))
+        is_nothrow_constructible_v<T, allocator_arg_t, Alloc const&, U>)
         : head(allocator_arg, alloc, UTL_SCOPE forward<U>(other_head)) {}
 
     template <allocator_usable_with<T> Alloc, typename U>
     requires (!constructible_from<T, allocator_arg_t, Alloc const&, U> &&
         constructible_from<T, U, Alloc const&>)
     constexpr storage(allocator_arg_t, Alloc const& alloc, U&& other_head) noexcept(
-        UTL_TRAIT_is_nothrow_constructible(T, U, Alloc const&))
+        is_nothrow_constructible_v<T, U, Alloc const&>)
         : head(UTL_SCOPE forward<U>(other_head), alloc) {}
 
     template <allocator_type Alloc, typename U>
     requires constructible_from<T, U>
     constexpr storage(allocator_arg_t, Alloc const& alloc, U&& other_head) noexcept(
-        UTL_TRAIT_is_nothrow_constructible(T, U))
+        is_nothrow_constructible_v<T, U>)
         : head(UTL_SCOPE forward<U>(other_head)) {}
 
     template <typename U>
-    constexpr void swap(storage<U>& other) noexcept(UTL_TRAIT_is_nothrow_swappable_with(T&, U&)) {
+    constexpr void swap(storage<U>& other) noexcept(is_nothrow_swappable_with_v<T&, U&>) {
         UTL_SCOPE utility::swap(head, other.head);
     }
 
     template <typename U>
     constexpr void swap(storage<U> const& other) noexcept(
-        UTL_TRAIT_is_nothrow_swappable_with(T&, U const&)) {
+        is_nothrow_swappable_with_v<T&, U const&>) {
         UTL_SCOPE utility::swap(head, other.head);
     }
 
     template <typename U>
     constexpr void swap(storage<U>& other) const
-        noexcept(UTL_TRAIT_is_nothrow_swappable_with(T const&, U&)) {
+        noexcept(is_nothrow_swappable_with_v<T const&, U&>) {
         UTL_SCOPE utility::swap(head, other.head);
     }
 
     template <typename U>
     constexpr void swap(storage<U> const& other) const
-        noexcept(UTL_TRAIT_is_nothrow_swappable_with(T const&, U const&)) {
+        noexcept(is_nothrow_swappable_with_v<T const&, U const&>) {
         UTL_SCOPE utility::swap(head, other.head);
     }
 
     template <typename U>
-    constexpr storage& assign(U&& other) noexcept(UTL_TRAIT_is_nothrow_assignable(T&, U)) {
+    constexpr storage& assign(U&& other) noexcept(is_nothrow_assignable_v<T&, U>) {
         head = UTL_SCOPE forward<U>(other);
         return *this;
     }
 
     template <typename U>
     constexpr storage const& assign(U&& other) const
-        noexcept(UTL_TRAIT_is_nothrow_assignable(T const&, U)) {
+        noexcept(is_nothrow_assignable_v<T const&, U>) {
         head = UTL_SCOPE forward<U>(other);
         return *this;
     }
@@ -270,39 +267,37 @@ public:
     using move_assign_t = conditional_t<move_assignable, invalid_t, storage>;
     using move_construct_t = conditional_t<move_constructible, invalid_t, storage>;
 
-    constexpr storage() noexcept((UTL_TRAIT_is_nothrow_default_constructible(T) && ... &&
-        UTL_TRAIT_is_nothrow_default_constructible(Tail))) = default;
-    constexpr storage(storage const&) noexcept((UTL_TRAIT_is_nothrow_copy_constructible(T) && ... &&
-        UTL_TRAIT_is_nothrow_copy_constructible(Tail))) = default;
+    constexpr storage() noexcept((is_nothrow_default_constructible_v<T> && ... &&
+        is_nothrow_default_constructible_v<Tail>)) = default;
+    constexpr storage(storage const&) noexcept((is_nothrow_copy_constructible_v<T> && ... &&
+        is_nothrow_copy_constructible_v<Tail>)) = default;
     constexpr storage& operator=(storage const&) noexcept(
-        (UTL_TRAIT_is_nothrow_copy_assignable(T) && ... &&
-            UTL_TRAIT_is_nothrow_copy_assignable(Tail))) = default;
+        (is_nothrow_copy_assignable_v<T> && ... && is_nothrow_copy_assignable_v<Tail>)) = default;
 
 #if UTL_ENFORCE_NONMOVABILIITY
-    constexpr storage(move_construct_t&&) noexcept((UTL_TRAIT_is_nothrow_move_constructible(T) &&
-        ... && UTL_TRAIT_is_nothrow_move_constructible(Tail))) = delete;
+    constexpr storage(move_construct_t&&) noexcept((is_nothrow_move_constructible_v<T> && ... &&
+        is_nothrow_move_constructible_v<Tail>)) = delete;
     constexpr storage& operator=(move_assign_t&&) noexcept(
-        (UTL_TRAIT_is_nothrow_move_assignable(T) && ... &&
-            UTL_TRAIT_is_nothrow_move_assignable(Tail))) = delete;
+        (is_nothrow_move_assignable_v<T> && ... && is_nothrow_move_assignable_v<Tail>)) = delete;
 #else
-    constexpr storage(storage&&) noexcept((UTL_TRAIT_is_nothrow_move_constructible(T) && ... &&
-        UTL_TRAIT_is_nothrow_move_constructible(Tail))) = default;
-    constexpr storage& operator=(storage&&) noexcept((UTL_TRAIT_is_nothrow_move_assignable(T) &&
-        ... && UTL_TRAIT_is_nothrow_move_assignable(Tail))) = default;
+    constexpr storage(storage&&) noexcept((is_nothrow_move_constructible_v<T> && ... &&
+        is_nothrow_move_constructible_v<Tail>)) = default;
+    constexpr storage& operator=(storage&&) noexcept(
+        (is_nothrow_move_assignable_v<T> && ... && is_nothrow_move_assignable_v<Tail>)) = default;
 #endif
 
     template <constructible_as<T> UHead, constructible_as<Tail>... UTail>
     constexpr storage(UHead&& other_head, UTail&&... other_tail) noexcept(
-        UTL_TRAIT_is_nothrow_constructible(head_type, UHead) &&
-        UTL_TRAIT_is_nothrow_constructible(tail_type, UTail...))
+        is_nothrow_constructible_v<head_type, UHead> &&
+        is_nothrow_constructible_v<tail_type, UTail...>)
         : head(UTL_SCOPE forward<UHead>(other_head))
         , tail(UTL_SCOPE forward<UTail>(other_tail)...) {}
 
     template <allocator_usable_with<T> Alloc>
     requires constructible_from<T, allocator_arg_t, Alloc const&>
     constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
-        UTL_TRAIT_is_nothrow_constructible(head_type, allocator_arg_t, Alloc const&) &&
-        UTL_TRAIT_is_nothrow_constructible(tail_type, allocator_arg_t, Alloc const&))
+        is_nothrow_constructible_v<head_type, allocator_arg_t, Alloc const&> &&
+        is_nothrow_constructible_v<tail_type, allocator_arg_t, Alloc const&>)
         : head(allocator_arg, alloc)
         , tail(allocator_arg, alloc) {}
 
@@ -310,25 +305,25 @@ public:
     requires (!constructible_from<T, allocator_arg_t, Alloc const&> &&
                  constructible_from<T, Alloc const&>)
     constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
-        UTL_TRAIT_is_nothrow_constructible(head_type, Alloc const&) &&
-        UTL_TRAIT_is_nothrow_constructible(tail_type, allocator_arg_t, Alloc const&))
+        is_nothrow_constructible_v<head_type, Alloc const&> &&
+        is_nothrow_constructible_v<tail_type, allocator_arg_t, Alloc const&>)
         : head(alloc)
         , tail(allocator_arg, alloc) {}
 
     template <allocator_type Alloc>
     requires constructible_from<T>
     constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
-        UTL_TRAIT_is_nothrow_default_constructible(head_type) &&
-        UTL_TRAIT_is_nothrow_constructible(tail_type, allocator_arg_t, Alloc const&))
+        is_nothrow_default_constructible_v<head_type> &&
+        is_nothrow_constructible_v<tail_type, allocator_arg_t, Alloc const&>)
         : head()
         , tail(allocator_arg, alloc) {}
 
     template <allocator_usable_with<T> Alloc, typename UHead, typename... UTail>
     requires constructible_from<T, allocator_arg_t, Alloc const&, UHead>
     constexpr storage(allocator_arg_t, Alloc const& alloc, UHead&& other_head,
-        UTail&&... other_tail) noexcept(UTL_TRAIT_is_nothrow_constructible(head_type,
-                                            allocator_arg_t, Alloc const&, UHead) &&
-        UTL_TRAIT_is_nothrow_constructible(tail_type, allocator_arg_t, Alloc const&, UTail...))
+        UTail&&... other_tail) noexcept(is_nothrow_constructible_v<head_type, allocator_arg_t,
+                                            Alloc const&, UHead> &&
+        is_nothrow_constructible_v<tail_type, allocator_arg_t, Alloc const&, UTail...>)
         : head(allocator_arg, alloc, UTL_SCOPE forward<UHead>(other_head))
         , tail(allocator_arg, alloc, UTL_SCOPE forward<UTail>(other_tail)...) {}
 
@@ -336,55 +331,53 @@ public:
     requires (!constructible_from<T, allocator_arg_t, Alloc const&, UHead> &&
                  constructible_from<T, UHead, Alloc const&>)
     constexpr storage(allocator_arg_t, Alloc const& alloc, UHead&& other_head,
-        UTail&&... other_tail) noexcept(UTL_TRAIT_is_nothrow_constructible(head_type, UHead,
-                                            Alloc const&) &&
-        UTL_TRAIT_is_nothrow_constructible(tail_type, allocator_arg_t, Alloc const&, UTail...))
+        UTail&&... other_tail) noexcept(is_nothrow_constructible_v<head_type, UHead,
+                                            Alloc const&> &&
+        is_nothrow_constructible_v<tail_type, allocator_arg_t, Alloc const&, UTail...>)
         : head(UTL_SCOPE forward<UHead>(other_head), alloc)
         , tail(allocator_arg, alloc, UTL_SCOPE forward<UTail>(other_tail)...) {}
 
     template <allocator_type Alloc, constructible_as<T> UHead, typename... UTail>
     constexpr storage(allocator_arg_t, Alloc const& alloc, UHead&& other_head,
-        UTail&&... other_tail) noexcept(UTL_TRAIT_is_nothrow_constructible(head_type, UHead) &&
-        UTL_TRAIT_is_nothrow_constructible(tail_type, allocator_arg_t, Alloc const&, UTail...))
+        UTail&&... other_tail) noexcept(is_nothrow_constructible_v<head_type, UHead> &&
+        is_nothrow_constructible_v<tail_type, allocator_arg_t, Alloc const&, UTail...>)
         : head(UTL_SCOPE forward<UHead>(other_head))
         , tail(allocator_arg, alloc, UTL_SCOPE forward<UTail>(other_tail)...) {}
 
     template <typename U, typename... Us>
     constexpr void swap(storage<U, Us...>& other) noexcept(
-        (UTL_TRAIT_is_nothrow_swappable_with(T&, U&) && ... &&
-            UTL_TRAIT_is_nothrow_swappable_with(Tail&, Us&))) {
+        (is_nothrow_swappable_with_v<T&, U&> && ... && is_nothrow_swappable_with_v<Tail&, Us&>)) {
         UTL_SCOPE utility::swap(head, other.head);
         tail.swap(other.tail);
     }
 
     template <typename U, typename... Us>
     constexpr void swap(storage<U, Us...>& other) const
-        noexcept((UTL_TRAIT_is_nothrow_swappable_with(T const&, U&) && ... &&
-            UTL_TRAIT_is_nothrow_swappable_with(Tail const&, Us&))) {
+        noexcept((is_nothrow_swappable_with_v<T const&, U&> && ... &&
+            is_nothrow_swappable_with_v<Tail const&, Us&>)) {
         UTL_SCOPE utility::swap(head, other.head);
         tail.swap(other.tail);
     }
 
     template <typename U, typename... Us>
     constexpr void swap(storage<U, Us...> const& other) noexcept(
-        (UTL_TRAIT_is_nothrow_swappable_with(T&, U const&) && ... &&
-            UTL_TRAIT_is_nothrow_swappable_with(Tail&, Us const&))) {
+        (is_nothrow_swappable_with_v<T&, U const&> && ... &&
+            is_nothrow_swappable_with_v<Tail&, Us const&>)) {
         UTL_SCOPE utility::swap(head, other.head);
         tail.swap(other.tail);
     }
 
     template <typename U, typename... Us>
     constexpr void swap(storage<U, Us...> const& other) const
-        noexcept((UTL_TRAIT_is_nothrow_swappable_with(T const&, U const&) && ... &&
-            UTL_TRAIT_is_nothrow_swappable_with(Tail const&, Us const&))) {
+        noexcept((is_nothrow_swappable_with_v<T const&, U const&> && ... &&
+            is_nothrow_swappable_with_v<Tail const&, Us const&>)) {
         UTL_SCOPE utility::swap(head, other.head);
         tail.swap(other.tail);
     }
 
     template <typename UHead, typename... UTail>
     constexpr storage& assign(UHead&& other_head, UTail&&... other_tail) noexcept(
-        UTL_TRAIT_is_nothrow_assignable(T&, UHead) && noexcept(
-            tail.assign(UTL_SCOPE declval<UTail>()...))) {
+        is_nothrow_assignable_v<T&, UHead>&& noexcept(tail.assign(UTL_SCOPE declval<UTail>()...))) {
         head = UTL_SCOPE forward<UHead>(other_head);
         tail.assign(UTL_SCOPE forward<UTail>(other_tail)...);
         return *this;
@@ -392,7 +385,7 @@ public:
 
     template <typename UHead, typename... UTail>
     constexpr storage const& assign(UHead&& other_head, UTail&&... other_tail) const
-        noexcept(UTL_TRAIT_is_nothrow_assignable(T const&, UHead) && noexcept(
+        noexcept(is_nothrow_assignable_v<T const&, UHead>&& noexcept(
             tail.assign(UTL_SCOPE declval<UTail>()...))) {
         head = UTL_SCOPE forward<UHead>(other_head);
         tail.assign(UTL_SCOPE forward<UTail>(other_tail)...);
@@ -540,13 +533,12 @@ private:
 
 public:
     constexpr tuple(tuple const&) noexcept(
-        (... && UTL_TRAIT_is_nothrow_copy_constructible(Types))) = default;
+        (... && is_nothrow_copy_constructible_v<Types>)) = default;
     constexpr tuple& operator=(tuple const&) noexcept(
-        (... && UTL_TRAIT_is_nothrow_copy_assignable(Types))) = default;
-    constexpr tuple(tuple&&) noexcept(
-        (... && UTL_TRAIT_is_nothrow_move_constructible(Types))) = default;
+        (... && is_nothrow_copy_assignable_v<Types>)) = default;
+    constexpr tuple(tuple&&) noexcept((... && is_nothrow_move_constructible_v<Types>)) = default;
     constexpr tuple& operator=(tuple&&) noexcept(
-        (... && UTL_TRAIT_is_nothrow_move_assignable(Types))) = default;
+        (... && is_nothrow_move_assignable_v<Types>)) = default;
 
     UTL_CONSTEXPR_CXX20 ~tuple() = default;
 
@@ -566,7 +558,7 @@ public:
     template <same_as<Types>... Us>
     requires (... && swappable_with<Types&, Us&>)
     constexpr void swap(tuple<Us...>& other) noexcept(
-        (... && UTL_TRAIT_is_nothrow_swappable_with(Types&, Us&))) {
+        (... && is_nothrow_swappable_with_v<Types&, Us&>)) {
         static_assert(is_base_of<details::tuple::storage<Us...>, tuple<Us...>>::value,
             "tuple must inherit from storage");
         base_type::swap((details::tuple::storage<Us...>&)other);
@@ -575,42 +567,42 @@ public:
     template <same_as<Types>... Us>
     requires (... && swappable_with<Types const&, Us const&>)
     constexpr void swap(tuple<Us...> const& other) const
-        noexcept((... && UTL_TRAIT_is_nothrow_swappable_with(Types const&, Us const&))) {
+        noexcept((... && is_nothrow_swappable_with_v<Types const&, Us const&>)) {
         static_assert(is_base_of<details::tuple::storage<Us...>, tuple<Us...>>::value,
             "tuple must inherit from storage");
         base_type::swap((details::tuple::storage<Us...> const&)other);
     }
 
     friend inline constexpr void swap(swap_type& l, swap_type& r) noexcept(
-        (... && UTL_TRAIT_is_nothrow_swappable(Types))) {
+        (... && is_nothrow_swappable_v<Types>)) {
         l.swap(r);
     }
 
     friend inline constexpr void swap(const_swap_type& l, const_swap_type& r) noexcept(
-        (... && UTL_TRAIT_is_nothrow_swappable(Types const))) {
+        (... && is_nothrow_swappable_v<Types const>)) {
         l.swap(r);
     }
 
 public:
-    explicit((... || UTL_TRAIT_is_explicit_constructible(Types))) constexpr tuple() noexcept(
-        (... && UTL_TRAIT_is_nothrow_default_constructible(Types))) = default;
+    explicit((... || is_explicit_constructible_v<Types>)) constexpr tuple() noexcept(
+        (... && is_nothrow_default_constructible_v<Types>)) = default;
 
 public:
-    explicit((... || UTL_TRAIT_is_explicit_constructible(Types, Types const&))) constexpr tuple(
-        Types const&... args) noexcept((... && UTL_TRAIT_is_nothrow_copy_constructible(Types)))
+    explicit((... || is_explicit_constructible_v<Types, Types const&>)) constexpr tuple(
+        Types const&... args) noexcept((... && is_nothrow_copy_constructible_v<Types>))
         : base_type(args...) {}
 
 private:
     template <constructible_as<Types>... Us>
     requires (... && !reference_constructs_from_temporary_v<Types, Us>)
     constexpr tuple(private_tag_t, Us&&... args) noexcept(
-        UTL_TRAIT_is_nothrow_constructible(base_type, Us...))
+        is_nothrow_constructible_v<base_type, Us...>)
         : base_type(UTL_SCOPE forward<Us>(args)...) {}
 
     template <constructible_as<Types>... Us>
     requires (... || reference_constructs_from_temporary_v<Types, Us>)
     constexpr tuple(private_tag_t, Us&&... args) noexcept(
-        UTL_TRAIT_is_nothrow_constructible(base_type, Us...)) = delete;
+        is_nothrow_constructible_v<base_type, Us...>) = delete;
 
     template <constructible_as<Types>... Us>
     static constexpr bool explicit_constructible_v =
