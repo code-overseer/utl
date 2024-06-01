@@ -103,13 +103,13 @@ void deallocate(typename type_identity<T>::type* ptr, size_t count) noexcept {
 namespace compile_time {
 #if UTL_CXX20
 template <typename T>
-inline constexpr ::std::allocator<T> allocator_v = {};
+inline constinit ::std::allocator<T> allocator_v = {};
 
 template <typename T>
 constexpr T* allocate(size_t count) {
     if (UTL_BUILTIN_is_constant_evaluated()) {
         if constexpr (is_complete<::std::allocator<T>>::value) {
-            return allocator_v.allocate(count);
+            return allocator_v<T>.allocate(count);
         } else {
             extern void constant_evaluation_failure();
             constant_evaluation_failure(); // TODO remove when UTL_ASSERT is defined
@@ -127,7 +127,7 @@ template <typename T>
 constexpr void deallocate(typename type_identity<T>::type* ptr, size_t count) noexcept {
     if (UTL_BUILTIN_is_constant_evaluated()) {
         if constexpr (is_complete<::std::allocator<T>>::value) {
-            allocator_v.deallocate(ptr, count);
+            allocator_v<T>.deallocate(ptr, count);
         } else {
             extern void constant_evaluation_failure();
             constant_evaluation_failure(); // TODO remove when UTL_ASSERT is defined

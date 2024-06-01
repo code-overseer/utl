@@ -7,6 +7,8 @@
 #include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_enable_if.h"
 
+#include <new>
+
 #if UTL_HAS_BUILTIN(__builtin_memmove)
 #  define UTL_MEMMOVE(...) __builtin_memmove(__VA_ARGS__)
 #else
@@ -19,8 +21,6 @@
 #  include <string.h>
 #  define UTL_MEMCPY(...) ::memcpy(__VA_ARGS__)
 #endif
-
-#include <new>
 
 UTL_NAMESPACE_BEGIN
 
@@ -55,7 +55,6 @@ namespace lifetime {
  * @param n - size of implicit lifetime object
  */
 UTL_START_LIFETIME_ATTRIBUTES inline void* entangle_storage(void* p, size_t n) noexcept {
-    using byte_type = unsigned char;
 #if UTL_ENTANGLE_MEMMOVE_IMPL
     /* UTL_UNDEFINED_BEHAVIOUR */
     // May be undefined behaviour if p points to a const object with automatic, static or
@@ -63,10 +62,37 @@ UTL_START_LIFETIME_ATTRIBUTES inline void* entangle_storage(void* p, size_t n) n
     // This is "more" defined than placement new byte array due to indeterminate value access in
     // the alternative
     return UTL_MEMMOVE(p, p, n);
-#elif UTL_ENTANGLE_PLACEMENT_IMPL
+#elif (UTL_ENTANGLE_PLACEMENT_IMPL | UTL_ENTANGLE_MEMCPY_IMPL)
+    using byte_type = unsigned char;
     /* UTL_UNDEFINED_BEHAVIOUR */
     // technically results in undefined behaviour since bytes have indeterminate value
     return ::new (p) byte_type[n];
+#else
+#  error Undefined implementation
+#endif
+}
+
+/**
+ * Generates a superposition of all posible implicit lifetime types of size n with alignment
+ * given by pointer `p`
+ *
+ * @param p - pointer to memory location to entangle
+ * @tparam N - size of implicit lifetime object
+ */
+template <size_t N>
+UTL_START_LIFETIME_ATTRIBUTES inline void* entangle_storage(void* p) noexcept {
+    using byte_type = unsigned char;
+#if UTL_ENTANGLE_MEMMOVE_IMPL
+    /* UTL_UNDEFINED_BEHAVIOUR */
+    // May be undefined behaviour if p points to a const object with automatic, static or
+    // thread-local storage
+    // This is "more" defined than placement new byte array due to indeterminate value access in
+    // the alternative
+    return UTL_MEMMOVE(p, p, N);
+#elif UTL_ENTANGLE_PLACEMENT_IMPL
+    /* UTL_UNDEFINED_BEHAVIOUR */
+    // technically results in undefined behaviour since bytes have indeterminate value
+    return ::new (p) byte_type[N];
 #elif UTL_ENTANGLE_MEMCPY_IMPL
     /* UTL_UNDEFINED_BEHAVIOUR */
     // same reasoning as memmove
@@ -95,12 +121,12 @@ UTL_START_LIFETIME_ATTRIBUTES inline void* entangle_storage(void* p, size_t n) n
  */
 template <typename T>
 UTL_START_LIFETIME_ATTRIBUTES inline T* collapse(void* p) noexcept {
+#if UTL_HAS_BUILTIN(__builtin_launder)
+    return __builtin_launder(reinterpret_cast<T*>(p));
+#else
     auto started = reinterpret_cast<T*>(p);
     // Dereferecing a pointer is only valid if the pointer actually points to an object within its
     // lifetime
-#if UTL_HAS_BUILTIN(__builtin_launder)
-    return __builtin_launder(started);
-#else
     (void)*started; // collapse wave-function by dereferencing
     return started;
 #endif
@@ -117,13 +143,21 @@ UTL_START_LIFETIME_ATTRIBUTES inline T* collapse(void* p) noexcept {
 template <typename T>
 UTL_START_LIFETIME_ATTRIBUTES inline T* collapse_array(void* p, size_t n) noexcept {
     if (n == 1) {
+#if UTL_HAS_BUILTIN(__builtin_launder)
+        return *__builtin_launder(reinterpret_cast<T(*)[1]>(p));
+#else
         return *reinterpret_cast<T(*)[1]>(p); // collapse wave-function by treating as T[1]
+#endif
     }
 
+#if UTL_HAS_BUILTIN(__builtin_launder)
+    return __builtin_launder(reinterpret_cast<T*>(p));
+#else
     auto started = reinterpret_cast<T*>(p);
     // pointer arithmetic is only valid if pointer is a pointer to an array element
     (void)(started + n);
     return started; // collapse wave-function by treating as array
+#endif
 }
 
 /**
@@ -135,7 +169,7 @@ UTL_START_LIFETIME_ATTRIBUTES inline T* collapse_array(void* p, size_t n) noexce
  */
 template <typename T>
 UTL_START_LIFETIME_ATTRIBUTES inline T* start_as(void* p) noexcept {
-    auto bytes = entangle_memory(p, sizeof(T));
+    auto bytes = entangle_storage<sizeof(T)>(p);
     return collapse(bytes);
 }
 
@@ -160,7 +194,7 @@ UTL_START_LIFETIME_ATTRIBUTES inline T* start_as_array(void* p, size_t n) noexce
         return reinterpret_cast<T*>(p);
     }
 
-    auto bytes = entangle_memory(p, sizeof(T) * n);
+    auto bytes = entangle_storage(p, sizeof(T) * n);
     return collapse_array(bytes);
 }
 } // namespace lifetime
