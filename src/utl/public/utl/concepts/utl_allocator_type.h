@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/concepts/utl_copy_constructible.h"
+#include "utl/concepts/utl_empty_type.h"
 #include "utl/concepts/utl_equality_comparable.h"
 #include "utl/concepts/utl_move_constructible.h"
 #include "utl/concepts/utl_swappable.h"
@@ -17,7 +18,7 @@ namespace details {
 namespace allocator {
 
 template <typename T>
-concept comparable = requires {
+concept comparable = empty_type(T) requires {
     typename T::is_always_equal;
     requires T::is_always_equal::value;
 } || (UTL_SCOPE equality_comparable<T> && requires(T const& l, T const& r) {
