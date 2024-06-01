@@ -994,29 +994,29 @@ UTL_NODISCARD constexpr tuple<unwrap_reference_t<decay_t<Ts>>...> make_tuple(Ts&
 namespace details {
 namespace tuple {
 
-template <typename T, typename U, size_t... Is>
+template <tuple_like T, tuple_like U, size_t... Is>
 auto three_way_result(T const& l, U const& r, index_sequence<Is...>) noexcept
     -> common_comparison_category_t<decltype(UTL_TUPLE_GET(Is, l) <=> UTL_TUPLE_GET(Is, r))...>;
 
-template <typename T, typename U, size_t... Is>
+template <tuple_like T, tuple_like U, size_t... Is>
 auto is_nothrow_three_way(T const& l, U const& r, index_sequence<Is...>) noexcept
     -> bool_constant<(...&& noexcept(UTL_TUPLE_GET(Is, l) <=> UTL_TUPLE_GET(Is, r)))>;
 
-template <typename T, typename U>
+template <tuple_like T, tuple_like U>
 using three_way_result_t = decltype(three_way_result(
     UTL_SCOPE declval<T>(), UTL_SCOPE declval<U>(), tuple_index_sequence<T>{}));
 
-template <typename T, typename U>
+template <tuple_like T, tuple_like U>
 UTL_INLINE_CXX17 constexpr bool is_nothrow_three_way_v = decltype(is_nothrow_three_way(
     UTL_SCOPE declval<T>(), UTL_SCOPE declval<U>(), tuple_index_sequence<T>{}))::value;
 
-template <size_t I, typename T, typename U>
+template <size_t I, tuple_like T, tuple_like U>
 requires (I == tuple_size<T>::value)
 UTL_ATTRIBUTE(CONST) constexpr three_way_result_t<T, U> three_way(T const&, U const&) noexcept {
     return three_way_result_t<T, U>::equal;
 }
 
-template <size_t I, typename T, typename U>
+template <size_t I, tuple_like T, tuple_like U>
 requires (I < tuple_size<T>::value)
 constexpr three_way_result_t<T, U> three_way(T const& l, U const& r) noexcept(
     is_nothrow_three_way_v<T, U>) {
@@ -1024,26 +1024,26 @@ constexpr three_way_result_t<T, U> three_way(T const& l, U const& r) noexcept(
     return c != 0 ? c : three_way<I + 1>(l, r);
 }
 
-template <typename T, typename U>
+template <tuple_like T, tuple_like U>
 constexpr three_way_result_t<T, U> three_way(T const& l, U const& r) noexcept(
     noexcept(three_way<0>(l, r))) {
     return three_way<0>(l, r);
 }
 
-template <size_t I, typename T, typename U>
+template <size_t I, tuple_like T, tuple_like U>
 requires (I == tuple_size<T>::value)
 UTL_ATTRIBUTE(CONST) constexpr bool equals(T const& l, U const& r) noexcept {
     return true;
 }
 
-template <size_t I, typename T, typename U>
+template <size_t I, tuple_like T, tuple_like U>
 requires (I < tuple_size<T>::value)
-constexpr bool equals(T const& l, U const& r) noexcept(
-    compare_ops::all_have_nothrow_eq<T, U>::value) {
+constexpr bool equals(T const& l, U const& r) noexcept(is_nothrow_accessible_v<T> &&
+    is_nothrow_accessible_v<U> && compare_ops::all_have_nothrow_eq<T, U>::value) {
     return (UTL_TUPLE_GET(I, l) == UTL_TUPLE_GET(I, r)) && equals<I + 1>(l, r);
 }
 
-template <typename T, typename U>
+template <tuple_like T, tuple_like U>
 UTL_ATTRIBUTE(FLATTEN)
 constexpr bool equals(T const& l, U const& r) noexcept(noexcept(equals<0>(l, r))) {
     static_assert(compare_ops::all_have_eq<T, U>::value, "All elements must be comparable");
@@ -1082,7 +1082,7 @@ UTL_NODISCARD constexpr tuple<Args&...> tie(Args&... args UTL_ATTRIBUTE(LIFETIME
 template <typename... Args>
 UTL_NODISCARD constexpr tuple<Args&&...> forward_as_tuple(
     Args&&... args UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
-    return {forward<Args>(args)...};
+    return {UTL_SCOPE forward<Args>(args)...};
 }
 
 UTL_NAMESPACE_END
