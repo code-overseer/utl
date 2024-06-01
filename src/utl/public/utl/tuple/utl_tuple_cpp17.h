@@ -1332,47 +1332,45 @@ struct tuple_element_offset<I, tuple<Ts...>> :
 namespace details {
 namespace tuple {
 template <size_t I, typename T, typename U>
-UTL_ATTRIBUTES(NODISCARD, CONST)
+UTL_ATTRIBUTE(CONST)
 constexpr enable_if_t<(I == tuple_size<T>::value), bool> less(T const& l, U const& r) noexcept {
     return false;
 }
 
 template <size_t I, typename T, typename U>
-UTL_ATTRIBUTES(NODISCARD, CONST)
 constexpr enable_if_t<(I < tuple_size<T>::value), bool> less(T const& l, U const& r) noexcept(
-    conjunction<is_nothrow_equality_comparable_with<T, U>,
-        is_nothrow_strict_subordinate_comparable_with<T, U>>::value) {
+    conjunction<compare_ops::all_have_nothrow_eq<T, U>,
+        compare_ops::all_have_nothrow_lt<T, U>>::value) {
     return (UTL_TUPLE_GET(I - 1, l) == UTL_TUPLE_GET(I - 1, r)) &&
         ((UTL_TUPLE_GET(I, l) < UTL_TUPLE_GET(I, r)) || less<I + 1>(l, r));
 }
 
 template <typename T, typename U>
-UTL_ATTRIBUTES(NODISCARD, FLATTEN)
+UTL_ATTRIBUTE(FLATTEN)
 constexpr bool less(T const& l, U const& r) noexcept(
-    conjunction<is_nothrow_equality_comparable_with<T, U>,
-        is_nothrow_strict_subordinate_comparable_with<T, U>>::value) {
+    conjunction<compare_ops::all_have_nothrow_eq<T, U>,
+        compare_ops::all_have_nothrow_lt<T, U>>::value) {
     static_assert(compare_ops::all_have_eq<T, U>::value, "All elements must be comparable");
     static_assert(compare_ops::all_have_lt<T, U>::value, "All elements must be comparable");
     return (UTL_TUPLE_GET(0, l) < UTL_TUPLE_GET(0, r)) || less<1>(l, r);
 }
 
 template <size_t I, typename T, typename U>
-UTL_ATTRIBUTES(NODISCARD, CONST)
+UTL_ATTRIBUTE(CONST)
 constexpr enable_if_t<(I == tuple_size<T>::value), bool> equals(T const& l, U const& r) noexcept {
     return true;
 }
 
 template <size_t I, typename T, typename U>
-UTL_ATTRIBUTES(NODISCARD, CONST)
 constexpr enable_if_t<(I < tuple_size<T>::value), bool> equals(T const& l, U const& r) noexcept(
-    is_nothrow_equality_comparable_with<T, U>::value) {
+    compare_ops::all_have_nothrow_eq<T, U>::value) {
     return (UTL_TUPLE_GET(I, l) == UTL_TUPLE_GET(I, r)) && equals<I + 1>(l, r);
 }
 
 template <typename T, typename U>
 UTL_ATTRIBUTES(NODISCARD, FLATTEN)
 constexpr bool equals(T const& l, U const& r) noexcept(
-    is_nothrow_equality_comparable_with<T, U>::value) {
+    compare_ops::all_have_nothrow_eq<T, U>::value) {
     static_assert(compare_ops::all_have_eq<T, U>::value, "All elements must be comparable");
     return equals<0>(l, r);
 }
@@ -1409,32 +1407,29 @@ constexpr bool operator<(tuple<> const& l, tuple<> const& r) noexcept {
 template <typename... Ts, typename... Us>
 UTL_NODISCARD constexpr enable_if_t<
     UTL_TRAIT_is_equality_comparable_with(tuple<Ts...>, tuple<Us...>), bool>
-operator!=(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
-    UTL_TRAIT_is_nothrow_equality_comparable_with(tuple<Ts...>, tuple<Us...>)) {
+operator!=(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(noexcept(!(l == r))) {
     return !(l == r);
 }
 
 template <typename... Ts, typename... Us>
 UTL_NODISCARD constexpr enable_if_t<
-    UTL_TRAIT_is_strict_subordinate_comparable_with(tuple<Ts...>, tuple<Us...>), bool>
-operator<=(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
-    UTL_TRAIT_is_nothrow_strict_subordinate_comparable_with(tuple<Ts...>, tuple<Us...>)) {
+    UTL_TRAIT_is_strict_subordinate_comparable_with(tuple<Us...>, tuple<Ts...>), bool>
+operator<=(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(noexcept(!(r < l))) {
     return !(r < l);
 }
 
 template <typename... Ts, typename... Us>
 UTL_NODISCARD constexpr enable_if_t<
-    UTL_TRAIT_is_equality_comparable_with(tuple<Us...>, tuple<Ts...>), bool>
+    UTL_TRAIT_is_strict_subordinate_comparable_with(tuple<Us...>, tuple<Ts...>), bool>
 operator>(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
-    UTL_TRAIT_is_nothrow_equality_comparable_with(tuple<Us...>, tuple<Ts...>)) {
+    noexcept(static_cast<bool>(r < l))) {
     return static_cast<bool>(r < l);
 }
 
 template <typename... Ts, typename... Us>
 UTL_NODISCARD constexpr enable_if_t<
     UTL_TRAIT_is_strict_subordinate_comparable_with(tuple<Ts...>, tuple<Us...>), bool>
-operator>=(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
-    UTL_TRAIT_is_nothrow_strict_subordinate_comparable_with(tuple<Ts...>, tuple<Us...>)) {
+operator>=(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(noexcept(!(l < r))) {
     return !(l < r);
 }
 
