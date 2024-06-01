@@ -9,7 +9,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-concept complete_type = (sizeof(T) > 0);
+concept complete_type = UTL_TRAIT_is_complete(T);
 
 UTL_NAMESPACE_END
 #endif
