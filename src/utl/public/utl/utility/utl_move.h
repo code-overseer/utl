@@ -3,6 +3,9 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_is_copy_constructible.h"
+#include "utl/type_traits/utl_is_nothrow_move_constructible.h"
+#include "utl/type_traits/utl_remove_reference.h"
 
 #if UTL_CXX14 && UTL_USE_STD_move
 #  include <utility>
@@ -33,7 +36,7 @@ namespace details {
 namespace utility {
 template <typename T>
 using move_if_noexcept_result_t =
-    conditional_t<!is_nothrow_move_constructible<T>::value && is_copy_constructible<T>::value,
+    conditional_t<!UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_copy_constructible(T),
         T const&, T&&>;
 
 } // namespace utility

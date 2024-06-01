@@ -153,4 +153,30 @@ struct is_nothrow_swappable : is_nothrow_swappable_with<T&, T&> {};
 
 UTL_NAMESPACE_END
 
+#  if UTL_CXX14
+
+UTL_NAMESPACE_BEGIN
+template <typename T, typename U>
+UTL_INLINE_CXX17 constexpr bool is_swappable_with_v = is_swappable_with<T, U>::value;
+template <typename T, typename U>
+UTL_INLINE_CXX17 constexpr bool is_nothrow_swappable_with_v = is_nothrow_swappable_with<T, T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_swappable_v = is_swappable_with_v<T&, T&>;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_nothrow_swappable_v = is_nothrow_swappable_with_v<T&, T&>;
+UTL_NAMESPACE_END
+
+#    define UTL_TRAIT_is_swappable(...) UTL_SCOPE is_swappable_v<__VA_ARGS__>
+#    define UTL_TRAIT_is_swappable_with(...) UTL_SCOPE is_swappable_with_v<__VA_ARGS__>
+#    define UTL_TRAIT_is_nothrow_swappable(...) UTL_SCOPE is_nothrow_swappable_v<__VA_ARGS__>
+#    define UTL_TRAIT_is_nothrow_swappable_with(...) \
+        UTL_SCOPE is_nothrow_swappable_with_v<__VA_ARGS__>
+#  else
+#    define UTL_TRAIT_is_swappable(...) UTL_SCOPE is_swappable<__VA_ARGS__>::value
+#    define UTL_TRAIT_is_swappable_with(...) UTL_SCOPE is_swappable_with<__VA_ARGS__>::value
+#    define UTL_TRAIT_is_nothrow_swappable(...) UTL_SCOPE is_nothrow_swappable<__VA_ARGS__>::value
+#    define UTL_TRAIT_is_nothrow_swappable_with(...) \
+        UTL_SCOPE is_nothrow_swappable_with<__VA_ARGS__>::value
+#  endif
+
 #endif // UTL_CXX20 && UTL_USE_STD_swap
