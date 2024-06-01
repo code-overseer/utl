@@ -65,7 +65,7 @@ template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_trivially_destructible_v = is_trivially_destructible<T>::value;
 #    endif // UTL_CXX14
 
-#    define UTL_TRAIT_SUPPORTED_is_nothrow_constructible 0
+#    define UTL_TRAIT_SUPPORTED_is_trivially_destructible 0
 
 UTL_NAMESPACE_END
 

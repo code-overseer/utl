@@ -4,6 +4,7 @@
 
 #include "utl/preprocessor/utl_namespace.h"
 #include "utl/type_traits/utl_declval.h"
+#include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/type_traits/utl_void_t.h"
 
@@ -128,23 +129,54 @@ struct castable : false_type {};
 template <typename T>
 struct castable<T, decltype(static_cast<bool>(declval<T>()))> : true_type {};
 
+template <typename T>
+struct nothrow_castable : bool_constant<noexcept(static_cast<bool>(declval<T>()))> {};
+template <typename T>
+struct nothrow_negatable : bool_constant<noexcept(!declval<T>())> {};
+template <typename T>
+struct nothrow_conjunctable :
+    bool_constant<noexcept(true && declval<T>()) && noexcept(declval<T>() && false) &&
+        noexcept(declval<T>() && declval<T>())> {};
+template <typename T>
+struct nothrow_disjunctable :
+    bool_constant<noexcept(false || declval<T>()) && noexcept(declval<T>() || true) &&
+        noexcept(declval<T>() || declval<T>())> {};
+
 } // namespace bool_testable
 } // namespace details
 
 template <typename T>
 struct is_boolean_testable :
-    conjunction<details::bool_testable::castable<T, bool>, details::bool_testable::negatable<T>,
+    conjunction<details::bool_testable::castable<T>, details::bool_testable::negatable<T>,
         details::bool_testable::conjunctable<T>, details::bool_testable::disjunctable<T>> {};
+template <>
+struct is_boolean_testable<bool> : true_type {};
+
+template <typename T>
+struct is_nothrow_boolean_testable :
+    conjunction<is_boolean_testable<T>, details::bool_testable::nothrow_castable<T>,
+        details::bool_testable::nothrow_negatable<T>,
+        details::bool_testable::nothrow_conjunctable<T>,
+        details::bool_testable::nothrow_disjunctable<T>> {};
+
+template <>
+struct is_nothrow_boolean_testable<bool> : true_type {};
 
 #if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_boolean_testable_v = is_boolean_testable<T>::value;
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_nothrow_boolean_testable_v = is_nothrow_boolean_testable<T>::value;
 #endif
 
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
 #  define UTL_TRAIT_is_boolean_testable(...) UTL_SCOPE is_boolean_testable_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_nothrow_boolean_testable(...) \
+      UTL_SCOPE is_nothrow_boolean_testable_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_boolean_testable(...) UTL_SCOPE is_boolean_testable<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_nothrow_boolean_testable(...) \
+      UTL_SCOPE is_nothrow_boolean_testable<__VA_ARGS__>::value
 #endif

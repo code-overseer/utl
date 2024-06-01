@@ -2,13 +2,14 @@
 
 #pragma once
 
+#include "utl/type_traits/utl_add_const.h"
 #include "utl/type_traits/utl_add_rvalue_reference.h"
 #include "utl/type_traits/utl_common.h"
 #include "utl/type_traits/utl_common_type.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_copy_cvref.h"
 #include "utl/type_traits/utl_declval.h"
-#include "utl/type_traits/utl_has_type.h"
+#include "utl/type_traits/utl_has_member_type.h"
 #include "utl/type_traits/utl_is_convertible.h"
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/type_traits/utl_merge_cv.h"
@@ -137,13 +138,15 @@ template <>
 struct first_type<> {};
 
 template <typename T, typename... Ts>
-struct first_type<T, Ts...> : conditional_t<has_type<T>::value, T, first_type<Ts...>> {};
+struct first_type<T, Ts...> : conditional_t<has_member_type<T>::value, T, first_type<Ts...>> {};
 
 template <typename T, typename U>
-using impl = first_type<simple_common_ref<T, U>,
-    basic_common_reference<remove_cvref_t<T>, remove_cvref_t<U>, copy_cvref_from<T>::template apply,
-        copy_cvref_from<U>::template apply>, // basic_common_reference
-    ternary_result<T, U>, common_type<T, U>>;
+using basic_common_ref = basic_common_reference<remove_cvref_t<T>, remove_cvref_t<U>,
+    copy_cvref_from<T>::template apply, copy_cvref_from<U>::template apply>;
+
+template <typename T, typename U>
+using impl = first_type<simple_common_ref<T, U>, basic_common_ref<T, U>, ternary_result<T, U>,
+    UTL_SCOPE common_type<T, U>>;
 
 template <typename List, typename = void>
 struct sfinae_gt_2 {};

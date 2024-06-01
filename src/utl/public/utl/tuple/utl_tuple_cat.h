@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_namespace.h"
+#include "utl/type_traits/utl_is_reference.h"
 
 #if !defined(UTL_TUPLE_PRIVATE_HEADER_GUARD)
 #  error "Private header accessed"

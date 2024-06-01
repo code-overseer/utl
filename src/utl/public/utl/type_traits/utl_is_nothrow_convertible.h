@@ -76,8 +76,13 @@ using is_nothrow = decltype(nothrow_test<From, To>(0));
 
 template <typename From, typename To>
 struct is_nothrow_convertible :
-    disjunction<conjunction<is_void<From>, is_void<To>>,
+    disjunction<bool_constant<UTL_TRAIT_is_void(From) && UTL_TRAIT_is_void(To)>,
         details::convertible::is_nothrow<From, To>> {};
+
+#    if UTL_CXX14
+template <typename From, typename To>
+UTL_INLINE_CXX17 constexpr bool is_nothrow_convertible_v = is_nothrow_convertible<From, To>::value;
+#    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
 
@@ -86,3 +91,11 @@ UTL_NAMESPACE_END
 #  endif // ifdef UTL_BUILTIN_is_nothrow_convertible
 
 #endif // if UTL_USE_STD_TYPE_TRAITS && UTL_CXX20
+
+#ifdef UTL_BUILTIN_is_nothrow_convertible
+#  define UTL_TRAIT_is_nothrow_convertible(...) UTL_BUILTIN_is_nothrow_convertible(__VA_ARGS__)
+#elif UTL_CXX14
+#  define UTL_TRAIT_is_nothrow_convertible(...) UTL_SCOPE is_nothrow_convertible_v<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_is_nothrow_convertible(...) UTL_SCOPE is_nothrow_convertible<__VA_ARGS__>::value
+#endif
