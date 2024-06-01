@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/concepts/utl_complete.h"
+#include "utl/concepts/utl_complete_type.h"
 #include "utl/concepts/utl_implicit_lifetime.h"
 #include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_enable_if.h"
@@ -228,25 +228,25 @@ UTL_START_LIFETIME_ATTRIBUTES inline UTL_ENABLE_IF_CXX11(T const volatile*,
     return details::lifetime::start_as<T const volatile>(const_cast<void*>(p));
 }
 
-template <UTL_CONCEPT_CXX20(complete) T>
+template <UTL_CONCEPT_CXX20(complete_type) T>
 UTL_START_LIFETIME_ATTRIBUTES inline UTL_ENABLE_IF_CXX11(T*, UTL_TRAIT_is_complete(T))
     start_lifetime_as_array(void* p, size_t n) noexcept {
     return details::lifetime::start_as_array<T>(const_cast<void*>(p), n);
 }
 
-template <UTL_CONCEPT_CXX20(complete) T>
+template <UTL_CONCEPT_CXX20(complete_type) T>
 UTL_START_LIFETIME_ATTRIBUTES inline UTL_ENABLE_IF_CXX11(T const*, UTL_TRAIT_is_complete(T))
     start_lifetime_as_array(void const* p, size_t n) noexcept {
     return details::lifetime::collapse_as_array<T const>(const_cast<void*>(p), n);
 }
 
-template <UTL_CONCEPT_CXX20(complete) T>
+template <UTL_CONCEPT_CXX20(complete_type) T>
 UTL_START_LIFETIME_ATTRIBUTES inline UTL_ENABLE_IF_CXX11(T volatile*, UTL_TRAIT_is_complete(T))
     start_lifetime_as_array(void volatile* p, size_t n) noexcept {
     return details::lifetime::start_as_array<T volatile>(const_cast<void*>(p), n);
 }
 
-template <UTL_CONCEPT_CXX20(complete) T>
+template <UTL_CONCEPT_CXX20(complete_type) T>
 UTL_START_LIFETIME_ATTRIBUTES inline UTL_ENABLE_IF_CXX11(T const volatile*,
     UTL_TRAIT_is_complete(T)) start_lifetime_as_array(void const volatile* p, size_t n) noexcept {
     return details::lifetime::start_as_array<T const volatile>(const_cast<void*>(p), n);
