@@ -30,10 +30,9 @@ explicit scope_exit(Fn&& f) -> scope_exit<decay_t<Fn>>;
 #endif
 
 template <typename Fn>
-auto make_scope_exit(Fn&& f) noexcept(
-    UTL_TRAIT_VALUE(is_nothrow_constructible, scope_exit<decay_t<Fn>>, Fn))
-    -> enable_if_t<UTL_TRAIT_VALUE(is_constructible, scope_exit<decay_t<Fn>>, Fn),
-        scope_exit<decay_t<Fn>>> {
+auto make_scope_exit(Fn&& f) noexcept(UTL_TRAIT_is_nothrow_constructible(scope_exit<decay_t<Fn>>,
+    Fn)) -> enable_if_t<UTL_TRAIT_is_constructible(scope_exit<decay_t<Fn>>, Fn),
+    scope_exit<decay_t<Fn>>> {
     return scope_exit<decay_t<Fn>>{forward<Fn>(f)};
 }
 
@@ -42,8 +41,8 @@ namespace scope {
 UTL_INLINE_CXX17 constexpr struct exit_proxy_t {
     template <typename Fn>
     auto operator->*(Fn&& f) const
-        noexcept(UTL_TRAIT_VALUE(is_nothrow_constructible, scope_exit<decay_t<Fn>>, Fn))
-            -> enable_if_t<UTL_TRAIT_VALUE(is_constructible, scope_exit<decay_t<Fn>>, Fn),
+        noexcept(UTL_TRAIT_is_nothrow_constructible(scope_exit<decay_t<Fn>>, Fn))
+            -> enable_if_t<UTL_TRAIT_is_constructible(scope_exit<decay_t<Fn>>, Fn),
                 scope_exit<decay_t<Fn>>> {
         return scope_exit<decay_t<Fn>>{forward<Fn>(f)};
     }

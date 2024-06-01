@@ -41,10 +41,9 @@ template <typename Fn>
 explicit scope_fail(Fn&& f) -> scope_fail<decay_t<Fn>>;
 
 template <typename Fn>
-auto make_scope_fail(Fn&& f) noexcept(
-    UTL_TRAIT_VALUE(is_nothrow_constructible, scope_fail<decay_t<Fn>>, Fn))
-    -> enable_if_t<UTL_TRAIT_is_constructible(scope_fail<decay_t<Fn>>, Fn),
-        scope_fail<decay_t<Fn>>> {
+auto make_scope_fail(Fn&& f) noexcept(UTL_TRAIT_is_nothrow_constructible(scope_fail<decay_t<Fn>>,
+    Fn)) -> enable_if_t<UTL_TRAIT_is_constructible(scope_fail<decay_t<Fn>>, Fn),
+    scope_fail<decay_t<Fn>>> {
     return scope_fail<decay_t<Fn>>{UTL_SCOPE forward<Fn>(f)};
 }
 
