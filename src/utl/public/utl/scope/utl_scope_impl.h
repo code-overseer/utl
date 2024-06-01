@@ -4,8 +4,9 @@
 
 #include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_enable_if.h"
+#include "utl/type_traits/utl_is_move_constructible.h"
+#include "utl/type_traits/utl_is_nothrow_move_constructible.h"
 #include "utl/type_traits/utl_is_same.h"
-#include "utl/type_traits/utl_is_x_constructible.h"
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/utility/utl_forward.h"
 
@@ -20,7 +21,8 @@ private:
 
 template <typename Impl, typename F>
 class impl {
-    // TODO static assert that F is callable
+    static_assert(UTL_TRAIT_is_invocable(F), "Callable F must be invocable");
+
 protected:
     using is_movable = is_move_constructible<F>;
 
@@ -29,16 +31,16 @@ private:
     using not_move_t = conditional_t<is_movable::value, details::scope::invalid_t, impl>;
 
 protected:
-    template <typename Fn, typename = enable_if_t<is_constructible<F, Fn&&>::value>>
-    impl(Fn&& func) noexcept(is_nothrow_constructible<F, Fn&&>::value)
-        : callable(forward<Fn>(func))
+    template <typename Fn, typename = enable_if_t<UTL_TRAIT_is_constructible(F, Fn&&)>>
+    impl(Fn&& func) noexcept(UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
+        : callable(UTL_SCOPE forward<Fn>(func))
         , released_(false) {}
     impl(impl const& other) = delete;
     impl& operator=(impl const& other) = delete;
     impl(not_move_t&& other) = delete;
     impl& operator=(impl&& other) = delete;
-    constexpr impl(move_t&& other) noexcept(is_nothrow_move_constructible<F>::value)
-        : impl(is_movable{}, move(other)) {}
+    constexpr impl(move_t&& other) noexcept(UTL_TRAIT_is_nothrow_move_constructible(F))
+        : impl(is_movable{}, UTL_SCOPE move(other)) {}
 
     void release() noexcept { released_ = true; }
 
@@ -52,9 +54,9 @@ private:
     // TODO ignore warning
     constexpr impl(false_type, details::scope::invalid_t&&) noexcept;
     template <typename T = impl,
-        typename = enable_if_t<is_movable::value && is_same<T, impl>::value>>
+        typename = enable_if_t<is_movable::value && UTL_TRAIT_is_same(T, impl)>>
     constexpr impl(true_type, T&& other) noexcept
-        : callable(move(other.callable))
+        : callable(UTL_SCOPE move(other.callable))
         , released_(other.released_) {
         other.release();
     }
