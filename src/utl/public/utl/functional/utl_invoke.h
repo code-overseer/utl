@@ -19,7 +19,8 @@ namespace invoke {
 template <typename R>
 struct invoke_t {
     template <typename F, typename... Args>
-    static R call(F&& f, Args&&... args) noexcept(UTL_TRAIT_is_nothrow_invocable_r(R, F, Args...)) {
+    static constexpr R call(F&& f, Args&&... args) noexcept(
+        UTL_TRAIT_is_nothrow_invocable_r(R, F, Args...)) {
         return details::invocable::invoke(
             UTL_SCOPE forward<F>(f), UTL_SCOPE forward<Args>(args)...);
     }
@@ -28,7 +29,8 @@ struct invoke_t {
 template <>
 struct invoke_t<void> {
     template <typename F, typename... Args>
-    static void call(F&& f, Args&&... args) noexcept(UTL_TRAIT_is_nothrow_invocable(F, Args...)) {
+    static constexpr void call(F&& f, Args&&... args) noexcept(
+        UTL_TRAIT_is_nothrow_invocable(F, Args...)) {
         details::invocable::invoke(UTL_SCOPE forward<F>(f), UTL_SCOPE forward<Args>(args)...);
     }
 };
