@@ -6,46 +6,27 @@
 
 #if UTL_CXX20
 
-#  include <concepts>
-
-UTL_NAMESPACE_BEGIN
-
-using std::assignable_from;
-using std::common_reference_with;
-using std::common_with;
-using std::constructible_from;
-using std::convertible_to;
-using std::copy_constructible;
-using std::default_initializable;
-using std::derived_from;
-using std::destructible;
-using std::floating_point;
-using std::integral;
-using std::move_constructible;
-using std::signed_integral;
-using std::swappable;
-using std::swappable_with;
-using std::unsigned_integral;
-
-using std::equality_comparable;
-using std::equality_comparable_with;
-using std::totally_ordered;
-using std::totally_ordered_with;
-
-using std::copyable;
-using std::movable;
-using std::regular;
-using std::semiregular;
-
-using std::equivalence_relation;
-using std::invocable;
-using std::predicate;
-using std::regular_invocable;
-using std::relation;
-using std::strict_weak_order;
-using std::swappable;
-using std::swappable_with;
-
-UTL_NAMESPACE_END
+#  include "utl/concepts/utl_assignable_from.h"
+#  include "utl/concepts/utl_common_reference_with.h"
+#  include "utl/concepts/utl_common_with.h"
+#  include "utl/concepts/utl_constructible_from.h"
+#  include "utl/concepts/utl_convertible_to.h"
+#  include "utl/concepts/utl_copy_constructible.h"
+#  include "utl/concepts/utl_copyable.h"
+#  include "utl/concepts/utl_default_initializable.h"
+#  include "utl/concepts/utl_derived_from.h"
+#  include "utl/concepts/utl_destructible.h"
+#  include "utl/concepts/utl_equality_comparable.h"
+#  include "utl/concepts/utl_floating_point.h"
+#  include "utl/concepts/utl_implicit_lifetime.h"
+#  include "utl/concepts/utl_integral.h"
+#  include "utl/concepts/utl_invocable.h"
+#  include "utl/concepts/utl_move_constructible.h"
+#  include "utl/concepts/utl_regular.h"
+#  include "utl/concepts/utl_same_as.h"
+#  include "utl/concepts/utl_semiregular.h"
+#  include "utl/concepts/utl_signed_integral.h"
+#  include "utl/concepts/utl_totally_ordered.h"
+#  include "utl/concepts/utl_unsigned_integral.h"
 
 #endif

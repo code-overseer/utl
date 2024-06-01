@@ -36,6 +36,7 @@ UTL_PRAGMA_WARN("C++ < 20 does not implement a constexpr swap, `UTL_USE_STD_swap
 #  include "utl/type_traits/utl_is_nothrow_move_assignable.h"
 #  include "utl/type_traits/utl_is_nothrow_move_constructible.h"
 #  include "utl/type_traits/utl_logical_traits.h"
+#  include "utl/type_traits/utl_void_t.h"
 
 UTL_NAMESPACE_BEGIN
 

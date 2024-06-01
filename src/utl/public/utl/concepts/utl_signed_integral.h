@@ -2,14 +2,15 @@
 
 #pragma once
 
+#include "utl/concepts/utl_integral.h"
 #include "utl/preprocessor/utl_config.h"
-#include "utl/type_traits/utl_is_complete.h"
+#include "utl/type_traits/utl_is_signed.h"
 
 #if UTL_CXX20
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-concept complete = (sizeof(T) > 0);
+concept signed_integral = UTL_TRAIT_is_signed(T) && integral<T>;
 
 UTL_NAMESPACE_END
 #endif
