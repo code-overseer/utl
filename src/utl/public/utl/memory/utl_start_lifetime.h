@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/concepts/utl_complete.h"
+#include "utl/concepts/utl_complete_type.h"
 #include "utl/concepts/utl_implicit_lifetime.h"
 #include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_enable_if.h"
