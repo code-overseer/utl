@@ -65,22 +65,19 @@ template <typename T, typename Alloc, typename... Args>
 struct is_constructible_with_allocator :
     conjunction<uses_allocator<T, Alloc>,
         disjunction<is_constructible<T, allocator_arg_t, Alloc const&, Args...>,
-            is_constructible<T, Args..., Alloc const&>,
-            is_constructible<T, ::std::allocator_arg_t, Alloc const&, Args...>>> {};
+            is_constructible<T, Args..., Alloc const&>>> {};
 
 template <typename T, typename Alloc, typename... Args>
 struct is_nothrow_constructible_with_allocator :
     conjunction<uses_allocator<T, Alloc>,
         disjunction<is_nothrow_constructible<T, allocator_arg_t, Alloc const&, Args...>,
-            is_nothrow_constructible<T, Args..., Alloc const&>,
-            is_nothrow_constructible<T, ::std::allocator_arg_t, Alloc const&, Args...>>> {};
+            is_nothrow_constructible<T, Args..., Alloc const&>>> {};
 
 template <typename T, typename Alloc, typename... Args>
 struct is_explicit_constructible_with_allocator :
     conjunction<uses_allocator<T, Alloc>,
         disjunction<is_explicit_constructible<T, allocator_arg_t, Alloc const&, Args...>,
-            is_explicit_constructible<T, Args..., Alloc const&>,
-            is_explicit_constructible<T, ::std::allocator_arg_t, Alloc const&, Args...>>> {};
+            is_explicit_constructible<T, Args..., Alloc const&>>> {};
 
 template <typename T, typename Alloc, typename... Args>
 struct is_implicit_constructible_with_allocator :

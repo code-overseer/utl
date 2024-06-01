@@ -25,11 +25,13 @@ UTL_NAMESPACE_END
 #else // UTL_USE_STDPAIR
 
 #  include "utl/compare/utl_compare_traits.h"
+#  include "utl/concepts/utl_common_with.h"
 #  include "utl/preprocessor/utl_config.h"
 #  include "utl/tuple/utl_tuple_traits.h"
 #  include "utl/type_traits/utl_common_reference.h"
 #  include "utl/type_traits/utl_common_type.h"
 #  include "utl/type_traits/utl_decay.h"
+#  include "utl/type_traits/utl_is_equality_comparable.h"
 #  include "utl/type_traits/utl_template_list.h"
 #  include "utl/type_traits/utl_unwrap_reference.h"
 #  include "utl/type_traits/utl_variadic_traits.h"
@@ -187,8 +189,8 @@ private:
     using traits = variadic_traits<T0, T1>;
     using this_type = pair<T0, T1>;
     using swap_type =
-        conditional_t<traits::template is_swappable, pair, details::pair::invalid_swap_t<T0, T1>>;
-    using const_swap_type = conditional_t<traits::template is_const_swappable, pair,
+        conditional_t<traits::is_swappable, pair, details::pair::invalid_swap_t<T0, T1>>;
+    using const_swap_type = conditional_t<traits::is_const_swappable, pair,
         details::pair::invalid_swap_t<T0, T1>> const;
 
     template <typename V, typename...>
@@ -291,18 +293,21 @@ public:
     }
 
 public:
-    template <typename U0 = T0, typename U1 = T1,
-        enable_if_t<defer<bool_constant<traits::is_implicit_default_constructible>, U0, U1>::value,
-            int> = 0>
+#  if !UTL_CXX20
+    template <typename U0 = T0, typename U1 = T1 UTL_REQUIRES_CXX11(
+        defer<bool_constant<traits::is_implicit_default_constructible>, U0, U1>::value)>
     constexpr pair() noexcept(traits::is_nothrow_default_constructible) : first()
                                                                         , second() {}
 
-    template <typename U0 = T0, typename U1 = T1,
-        enable_if_t<defer<bool_constant<traits::is_explicit_default_constructible>, U0, U1>::value,
-            int> = 1>
+    template <typename U0 = T0, typename U1 = T1 UTL_REQUIRES_CXX11(
+        defer<bool_constant<traits::is_explicit_default_constructible>, U0, U1>::value)>
     explicit constexpr pair() noexcept(traits::is_nothrow_default_constructible)
         : first()
         , second() {}
+#  else
+    explicit(traits::is_explicit_default_constructible) constexpr pair() noexcept(
+        traits::is_nothrow_default_constructible) = default;
+#  endif
 
 public:
     template <typename U0 = T0, typename U1 = T1,
@@ -323,7 +328,7 @@ public:
 public:
     template <typename U0 = T0, typename U1 = T1,
         enable_if_t<traits::template is_implicit_constructible<U0&&, U1&&>::value, bool> = true,
-        enable_if_t<!traits::template is_dangling<U0&&, U1&&>, bool> = true>
+        enable_if_t<!traits::template is_dangling<U0&&, U1&&>::value, bool> = true>
     constexpr pair(U0&& u0, U1&& u1) noexcept(
         traits::template is_nothrow_constructible<U0, U1>::value)
         : first(forward<U0>(u0))
@@ -331,7 +336,7 @@ public:
 
     template <typename U0 = T0, typename U1 = T1,
         enable_if_t<traits::template is_explicit_constructible<U0&&, U1&&>::value, bool> = false,
-        enable_if_t<!traits::template is_dangling<U0&&, U1&&>, bool> = true>
+        enable_if_t<!traits::template is_dangling<U0&&, U1&&>::value, bool> = true>
     explicit constexpr pair(U0&& u0, U1&& u1) noexcept(
         traits::template is_nothrow_constructible<U0, U1>::value)
         : first(forward<U0>(u0))
@@ -339,13 +344,13 @@ public:
 
     template <typename U0 = T0, typename U1 = T1,
         enable_if_t<traits::template is_implicit_constructible<U0&&, U1&&>::value, bool> = true,
-        enable_if_t<traits::template is_dangling<U0&&, U1&&>, bool> = false>
+        enable_if_t<traits::template is_dangling<U0&&, U1&&>::value, bool> = false>
     constexpr pair(U0&& u0, U1&& u1) noexcept(
         traits::template is_nothrow_constructible<U0, U1>::value) = delete;
 
     template <typename U0 = T0, typename U1 = T1,
         enable_if_t<traits::template is_explicit_constructible<U0&&, U1&&>::value, bool> = false,
-        enable_if_t<traits::template is_dangling<U0&&, U1&&>, bool> = false>
+        enable_if_t<traits::template is_dangling<U0&&, U1&&>::value, bool> = false>
     explicit constexpr pair(U0&& u0, U1&& u1) noexcept(
         traits::template is_nothrow_constructible<U0, U1>::value) = delete;
 
@@ -606,50 +611,56 @@ public:
 
 template <typename T0, typename T1, typename U0, typename U1>
 UTL_NODISCARD constexpr enable_if_t<
-    conjunction<is_equality_comparable<T0, U0>, is_equality_comparable<T1, U1>>::value, bool>
+    conjunction<is_equality_comparable_with<T0, U0>, is_equality_comparable_with<T1, U1>>::value,
+    bool>
 operator==(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
-    conjunction<is_nothrow_equality_comparable<T0, U0>,
-        is_nothrow_equality_comparable<T1, U1>>::value) {
+    conjunction<is_nothrow_equality_comparable_with<T0, U0>,
+        is_nothrow_equality_comparable_with<T1, U1>>::value) {
     return static_cast<bool>(l.first == r.first) && static_cast<bool>(l.second == r.second);
 }
 
 template <typename T0, typename T1, typename U0, typename U1>
 UTL_NODISCARD constexpr enable_if_t<
-    conjunction<is_equality_comparable<T0, U0>, is_less_comparable<T0, U0>,
-        is_less_comparable<T1, U1>>::value,
+    conjunction<is_equality_comparable_with<T0, U0>, is_strict_subordinate_comparable_with<T0, U0>,
+        is_strict_subordinate_comparable_with<T1, U1>>::value,
     bool>
 operator<(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
-    conjunction<is_nothrow_equality_comparable<T0, U0>, is_nothrow_less_comparable<T0, U0>,
-        is_nothrow_less_comparable<T1, U1>>::value) {
+    conjunction<is_nothrow_equality_comparable_with<T0, U0>,
+        is_nothrow_strict_subordinate_comparable_with<T0, U0>,
+        is_nothrow_strict_subordinate_comparable_with<T1, U1>>::value) {
     return static_cast<bool>(l.first < r.first) ||
         (static_cast<bool>(l.first == r.first) && static_cast<bool>(l.second < r.second));
 }
 
 template <typename T0, typename T1, typename U0, typename U1>
-UTL_NODISCARD constexpr enable_if_t<is_equality_comparable<pair<T0, T1>, pair<U0, U1>>::value, bool>
+UTL_NODISCARD constexpr enable_if_t<is_equality_comparable_with<pair<T0, T1>, pair<U0, U1>>::value,
+    bool>
 operator!=(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
-    is_nothrow_equality_comparable<pair<T0, T1>, pair<U0, U1>>::value) {
+    is_nothrow_equality_comparable_with<pair<T0, T1>, pair<U0, U1>>::value) {
     return !static_cast<bool>(l == r);
 }
 
 template <typename T0, typename T1, typename U0, typename U1>
-UTL_NODISCARD constexpr enable_if_t<is_less_comparable<pair<U0, U1>, pair<T0, T1>>::value, bool>
+UTL_NODISCARD constexpr enable_if_t<
+    is_strict_subordinate_comparable_with<pair<U0, U1>, pair<T0, T1>>::value, bool>
 operator<=(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
-    is_nothrow_less_comparable<pair<U0, U1>, pair<T0, T1>>::value) {
+    is_nothrow_strict_subordinate_comparable_with<pair<U0, U1>, pair<T0, T1>>::value) {
     return !static_cast<bool>(r < l);
 }
 
 template <typename T0, typename T1, typename U0, typename U1>
-UTL_NODISCARD constexpr enable_if_t<is_less_comparable<pair<U0, U1>, pair<T0, T1>>::value, bool>
+UTL_NODISCARD constexpr enable_if_t<
+    is_strict_subordinate_comparable_with<pair<U0, U1>, pair<T0, T1>>::value, bool>
 operator>(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
-    is_nothrow_less_comparable<pair<U0, U1>, pair<T0, T1>>::value) {
+    is_nothrow_strict_subordinate_comparable_with<pair<U0, U1>, pair<T0, T1>>::value) {
     return static_cast<bool>(r < l);
 }
 
 template <typename T0, typename T1, typename U0, typename U1>
-UTL_NODISCARD constexpr enable_if_t<is_less_comparable<pair<T0, T1>, pair<U0, U1>>::value, bool>
+UTL_NODISCARD constexpr enable_if_t<
+    is_strict_subordinate_comparable_with<pair<T0, T1>, pair<U0, U1>>::value, bool>
 operator>=(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
-    is_nothrow_less_comparable<pair<T0, T1>, pair<U0, U1>>::value) {
+    is_nothrow_strict_subordinate_comparable_with<pair<T0, T1>, pair<U0, U1>>::value) {
     return !static_cast<bool>(l < r);
 }
 
@@ -697,12 +708,12 @@ UTL_NAMESPACE_END
 namespace std {
 
 template <typename T0, typename T1, typename U0, typename U1>
-struct common_type<pair<T0, T1>, pair<U0, U1>> :
+struct common_type<UTL_SCOPE pair<T0, T1>, UTL_SCOPE pair<U0, U1>> :
     UTL_SCOPE details::pair::common_type_impl<T0, T1, U0, U1> {};
 
 template <typename T0, typename T1, typename U0, typename U1, template <typename> class TQual,
     template <typename> class UQual>
-struct basic_common_reference<pair<T0, T1>, pair<U0, U1>, TQual, UQual> :
+struct basic_common_reference<UTL_SCOPE pair<T0, T1>, UTL_SCOPE pair<U0, U1>, TQual, UQual> :
     UTL_SCOPE details::pair::basic_ref_impl<T0, T1, U0, U1, TQual, UQual> {};
 
 } // namespace std
@@ -710,21 +721,20 @@ struct basic_common_reference<pair<T0, T1>, pair<U0, U1>, TQual, UQual> :
 #else  // if !UTL_CXX20
 
 namespace std {
-template <typename T0, typename T1, typename U0, typename U1>
-requires requires { typename pair<common_type_t<T0, U0>, common_type_t<T1, U1>>; }
-struct common_type<pair<T0, T1>, pair<U0, U1>> {
-    using type = pair<common_type_t<T0, U0>, common_type_t<T1, U1>>;
+template <typename T0, typename T1, UTL_SCOPE common_with<T0> U0, UTL_SCOPE common_with<T1> U1>
+struct common_type<UTL_SCOPE pair<T0, T1>, UTL_SCOPE pair<U0, U1>> {
+    using type = UTL_SCOPE pair<UTL_SCOPE common_type_t<T0, U0>, UTL_SCOPE common_type_t<T1, U1>>;
 };
 
 template <typename T0, typename T1, typename U0, typename U1, template <typename> class TQual,
     template <typename> class UQual>
 requires requires {
-    typename pair<common_reference_t<TQual<T0>, UQual<U0>>,
-        common_reference_t<TQual<T1>, UQual<U1>>>;
+    typename UTL_SCOPE common_reference<TQual<T0>, UQual<U0>>::type;
+    typename UTL_SCOPE common_reference<TQual<T1>, UQual<U1>>::type;
 }
-struct basic_common_reference<pair<T0, T1>, pair<U0, U1>, TQual, UQual> {
-    using type =
-        pair<common_reference_t<TQual<T0>, UQual<U0>>, common_reference_t<TQual<T1>, UQual<U1>>>;
+struct basic_common_reference<UTL_SCOPE pair<T0, T1>, UTL_SCOPE pair<U0, U1>, TQual, UQual> {
+    using type = UTL_SCOPE pair<UTL_SCOPE common_reference_t<TQual<T0>, UQual<U0>>,
+        UTL_SCOPE common_reference_t<TQual<T1>, UQual<U1>>>;
 };
 } // namespace std
 #endif // if !UTL_CXX20
