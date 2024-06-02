@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "utl/atomic.h"
 #include "utl/compare/utl_pointer_comparable.h"
 #include "utl/exception/utl_program_exception.h"
 #include "utl/memory/utl_addressof.h"

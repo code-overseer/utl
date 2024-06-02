@@ -6,6 +6,10 @@
 			"name": "UTL"
 		},
 		{
+			"path": "src/experimental",
+			"name": "EXP"
+		},
+		{
 			"path": ".",
 			"name": "Root",
 			"folder_exclude_patterns": [ "*/" ]
@@ -32,16 +36,36 @@
 			"variants":
 			[
 				{
-					"name": "Compile Tests",
+					"name": "Compile Private",
 					"shell_cmd": "make -C $project_path/src/utl compile -j8"
 				},
 				{
-					"name": "Preprocess Tests",
+					"name": "Preprocess Private",
 					"shell_cmd": "make -C $project_path/src/utl preprocess -j8"
 				},
 				{
 					"name": "Print Build Variables",
 					"shell_cmd": "make -C $project_path/src/utl print -j8"	
+				}
+			]
+		},
+		{
+			"name": "EXP Build",
+			"cancel": { "kill": true },
+			"file_regex": "^(/...*?):([0-9]+):?([0-9]+)",
+			"variants":
+			[
+				{
+					"name": "Compile Private",
+					"shell_cmd": "make -C $project_path/src/experimental compile -j8"
+				},
+				{
+					"name": "Preprocess Private",
+					"shell_cmd": "make -C $project_path/src/experimental preprocess -j8"
+				},
+				{
+					"name": "Print Build Variables",
+					"shell_cmd": "make -C $project_path/src/experimental print -j8"	
 				}
 			]
 		}
