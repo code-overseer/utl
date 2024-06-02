@@ -437,13 +437,13 @@ public:
     parallel_handle_t<F> plan(size_t count, F&& executions);
 
     template <typename F>
-    single_handle_t<F> plan(job_handle& dependency, F&& execution);
+    single_handle_t<F> plan(job_handle&& dependency, F&& execution);
 
     template <typename... Fs>
-    multi_handle_t<Fs...> plan(job_handle& dependency, Fs&&... executions);
+    multi_handle_t<Fs...> plan(job_handle&& dependency, Fs&&... executions);
 
     template <typename F>
-    parallel_handle_t<F> plan(job_handle& dependency, size_t count, F&& executions);
+    parallel_handle_t<F> plan(job_handle&& dependency, size_t count, F&& executions);
 
     template <typename F>
     std::invoke_result_t<F> execute(F&& execution) {
