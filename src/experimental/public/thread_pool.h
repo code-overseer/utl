@@ -12,6 +12,14 @@
 // todo intrusive_ptr
 // todo atomic_reference_counter
 
+/**
+ * Notes
+ *
+ * We have a "plan" API which creates a dependency graph
+ *
+ * We then have an execution API which executes the jobs, either async or sync
+ */
+
 namespace utl::experimental {
 using size_t = decltype(sizeof(0));
 
@@ -314,7 +322,7 @@ protected:
     void set_completion(completion_interface* interface) { completion_.reset(interface); }
 
 private:
-    utl::intrusive_ptr<job_header> dependency_;
+    utl::intrusive_ptr<job_header> dependent_;
     std::unique_ptr<completion_interface, completion_interface::deleter> completion_;
 };
 
@@ -418,24 +426,24 @@ public:
     constexpr size_t size() const noexcept { return size_; }
 
     template <typename F>
-    single_handle_t<F> schedule(F&& execution) {
-        return job_handle(pool_handle(), std::forward<F>(execution));
+    single_handle_t<F> plan(F&& execution) {
+        return job_handle(std::forward<F>(execution));
     }
 
     template <typename... Fs>
-    multi_handle_t<Fs...> schedule(Fs&&... executions) {}
+    multi_handle_t<Fs...> plan(Fs&&... executions) {}
 
     template <typename F>
-    parallel_handle_t<F> schedule(size_t count, F&& executions);
+    parallel_handle_t<F> plan(size_t count, F&& executions);
 
     template <typename F>
-    single_handle_t<F> schedule(job_handle dependency, F&& execution);
+    single_handle_t<F> plan(job_handle& dependency, F&& execution);
 
     template <typename... Fs>
-    multi_handle_t<Fs...> schedule(job_handle dependency, Fs&&... executions);
+    multi_handle_t<Fs...> plan(job_handle& dependency, Fs&&... executions);
 
     template <typename F>
-    parallel_handle_t<F> schedule(job_handle dependency, size_t count, F&& executions);
+    parallel_handle_t<F> plan(job_handle& dependency, size_t count, F&& executions);
 
     template <typename F>
     std::invoke_result_t<F> execute(F&& execution) {
@@ -447,24 +455,26 @@ public:
         return multi_execute(index_sequence_for<Fs...>{}, std::forward<Fs>(executions)...);
     }
 
+    void execute(job_handle&& job);
+
     template <typename F>
     parallel_t<F> execute(size_t count, F&& execution) {
         schedule(count, executions).wait();
     }
 
     template <typename F>
-    std::invoke_result_t<F> execute(job_handle dependency, F&& execution) {
+    std::invoke_result_t<F> execute(job_handle&& dependency, F&& execution) {
         return dependency.wait(), std::invoke(std::forward<F>(execution));
     }
 
     template <typename... Fs>
-    multi_result_t<Fs...> execute(job_handle dependency, Fs&&... executions) {
+    multi_result_t<Fs...> execute(job_handle&& dependency, Fs&&... executions) {
         dependency.wait();
         return multi_execute(index_sequence_for<Fs...>{}, std::forward<Fs>(executions)...);
     }
 
     template <typename F>
-    parallel_t<F> execute(job_handle dependency, size_t count, F&& execution) {
+    parallel_t<F> execute(job_handle&& dependency, size_t count, F&& execution) {
         schedule(dependency, count, executions).wait();
     }
 
