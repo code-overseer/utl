@@ -12,504 +12,378 @@
 // todo intrusive_ptr
 // todo atomic_reference_counter
 
-/**
- * Notes
- *
- * We have a "plan" API which creates a dependency graph
- *
- * We then have an execution API which executes the jobs, either async or sync
- */
+/*
 
-namespace utl::experimental {
-using size_t = decltype(sizeof(0));
 
-class job_handle;
-class jthread : public std::thread {
-public:
-    using thread::thread;
+UTL_NAMESPACE_BEGIN
 
-    ~jthread() {
-        if (this->joinable()) {
-            this->join();
-        }
+template <typename...>
+class group_t;
+template <typename...>
+class graph_t;
+template <typename...>
+class scatter_t;
+UTL_INLINE_CXX17 constexpr class identity_t {
+} identity = {};
+template <typename...>
+struct unwrap;
+
+template <typename>
+struct is_group : UTL_SCOPE false_type {};
+template <typename... Ts>
+struct is_group<group_t<Ts...>> : UTL_SCOPE true_type {};
+template <typename>
+struct is_graph : UTL_SCOPE false_type {};
+template <typename... Ts>
+struct is_graph<graph_t<Ts...>> : UTL_SCOPE true_type {};
+template <typename>
+struct is_scatter : UTL_SCOPE false_type {};
+template <typename... Ts>
+struct is_scatter<scatter_t<Ts...>> : UTL_SCOPE bool_constant<(sizeof...(Ts) <= 2)> {};
+
+template <template <typename...> class Container>
+struct is_instruction : UTL_SCOPE false_type {};
+template <>
+struct is_instruction<group_t> : UTL_SCOPE true_type {};
+template <>
+struct is_instruction<graph_t> : UTL_SCOPE true_type {};
+template <>
+struct is_instruction<scatter_t> : UTL_SCOPE true_type {};
+
+template <typename T>
+struct is_instruction_type : UTL_SCOPE false_type {};
+template <template <typename...> class Container, typename... Ts>
+struct is_instruction_type<Container<Ts...>> : is_instruction<Container> {};
+
+template <typename T>
+using is_executable = is_invocable<T>;
+
+template <typename T>
+using is_valid_argument =
+    UTL_SCOPE disjunction<is_executable<remove_cvref_t<T>>, is_instruction_type<remove_cvref_t<T>>>;
+
+#if UTL_CXX20
+template <typename T>
+concept executable = invocable<T>;
+
+template <typename T>
+concept instruction_type = is_instruction_type<T>::value;
+
+template <typename T>
+concept valid_argument = (executable<remove_cvref_t<T>> || instruction_type<remove_cvref_t<T>>);
+#endif
+
+template <>
+class graph_t<> {
+    template <UTL_CONCEPT_CXX20(valid_argument) T UTL_REQUIRES_CXX11(is_valid_argument<T>::value)>
+    UTL_ATTRIBUTE(NO_DISCARD)
+    constexpr graph_t<UTL_SCOPE decay_t<T>> operator>>(T&& execution) const noexcept {
+        return graph_t<UTL_SCOPE decay_t<T>>{UTL_SCOPE forward<T>(execution)};
     }
 };
-
-inline constexpr size_t dynamic_extent = (size_t)-1;
-
-template <size_t N = dynamic_extent>
-class thread_pool;
-
-namespace details {
-namespace thread_pool {
-
-class completion_interface {
+template <typename... Ts>
+class graph_t {
 public:
-    struct deleter {
-        void operator()(completion_interface* ptr) const noexcept { ptr->~completion_interface(); }
-    };
+    template <UTL_CONCEPT_CXX20(valid_argument) T UTL_REQUIRES_CXX11(is_valid_argument<T>::value)>
+    UTL_ATTRIBUTE(NO_DISCARD)
+    constexpr graph_t<Ts..., UTL_SCOPE decay_t<T>> operator>>(T&& execution) const&& noexcept {
+        static_assert((UTL_TRAIT_is_constructible(UTL_SCOPE decay_t<T>, T) && ... &&
+                          UTL_TRAIT_is_move_constructible(Ts)),
+            "");
 
-    virtual bool wait_for(std::chrono::microseconds) = 0;
-    virtual void wait() = 0;
-    virtual bool try_wait() const = 0;
-
-    template <typename R, typename P>
-    bool wait_for(std::chrono::duration<R, P> d) {
-        return this->wait_for(std::chrono::duration_cast<std::chrono::microseconds>(d));
+        return UTL_SCOPE apply(
+            [&](Ts&&... ts) {
+                return graph_t<Ts..., UTL_SCOPE decay_t<T>>{
+                    UTL_SCOPE move(ts)..., UTL_SCOPE forward<T>(execution)};
+            },
+            UTL_SCOPE move(executables));
     }
 
-protected:
-    completion_interface(completion_interface const&) = delete;
-    completion_interface& operator=(completion_interface const&) = delete;
-    completion_interface() = default;
-    virtual ~completion_interface() = default;
-};
-
-class execution_interface {
-public:
-    virtual size_t count() const noexcept = 0;
-    virtual void execute(size_t thread_idx, size_t job_idx) final = 0;
-
-protected:
-    execution_interface(execution_interface const&) = delete;
-    execution_interface& operator=(execution_interface const&) = delete;
-    execution_interface() = default;
-    virtual ~execution_interface() = default;
-};
-
-template <typename... Fs>
-class multi_execution : public completion_interface, public execution_interface {
-
-public:
-    template <typename... Args>
-    multi_execution(Args&&... args) : executions(std::forward<Args>(args)...) {}
-
-    ~multi_execution() final = default;
-
-    size_t count() const noexcept final { return sizeof...(Fs); }
-
-    void execute(size_t thread_idx, size_t job_idx) final {
-        execute(thread_idx, job_idx, index_sequence_for<Fs...>{});
+    template <UTL_CONCEPT_CXX20(valid_argument) T UTL_REQUIRES_CXX11(is_valid_argument<T>::value)>
+    UTL_ATTRIBUTE(NO_DISCARD)
+    constexpr graph_t<Ts..., UTL_SCOPE decay_t<T>> operator>>(T&& execution) const& noexcept {
+        static_assert((UTL_TRAIT_is_constructible(UTL_SCOPE decay_t<T>, T) && ... &&
+                          UTL_TRAIT_is_copy_constructible(Ts)),
+            "");
+        return UTL_SCOPE apply(
+            [&](Ts const&... ts) {
+                return graph_t<Ts..., UTL_SCOPE decay_t<T>>{ts..., UTL_SCOPE forward<T>(execution)};
+            },
+            executables);
     }
 
 private:
-    bool wait_for(std::chrono::microseconds d) final {
-        return latch.wait_for(d) && latch.try_wait();
-    }
+    UTL_SCOPE tuple<Ts...> executables;
+}
 
-    void wait() final {
-        latch.wait();
-        std::ignore = try_wait();
-    }
+template <typename... Ts>
+class group_t {
 
-    bool try_wait() const final {
-        if (!latch.try_wait()) {
-            return false;
-        }
-
-        propogate_exceptions();
-        return true;
-    }
-
-    template <size_t... Is>
-    void execute(size_t, size_t job_idx, std::index_sequence<Is...>) {
-        static constexpr auto vtable[] = {&multi_execution::execute<Is>...};
-        (this->*vtable[job_idx])();
-    }
-
-    template <size_t I>
-    void execute() {
-        UTL_ON_SCOPE_EXIT {
-            latch.count_down();
-        };
-        try {
-            std::get<I>(executions)();
-        } catch (std::exception const& e) {
-            std::get<I>(exceptions)(std::current_exception());
-        } catch (...) {
-            std::terminate();
-        }
-    }
-    template <size_t... Is>
-    void propogate_exceptions(std::index_sequence<Is...>) const {
-        std::atomic_thread_fence(std::memory_order_acquire);
-        if ((... || std::get<I>(executions))) {
-            throw std::runtime_error("Uncaught exception");
-        }
-    }
-
-    void propogate_exceptions() const { propogate_exceptions(index_sequence_for<Fs...>{}); }
-
-    std::tuple<std::exception_ptr> exceptions;
-    std::tuple<Fs...> executions;
-    latch latch;
-};
-
-template <typename F>
-class single_execution<F> : public completion_interface, public execution_interface {
 public:
-    template <typename A>
-    job_execution(A&& arg) : execution(std::forward<A>(arg))
-                           , latch(1) {}
-    ~job_execution() final = default;
+    template <UTL_CONCEPT_CXX20(valid_argument)... Us UTL_REQUIRES_CXX11(
+        UTL_SCOPE conjunction<is_valid_argument<Us>...>::value)>
+    group_t(Us&&... args) : executables(UTL_SCOPE forward<Us>(args)...) {}
 
-    constexpr size_t count() const noexcept { return 1; }
-
-    void execute(size_t, size_t) { execute(); }
-
-private:
-    bool wait_for(std::chrono::microseconds d) final {
-        return latch.wait_for(d) && latch.try_wait();
+    template <typename T>
+    scatter_t<UTL_SCOPE decay_t<T>, group_t> operator*(T&& t) const&& noexcept {
+        return scatter_t<UTL_SCOPE decay_t<T>, group_t>{
+            UTL_SCOPE forward<T>(t), UTL_SCOPE move(*this)};
     }
 
-    void wait() final {
-        latch.wait();
-        if (exception) {
-            rethrow_exception(exception);
-        }
-    }
-
-    bool try_wait() const final {
-        if (!latch.try_wait()) {
-            return true;
-        }
-
-        if (exception) {
-            rethrow_exception(exception);
-        }
-
-        return true;
-    }
-
-    void execute() {
-        UTL_ON_SCOPE_EXIT {
-            latch.count_down();
-        };
-        try {
-            execution();
-        } catch (std::exception const& e) {
-            exception = std::current_exception();
-        } catch (...) {
-            std::terminate();
-        }
-    }
-
-    std::exception_ptr exception;
-    F execution;
-    latch latch;
-};
-
-template <typename F>
-class parallel_execution : public completion_interface, public execution_interface {
-public:
-    template <typename A>
-    parallel_execution(A&& arg, size_t count) : execution(std::forward<A>(arg))
-                                              , latch(count) {}
-    ~parallel_execution() final = default;
-
-    size_t count() const noexcept { return count; }
-
-    void execute(size_t thread_idx, size_t job_idx) {
-        UTL_ON_SCOPE_EXIT {
-            latch.count_down();
-        };
-        try {
-            execution(thread_idx, job_idx);
-        } catch (std::exception const& e) {
-            exceptions_thrown.store(true, std::memory_order_release);
-        } catch (...) {
-            std::terminate();
-        }
+    template <typename T>
+    scatter_t<UTL_SCOPE decay_t<T>, group_t> operator*(T&& t) const& noexcept {
+        static_assert(sizeof...(Ts) > 1, "");
+        return scatter_t<UTL_SCOPE decay_t<T>, group_t>{UTL_SCOPE forward<T>(t), *this};
     }
 
 private:
-    bool wait_for(std::chrono::microseconds d) final {
-        return latch.wait_for(d) && latch.try_wait();
-    }
-
-    void wait() final {
-        latch.wait();
-        if (exceptions_thrown.load(std::memory_order_acquire)) {
-            // TODO
-            throw std::runtime_error("Uncaught exception");
-        }
-    }
-
-    bool try_wait() const final {
-        if (!latch.try_wait()) {
-            return true;
-        }
-
-        if (exceptions_thrown.load(std::memory_order_acquire)) {
-            // TODO
-            throw std::runtime_error("Uncaught exception");
-        }
-
-        return true;
-    }
-
-    // TODO handle exception properly
-    std::atomic<bool> exceptions_thrown = false;
-    size_t count;
-    F execution;
-    latch latch;
-};
-
-template <size_t N>
-class job_collection : public completion_interface {
-
-public:
-    template <typename... J, std::enable_if_t<sizeof...(J) == N, int> = 0>
-    job_collection(J const&... header_ptr) : jobs_{header_ptr...} {}
-
-private:
-    bool wait_for(std::chrono::microseconds d) final {
-        for (auto const& ptr : jobs_) {
-            auto const begin = std::chrono::high_resolution_clock::now();
-            if (!ptr->wait_for(d)) {
-                return;
-            }
-
-            using clock_duration = decltype(std::chrono::high_resolution_clock::now() - begin);
-            auto const min_val = std::min<std::common_type_t<clock_duration, decltype(d)>>(
-                (std::chrono::high_resolution_clock::now() - begin), d);
-
-            d -= min_val;
-        }
-    }
-    void wait() final {
-        for (auto const& ptr : jobs_) {
-            ptr->wait();
-        }
-    }
-
-    bool try_wait() const final {
-        return std::all_of(
-            begin(jobs_), end(jobs_), [](auto const& ptr) { return ptr->try_wait(); });
-    }
-
-    std::array<utl::intrusive_ptr<job_header>> jobs_;
-};
-
-class pool_handle : private utl::atomic_reference_count<pool_handle> {
-    template <size_t N = dynamic_extent>
-    friend class ::thread_pool;
-
-    static constexpr struct construct_tag_t {
-    } construct_tag = {};
-
-public:
-    virtual ~pool_handle() = default;
-
-    template <typename Executor>
-    void schedule_execution(Executor& execution) {
-        auto const count = execution.count();
-    }
-
-protected:
-    pool_handle(size_t count) : threads_(new jthread[count]), size_(count) {}
-
-private:
-    std::unique_ptr<jthread[]> threads_;
-    size_t size_;
-};
-
-class job_header : private utl::atomic_reference_count<job_header> {
-public:
-    job_header() = default;
-
-protected:
-    void set_completion(completion_interface* interface) { completion_.reset(interface); }
-
-private:
-    utl::intrusive_ptr<job_header> dependent_;
-    std::unique_ptr<completion_interface, completion_interface::deleter> completion_;
+    UTL_SCOPE tuple<Ts...> executables;
 };
 
 template <typename T>
-class job : public job_header, public T {
-    static_assert(std::is_base_of_v<completion_interface, T>, "Invalid job");
-    static_assert(std::is_base_of_v<execution_interface, T>, "Invalid job");
-    using execution_base = T;
+concept group_type = is_group<UTL_SCOPE decay_t<T>>::value;
+template <typename T>
+concept not_group_type = !group_type<T>;
 
+template <not_group_type T, group_type U>
+scatter_t<UTL_SCOPE decay_t<T>, UTL_SCOPE decay_t<U>> operator*(T&& t, U&& u) noexcept {
+    return UTL_SCOPE forward<U>(u) * UTL_SCOPE forward<T>(t);
+}
+
+template <>
+class scatter_t<> {
 public:
-    template <typename... Args>
-    job(pool_handle& pool, Args&&... args) : execution_base{std::forward<Args>(args)...} {
-        job_header::set_completion(this);
+    template <UTL_CONCEPT_CXX20(valid_argument) T UTL_REQUIRES_CXX11(is_valid_argument<T>::value)>
+    UTL_ATTRIBUTE(NO_DISCARD)
+    constexpr scatter_t<T&&> operator->*(T&& execution UTL_ATTRIBUTE(LIFETIMEBOUND)) const
+        noexcept(UTL_TRAIT_is_nothrow_constructible(scatter_t<T>, T)) {
+        return scatter_t<T&&>{UTL_SCOPE forward<T>(execution)};
     }
 };
 
-} // namespace thread_pool
+template <typename T>
+class scatter_t<T> {
+    static_assert(UTL_SCOPE is_reference<T>::value, "Invalid scatter");
+    static_assert(is_valid_argument<UTL_SCOPE decay_t<T>>::value, "Invalid scatter");
+    using reference = T;
+    using value_type = UTL_SCOPE decay_t<reference>;
+
+public:
+    scatter_t(reference t) noexcept : src_(t) {}
+
+    template <UTL_CONCEPT_CXX20(instruction_type) U UTL_REQUIRES_CXX11(
+        is_instruction_type<Container>::value)>
+    UTL_ATTRIBUTE(NO_DISCARD)
+    constexpr scatter_t<value_type, UTL_SCOPE decay_t<U>> operator*(U&& execution) const noexcept {
+        return scatter_t<value_type, UTL_SCOPE decay_t<U>>{
+            UTL_SCOPE forward<reference>(src_), UTL_SCOPE forward<U>(execution)};
+    }
+
+private:
+    reference src_;
+};
+
+template <typename T, typename U>
+class scatter_t<T, U> {
+public:
+    // TODO U must be a group_t or scatter
+
+    template <typename TT, typename UU>
+    scatter_t(TT&& t, UU&& u) noexcept(
+        UTL_TRAIT_is_nothrow_constructible(T, TT) && UTL_TRAIT_is_nothrow_constructible(U, UU))
+        : first(UTL_SCOPE forward<TT>(t))
+        , second(UTL_SCOPE forward<UU>(u)) {}
+
+private:
+    T first;
+    U second;
+};
+
+template <typename... Ts>
+class scatter_t {
+    static_assert(sizeof...(Ts) <= 2, "Invalid operation, `scatter` is a binary operation");
+};
+
+template <typename... Ts>
+struct find_entrypoints;
+
+#if UTL_CXX20
+
+template <typename T0, typename T1>
+struct entrypoint_concat {};
+
+template <typename T>
+struct is_entrypoint_finder : UTL_SCOPE false_type {};
+
+template <typename... Ts>
+struct is_entrypoint_finder<find_entrypoints<Ts...>> : UTL_SCOPE true_type {};
+
+template <typename T>
+concept entrypoint_finder = is_entrypoint_finder<T>::value;
+
+template <typename T>
+concept entrypoint_result = entrypoint_finder<T> && UTL_TRAIT_has_member_type(T);
+
+template <entrypoint_result T, entrypoint_result U>
+struct entrypoint_concat<T, U> {
+    using type = UTL_SCOPE concat_elements<typename T::type, typename U::type>;
+};
+
+template <entrypoint_result T, entrypoint_finder U>
+struct entrypoint_concat<T, U> : T {};
+
+template <entrypoint_finder T, entrypoint_result U>
+struct entrypoint_concat<T, U> : U {};
+
+template <>
+struct find_entrypoints {
+    using type = UTL_SCOPE tuple<>;
+};
+
+template <executable F, typename... Ts>
+struct find_entrypoints<F, Ts...> : find_entrypoints<Ts...> {};
+
+template <typename... Ts, typename... Us>
+struct find_entrypoints<group_t<Ts...>, Us...> :
+    entrypoint_concat<find_entrypoints<Ts...>, find_entrypoints<Us...>> {};
+
+template <typename T0, typename T1, typename... Us>
+struct find_entrypoints<scatter_t<T0, T1>, Us...> :
+    entrypoint_concat<find_entrypoints<T0, T1>, find_entrypoints<Us...>> {};
+
+template <typename T0, typename... Ts, typename... Us>
+struct find_entrypoints<graph_t<T0, Ts...>, Us...> :
+    UTL_SCOPE concat_elements<UTL_SCOPE tuple<T0&>,
+        typename entrypoint_concat<find_entrypoints<Ts...>, find_entrypoints<Us...>>::type> {};
+
+#else
+
+template <typename T0, typename T1 UTL_TYPENAME_CXX11(void)>
+struct entrypoint_concat {
+    using type = UTL_SCOPE tuple<>;
+}
+
+template <typename... Ts, typename... Us>
+struct entrypoint_concat<find_entrypoints<Ts...>, find_entrypoints<Us...> UTL_REQUIRES_CXX11(
+    UTL_TRAIT_has_member_type(
+        find_entrypoints<Ts...>) && UTL_TRAIT_has_member_type(find_entrypoints<Us...>))> {
+    using type = UTL_SCOPE concat_elements<typename find_entrypoints<Ts...>::type,
+        typename find_entrypoints<Us...>::type>;
+};
+
+template <typename... Ts, typename... Us>
+struct entrypoint_concat<find_entrypoints<Ts...>, find_entrypoints<Us...> UTL_REQUIRES_CXX11(
+    UTL_TRAIT_has_member_type(
+        find_entrypoints<Ts...>) && !UTL_TRAIT_has_member_type(find_entrypoints<Us...>))> {
+    using type = typename find_entrypoints<Ts...>::type;
+};
+
+template <typename... Ts, typename... Us>
+struct entrypoint_concat<find_entrypoints<Ts...>, find_entrypoints<Us...> UTL_REQUIRES_CXX11(
+    !UTL_TRAIT_has_member_type(
+        find_entrypoints<Ts...>) && UTL_TRAIT_has_member_type(find_entrypoints<Us...>))> {
+    using type = typename find_entrypoints<Ts...>::type;
+};
+
+namespace details {
+
+template <typename T, typename = void>
+struct find_entrypoints_impl {
+    using type = UTL_SCOPE tuple<>;
+};
+
+template <typename F, typename... Ts>
+struct find_entrypoints_impl<find_entrypoints<F, Ts...>,
+    UTL_SCOPE enable_if_t<is_executable<F>::value>> :
+    find_entrypoints_impl<find_entrypoints<Ts...>> {};
+
+template <typename... Ts, typename... Us>
+struct find_entrypoints_impl<find_entrypoints<group_t<Ts...>, Us...>> :
+    entrypoint_concat<find_entrypoints_impl<Ts...>, find_entrypoints_impl<Us...>> {};
+
+template <typename T0, typename T1, typename... Us>
+struct find_entrypoints_impl<find_entrypoints<scatter_t<T0, T1>, Us...>> :
+    entrypoint_concat<find_entrypoints_impl<T0, T1>, find_entrypoints_impl<Us...>> {};
+
+template <typename T0, typename... Ts, typename... Us>
+struct find_entrypoints_impl<graph_t<T0, Ts...>, Us...> :
+    UTL_SCOPE concat_elements<UTL_SCOPE tuple<T0&>,
+        typename entrypoint_concat<find_entrypoints<Ts...>, find_entrypoints<Us...>>::type> {};
 } // namespace details
 
-class job_handle {
-    using pool_type = details::thread_pool::pool_handle;
-    using header_type = details::thread_pool::job_header;
-    using header_ptr = utl::intrusive_ptr<header_type>;
+template <typename... Ts>
+struct find_entrypoints<Ts...> : details::find_entrypoints_impl<Ts...> {};
 
-    template <typename... Fs>
-    static auto create_handle(intrusive_ptr<pool_type> pool, Fs&&... f);
+#endif
 
-    template <typename... Headers,
-        std::enable_if_t<(... && std::is_same_v<decay_t<Headers>, header_ptr>), bool> = true>
-    static auto create_collection_header(intrusive_ptr<pool_type> pool, Headers&&... headers) {}
+//     A
+//    / \
+//   B   C
+//  / \ / \
+// D   E   F
+//  \ / \ / \
+//   G   H   I
+//    \ /   / \
+//     J   K   L
 
-    template <typename... Headers,
-        std::enable_if_t<(... && std::is_same_v<decay_t<Headers>, header_ptr>), bool> = true>
-    job_handle(intrusive_ptr<pool_type> pool, Headers&&... headers)
-        : pool_(std::move(pool))
-        , job_(create_collection_header(pool_, std::forward<Headers>(headers)...)) {}
+// graph<J, group<G,H>, scatter<E, group<D, graph<group<K,L>, I, F>>>, group<B,C>, A>
+// latch<0, 1,                 <2,      <1,      <0,        , 2, 2>>>,      <2,2>  2>
 
-public:
-    template <typename... Jobs,
-        std::enable_if_t<
-            ((sizeof...(Jobs) > 1) && ... && std::is_same_v<decay_t<Jobs>, job_handle>), bool> =
-            true>
-    static job_handle combine(Jobs&&... jobs) {
-        Jobs const* array[]{&jobs...};
-        auto const& pool = (*array)->pool_;
-        if (!std::all_of(
-                array, array + sizeof...(Jobs), [&](auto ptr) { return ptr->pool_ == pool; })) {
-            throw std::runtime_error("[job_handle] only jobs from the same pool can be combined");
-        }
+void func(utl::thread_pool<16> pool) {
+    // clang-format off
+    auto subgraph = utl::job::grapher >>
+        utl::job::group([]() { K; }, []() { L; }) >> []() { I; } >> []() { F; };
 
-        return job_handle(pool, std::forward<Jobs>(jobs).job_...);
-    }
+    auto graph = utl::job::grapher >> []() { J; } >>
+        utl::job::group([]() { G; }, []() { H; })
+        >> []() { E; } * utl::job::group([]() { D; }, UTL_SCOPE move(subgraph))
+        >> utl::job::group([]() { B; }, []() { C; }) >> []() { A; };
+    // clang-format on
 
-public:
-    job_handle() = default;
-    job_handle(job_handle const&) = default;
-    job_handle& operator=(job_handle const&) = default;
-    job_handle(job_handle&&) noexcept = default;
-    job_handle& operator=(job_handle&&) noexcept = default;
+    pool.execute(graph);
 
-    template <typename... Fs>
-    explicit job_handle(intrusive_ptr<pool_type> pool, Fs&&... f)
-        : job_(create_handle(std::move(pool), std::forward<Fs>(f)...)) {}
+    // graph is copyable and/or movable depending on nodes
 
-    void wait() {
-        if (job_) {
-            job_->wait();
-        }
-    }
+    // graph_handle moveable only
+    // ctor of graph handle will call `new`; allocators cannot be used due to type-hiding
+    // requirement
+    utl::job::graph_handle handle(graph); // copy/move graph
+    utl::job::graph_handle handle2(move(graph));
 
-    bool try_wait() const { return !job_ || job_->try_wait(); }
+    pool.execute(handle); // execute and wait until done
+    // future moveable only
+    // empty future does noting
 
-    ~job_handle() { wait(); }
+    auto future = pool.execute_async(move(handle));
 
-private:
-    utl::intrusive_ptr<pool_type> pool_;
-    utl::intrusive_ptr<header_type> job_;
-};
+    auto future2 = future.then(move(handle2));
+    // future.detach(); // Similar to thread::detach
+    // future.wait(); // Similar to thread::join
+    // release the graph handle back for reuse, will wait until completion
+    handle = future.release();
 
-class thread_pool {
-    template <typename... Fs>
-    using multi_handle_t =
-        std::std::enable_if_t<((sizeof...(Fs) > 1) && ... && std::is_invocable_v<Fs>), job_handle>;
-    template <typename... Fs>
-    using multi_result_t =
-        std::std::enable_if_t<(sizeof...(Fs) > 1), std::tuple<std::invoke_result_t<Fs>...>>;
-    template <typename F>
-    using single_handle_t = std::enable_if_t<std::is_invocable_v<F>, job_handle>;
+    // dtor of future should call wait
+}
 
-    using pool_handle_t = details::thread_pool::pool_handle;
+UTL_INLINE_CXX17 constexpr group_t<> grapher = {};
 
-    template <typename F>
-    using parallel_handle_t = std::enable_if_t<std::is_invocable_v<F, size_t, size_t>, job_handle>;
-    template <typename F>
-    using parallel_t = std::enable_if_t<std::is_invocable_v<F, size_t, size_t>, void>;
+UTL_NAMESPACE_END
 
-    using init_arg_t = std::conditional_t<N == dynamic_extent, size_t, invalid_t>;
+// A : B, C
+// B : D, E
+// C : E, F
+// D : G
+// E : G, H
+// F : H, I
+// G : J
+// H : J
+// I : K, L
+// J :
+// K :
+// L :
 
-public:
-    constexpr explicit thread_pool(size_t n) noexcept : size_(n) {}
-    constexpr size_t size() const noexcept { return size_; }
+// I : waiting for 2
+// G : waiting for 1
 
-    template <typename F>
-    single_handle_t<F> plan(F&& execution) {
-        return job_handle(std::forward<F>(execution));
-    }
 
-    template <typename... Fs>
-    multi_handle_t<Fs...> plan(Fs&&... executions) {}
-
-    template <typename F>
-    parallel_handle_t<F> plan(size_t count, F&& executions);
-
-    template <typename F>
-    single_handle_t<F> plan(job_handle&& dependency, F&& execution);
-
-    template <typename... Fs>
-    multi_handle_t<Fs...> plan(job_handle&& dependency, Fs&&... executions);
-
-    template <typename F>
-    parallel_handle_t<F> plan(job_handle&& dependency, size_t count, F&& executions);
-
-    template <typename F>
-    std::invoke_result_t<F> execute(F&& execution) {
-        return std::invoke(std::forward<F>(execution));
-    }
-
-    template <typename... Fs>
-    multi_result_t<Fs...> execute(Fs&&... executions) {
-        return multi_execute(index_sequence_for<Fs...>{}, std::forward<Fs>(executions)...);
-    }
-
-    void execute(job_handle&& job);
-
-    template <typename F>
-    parallel_t<F> execute(size_t count, F&& execution) {
-        schedule(count, executions).wait();
-    }
-
-    template <typename F>
-    std::invoke_result_t<F> execute(job_handle&& dependency, F&& execution) {
-        return dependency.wait(), std::invoke(std::forward<F>(execution));
-    }
-
-    template <typename... Fs>
-    multi_result_t<Fs...> execute(job_handle&& dependency, Fs&&... executions) {
-        dependency.wait();
-        return multi_execute(index_sequence_for<Fs...>{}, std::forward<Fs>(executions)...);
-    }
-
-    template <typename F>
-    parallel_t<F> execute(job_handle&& dependency, size_t count, F&& execution) {
-        schedule(dependency, count, executions).wait();
-    }
-
-private:
-    template <typename T, typename U, typename F, size_t I>
-    static auto tuple_executor(T& t, U& exe) {
-        return [&t, &exe]() { std::get<I>(t).emplace(std::forward<F>(std::get<I>(exe))()); };
-    }
-
-    template <typename... Ts, size_t... Is>
-    static std::tuple<Ts...> optional_to_tuple(
-        std::tuple<std::optional<Ts>...>&& t, std::index_sequence<Is...>) {
-        return std::tuple<Ts...>{(*std::get<Is...>(std::move(t)))...};
-    }
-
-    template <typename... Fs, size_t... Is>
-    multi_result_t<Fs...> multi_execute(std::index_sequence<Is...>, Fs&&... executions) {
-        std::tuple<std::optional<invoke_result_t<Fs>>...> t;
-        auto exe = std::forward_as_tuple(std::forward<Fs>(executions)...);
-
-        schedule(tuple_executor<Fs, Is>(t, exe)...).wait();
-
-        return optional_to_tuple(std::move(t), index_sequence<Is...>{});
-    }
-
-    intrusive_ptr<pool_handle_t> const& pool_handle() {
-        if (!pool_handle_) {
-            pool_handle_ = utl::make_intrusive_ptr<pool_handle_t>(size());
-        }
-
-        return pool_handle_;
-    }
-
-    intrusive_ptr<pool_handle_t> pool_handle_;
-    size_t size_;
-};
-
-} // namespace utl::experimental
+*/

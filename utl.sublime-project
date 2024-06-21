@@ -13,6 +13,9 @@
 			"path": ".",
 			"name": "Root",
 			"folder_exclude_patterns": [ "*/" ]
+		},
+		{
+			"path" : "SCRATCH"
 		}
 	],
 	"settings":
