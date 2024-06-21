@@ -5,6 +5,8 @@
 #include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_is_copy_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_move_constructible.h"
+#include "utl/type_traits/utl_logical_traits.h"
+#include "utl/type_traits/utl_remove_reference.h"
 
 #if UTL_CXX14 && UTL_USE_STD_move
 #  include <utility>

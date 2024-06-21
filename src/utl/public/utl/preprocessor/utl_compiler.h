@@ -2,20 +2,20 @@
 
 #pragma once
 
-#ifdef __clang__
-#  define UTL_COMPILER_CLANG 1
-#  define UTL_COMPILER_CLANG_AT_LEAST(MAJOR, MINOR, PATCH) \
-      __clang_major__ > MAJOR ||                           \
-          (__clang_major__ == MAJOR &&                     \
-              (__clang_minor__ > MINOR ||                  \
-                  (__clang_minor__ == MINOR && __clang_patchlevel__ > PATCH)))
-#elif defined(__INTEL_LLVM_COMPILER)
+#if defined(__INTEL_LLVM_COMPILER)
 #  define UTL_COMPILER_ICX 1
 #  if defined(SYCL_LANGUAGE_VERSION)
 #    define UTL_COMPILER_ICX_DPCPP 1
 #  endif
 #  define UTL_COMPILER_ICX_AT_LEAST(VERSION) __INTEL_LLVM_COMPILER >= VERSION
 #  define UTL_COMPILER_ICX_DPCPP_AT_LEAST(VERSION) SYCL_LANGUAGE_VERSION >= VERSION
+#elif defined(__clang__)
+#  define UTL_COMPILER_CLANG 1
+#  define UTL_COMPILER_CLANG_AT_LEAST(MAJOR, MINOR, PATCH) \
+      __clang_major__ > MAJOR ||                           \
+          (__clang_major__ == MAJOR &&                     \
+              (__clang_minor__ > MINOR ||                  \
+                  (__clang_minor__ == MINOR && __clang_patchlevel__ > PATCH)))
 #elif defined(__INTEL_COMPILER)
 #  define UTL_COMPILER_ICC 1
 #  define UTL_COMPILER_ICC_AT_LEAST(VERSION) __VERSION__ >= VERSION

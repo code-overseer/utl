@@ -39,29 +39,28 @@ constexpr T* memset(T* dst, T const src, element_count_t count) noexcept {
 }
 } // namespace unsafe
 
-template <UTL_CONCEPT_CXX20(trivially_copyable<T>)
-        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
+template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
+    is_trivially_copyable<T>::value)>
 constexpr T* memcpy(
     T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count) noexcept {
     return unsafe::memcpy(dst, src, count);
 }
 
-template <UTL_CONCEPT_CXX20(trivially_copyable<T>)
-        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
+template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
+    is_trivially_copyable<T>::value)>
 constexpr T* memmove(T* dst, T const* src, element_count_t count) noexcept {
     return unsafe::memmove(dst, src, count);
 }
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T,
-    UTL_CONCEPT_CXX20(exact_size<1>)
-        U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
+template <UTL_CONCEPT_CXX20(exact_size<1>) T, UTL_CONCEPT_CXX20(exact_size<1>) U UTL_REQUIRES_CXX11(
+    exact_size<T, 1>::value && exact_size<U, 1>::value)>
 UTL_LIBC_PURE constexpr T* memchr(T const* str, U value, size_t bytes) noexcept {
     return UTL_CONSTANT_P((value, str + bytes)) ? compile_time::memchr(str, value, bytes)
                                                 : runtime::memchr(str, value, bytes);
 }
 
-template <UTL_CONCEPT_CXX20(trivially_copyable)
-        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value&& exact_size<T, 1>::value)>
+template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
+    is_trivially_copyable<T>::value && exact_size<T, 1>::value)>
 UTL_REQUIRES_CXX20(exact_size<T, 1>)
 constexpr T* memset(T* dst, T const src, element_count_t count) noexcept {
     return unsafe::memset(dst, src, count);

@@ -43,6 +43,16 @@ struct is_nothrow_implicit_constructible :
     conjunction<is_implicit_constructible<TTarget, TArgs...>,
         is_nothrow_constructible<TTarget, TArgs...>> {};
 
+#if UTL_CXX14
+template <typename TTarget, typename... TArgs>
+UTL_INLINE_CXX17 constexpr bool is_implicit_constructible_v =
+    details::constructible::is_implicit<TTarget, TArgs...>::value;
+
+template <typename TTarget, typename... TArgs>
+UTL_INLINE_CXX17 constexpr bool is_nothrow_implicit_constructible_v =
+    is_nothrow_implicit_constructible<TTarget, TArgs...>::value;
+#endif
+
 UTL_NAMESPACE_END
 
 #if UTL_CXX14

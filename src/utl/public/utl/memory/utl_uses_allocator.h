@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include "utl/concepts/utl_allocator_type.h"
 #include "utl/concepts/utl_same_as.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_constructible.h"
 #include "utl/type_traits/utl_is_explicit_constructible.h"
@@ -43,11 +43,11 @@ using impl = R;
 
 struct allocator_arg_t {
     explicit constexpr allocator_arg_t() noexcept = default;
-    template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_VALUE(is_same, T, ::std::allocator_arg_t))>
-    UTL_REQUIRES_CXX20(same_as<T, ::std::allocator_arg_t>)
+    template <UTL_CONCEPT_CXX20(same_as<::std::allocator_arg_t>) T UTL_REQUIRES_CXX11(
+        UTL_TRAIT_is_same(T, ::std::allocator_arg_t))>
     constexpr allocator_arg_t(T) noexcept {}
-    template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_VALUE(is_same, T, ::std::allocator_arg_t))>
-    UTL_REQUIRES_CXX20(same_as<T, ::std::allocator_arg_t>)
+    template <UTL_CONCEPT_CXX20(same_as<::std::allocator_arg_t>) T UTL_REQUIRES_CXX11(
+        UTL_TRAIT_is_same(T, ::std::allocator_arg_t))>
     constexpr operator T() const noexcept {
         return {};
     }
@@ -65,22 +65,19 @@ template <typename T, typename Alloc, typename... Args>
 struct is_constructible_with_allocator :
     conjunction<uses_allocator<T, Alloc>,
         disjunction<is_constructible<T, allocator_arg_t, Alloc const&, Args...>,
-            is_constructible<T, Args..., Alloc const&>,
-            is_constructible<T, ::std::allocator_arg_t, Alloc const&, Args...>>> {};
+            is_constructible<T, Args..., Alloc const&>>> {};
 
 template <typename T, typename Alloc, typename... Args>
 struct is_nothrow_constructible_with_allocator :
     conjunction<uses_allocator<T, Alloc>,
         disjunction<is_nothrow_constructible<T, allocator_arg_t, Alloc const&, Args...>,
-            is_nothrow_constructible<T, Args..., Alloc const&>,
-            is_nothrow_constructible<T, ::std::allocator_arg_t, Alloc const&, Args...>>> {};
+            is_nothrow_constructible<T, Args..., Alloc const&>>> {};
 
 template <typename T, typename Alloc, typename... Args>
 struct is_explicit_constructible_with_allocator :
     conjunction<uses_allocator<T, Alloc>,
         disjunction<is_explicit_constructible<T, allocator_arg_t, Alloc const&, Args...>,
-            is_explicit_constructible<T, Args..., Alloc const&>,
-            is_explicit_constructible<T, ::std::allocator_arg_t, Alloc const&, Args...>>> {};
+            is_explicit_constructible<T, Args..., Alloc const&>>> {};
 
 template <typename T, typename Alloc, typename... Args>
 struct is_implicit_constructible_with_allocator :
@@ -88,4 +85,50 @@ struct is_implicit_constructible_with_allocator :
         negation<is_explicit_constructible_with_allocator<T, Alloc, Args...>>,
         is_constructible_with_allocator<T, Alloc, Args...>> {};
 
+#if UTL_CXX14
+template <typename T, typename Alloc>
+UTL_INLINE_CXX17 constexpr bool uses_allocator_v = uses_allocator<T, Alloc>::value;
+template <typename T, typename Alloc, typename... Args>
+UTL_INLINE_CXX17 constexpr bool is_constructible_with_allocator_v =
+    is_constructible_with_allocator<T, Alloc, Args...>::value;
+template <typename T, typename Alloc, typename... Args>
+UTL_INLINE_CXX17 constexpr bool is_nothrow_constructible_with_allocator_v =
+    is_nothrow_constructible_with_allocator<T, Alloc, Args...>::value;
+template <typename T, typename Alloc, typename... Args>
+UTL_INLINE_CXX17 constexpr bool is_explicit_constructible_with_allocator_v =
+    is_explicit_constructible_with_allocator<T, Alloc, Args...>::value;
+template <typename T, typename Alloc, typename... Args>
+UTL_INLINE_CXX17 constexpr bool is_implicit_constructible_with_allocator_v =
+    is_implicit_constructible_with_allocator<T, Alloc, Args...>::value;
+
+#  define UTL_TRAIT_uses_allocator(...) UTL_SCOPE uses_allocator_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_constructible_with_allocator(...) \
+      UTL_SCOPE is_constructible_with_allocator_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_nothrow_constructible_with_allocator(...) \
+      UTL_SCOPE is_nothrow_constructible_with_allocator<__VA_ARGS__>
+#  define UTL_TRAIT_is_explicit_constructible_with_allocator(...) \
+      UTL_SCOPE is_explicit_constructible_with_allocator<__VA_ARGS__>
+#  define UTL_TRAIT_is_implicit_constructible_with_allocator(...) \
+      UTL_SCOPE is_implicit_constructible_with_allocator<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_uses_allocator(...) UTL_SCOPE uses_allocator<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_constructible_with_allocator(...) \
+      UTL_SCOPE is_constructible_with_allocator<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_nothrow_constructible_with_allocator(...) \
+      UTL_SCOPE is_nothrow_constructible_with_allocator<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_explicit_constructible_with_allocator(...) \
+      UTL_SCOPE is_explicit_constructible_with_allocator<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_implicit_constructible_with_allocator(...) \
+      UTL_SCOPE is_implicit_constructible_with_allocator<__VA_ARGS__>::value
+#endif
+
 UTL_NAMESPACE_END
+
+#if UTL_CXX20
+UTL_NAMESPACE_BEGIN
+
+template <typename Alloc, typename T>
+concept allocator_usable_with = allocator_type<Alloc> && uses_allocator_v<T, Alloc>;
+
+UTL_NAMESPACE_END
+#endif

@@ -105,3 +105,12 @@ UTL_NAMESPACE_END
 #  endif // ifdef UTL_BUILTIN_is_nothrow_constructible
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
+
+#ifdef UTL_BUILTIN_is_nothrow_constructible
+#  define UTL_TRAIT_is_nothrow_constructible(...) UTL_BUILTIN_is_nothrow_constructible(__VA_ARGS__)
+#elif UTL_CXX14
+#  define UTL_TRAIT_is_nothrow_constructible(...) UTL_SCOPE is_nothrow_constructible_v<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_is_nothrow_constructible(...) \
+      UTL_SCOPE is_nothrow_constructible<__VA_ARGS__>::value
+#endif
