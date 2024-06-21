@@ -144,19 +144,14 @@ protected:
     constexpr contiguous_iterator_base(contiguous_iterator_base&&) noexcept = default;
     UTL_CONSTEXPR_CXX20 ~contiguous_iterator_base() noexcept = default;
 
-    template <typename T UTL_REQUIRES_CXX11(is_convertible<T*, value_type*>::value)>
-    UTL_REQUIRES_CXX20(requires(T* ptr) {
-        { value_type* dst = ptr };
-    })
+    template <UTL_CONCEPT_CXX20(constructible_as<pointer, add_pointer>) T UTL_REQUIRES_CXX11(
+        is_convertible<T*, pointer>::value)>
     constexpr contiguous_iterator_base(contiguous_iterator_base<It, T> it) noexcept
         : ptr_(as_ptr(it)){};
 
-    template <typename T UTL_REQUIRES_CXX11(is_convertible<T*, value_type*>::value)>
-    UTL_REQUIRES_CXX20(requires(value_type*& dst, T* ptr) {
-        { dst = ptr };
-    })
-    UTL_CONSTEXPR_CXX14 contiguous_iterator_base& operator=(
-        contiguous_iterator_base<It, T> it) noexcept {
+    template <UTL_CONCEPT_CXX20(assignable_to<pointer&, add_pointer>) T UTL_REQUIRES_CXX11(
+        is_convertible<T*, pointer>::value)>
+    UTL_CONSTEXPR_CXX14 contiguous_iterator_base& operator=(contiguous_iterator_base<It, T> it) noexcept {
         ptr_ = as_ptr(it);
         return *this;
     }

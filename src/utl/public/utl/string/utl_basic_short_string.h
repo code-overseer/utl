@@ -94,6 +94,8 @@ public:
         constexpr iterator(iterator&& other) noexcept = default;
         constexpr iterator& operator=(iterator const& other) noexcept = default;
         constexpr iterator& operator=(iterator&& other) noexcept = default;
+        using contiguous_iterator_base::operator*;
+        using contiguous_iterator_base::operator->;
 
     private:
         friend basic_short_string;
@@ -109,6 +111,8 @@ public:
         constexpr const_iterator(const_iterator&& other) noexcept = default;
         constexpr const_iterator& operator=(const_iterator const& other) noexcept = default;
         constexpr const_iterator& operator=(const_iterator&& other) noexcept = default;
+        using contiguous_iterator_base::operator*;
+        using contiguous_iterator_base::operator->;
 
     private:
         friend basic_short_string;
