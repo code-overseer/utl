@@ -20,10 +20,10 @@ concept forward_iterator = UTL_SCOPE input_iterator<T> &&
     UTL_SCOPE incrementable<T> && UTL_SCOPE sentinel_for<T, T>;
 
 template <typename T>
-struct is_forward_iterator : UTL_SCOPE bool_constant<input_iterator<T>> {};
+struct is_forward_iterator : UTL_SCOPE bool_constant<forward_iterator<T>> {};
 
 template <typename T>
-inline constexpr bool is_forward_iterator_v = input_iterator<T>;
+inline constexpr bool is_forward_iterator_v = forward_iterator<T>;
 
 UTL_NAMESPACE_END
 
