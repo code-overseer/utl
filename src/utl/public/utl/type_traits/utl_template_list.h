@@ -2,12 +2,10 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_common.h"
 
 UTL_NAMESPACE_BEGIN
-
-using size_t = decltype(sizeof(0));
 
 template <size_t I, typename List>
 struct template_element;

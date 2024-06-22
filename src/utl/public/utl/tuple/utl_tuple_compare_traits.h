@@ -30,7 +30,7 @@ template <typename T, typename U, size_t... Is>
 struct all_have_eq_impl<T, U, index_sequence<Is...>,
     enable_if_t<conjunction<TT_SCOPE is_tuple_like<T>, TT_SCOPE is_tuple_like<U>,
         bool_constant<tuple_size<T>::value == tuple_size<U>::value>,
-        has_eq<const_ref_t<tuple_element_t<Is, T>>,
+        is_equality_comparable_with<const_ref_t<tuple_element_t<Is, T>>,
             const_ref_t<tuple_element_t<Is, U>>>...>::value> // enable_if_t
     > : true_type {};
 
@@ -40,7 +40,7 @@ template <typename T, typename U, size_t... Is>
 struct all_have_neq_impl<T, U, index_sequence<Is...>,
     enable_if_t<conjunction<TT_SCOPE is_tuple_like<T>, TT_SCOPE is_tuple_like<U>,
         bool_constant<tuple_size<T>::value == tuple_size<U>::value>,
-        has_neq<const_ref_t<tuple_element_t<Is, T>>,
+        is_inequality_comparable_with<const_ref_t<tuple_element_t<Is, T>>,
             const_ref_t<tuple_element_t<Is, U>>>...>::value> // enable_if_t
     > : true_type {};
 
@@ -50,7 +50,7 @@ template <typename T, typename U, size_t... Is>
 struct all_have_lt_impl<T, U, index_sequence<Is...>,
     enable_if_t<conjunction<TT_SCOPE is_tuple_like<T>, TT_SCOPE is_tuple_like<U>,
         bool_constant<tuple_size<T>::value == tuple_size<U>::value>,
-        has_lt<const_ref_t<tuple_element_t<Is, T>>,
+        is_strict_subordinate_comparable_with<const_ref_t<tuple_element_t<Is, T>>,
             const_ref_t<tuple_element_t<Is, U>>>...>::value> // enable_if_t
     > : true_type {};
 
@@ -60,7 +60,7 @@ template <typename T, typename U, size_t... Is>
 struct all_have_gt_impl<T, U, index_sequence<Is...>,
     enable_if_t<conjunction<TT_SCOPE is_tuple_like<T>, TT_SCOPE is_tuple_like<U>,
         bool_constant<tuple_size<T>::value == tuple_size<U>::value>,
-        has_gt<const_ref_t<tuple_element_t<Is, T>>,
+        is_strict_superordinate_comparable_with<const_ref_t<tuple_element_t<Is, T>>,
             const_ref_t<tuple_element_t<Is, U>>>...>::value> // enable_if_t
     > : true_type {};
 
@@ -70,7 +70,7 @@ template <typename T, typename U, size_t... Is>
 struct all_have_lteq_impl<T, U, index_sequence<Is...>,
     enable_if_t<conjunction<TT_SCOPE is_tuple_like<T>, TT_SCOPE is_tuple_like<U>,
         bool_constant<tuple_size<T>::value == tuple_size<U>::value>,
-        has_lteq<const_ref_t<tuple_element_t<Is, T>>,
+        is_subordinate_comparable_with<const_ref_t<tuple_element_t<Is, T>>,
             const_ref_t<tuple_element_t<Is, U>>>...>::value> // enable_if_t
     > : true_type {};
 
@@ -80,7 +80,7 @@ template <typename T, typename U, size_t... Is>
 struct all_have_gteq_impl<T, U, index_sequence<Is...>,
     enable_if_t<conjunction<TT_SCOPE is_tuple_like<T>, TT_SCOPE is_tuple_like<U>,
         bool_constant<tuple_size<T>::value == tuple_size<U>::value>,
-        has_gteq<const_ref_t<tuple_element_t<Is, T>>,
+        is_superordinate_comparable_with<const_ref_t<tuple_element_t<Is, T>>,
             const_ref_t<tuple_element_t<Is, U>>>...>::value> // enable_if_t
     > : true_type {};
 } // namespace details
@@ -105,7 +105,8 @@ template <typename T, typename U, size_t... Is>
 struct all_have_nothrow_eq_impl<T, U, index_sequence<Is...>,
     enable_if_t<conjunction<all_have_eq<T, U>, TT_SCOPE is_all_nothrow_gettable<T>,
         TT_SCOPE is_all_nothrow_gettable<U>,
-        has_nothrow_eq<tuple_element_t<Is, T>, tuple_element_t<Is, U>>...>::value>> : true_type {};
+        is_nothrow_equality_comparable_with<tuple_element_t<Is, T>,
+            tuple_element_t<Is, U>>...>::value>> : true_type {};
 
 template <typename T, typename U, typename Seq = sequence_t<T>, typename = void>
 struct all_have_nothrow_neq_impl;
@@ -113,7 +114,8 @@ template <typename T, typename U, size_t... Is>
 struct all_have_nothrow_neq_impl<T, U, index_sequence<Is...>,
     enable_if_t<conjunction<all_have_neq<T, U>, TT_SCOPE is_all_nothrow_gettable<T>,
         TT_SCOPE is_all_nothrow_gettable<U>,
-        has_nothrow_neq<tuple_element_t<Is, T>, tuple_element_t<Is, U>>...>::value>> : true_type {};
+        is_nothrow_inequality_comparable_with<tuple_element_t<Is, T>,
+            tuple_element_t<Is, U>>...>::value>> : true_type {};
 
 template <typename T, typename U, typename Seq = sequence_t<T>, typename = void>
 struct all_have_nothrow_lt_impl;
@@ -121,7 +123,8 @@ template <typename T, typename U, size_t... Is>
 struct all_have_nothrow_lt_impl<T, U, index_sequence<Is...>,
     enable_if_t<conjunction<all_have_lt<T, U>, TT_SCOPE is_all_nothrow_gettable<T>,
         TT_SCOPE is_all_nothrow_gettable<U>,
-        has_nothrow_lt<tuple_element_t<Is, T>, tuple_element_t<Is, U>>...>::value>> : true_type {};
+        is_nothrow_strict_subordinate_comparable_with<tuple_element_t<Is, T>,
+            tuple_element_t<Is, U>>...>::value>> : true_type {};
 
 template <typename T, typename U, typename Seq = sequence_t<T>, typename = void>
 struct all_have_nothrow_gt_impl;
@@ -129,7 +132,8 @@ template <typename T, typename U, size_t... Is>
 struct all_have_nothrow_gt_impl<T, U, index_sequence<Is...>,
     enable_if_t<conjunction<all_have_gt<T, U>, TT_SCOPE is_all_nothrow_gettable<T>,
         TT_SCOPE is_all_nothrow_gettable<U>,
-        has_nothrow_gt<tuple_element_t<Is, T>, tuple_element_t<Is, U>>...>::value>> : true_type {};
+        is_nothrow_strict_superordinate_comparable_with<tuple_element_t<Is, T>,
+            tuple_element_t<Is, U>>...>::value>> : true_type {};
 
 template <typename T, typename U, typename Seq = sequence_t<T>, typename = void>
 struct all_have_nothrow_lteq_impl;
@@ -137,8 +141,8 @@ template <typename T, typename U, size_t... Is>
 struct all_have_nothrow_lteq_impl<T, U, index_sequence<Is...>,
     enable_if_t<conjunction<all_have_lteq<T, U>, TT_SCOPE is_all_nothrow_gettable<T>,
         TT_SCOPE is_all_nothrow_gettable<U>,
-        has_nothrow_lteq<tuple_element_t<Is, T>, tuple_element_t<Is, U>>...>::value>> :
-    true_type {};
+        is_nothrow_subordinate_comparable_with<tuple_element_t<Is, T>,
+            tuple_element_t<Is, U>>...>::value>> : true_type {};
 
 template <typename T, typename U, typename Seq = sequence_t<T>, typename = void>
 struct all_have_nothrow_gteq_impl;
@@ -146,8 +150,8 @@ template <typename T, typename U, size_t... Is>
 struct all_have_nothrow_gteq_impl<T, U, index_sequence<Is...>,
     enable_if_t<conjunction<all_have_gteq<T, U>, TT_SCOPE is_all_nothrow_gettable<T>,
         TT_SCOPE is_all_nothrow_gettable<U>,
-        has_nothrow_gteq<tuple_element_t<Is, T>, tuple_element_t<Is, U>>...>::value>> :
-    true_type {};
+        is_nothrow_superordinate_comparable_with<tuple_element_t<Is, T>,
+            tuple_element_t<Is, U>>...>::value>> : true_type {};
 } // namespace details
 
 template <typename T, typename U = T>

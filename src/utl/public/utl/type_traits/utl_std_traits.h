@@ -7,6 +7,7 @@
 #include "utl/type_traits/utl_add_const.h"
 #include "utl/type_traits/utl_add_cv.h"
 #include "utl/type_traits/utl_add_lvalue_reference.h"
+#include "utl/type_traits/utl_add_pointer.h"
 #include "utl/type_traits/utl_add_rvalue_reference.h"
 #include "utl/type_traits/utl_add_volatile.h"
 #include "utl/type_traits/utl_constants.h"
@@ -14,6 +15,9 @@
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_extent.h"
+#include "utl/type_traits/utl_has_virtual_destructor.h"
+#include "utl/type_traits/utl_invoke.h"
+#include "utl/type_traits/utl_is_abstract.h"
 #include "utl/type_traits/utl_is_aggregate.h"
 #include "utl/type_traits/utl_is_arithmetic.h"
 #include "utl/type_traits/utl_is_assignable.h"
@@ -53,15 +57,19 @@
 #include "utl/type_traits/utl_is_null_pointer.h"
 #include "utl/type_traits/utl_is_object.h"
 #include "utl/type_traits/utl_is_pointer.h"
+#include "utl/type_traits/utl_is_polymorphic.h"
 #include "utl/type_traits/utl_is_reference.h"
 #include "utl/type_traits/utl_is_rvalue_reference.h"
 #include "utl/type_traits/utl_is_same.h"
 #include "utl/type_traits/utl_is_scalar.h"
 #include "utl/type_traits/utl_is_signed.h"
+#include "utl/type_traits/utl_is_standard_layout.h"
+#include "utl/type_traits/utl_is_trivial.h"
 #include "utl/type_traits/utl_is_trivially_assignable.h"
 #include "utl/type_traits/utl_is_trivially_constructible.h"
 #include "utl/type_traits/utl_is_trivially_copy_assignable.h"
 #include "utl/type_traits/utl_is_trivially_copy_constructible.h"
+#include "utl/type_traits/utl_is_trivially_copyable.h"
 #include "utl/type_traits/utl_is_trivially_default_constructible.h"
 #include "utl/type_traits/utl_is_trivially_destructible.h"
 #include "utl/type_traits/utl_is_trivially_move_assignable.h"
@@ -71,93 +79,15 @@
 #include "utl/type_traits/utl_is_void.h"
 #include "utl/type_traits/utl_is_volatile.h"
 #include "utl/type_traits/utl_logical_traits.h"
-#include "utl/type_traits/utl_modify_pointer.h"
 #include "utl/type_traits/utl_rank.h"
 #include "utl/type_traits/utl_remove_all_extents.h"
 #include "utl/type_traits/utl_remove_const.h"
 #include "utl/type_traits/utl_remove_cv.h"
 #include "utl/type_traits/utl_remove_cvref.h"
 #include "utl/type_traits/utl_remove_extent.h"
+#include "utl/type_traits/utl_remove_pointer.h"
 #include "utl/type_traits/utl_remove_reference.h"
 #include "utl/type_traits/utl_remove_volatile.h"
 #include "utl/type_traits/utl_type_identity.h"
+#include "utl/type_traits/utl_underlying_type.h"
 #include "utl/type_traits/utl_void_t.h"
-
-#include <type_traits>
-
-UTL_NAMESPACE_BEGIN
-
-using ::std::is_abstract;
-using ::std::is_polymorphic;
-using ::std::is_standard_layout;
-using ::std::is_trivial;
-using ::std::is_trivially_copyable;
-
-using ::std::has_virtual_destructor;
-
-template <typename... Ts>
-struct common_type : ::std::common_type<Ts...> {};
-template <typename... T>
-using common_type_t = typename common_type<T...>::type;
-
-using ::std::underlying_type;
-template <typename T>
-using underlying_type_t = typename underlying_type<T>::type;
-
-#ifdef UTL_BUILTIN_is_layout_compatible
-template <typename T, typename U>
-struct is_layout_compatible : bool_constant<UTL_BUILTIN_is_layout_compatible(T, U)> {};
-
-#  if UTL_CXX14
-template <typename T, typename U>
-UTL_INLINE_CXX17 constexpr bool is_layout_compatible_v = UTL_BUILTIN_is_layout_compatible(T, U);
-#  endif
-
-#  define UTL_TRAIT_SUPPORTED_is_layout_compatible 1
-#else /* ifdef UTL_BUILTIN_is_layout_compatible */
-template <typename, typename>
-struct is_layout_compatible : false_type {};
-template <typename T>
-struct is_layout_compatible<T, T> : true_type {};
-
-#  if UTL_CXX14
-template <typename T, typename U>
-UTL_INLINE_CXX17 constexpr bool is_layout_compatible_v = is_layout_compatible<T, U>::value;
-#  endif
-
-#  define UTL_TRAIT_SUPPORTED_is_layout_compatible 0
-#  define UTL_TRAIT_DEFINED_is_layout_compatible 1
-#endif /* ifdef UTL_BUILTIN_is_layout_compatible */
-
-#ifdef UTL_BUILTIN_is_pointer_interconvertible_base_of
-
-template <typename T, typename U>
-struct is_pointer_interconvertible_base_of :
-    bool_constant<UTL_BUILTIN_is_pointer_interconvertible_base_of(T, U)> {};
-
-#  if UTL_CXX14
-template <typename T, typename U>
-UTL_INLINE_CXX17 constexpr bool is_pointer_interconvertible_base_of_v =
-    UTL_BUILTIN_is_pointer_interconvertible_base_of(T, U);
-#  endif
-
-#  define UTL_TRAIT_SUPPORTED_is_pointer_interconvertible_base_of 1
-#else /* ifdef UTL_BUILTIN_is_pointer_interconvertible_base_of */
-template <typename, typename>
-struct is_pointer_interconvertible_base_of : false_type {};
-template <typename T>
-struct is_pointer_interconvertible_base_of<T, T> : true_type {};
-
-#  if UTL_CXX14
-template <typename T, typename U>
-UTL_INLINE_CXX17 constexpr bool is_pointer_interconvertible_base_of_v =
-    is_pointer_interconvertible_base_of<T, U>::value;
-#  endif
-
-#  define UTL_TRAIT_SUPPORTED_is_pointer_interconvertible_base_of 0
-#  define UTL_TRAIT_DEFINED_is_pointer_interconvertible_base_of 1
-#endif /* ifdef UTL_BUILTIN_is_pointer_interconvertible_base_of */
-
-UTL_NAMESPACE_END
-
-#include "utl/type_traits/utl_traits_support.h"
