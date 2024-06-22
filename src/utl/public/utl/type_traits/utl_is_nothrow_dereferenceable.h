@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "utl/concepts/utl_dereferenceable.h"
 #include "utl/type_traits/utl_common.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_is_dereferenceable.h"
@@ -10,7 +11,7 @@ UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace nothrow_dereferenceable {
-template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_is_dereferenceable(T))>
+template <UTL_CONCEPT_CXX20(dereferenceable) T UTL_REQUIRES_CXX11(UTL_TRAIT_is_dereferenceable(T))>
 auto evaluate(int) noexcept -> bool_constant<noexcept(*declval<T>())>;
 template <typename T>
 false_type evaluate(float) noexcept;
