@@ -58,7 +58,7 @@ private:
     struct heap_type {
         pointer data_;
         /**
-         * Capacity including null-chacacter
+         * Capacity includes null-chacacter
          */
         size_type capacity_;
 
