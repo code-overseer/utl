@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "utl/iterator/utl_iterator_tags.h"
 #include "utl/memory/utl_pointer_traits.h"
 #include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_enable_if.h"
@@ -16,8 +17,12 @@ UTL_NAMESPACE_BEGIN
 
 template <typename It, typename ValueType>
 class contiguous_iterator_base {
+public:
     using value_type = ValueType;
     using difference_type = typename pointer_traits<value_type*>::difference_type;
+    using iterator_category = contiguous_iterator_tag;
+
+private:
     using size_type = decltype(sizeof(0));
     using pointer = remove_const_t<value_type>*;
 
@@ -155,8 +160,7 @@ protected:
     UTL_REQUIRES_CXX20(requires(value_type*& dst, T* ptr) {
         { dst = ptr };
     })
-    UTL_CONSTEXPR_CXX14 contiguous_iterator_base& operator=(
-        contiguous_iterator_base<It, T> it) noexcept {
+    UTL_CONSTEXPR_CXX14 contiguous_iterator_base& operator=(contiguous_iterator_base<It, T> it) noexcept {
         ptr_ = as_ptr(it);
         return *this;
     }
