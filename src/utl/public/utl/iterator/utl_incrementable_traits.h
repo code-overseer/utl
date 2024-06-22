@@ -12,8 +12,6 @@ template <typename>
 struct incrementable_traits;
 template <typename T>
 struct incrementable_traits<T const> : incrementable_traits<T> {};
-template <typename T>
-struct incrementable_traits<T volatile> : incrementable_traits<T> {};
 
 using ptrdiff_t = decltype((char*)0 - (char*)0);
 
