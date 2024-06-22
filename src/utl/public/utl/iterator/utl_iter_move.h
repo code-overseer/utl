@@ -20,7 +20,7 @@ namespace ranges {
 namespace details {
 template <typename T UTL_REQUIRES_CXX11(
     UTL_TRAIT_is_lvalue_reference(decltype(*UTL_SCOPE declval<T>()))
-        &&UTL_TRAIT_is_void(void_t < decltype(move(*UTL_SCOPE declval<T>()))>))>
+        &&UTL_TRAIT_is_rvalue_reference(decltype(UTL_SCOPE move(*UTL_SCOPE declval<T>()))))>
 UTL_REQUIRES_CXX20(requires(T&& it) {
     { *it } -> lvalue_reference;
     UTL_SCOPE move(*it);

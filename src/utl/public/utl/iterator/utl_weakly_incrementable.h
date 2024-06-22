@@ -2,14 +2,10 @@
 
 #pragma once
 
-#include "utl/iterator/utl_iter_move.h"
-#include "utl/iterator/utl_iter_reference_t.h"
-#include "utl/iterator/utl_iter_rvalue_reference_t.h"
-#include "utl/iterator/utl_iter_value_t.h"
+#include "utl/iterator/utl_iter_difference_t.h"
 #include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_enable_if.h"
-#include "utl/type_traits/utl_remove_cvref.h"
 
 #if UTL_CXX20
 #  include "utl/concepts/utl_movable.h"
@@ -35,6 +31,9 @@ inline constexpr bool is_weakly_incrementable_v = weakly_incrementable<T>;
 UTL_NAMESPACE_END
 
 #else
+
+#  include "utl/type_traits/utl_is_same.h"
+#  include "utl/type_traits/utl_is_signed_integral.h"
 
 UTL_NAMESPACE_BEGIN
 namespace details {

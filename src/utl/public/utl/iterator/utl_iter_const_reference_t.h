@@ -20,7 +20,7 @@ auto resolve(int) noexcept -> UTL_SCOPE
 } // namespace iter_const_reference
 } // namespace details
 
-template <UTL_CONCEPT_CXX20(indirectly_readable) T>
+template <UTL_CONCEPT_CXX20(UTL_SCOPE indirectly_readable) T>
 using iter_const_reference_t = decltype(details::iter_const_reference::resolve<T>(0));
 
 UTL_NAMESPACE_END
