@@ -10,42 +10,56 @@ UTL_NAMESPACE_BEGIN
 
 template <typename>
 struct incrementable_traits;
+template <typename T>
+struct incrementable_traits<T const> : incrementable_traits<T> {};
+template <typename T>
+struct incrementable_traits<T volatile> : incrementable_traits<T> {};
 
 using ptrdiff_t = decltype((char*)0 - (char*)0);
+
+namespace details {
+namespace incrementable {
+template <typename T>
+using subtract_result_t = UTL_SCOPE
+    make_signed_t<decltype(UTL_SCOPE declval<T const&>() - UTL_SCOPE declval<T const&>())>;
+}
+} // namespace details
 
 UTL_NAMESPACE_END
 
 #if UTL_CXX20
 
 #  include "utl/concepts/utl_integral.h"
+#  include "utl/concepts/utl_object_type.h"
 
 UTL_NAMESPACE_BEGIN
 
+namespace details {
+namespace incrementable {
 template <typename T>
-struct incrementable_traits : details::incrementable::traits<T> {};
+concept with_difference_type = requires { typename T::difference_type; };
+template <typename T>
+concept subtractable = !with_difference_type<T> && requires(T const& a, T const& b) {
+    { a - b } -> integral;
+};
+} // namespace incrementable
+} // namespace details
 
-template <typename T>
-requires (UTL_TRAIT_is_object(T))
+template <typename>
+struct incrementable_traits {};
+
+template <object_type T>
 struct incrementable_traits<T*> {
-    using difference_type = ptrdiff_t;
+    using difference_type = UTL_SCOPE ptrdiff_t;
 };
 
-template <typename T>
-requires requires { typename T::difference_type; }
+template <details::incrementable::with_difference_type T>
 struct incrementable_traits<T> {
     using difference_type = typename T::difference_type;
 };
 
-template <typename T>
-requires (!requires { typename T::difference_type; }) && requires(T const& a, T const& b) {
-    { a - b } -> integral;
-}
-struct incrementable_traits<T> {
-    using difference_type = make_signed_t<decltype(declval<T const&>() - declval<T const&>())>;
-};
-
-template <typename T>
-struct incrementable_traits<T const> : incrementable_traits<T> {};
+template <details::incrementable::subtractable T>
+struct incrementable_traits<T> : details::incrementable::subtract_result_t<T> {};
 
 UTL_NAMESPACE_END
 
@@ -53,34 +67,26 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_enable_if.h"
 #  include "utl/type_traits/utl_has_member_difference_type.h"
-#  include "utl/type_traits/utl_void_t.h"
+#  include "utl/type_traits/utl_is_object.h"
 
 UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace incrementable {
-
 template <typename T>
 struct difference_identity {
     using difference_type = T;
 };
-
 template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_is_object(T))>
-UTL_REQUIRES_CXX20(UTL_TRAIT_is_object(T))
 using object_pointer = difference_identity<ptrdiff_t>;
-
-template <typename T UTL_REQUIRES_CXX11(has_member_difference_type<T>::value)>
+template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_has_member_difference_type(T))>
 auto resolve_trait(int) noexcept -> difference_identity<typename T::difference_type>;
-
-template <typename T UTL_REQUIRES_CXX11(!has_difference_type<T>::value &&
-    UTL_TRAIT_is_integral(decltype(declval<T const&>()-declval<T const&>())))>
-auto resolve_trait(int) noexcept
-    -> difference_identity<make_signed_t<decltype(declval<T const&>() - declval<T const&>())>>;
+template <typename T UTL_REQUIRES_CXX11(!UTL_TRAIT_has_member_difference_type(T))>
+auto resolve_trait(int) noexcept -> difference_identity<subtract_result_t<T>>;
 
 struct fallback_t {};
 template <typename T>
 auto resolve_trait(float) noexcept -> fallback_t;
-
 template <typename T>
 using traits = decltype(resolve_trait<T>(0));
 
@@ -92,9 +98,6 @@ struct incrementable_traits : details::incrementable::traits<T> {};
 
 template <typename T>
 struct incrementable_traits<T*> : details::incrementable::object_pointer<T> {};
-
-template <typename T>
-struct incrementable_traits<T const> : incrementable_traits<T> {};
 
 UTL_NAMESPACE_END
 
