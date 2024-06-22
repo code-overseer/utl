@@ -10,7 +10,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-concept object = UTL_TRAIT_is_object(T);
+concept object_type = UTL_TRAIT_is_object(T);
 
 UTL_NAMESPACE_END
 #endif
