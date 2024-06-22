@@ -17,8 +17,8 @@ template <typename T>
 concept bidirectional_iterator = UTL_SCOPE forward_iterator<T> &&
     UTL_SCOPE derived_from<UTL_SCOPE iterator_concept_t<T>, UTL_SCOPE bidirectional_iterator_tag> &&
     requires(T t) {
-        { --t } -> same_as<T&>;
-        { t-- } -> same_as<T>;
+        { --t } -> UTL_SCOPE same_as<T&>;
+        { t-- } -> UTL_SCOPE same_as<T>;
     };
 
 template <typename T>
