@@ -38,10 +38,10 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace iter_rvalue_reference {
 
-template <typename T,
-    typename = UTL_SCOPE enable_if_t<UTL_SCOPE conjunction<UTL_SCOPE is_dereferenceable<T>,
-        UTL_SCOPE is_referenceable<decltype(ranges::iter_move(UTL_SCOPE declval<T&>()))>>::value>>
-auto resolve(int) noexcept -> decltype(ranges::iter_move(UTL_SCOPE declval<T&>()));
+template <UTL_CONCEPT_CXX20(dereferenceable) T UTL_REQUIRES_CXX11(UTL_TRAIT_is_dereferenceable(T))>
+auto resolve(int) noexcept -> UTL_SCOPE enable_if_t<
+    UTL_SCOPE is_referenceable<decltype(ranges::iter_move(UTL_SCOPE declval<T&>()))>::value,
+    decltype(ranges::iter_move(UTL_SCOPE declval<T&>()))>;
 
 } // namespace iter_rvalue_reference
 } // namespace details
