@@ -32,45 +32,47 @@ namespace details {
 namespace indirectly_readable {
 
 template <typename T>
-concept with_conflict_member_types = with_member_value_type<T> && with_member_element_type<T>;
+concept with_member_object_value_type = with_member_value_type<T> && !with_member_element_type<T> &&
+    UTL_SCOPE object_type<typename T::value_type>;
 
 template <typename T>
-concept with_resolvable_conflict = with_conflict_member_types<T> &&
+concept with_member_object_element_type = with_member_element_type<T> &&
+    !with_member_value_type<T> && UTL_SCOPE object_type<typename T::element_type>;
+
+template <typename T>
+concept with_resolvable_conflict = with_member_value_type<T> && with_member_element_type<T> &&
     UTL_SCOPE same_as<UTL_SCOPE remove_cv_t<typename T::value_type>,
-        UTL_SCOPE remove_cv_t<typename T::element_type>>;
+        UTL_SCOPE remove_cv_t<typename T::element_type>> &&
+    UTL_SCOPE object_type<typename T::value_type>;
+
+template <typename T>
+struct traits {
+    using value_type = UTL_SCOPE remove_cv_t<T>;
+};
 } // namespace indirectly_readable
 } // namespace details
 
 template <typename>
 struct indirectly_readable_traits {};
 
-template <object_type T>
-struct indirectly_readable_traits<T*> {
-    using value_type = UTL_SCOPE remove_cv_t<T>;
-};
-
 template <array_type T>
-struct indirectly_readable_traits<T> {
-    using value_type = UTL_SCOPE remove_cv_t<UTL_SCOPE remove_extent_t<T>>;
-};
+struct indirectly_readable_traits<T> :
+    details::indirectly_readable::traits<UTL_SCOPE remove_extent_t<T>> {};
 
-template <with_member_value_type T>
-struct indirectly_readable_traits<T> {
-    using value_type = typename T::value_type;
-};
+template <object_type T>
+struct indirectly_readable_traits<T*> : details::indirectly_readable::traits<T> {};
 
-template <with_member_element_type T>
-struct indirectly_readable_traits<T> {
-    using value_type = typename T::element_type;
-};
+template <UTL_SCOPE details::indirectly_readable::with_member_object_value_type T>
+struct indirectly_readable_traits<T> :
+    details::indirectly_readable::traits<typename T::value_type> {};
 
-template <details::indirectly_readable::with_conflict_member_types T>
-struct indirectly_readable_traits<T> {};
+template <UTL_SCOPE details::indirectly_readable::with_member_object_element_type T>
+struct indirectly_readable_traits<T> :
+    details::indirectly_readable::traits<typename T::element_type> {};
 
 template <details::indirectly_readable::with_resolvable_conflict T>
-struct indirectly_readable_traits<T> {
-    using value_type = typename T::value_type;
-};
+struct indirectly_readable_traits<T> :
+    details::indirectly_readable::traits<typename T::value_type> {};
 
 UTL_NAMESPACE_END
 
@@ -92,31 +94,30 @@ struct value_identity {
     using value_type = T;
 };
 
-template <typename T, typename = void>
+template <typename T, bool = true, bool = UTL_TRAIT_is_object(T)>
 struct object_value_type {};
-
 template <typename T>
-struct object_value_type<T, UTL_SCOPE enable_if_t<UTL_TRAIT_is_object(T)>> {
+struct object_value_type<T, true, true> {
     using value_type = UTL_SCOPE remove_cv_t<T>;
 };
 
-template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_is_array(T))>
-auto resolve(int) noexcept -> value_identity<UTL_SCOPE remove_cv_t<UTL_SCOPE remove_extent_t<T>>>;
-template <typename T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_has_member_value_type(T) && !UTL_TRAIT_has_member_element_type(T))>
-auto resolve(int) noexcept -> value_identity<typename T::value_type>;
-template <typename T UTL_REQUIRES_CXX11(
-    !UTL_TRAIT_has_member_value_type(T) && UTL_TRAIT_has_member_element_type(T))>
-auto resolve(int) noexcept -> value_identity<typename T::element_type>;
-template <typename T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_same(typename T::value_type, typename T::element_type))>
-auto resolve(int) noexcept -> value_identity<typename T::value_type>;
-struct fallback_t {};
+struct empty_trait {};
 template <typename T>
-auto resolve(float) -> fallback_t;
+auto resolve(int, int) noexcept -> UTL_SCOPE
+    enable_if_t<UTL_TRAIT_is_array(T), object_value_type<UTL_SCOPE remove_extent_t<T>>>;
+template <typename T>
+auto resolve(int, int) noexcept -> object_value_type<typename T::value_type,
+    UTL_TRAIT_is_same(UTL_SCOPE remove_cv_t<typename T::value_type>,
+        UTL_SCOPE remove_cv_t<typename T::element_type>)>;
+template <typename T>
+auto resolve(int, float) noexcept -> object_value_type<typename T::value_type>;
+template <typename T>
+auto resolve(int, float) noexcept -> object_value_type<typename T::element_type>;
+template <typename T>
+auto resolve(...) -> empty_trait;
 
 template <typename T>
-using impl = decltype(resolve<T>(0));
+using impl = decltype(resolve<T>(0, 0));
 
 } // namespace indirectly_readable
 } // namespace details
