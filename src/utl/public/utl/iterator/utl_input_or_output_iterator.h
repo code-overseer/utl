@@ -36,25 +36,28 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 namespace details {
 namespace input_or_output_iterator {
-template <typename T, typename = void>
-struct trait : UTL_SCOPE false_type {};
 
 template <typename T>
-struct trait<T,
-    UTL_SCOPE
-        enable_if_t<UTL_SCOPE is_referenceable<decltype(*static_cast<T (*)()>(0)())>::value>> :
-    UTL_SCOPE is_weakly_incrementable<T> {};
+auto check(float) noexcept -> UTL_SCOPE false_type;
+
+template <typename T>
+auto check(int) noexcept
+    -> UTL_SCOPE conjunction<UTL_SCOPE is_referenceable<decltype(*static_cast<T (*)()>(0)())>,
+        UTL_SCOPE is_weakly_incrementable<T>>;
+
+template <typename T>
+using implemented = decltype(UTL_SCOPE details::input_or_output_iterator::check<T>(0));
 
 } // namespace input_or_output_iterator
 } // namespace details
 
 template <typename T>
-struct is_input_or_output_iterator : details::input_or_output_iterator::trait<T> {};
+struct is_input_or_output_iterator : details::input_or_output_iterator::implemented<T> {};
 
 #  if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_input_or_output_iterator_v =
-    details::input_or_output_iterator::trait<T>::value;
+    details::input_or_output_iterator::implemented<T>::value;
 #  endif
 
 UTL_NAMESPACE_END
