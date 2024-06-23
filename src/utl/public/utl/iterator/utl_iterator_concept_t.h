@@ -5,6 +5,7 @@
 #include "utl/iterator/utl_iterator_tags.h"
 #include "utl/iterator/utl_iterator_traits_fwd.h"
 #include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_is_base_of.h"
 
 #if UTL_CXX20
 
@@ -53,6 +54,13 @@ struct tag_type<T> {
 
 template <typename T>
 using tag_type_t = typename tag_type<T>::type;
+
+template <typename T, typename Tag>
+concept implements = iterator_tag<Tag> && requires {
+    typename tag_type<T>::type;
+    requires UTL_SCOPE derived_from<tag_type_t<T>, Tag>;
+};
+
 } // namespace iterator_concept
 } // namespace details
 
@@ -106,6 +114,18 @@ struct tag_type {
     using type = decltype(UTL_SCOPE details::iterator_concept::resolve<T>(0));
 };
 
+template <typename T>
+using tag_type_t = decltype(UTL_SCOPE details::iterator_concept::resolve<T>(0));
+
+template <typename Tag, typename T, typename = void>
+struct implements : UTL_SCOPE false_type {};
+
+template <typename Tag, typename T>
+struct implements<Tag, T,
+    UTL_SCOPE
+        enable_if_t<UTL_TRAIT_is_iterator_tag(Tag) && UTL_TRAIT_is_base_of(Tag, tag_type_t<T>)>> :
+    UTL_SCOPE true_type {};
+
 } // namespace iterator_concept
 } // namespace details
 
@@ -116,4 +136,5 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 template <typename T>
 using iterator_concept_t = typename UTL_SCOPE details::iterator_concept::tag_type<T>::type;
+
 UTL_NAMESPACE_END

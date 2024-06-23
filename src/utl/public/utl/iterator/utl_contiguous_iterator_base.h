@@ -2,12 +2,16 @@
 
 #pragma once
 
+#include "utl/concepts/utl_assignable_to.h"
+#include "utl/concepts/utl_constructible_as.h"
 #include "utl/iterator/utl_iterator_tags.h"
 #include "utl/memory/utl_pointer_traits.h"
 #include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_add_pointer.h"
 #include "utl/type_traits/utl_enable_if.h"
+#include "utl/type_traits/utl_is_assignable.h"
 #include "utl/type_traits/utl_is_base_of.h"
-#include "utl/type_traits/utl_is_convertible.h"
+#include "utl/type_traits/utl_is_constructible.h"
 #include "utl/type_traits/utl_remove_const.h"
 
 UTL_NAMESPACE_BEGIN
@@ -20,10 +24,9 @@ class contiguous_iterator_base {
 public:
     using value_type = ValueType;
     using difference_type = typename pointer_traits<value_type*>::difference_type;
-    using iterator_category = contiguous_iterator_tag;
+    using iterator_concept = contiguous_iterator_tag;
 
 private:
-    using size_type = decltype(sizeof(0));
     using pointer = remove_const_t<value_type>*;
 
     UTL_ITERATOR_CONST
@@ -32,13 +35,10 @@ private:
         return ((contiguous_iterator_base const&)it).ptr_;
     }
 
-    static constexpr void set_ptr(It& it, value_type* value) noexcept {
+    static constexpr It& set_ptr(It& it, value_type* value) noexcept {
         static_assert(is_base_of<contiguous_iterator_base, It>::value, "Invalid iterator type");
-        ((contiguous_iterator_base&)it).ptr_ = value;
+        return ((contiguous_iterator_base&)it).ptr_ = value, it;
     }
-
-    UTL_ITERATOR_CONST
-    friend constexpr value_type* as_ptr(contiguous_iterator_base it) noexcept { return it.ptr_; }
 
 public:
     UTL_ITERATOR_PURE constexpr value_type& operator*() const noexcept { return *ptr_; }
@@ -47,20 +47,17 @@ public:
 
     UTL_ITERATOR_CONST
     friend constexpr It operator+(It it, difference_type offset) noexcept {
-        set_ptr(it, get_ptr(it) + offset);
-        return it;
+        return set_ptr(it, get_ptr(it) + offset), it;
     }
 
     UTL_ITERATOR_CONST
     friend constexpr It operator+(difference_type offset, It it) noexcept {
-        set_ptr(it, get_ptr(it) + offset);
-        return it;
+        return set_ptr(it, get_ptr(it) + offset), it;
     }
 
     UTL_ITERATOR_CONST
     friend constexpr It operator-(It it, difference_type offset) noexcept {
-        set_ptr(it, get_ptr(it) - offset);
-        return it;
+        return set_ptr(it, get_ptr(it) - offset), it;
     }
 
     UTL_ITERATOR_CONST
@@ -69,32 +66,24 @@ public:
     }
 
     friend constexpr It& operator+=(It& it, difference_type offset) noexcept {
-        set_ptr(it, get_ptr(it) + offset);
-        return it;
+        return set_ptr(it, get_ptr(it) + offset), it;
     }
 
     friend constexpr It& operator-=(It& it, difference_type offset) noexcept {
-        set_ptr(it, get_ptr(it) - offset);
-        return it;
+        return set_ptr(it, get_ptr(it) - offset), it;
     }
 
-    friend constexpr It& operator++(It& it) noexcept {
-        set_ptr(it, get_ptr(it) + 1);
-        return it;
-    }
+    friend constexpr It& operator++(It& it) noexcept { return set_ptr(it, get_ptr(it) + 1), it; }
 
-    friend constexpr It operator++(It& it, int) noexcept {
+    friend UTL_CONSTEXPR_CXX14 It operator++(It& it, int) noexcept {
         It before = it;
         ++it;
         return before;
     }
 
-    friend constexpr It& operator--(It& it) noexcept {
-        set_ptr(it, get_ptr(it) - 1);
-        return it;
-    }
+    friend constexpr It& operator--(It& it) noexcept { return set_ptr(it, get_ptr(it) - 1), it; }
 
-    friend constexpr It operator--(It& it, int) noexcept {
+    friend UTL_CONSTEXPR_CXX14 It operator--(It& it, int) noexcept {
         It before = it;
         --it;
         return before;
@@ -147,21 +136,20 @@ protected:
     constexpr contiguous_iterator_base() noexcept = default;
     constexpr contiguous_iterator_base(contiguous_iterator_base const&) noexcept = default;
     constexpr contiguous_iterator_base(contiguous_iterator_base&&) noexcept = default;
+    UTL_CONSTEXPR_CXX14 contiguous_iterator_base& operator=(
+        contiguous_iterator_base const&) noexcept = default;
+    UTL_CONSTEXPR_CXX14 contiguous_iterator_base& operator=(contiguous_iterator_base&&) noexcept = default;
     UTL_CONSTEXPR_CXX20 ~contiguous_iterator_base() noexcept = default;
 
-    template <typename T UTL_REQUIRES_CXX11(is_convertible<T*, value_type*>::value)>
-    UTL_REQUIRES_CXX20(requires(T* ptr) {
-        { value_type* dst = ptr };
-    })
+    template <UTL_CONCEPT_CXX20(constructible_as<pointer, UTL_SCOPE add_pointer>) T
+            UTL_REQUIRES_CXX11(UTL_TRAIT_is_constructible(pointer, T*))>
     constexpr contiguous_iterator_base(contiguous_iterator_base<It, T> it) noexcept
-        : ptr_(as_ptr(it)){};
+        : ptr_(it.operator->()){};
 
-    template <typename T UTL_REQUIRES_CXX11(is_convertible<T*, value_type*>::value)>
-    UTL_REQUIRES_CXX20(requires(value_type*& dst, T* ptr) {
-        { dst = ptr };
-    })
+    template <UTL_CONCEPT_CXX20(assignable_to<pointer, UTL_SCOPE add_pointer>) T UTL_REQUIRES_CXX11(
+        UTL_TRAIT_is_assignable(pointer&, T*))>
     UTL_CONSTEXPR_CXX14 contiguous_iterator_base& operator=(contiguous_iterator_base<It, T> it) noexcept {
-        ptr_ = as_ptr(it);
+        ptr_ = it.operator->();
         return *this;
     }
 

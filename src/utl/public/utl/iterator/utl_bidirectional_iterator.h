@@ -15,7 +15,7 @@
 UTL_NAMESPACE_BEGIN
 template <typename T>
 concept bidirectional_iterator = UTL_SCOPE forward_iterator<T> &&
-    UTL_SCOPE derived_from<UTL_SCOPE iterator_concept_t<T>, UTL_SCOPE bidirectional_iterator_tag> &&
+    UTL_SCOPE details::iterator_concept::implements<T, UTL_SCOPE bidirectional_iterator_tag> &&
     requires(T t) {
         { --t } -> UTL_SCOPE same_as<T&>;
         { t-- } -> UTL_SCOPE same_as<T>;
@@ -56,7 +56,7 @@ using is_reversible = decltype(reversible<T>(0));
 template <typename T>
 struct is_bidirectional_iterator :
     UTL_SCOPE conjunction<UTL_SCOPE is_forward_iterator<T>,
-        UTL_SCOPE is_base_of<UTL_SCOPE bidirectional_iterator_tag, UTL_SCOPE iterator_concept_t<T>>,
+        UTL_SCOPE details::iterator_concept::implements<UTL_SCOPE bidirectional_iterator_tag, T>,
         UTL_SCOPE details::bidirectional_iterator::is_reversible<T>> {};
 
 #  if UTL_CXX14

@@ -16,7 +16,7 @@
 UTL_NAMESPACE_BEGIN
 template <typename T>
 concept forward_iterator = UTL_SCOPE input_iterator<T> &&
-    UTL_SCOPE derived_from<UTL_SCOPE iterator_concept_t<T>, UTL_SCOPE forward_iterator_tag> &&
+    UTL_SCOPE details::iterator_concept::implements<T, UTL_SCOPE forward_iterator_tag> &&
     UTL_SCOPE incrementable<T> && UTL_SCOPE sentinel_for<T, T>;
 
 template <typename T>
@@ -36,7 +36,7 @@ UTL_NAMESPACE_BEGIN
 template <typename T>
 struct is_forward_iterator :
     UTL_SCOPE conjunction<UTL_SCOPE is_input_iterator<T>,
-        UTL_SCOPE is_base_of<UTL_SCOPE forward_iterator_tag, UTL_SCOPE iterator_concept_t<T>>,
+        UTL_SCOPE details::iterator_concept::implements<UTL_SCOPE forward_iterator_tag, T>,
         UTL_SCOPE is_incrementable<T>, UTL_SCOPE is_sentinel_for<T, T>> {};
 
 #  if UTL_CXX14

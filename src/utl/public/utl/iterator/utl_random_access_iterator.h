@@ -19,7 +19,7 @@
 UTL_NAMESPACE_BEGIN
 template <typename T>
 concept random_access_iterator = UTL_SCOPE bidirectional_iterator<T> &&
-    UTL_SCOPE derived_from<UTL_SCOPE iterator_concept_t<T>, UTL_SCOPE random_access_iterator_tag> &&
+    UTL_SCOPE details::iterator_concept::implements<T, UTL_SCOPE random_access_iterator_tag> &&
     UTL_SCOPE totally_ordered<T> && UTL_SCOPE sized_sentinel_for<T> &&
     requires(T t, T const u, UTL_SCOPE iter_difference_t<T> const n) {
         { t += n } -> UTL_SCOPE same_as<T&>;
@@ -83,7 +83,7 @@ using is_indexible = decltype(UTL_SCOPE details::random_access_iterator::indexib
 template <typename T>
 struct is_random_access_iterator :
     UTL_SCOPE conjunction<UTL_SCOPE is_bidirectional_iterator<T>,
-        UTL_SCOPE is_base_of<UTL_SCOPE random_access_iterator_tag, UTL_SCOPE iterator_concept_t<T>>,
+        UTL_SCOPE details::iterator_concept::implements<UTL_SCOPE random_access_iterator_tag, T>,
         UTL_SCOPE is_totally_ordered<T>, UTL_SCOPE is_sized_sentinel_for<T>,
         UTL_SCOPE details::random_access_iterator::is_indexible<T>> {};
 
