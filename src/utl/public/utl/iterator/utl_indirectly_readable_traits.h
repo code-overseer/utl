@@ -34,12 +34,12 @@ template <typename T>
 struct object_value_type {};
 
 template <object_type T>
-struct object_value_type {
+struct object_value_type<T> {
     using value_type = UTL_SCOPE remove_cv_t<T>;
 };
 
 template <typename T>
-concept with_conflict = with_member_value_type<T> && with_member_element_type<T>;
+concept with_conflict_member_types = with_member_value_type<T> && with_member_element_type<T>;
 
 template <typename T>
 concept with_resolvable_conflict = with_conflict_member_types<T> &&
@@ -69,7 +69,7 @@ struct indirectly_readable_traits<T> {
     using value_type = typename T::element_type;
 };
 
-template <details::indirectly_readable::with_conflict T>
+template <details::indirectly_readable::with_conflict_member_types T>
 struct indirectly_readable_traits<T> {};
 
 template <details::indirectly_readable::with_resolvable_conflict T>

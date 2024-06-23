@@ -2,21 +2,23 @@
 
 #pragma once
 
-#include "utl/concepts/utl_dereferenceable.h"
-#include "utl/iterator/iter_move.h"
+#include "utl/iterator/utl_iter_move.h"
 #include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_declval.h"
 
 #if UTL_CXX20
+
+#  include "utl/concepts/utl_dereferenceable.h"
+#  include "utl/concepts/utl_referenceable.h"
 
 UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace iter_rvalue_reference {
 
-template <dereferenceable T>
+template <UTL_SCOPE dereferenceable T>
 requires requires(T& t) {
-    { ranges::iter_move(t) } -> referenceable;
+    { ranges::iter_move(t) } -> UTL_SCOPE referenceable;
 }
 auto resolve(int) noexcept -> decltype(ranges::iter_move(UTL_SCOPE declval<T&>()));
 

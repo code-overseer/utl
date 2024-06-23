@@ -25,7 +25,7 @@ UTL_REQUIRES_CXX20(requires(T&& it) {
     { *it } -> lvalue_reference;
     UTL_SCOPE move(*it);
 })
-constexpr auto iter_move(T&& it) const noexcept(UTL_TRAIT_is_nothrow_dereferenceable(T))
+constexpr auto iter_move(T&& it) noexcept(UTL_TRAIT_is_nothrow_dereferenceable(T))
     -> decltype(UTL_SCOPE move(*it)) {
     return UTL_SCOPE move(*it);
 }
@@ -35,7 +35,7 @@ template <typename T UTL_REQUIRES_CXX11(
 UTL_REQUIRES_CXX20(requires(T&& it) {
     { *it } -> rvalue_reference;
 })
-constexpr auto iter_move(T&& it) const noexcept(UTL_TRAIT_is_nothrow_dereferenceable(T))
+constexpr auto iter_move(T&& it) noexcept(UTL_TRAIT_is_nothrow_dereferenceable(T))
     -> decltype(*it) {
     return *it;
 }

@@ -3,7 +3,8 @@
 #pragma once
 
 #include "utl/iterator/utl_indirectly_readable.h"
-#include "utl/iterator/utl_iterator_concept.h"
+#include "utl/iterator/utl_input_or_output_iterator.h"
+#include "utl/iterator/utl_iterator_concept_t.h"
 #include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_constants.h"
 

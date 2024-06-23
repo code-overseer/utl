@@ -11,7 +11,7 @@
 #  include "utl/iterator/utl_input_or_output_iterator.h"
 UTL_NAMESPACE_BEGIN
 template <typename S, typename I>
-concept sentinel_for = UTL_SCOPE semiregular<T> && UTL_SCOPE input_or_output_iterator<I> &&
+concept sentinel_for = UTL_SCOPE semiregular<S> && UTL_SCOPE input_or_output_iterator<I> &&
     UTL_SCOPE details::equality_comparable::weak<S, I>;
 
 template <typename S, typename I>
@@ -34,10 +34,10 @@ UTL_NAMESPACE_BEGIN
 
 template <typename S, typename I>
 struct is_sentinel_for :
-    UTL_SCOPE conjunction<UTL_SCOPE is_copyable<T>, UTL_SCOPE is_default_constructible<T>,
-        UTL_SCOPE is_input_or_output_iterator<I>, UTL_SCOPE is_equality_comparable<S, I>,
-        UTL_SCOPE is_inequality_comparable<S, I>, UTL_SCOPE is_equality_comparable<I, S>,
-        UTL_SCOPE is_inequality_comparable<I, S>> {};
+    UTL_SCOPE conjunction<UTL_SCOPE is_copyable<S>, UTL_SCOPE is_default_constructible<S>,
+        UTL_SCOPE is_input_or_output_iterator<I>, UTL_SCOPE is_equality_comparable_with<S, I>,
+        UTL_SCOPE is_inequality_comparable_with<S, I>, UTL_SCOPE is_equality_comparable_with<I, S>,
+        UTL_SCOPE is_inequality_comparable_with<I, S>> {};
 
 #  if UTL_CXX14
 template <typename S, typename I>

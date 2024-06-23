@@ -19,7 +19,7 @@ concept weakly_incrementable = UTL_SCOPE movable<T> && requires(T t) {
     typename UTL_SCOPE iter_difference_t<T>;
     requires UTL_SCOPE signed_integral<UTL_SCOPE iter_difference_t<T>>;
     { ++t } -> UTL_SCOPE same_as<T&>;
-    i++;
+    t++;
 };
 
 template <typename T>
@@ -32,8 +32,9 @@ UTL_NAMESPACE_END
 
 #else
 
+#  include "utl/type_traits/utl_is_integral.h"
 #  include "utl/type_traits/utl_is_same.h"
-#  include "utl/type_traits/utl_is_signed_integral.h"
+#  include "utl/type_traits/utl_is_signed.h"
 
 UTL_NAMESPACE_BEGIN
 namespace details {
@@ -44,10 +45,11 @@ struct trait : UTL_SCOPE false_type {};
 template <typename T>
 struct trait<T,
     UTL_SCOPE void_t<UTL_SCOPE iter_difference_t<T>,
-        UTL_SCOPE enable_if_t<
-            UTL_SCOPE conjunction<UTL_SCOPE is_signed_integral<UTL_SCOPE iter_difference_t<T>>,
+        UTL_SCOPE
+            enable_if_t<UTL_SCOPE conjunction<UTL_SCOPE is_signed<UTL_SCOPE iter_difference_t<T>>,
+                UTL_SCOPE is_integral<UTL_SCOPE iter_difference_t<T>>,
                 UTL_SCOPE is_same<decltype(++static_cast<T (*)()>(0)()), T&>>::value>,
-        decltype(i++)>> : UTL_SCOPE true_type {};
+        decltype(static_cast<T (*)()>(0)()++)>> : UTL_SCOPE true_type {};
 
 } // namespace weakly_incrementable
 } // namespace details

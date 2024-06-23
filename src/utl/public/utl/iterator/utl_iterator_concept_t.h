@@ -5,9 +5,10 @@
 #include "utl/iterator/utl_iterator_tags.h"
 #include "utl/iterator/utl_iterator_traits_fwd.h"
 #include "utl/preprocessor/utl_config.h"
-#include "utl/type_traits/utl_is_base_of.h"
 
 #if UTL_CXX20
+
+#  include "utl/concepts/utl_derived_from.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -19,7 +20,7 @@ struct trait_type {
     using type = T;
 };
 template <UTL_SCOPE details::iterator_traits::is_specialized T>
-struct trait_type {
+struct trait_type<T> {
     using type = UTL_SCOPE iterator_traits<T>;
 };
 
@@ -69,6 +70,7 @@ UTL_NAMESPACE_END
 #else // UTL_CXX20
 
 #  include "utl/type_traits/utl_constants.h"
+#  include "utl/type_traits/utl_is_base_of.h"
 
 UTL_NAMESPACE_BEGIN
 namespace details {

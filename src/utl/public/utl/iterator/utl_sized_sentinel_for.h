@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/iterator/utl_iterator_difference.h"
+#include "utl/iterator/utl_iter_difference_t.h"
 #include "utl/iterator/utl_sentinel_for.h"
 #include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_constants.h"
@@ -19,7 +19,7 @@ inline constexpr bool disable_sized_sentinel_for = false;
 template <typename S, typename I>
 concept sized_sentinel_for = UTL_SCOPE sentinel_for<S, I> &&
     !UTL_SCOPE disable_sized_sentinel_for<UTL_SCOPE remove_cv_t<S>, UTL_SCOPE remove_cv_t<I>> &&
-    requires(T const& t, S const& s) {
+    requires(I const& i, S const& s) {
         { s - i } -> UTL_SCOPE same_as<UTL_SCOPE iter_difference_t<I>>;
         { i - s } -> UTL_SCOPE same_as<UTL_SCOPE iter_difference_t<I>>;
     };
@@ -42,7 +42,7 @@ UTL_NAMESPACE_BEGIN
 
 #  if UTL_CXX14
 template <typename S, typename I>
-inline constexpr bool disable_sized_sentinel_for = false;
+UTL_INLINE_CXX17 constexpr bool disable_sized_sentinel_for = false;
 
 namespace details {
 namespace sized_sentinel_for {
@@ -83,8 +83,8 @@ using is_subtractible = decltype(UTL_SCOPE details::sized_sentinel_for::subtract
 template <typename S, typename I>
 struct is_sized_sentinel_for :
     UTL_SCOPE conjunction<UTL_SCOPE is_sentinel_for<S, I>,
-        UTL_SCOPE details::sized_sentinel_for::is_disabled<T>,
-        UTL_SCOPE details::sized_sentinel_for::is_subtractible<T>> {};
+        UTL_SCOPE details::sized_sentinel_for::is_disabled<S, I>,
+        UTL_SCOPE details::sized_sentinel_for::is_subtractible<S, I>> {};
 
 #  if UTL_CXX14
 template <typename S, typename I>

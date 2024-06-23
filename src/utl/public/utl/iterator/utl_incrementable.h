@@ -14,7 +14,7 @@ UTL_NAMESPACE_BEGIN
 
 template <typename T>
 concept incrementable = UTL_SCOPE regular<T> && UTL_SCOPE weakly_incrementable<T> && requires(T t) {
-    { i++ } -> UTL_SCOPE same_as<T>;
+    { t++ } -> UTL_SCOPE same_as<T>;
 };
 
 template <typename T>
@@ -27,6 +27,9 @@ UTL_NAMESPACE_END
 
 #else
 
+#  include "utl/type_traits/utl_is_copyable.h"
+#  include "utl/type_traits/utl_is_default_constructible.h"
+#  include "utl/type_traits/utl_is_equality_comparable.h"
 #  include "utl/type_traits/utl_void_t.h"
 
 UTL_NAMESPACE_BEGIN
