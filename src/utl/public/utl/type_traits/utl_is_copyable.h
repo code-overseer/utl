@@ -10,7 +10,8 @@ UTL_NAMESPACE_BEGIN
 
 template <typename T>
 struct is_copyable :
-    bool_constant<UTL_TRAIT_is_movable(T) && UTL_TRAIT_is_copy_constructible(T)> {};
+    bool_constant<UTL_TRAIT_is_movable(T) && UTL_TRAIT_is_copy_constructible(T) &&
+        UTL_TRAIT_is_copy_assignable(T)> {};
 
 #if UTL_CXX14
 template <typename T>
