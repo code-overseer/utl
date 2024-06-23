@@ -23,20 +23,24 @@ template <typename It, typename ValueType>
 class contiguous_iterator_base {
 public:
     using value_type = ValueType;
-    using difference_type = typename pointer_traits<value_type*>::difference_type;
-    using iterator_concept = contiguous_iterator_tag;
+    using pointer = value_type*;
+    using reference = value_type&;
+    using difference_type = typename UTL_SCOPE pointer_traits<pointer>::difference_type;
+    using iterator_concept = UTL_SCOPE contiguous_iterator_tag;
 
 private:
-    using pointer = remove_const_t<value_type>*;
+    using stored_pointer = UTL_SCOPE remove_const_t<value_type>*;
 
-    UTL_ITERATOR_CONST
-    static constexpr value_type* get_ptr(It it) noexcept {
-        static_assert(is_base_of<contiguous_iterator_base, It>::value, "Invalid iterator type");
+    UTL_ITERATOR_PURE
+    static constexpr value_type* get_ptr(It const& it) noexcept {
+        static_assert(
+            UTL_SCOPE is_base_of<contiguous_iterator_base, It>::value, "Invalid iterator type");
         return ((contiguous_iterator_base const&)it).ptr_;
     }
 
     static constexpr It& set_ptr(It& it, value_type* value) noexcept {
-        static_assert(is_base_of<contiguous_iterator_base, It>::value, "Invalid iterator type");
+        static_assert(
+            UTL_SCOPE is_base_of<contiguous_iterator_base, It>::value, "Invalid iterator type");
         return ((contiguous_iterator_base&)it).ptr_ = value, it;
     }
 
@@ -141,20 +145,20 @@ protected:
     UTL_CONSTEXPR_CXX14 contiguous_iterator_base& operator=(contiguous_iterator_base&&) noexcept = default;
     UTL_CONSTEXPR_CXX20 ~contiguous_iterator_base() noexcept = default;
 
-    template <UTL_CONCEPT_CXX20(constructible_as<pointer, UTL_SCOPE add_pointer>) T
-            UTL_REQUIRES_CXX11(UTL_TRAIT_is_constructible(pointer, T*))>
+    template <UTL_CONCEPT_CXX20(constructible_as<stored_pointer, UTL_SCOPE add_pointer>) T
+            UTL_REQUIRES_CXX11(UTL_TRAIT_is_constructible(stored_pointer, T*))>
     constexpr contiguous_iterator_base(contiguous_iterator_base<It, T> it) noexcept
         : ptr_(it.operator->()){};
 
-    template <UTL_CONCEPT_CXX20(assignable_to<pointer, UTL_SCOPE add_pointer>) T UTL_REQUIRES_CXX11(
-        UTL_TRAIT_is_assignable(pointer&, T*))>
+    template <UTL_CONCEPT_CXX20(assignable_to<stored_pointer, UTL_SCOPE add_pointer>) T
+            UTL_REQUIRES_CXX11(UTL_TRAIT_is_assignable(stored_pointer&, T*))>
     UTL_CONSTEXPR_CXX14 contiguous_iterator_base& operator=(contiguous_iterator_base<It, T> it) noexcept {
         ptr_ = it.operator->();
         return *this;
     }
 
 private:
-    pointer ptr_ = nullptr;
+    stored_pointer ptr_ = nullptr;
 };
 
 #undef UTL_ITERATOR_PURE
