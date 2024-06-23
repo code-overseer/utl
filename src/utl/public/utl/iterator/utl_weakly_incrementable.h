@@ -35,6 +35,7 @@ UTL_NAMESPACE_END
 #  include "utl/type_traits/utl_is_integral.h"
 #  include "utl/type_traits/utl_is_same.h"
 #  include "utl/type_traits/utl_is_signed.h"
+#  include "utl/type_traits/utl_logical_traits.h"
 
 UTL_NAMESPACE_BEGIN
 namespace details {

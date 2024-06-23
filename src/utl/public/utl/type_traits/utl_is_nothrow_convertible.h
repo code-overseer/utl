@@ -18,8 +18,8 @@ using std::is_nothrow_convertible_v;
 
 #  elif UTL_CXX14 // if UTL_CXX17
 
-template <typename T, typename... Args>
-UTL_INLINE_CXX17 constexpr bool is_nothrow_convertible_v = is_nothrow_convertible<T, Args...>::value;
+template <typename From, typename To>
+UTL_INLINE_CXX17 constexpr bool is_nothrow_convertible_v = is_nothrow_convertible<From, To>::value;
 
 #  endif // if UTL_CXX17
 
