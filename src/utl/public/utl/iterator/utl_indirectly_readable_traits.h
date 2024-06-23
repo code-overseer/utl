@@ -30,13 +30,6 @@ concept with_member_element_type = requires { typename T::element_type; };
 
 namespace details {
 namespace indirectly_readable {
-template <typename T>
-struct object_value_type {};
-
-template <object_type T>
-struct object_value_type<T> {
-    using value_type = UTL_SCOPE remove_cv_t<T>;
-};
 
 template <typename T>
 concept with_conflict_member_types = with_member_value_type<T> && with_member_element_type<T>;
@@ -51,8 +44,10 @@ concept with_resolvable_conflict = with_conflict_member_types<T> &&
 template <typename>
 struct indirectly_readable_traits {};
 
-template <typename T>
-struct indirectly_readable_traits<T*> : details::indirectly_readable::object_value_type<T> {};
+template <object_type T>
+struct indirectly_readable_traits<T*> {
+    using value_type = UTL_SCOPE remove_cv_t<T>;
+};
 
 template <array_type T>
 struct indirectly_readable_traits<T> {
