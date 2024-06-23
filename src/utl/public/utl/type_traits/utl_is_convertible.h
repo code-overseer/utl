@@ -37,12 +37,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T, typename... Args>
-struct is_convertible : bool_constant<UTL_BUILTIN_is_convertible(T, Args...)> {};
+template <typename From, typename To>
+struct is_convertible : bool_constant<UTL_BUILTIN_is_convertible(From, To)> {};
 
 #    if UTL_CXX14
-template <typename T, typename... Args>
-UTL_INLINE_CXX17 constexpr bool is_convertible_v = UTL_BUILTIN_is_convertible(T, Args...);
+template <typename From, typename To>
+UTL_INLINE_CXX17 constexpr bool is_convertible_v = UTL_BUILTIN_is_convertible(From, To);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
