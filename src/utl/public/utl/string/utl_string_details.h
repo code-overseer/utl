@@ -8,7 +8,9 @@
 
 namespace details {
 namespace string {
+using UTL_SCOPE libc::element_count_t;
 namespace compile_time {
+
 template <typename T>
 UTL_CONSTEVAL T* rfind_char(T const* str, T const ch, T const* org) noexcept {
     return *str == ch ? const_cast<T*>(str)
@@ -77,12 +79,12 @@ UTL_ATTRIBUTES(NODISCARD, PURE)
 T* find_first_of(
     T const* str, element_count_t len, T const* chars, element_count_t char_count) noexcept {
     auto const chars_len = size_t(char_count);
-    while (len) {
+    while ((size_t)len) {
         if (Traits::find(chars, chars_len, *str) != nullptr) {
             return str;
         }
 
-        --len;
+        len = len - 1;
         ++str;
     }
 
@@ -94,12 +96,12 @@ UTL_ATTRIBUTES(NODISCARD, PURE)
 T* find_first_not_of(
     T const* str, element_count_t len, T const* chars, element_count_t char_count) noexcept {
     auto const chars_len = size_t(char_count);
-    while (len) {
+    while ((size_t)len) {
         if (Traits::find(chars, chars_len, *str) == nullptr) {
             return str;
         }
 
-        --len;
+        len = len - 1;
         ++str;
     }
 

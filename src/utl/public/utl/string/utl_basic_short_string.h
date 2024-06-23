@@ -5,8 +5,11 @@
 #include "utl/concepts.h" // integral, convertible_to
 #include "utl/exception.h"
 #include "utl/iterator/utl_contiguous_iterator_base.h"
+#include "utl/iterator/utl_legacy_forward_iterator.h"
+#include "utl/iterator/utl_legacy_input_iterator.h"
 #include "utl/memory/utl_allocator_traits.h"
 #include "utl/preprocessor/utl_config.h"
+// #include "utl/string/utl_string_details.h"
 #include "utl/string/utl_string_fwd.h"
 #include "utl/type_traits/utl_is_convertible.h"
 #include "utl/type_traits/utl_is_nothrow_convertible.h"
@@ -25,7 +28,7 @@
 #endif
 
 #define UTL_STRING_PURE UTL_ATTRIBUTES(NODISCARD, PURE)
-#define UTL_STRING_CONST UTL_STRING_CONST
+#define UTL_STRING_CONST UTL_ATTRIBUTES(NODISCARD, CONST)
 
 UTL_NAMESPACE_BEGIN
 template <typename CharType, size_t ShortSize, typename Traits, typename Alloc>
@@ -87,38 +90,55 @@ private:
     using storage_type = compressed_pair<storage_union, allocator_type>;
 
 public:
-    class iterator : contiguous_iterator_base<iterator, value_type> {
+    class iterator : UTL_SCOPE contiguous_iterator_base<iterator, value_type> {
+        using base_type = contiguous_iterator_base<iterator, value_type>;
+
     public:
+        using value_type = base_type::value_type;
+        using pointer = base_type::pointer;
+        using reference = base_type::reference;
+        using difference_type = base_type::difference_type;
+        using iterator_concept = base_type::iterator_concept;
+
         constexpr iterator() noexcept = default;
         constexpr iterator(iterator const& other) noexcept = default;
         constexpr iterator(iterator&& other) noexcept = default;
         constexpr iterator& operator=(iterator const& other) noexcept = default;
         constexpr iterator& operator=(iterator&& other) noexcept = default;
-        using contiguous_iterator_base::operator*;
-        using contiguous_iterator_base::operator->;
+        using base_type::operator*;
+        using base_type::operator->;
 
     private:
         friend basic_short_string;
         constexpr iterator(pointer data) noexcept : contiguous_iterator_base(data) {}
         constexpr iterator(contiguous_iterator_base<iterator, value_type const> other) noexcept
-            : iterator(const_cast<pointer>(as_ptr(other))) {}
+            : iterator(const_cast<pointer>(other.operator->())) {}
     };
 
-    class const_iterator : contiguous_iterator_base<iterator, value_type const> {
+    class const_iterator : UTL_SCOPE contiguous_iterator_base<iterator, value_type const> {
+        using base_type = contiguous_iterator_base<iterator, value_type>;
+
     public:
+        using value_type = base_type::value_type;
+        using pointer = base_type::pointer;
+        using reference = base_type::reference;
+        using difference_type = base_type::difference_type;
+        using iterator_concept = base_type::iterator_concept;
+
         constexpr const_iterator() noexcept = default;
         constexpr const_iterator(const_iterator const& other) noexcept = default;
         constexpr const_iterator(const_iterator&& other) noexcept = default;
         constexpr const_iterator& operator=(const_iterator const& other) noexcept = default;
         constexpr const_iterator& operator=(const_iterator&& other) noexcept = default;
-        using contiguous_iterator_base::operator*;
-        using contiguous_iterator_base::operator->;
+        using base_type::operator*;
+        using base_type::operator->;
 
     private:
         friend basic_short_string;
-        constexpr const_iterator(pointer data) noexcept : contiguous_iterator_base(data) {}
-        constexpr const_iterator(contiguous_iterator_base<iterator, value_type> other) noexcept
-            : contiguous_iterator_base(other) {}
+        constexpr const_iterator(pointer data) noexcept : base_type(data) {}
+        constexpr const_iterator(
+            contiguous_iterator_base<iterator, basic_short_string::value_type> other) noexcept
+            : base_type(other) {}
     };
 
     using reverse_iterator = ::std::reverse_iterator<iterator>;
@@ -139,8 +159,8 @@ public:
         assign(str, len);
     }
 
-    template <UTL_CONCEPT_CXX20(details::iterator::InputIterator) It UTL_REQUIRES_CXX11(
-        details::iterator::InputIterator<It>::value)>
+    template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
+        UTL_TRAIT_is_legacy_input_iterator(It))>
     UTL_CONSTEXPR_CXX14 basic_short_string(
         It first, It last, allocator_type const& a = allocator_type()) UTL_THROWS
         : basic_short_string(a) {
@@ -203,8 +223,8 @@ public:
             storage_.get_heap() = clone_heap(allocator_ref(), other);
         }
         auto const new_size = min(other.size() - pos, count);
-        traits_type::move(output.data(), output.data() + pos, new_size);
-        output.resize(new_size);
+        traits_type::move(this->data(), this->data() + pos, new_size);
+        this->resize(new_size);
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string(basic_short_string const& other, size_type pos,
@@ -243,8 +263,8 @@ public:
             program_exception<void>("[UTL] basic_short_string construction failed, "
                                     "Reason=[index out of range]"));
         auto const new_size = min(other.size() - pos, count);
-        traits_type::move(data(), data() + pos, new_size);
-        output.resize(new_size);
+        traits_type::move(this->data(), this->data() + pos, new_size);
+        this->resize(new_size);
 
         other.reset_to_short();
     }
@@ -282,14 +302,14 @@ public:
     UTL_STRING_PURE constexpr size_type size() const noexcept { return size_; }
     UTL_STRING_PURE constexpr size_type length() const noexcept { return size_; }
 
-    UTL_STRING_CONST static constexpr size_type max_size() const noexcept {
-        static constexpr size_type max_bytes = ~(1 << (sizeof(size_type) * CHAR_BIT - 1));
-        static constexpr size_type max_characters = max_bytes / sizeof(value_type);
+    UTL_STRING_CONST constexpr size_type max_size() const noexcept {
+        constexpr size_type max_bytes = ~(size_type(1) << (sizeof(size_type) * CHAR_BIT - 1));
+        constexpr size_type max_characters = max_bytes / sizeof(value_type);
         return max_characters - 1;
     }
 
     UTL_STRING_PURE constexpr size_type capacity() const noexcept {
-        static constexpr size_type short_capacity = sizeof(short_type::data_) / sizeof(value_type);
+        constexpr size_type short_capacity = sizeof(short_type::data_) / sizeof(value_type);
         size_type const buffer_capacity = !is_heap_ ? short_capacity : get_heap().capacity_;
         return buffer_capacity - 1;
     }
@@ -318,7 +338,7 @@ public:
     }
 
     template <typename Op UTL_REQUIRES_CXX11(
-        is_integral < decltype(declval<Op>()(pointer(), size_type()))> ::value)>
+        is_integral < decltype(UTL_SCOPE declval<Op>()(pointer{}, size_type{})) > ::value)>
     UTL_REQUIRES_CXX20(requires(Op op, pointer p, size_type s) {
         { op(p, s) } -> integral;
     })
@@ -448,9 +468,8 @@ public:
         assign(str, traits_type::length(str));
     }
 
-    template <UTL_CONCEPT_CXX20(details::iterator::InputIterator) It UTL_REQUIRES_CXX11(
-        details::iterator::InputIterator<It>::value &&
-        !details::iterator::ForwardIterator<It>::value)>
+    template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
+        UTL_TRAIT_is_legacy_input_iterator(It) && !UTL_TRAIT_is_legacy_forward_iterator(It))>
     UTL_CONSTEXPR_CXX14 basic_short_string& assign(It begin, It end) UTL_THROWS {
         size_ = 0;
         while (begin != end) {
@@ -459,8 +478,8 @@ public:
         }
     }
 
-    template <UTL_CONCEPT_CXX20(details::iterator::ForwardIterator) It UTL_REQUIRES_CXX11(
-        details::iterator::ForwardIterator<It>::value)>
+    template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_forward_iterator) It UTL_REQUIRES_CXX11(
+        UTL_TRAIT_is_legacy_forward_iterator(It))>
     UTL_CONSTEXPR_CXX17 basic_short_string& assign(It begin, It end) UTL_THROWS {
         auto const diff = ::std::distance(begin, end);
         if (diff < 0)
@@ -561,21 +580,18 @@ public:
         return insert(pos, 1, ch);
     }
 
-    template <UTL_CONCEPT_CXX20(details::iterator::InputIterator) InputIt UTL_REQUIRES_CXX11(
-        details::iterator::InputIterator<It>::value &&
-        !details::iterator::ForwardIterator<It>::value)>
-    UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, InputIt first, InputIt last)
-        UTL_THROWS {
+    template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
+        UTL_TRAIT_is_legacy_input_iterator(It) && !UTL_TRAIT_is_legacy_forward_iterator(It))>
+    UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, It first, It last) UTL_THROWS {
         while (first != last) {
             insert(pos, *first);
             ++first;
         }
     }
 
-    template <UTL_CONCEPT_CXX20(details::iterator::ForwardIterator) InputIt UTL_REQUIRES_CXX11(
-        details::iterator::ForwardIterator<It>::value)>
-    UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, InputIt first, InputIt last)
-        UTL_THROWS {
+    template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_forward_iterator) It UTL_REQUIRES_CXX11(
+        UTL_TRAIT_is_legacy_forward_iterator(It))>
+    UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, It first, It last) UTL_THROWS {
         auto const length = ::std::distance(first, last);
         if (length < 0)
             UTL_ATTRIBUTE(UNLIKELY) {
@@ -671,13 +687,14 @@ public:
         return insert(end(), str, count), *this;
     }
 
-    template <UTL_CONCEPT_CXX20(details::iterator::InputIterator) InputIt UTL_REQUIRES_CXX11(
-        details::iterator::InputIterator<It>::value)>
-    UTL_CONSTEXPR_CXX14 basic_short_string& append(InputIt first, InputIt last) UTL_THROWS {
+    template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
+        UTL_TRAIT_is_legacy_input_iterator(It))>
+    UTL_CONSTEXPR_CXX14 basic_short_string& append(It first, It last) UTL_THROWS {
         return insert(end(), first, last), *this;
     }
 
-    UTL_CONSTEXPR_CXX14 basic_short_string& append(initializer_list<value_type> list) UTL_THROWS {
+    UTL_CONSTEXPR_CXX14 basic_short_string& append(::std::initializer_list<value_type> list)
+        UTL_THROWS {
         return insert(end(), list), *this;
     }
 
@@ -692,7 +709,7 @@ public:
     UTL_CONSTEXPR_CXX14 basic_short_string& append(
         View const& view, size_type subidx, size_type subcount = npos) UTL_THROWS {
         view_type const v(view);
-        UTL_THROW_IF(idx > v.size(),
+        UTL_THROW_IF(subidx > v.size(),
             program_exception<void>("[UTL] `basic_short_string::append` operation failed, "
                                     "Reason=[argument substring index out of range]"));
         return insert(end(), v.substr(subidx, subcount));
@@ -706,7 +723,7 @@ public:
 
     UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(const_pointer str) UTL_THROWS { return append(str); }
 
-    UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(initializer_list<value_type> list)
+    UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(::std::initializer_list<value_type> list)
         UTL_THROWS {
         return append(list);
     }
@@ -785,7 +802,6 @@ public:
 
     UTL_CONSTEXPR_CXX14 basic_short_string& replace(
         const_iterator first, const_iterator last, size_type char_count, value_type ch) UTL_THROWS {
-
         auto const replaced_count = last - first;
         auto const assign_ch = [p = const_cast<pointer>(first.operator->()), ch](
                                    size_type cnt) { return traits_type::assign(p, cnt, ch); };
@@ -801,11 +817,10 @@ public:
         return *this;
     }
 
-    template <UTL_CONCEPT_CXX20(details::iterator::InputIterator) InputIt UTL_REQUIRES_CXX11(
-        details::iterator::InputIterator<It>::value)>
+    template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
+        UTL_TRAIT_is_legacy_input_iterator(It))>
     UTL_CONSTEXPR_CXX14 basic_short_string& replace(
-        const_iterator first, const_iterator last, InputIt in_first, InputIt in_last) UTL_THROWS {
-
+        const_iterator first, const_iterator last, It in_first, It in_last) UTL_THROWS {
         while (first != last && in_first != in_last) {
             const_cast<reference>(*first) = *in_first;
             ++first;
@@ -838,7 +853,7 @@ public:
         UTL_THROW_IF(subidx > v.size(),
             program_exception<void>("[UTL] `basic_short_string::replace` operation failed, "
                                     "Reason=[argument substring index out of range]"));
-        return replace(idx, count, v.substr(subidx, subcount));
+        return replace(first, last, v.substr(subidx, subcount));
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
@@ -871,11 +886,9 @@ public:
 
     UTL_CONSTEXPR_CXX14 void swap(basic_short_string& other) noexcept(
         alloc_traits::propagate_on_container_swap::value || alloc_traits::is_always_equal::value) {
-        static constexpr bool should_swap_alloc =
-            alloc_traits::propagate_on_container_swap::value ||
-            !alloc_traits::is_always_equal::value;
-        static constexpr bool_constant<should_swap_alloc> swap_alloc = {};
-        swap(other, swap_alloc);
+        using swap_alloc_t = bool_constant<alloc_traits::propagate_on_container_swap::value ||
+            !alloc_traits::is_always_equal::value>;
+        swap(other, swap_alloc_t{});
     }
 
     friend void swap(basic_short_string& l, basic_short_string& r) noexcept(noexcept(l.swap(r))) {
@@ -888,7 +901,8 @@ public:
             program_exception<void>("[UTL] `basic_short_string::find` operation failed, "
                                     "Reason=[index out of range]"));
         return index(data(),
-            details::string::find<traits_type>(data(), size(), str.data(), str.size(), pos));
+            UTL_SCOPE details::string::find<traits_type>(
+                data(), size(), str.data(), str.size(), pos));
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find(
@@ -940,8 +954,7 @@ public:
                 data(), size_clamp(last_to_size(pos)), str, Traits::length(str)));
     }
 
-    UTL_STRING_PURE
-    constexpr size_type rfind(value_type ch, size_type pos = npos) const noexcept {
+    UTL_STRING_PURE constexpr size_type rfind(value_type ch, size_type pos = npos) const noexcept {
         return index(data(), details::string::rfind(data(), size_clamp(last_to_size(pos)), ch));
     }
 
@@ -1095,8 +1108,7 @@ public:
         return find_last_not_of(v.data(), pos, v.size());
     }
 
-    UTL_STRING_PURE
-    constexpr int compare(basic_short_string const& other) const noexcept {
+    UTL_STRING_PURE constexpr int compare(basic_short_string const& other) const noexcept {
         return compare_str(view_type(*this), view_type(other));
     }
 
@@ -1117,8 +1129,7 @@ public:
             view_type(*this).substr(pos, count), view_type(other).substr(pos2, count2));
     }
 
-    UTL_STRING_PURE
-    constexpr int compare(const_pointer str) const noexcept {
+    UTL_STRING_PURE constexpr int compare(const_pointer str) const noexcept {
         UTL_ASSERT_CXX14(str != nullptr);
         return compare_str(view_type(*this), view_type(str));
     }
@@ -1211,16 +1222,15 @@ private:
         const_pointer base, const_pointer ptr) noexcept {
         return ptr ? ptr - base : npos;
     }
-    UTL_STRING_PURE
-    constexpr size_type last_to_size(size_type val) noexcept { return val + (val < size()); }
+    UTL_STRING_PURE constexpr size_type last_to_size(size_type val) noexcept {
+        return val + (val < size());
+    }
 
-    UTL_STRING_PURE
-    constexpr size_type size_clamp(size_type val) const noexcept {
+    UTL_STRING_PURE constexpr size_type size_clamp(size_type val) const noexcept {
         return val > size() ? size() : val;
     }
 
-    UTL_STRING_PURE
-    static UTL_CONSTEXPR_CXX14 int compare_str(
+    UTL_STRING_PURE static UTL_CONSTEXPR_CXX14 int compare_str(
         view_type left, view_type right, size_type pos2, size_type count2) UTL_THROWS {
         UTL_THROW_IF(pos2 > right.size(),
             program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
@@ -1228,14 +1238,13 @@ private:
         return compare_str(left, right.substr(pos2, count2));
     }
 
-    UTL_STRING_PURE
-    static constexpr int compare_str(view_type left, view_type right) noexcept {
+    UTL_STRING_PURE static constexpr int compare_str(view_type left, view_type right) noexcept {
         return compare_size(
             traits_type::compare(left.data(), right.data(), min(left.size(), right.size())),
             left.size(), right.size());
     }
-    UTL_STRING_CONST
-    static constexpr int compare_size(int strcmp, size_type left, size_type right) noexcept {
+    UTL_STRING_CONST static constexpr int compare_size(
+        int strcmp, size_type left, size_type right) noexcept {
         return strcmp != 0 ? strcmp : left == right ? 0 : left < right ? -1 : 1;
     }
 
@@ -1328,12 +1337,15 @@ private:
     UTL_STRING_CONST UTL_CONSTEXPR_CXX14 allocator_type& allocator_ref() noexcept {
         return storage_.second();
     }
-    UTL_STRING_CONST
-    constexpr short_type const& get_short() const noexcept { return storage_.first().short_; }
-    UTL_STRING_CONST
-    constexpr heap_type const& get_heap() const noexcept { return storage_.first().heap_; }
-    UTL_STRING_CONST
-    constexpr allocator_type const& allocator_ref() const noexcept { return storage_.second(); }
+    UTL_STRING_CONST constexpr short_type const& get_short() const noexcept {
+        return storage_.first().short_;
+    }
+    UTL_STRING_CONST constexpr heap_type const& get_heap() const noexcept {
+        return storage_.first().heap_;
+    }
+    UTL_STRING_CONST constexpr allocator_type const& allocator_ref() const noexcept {
+        return storage_.second();
+    }
 
     storage_type storage_;
     /**
