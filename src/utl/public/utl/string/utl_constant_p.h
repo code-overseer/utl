@@ -9,7 +9,7 @@
 #  define UTL_CONSTANT_P(...) UTL_BUILTIN_is_constant_evaluated()
 
 #elif UTL_HAS_BUILTIN(__builtin_constant_p)
-#  define UTL_CONSTANT_P(...) __builtin_constant_p(__VA_ARGS__)
+#  define UTL_CONSTANT_P(...) __builtin_constant_p((__VA_ARGS__))
 
 #elif UTL_COMPILER_MSVC
 UTL_NAMESPACE_BEGIN

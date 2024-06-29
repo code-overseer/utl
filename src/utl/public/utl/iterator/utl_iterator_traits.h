@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/iterator/utl_iterator_tags.h"
 #include "utl/iterator/utl_iterator_traits_fwd.h"
 #include "utl/iterator/utl_legacy_bidirectional_iterator.h"
@@ -10,7 +12,7 @@
 #include "utl/iterator/utl_legacy_iterator.h"
 #include "utl/iterator/utl_legacy_output_iterator.h"
 #include "utl/iterator/utl_legacy_random_access_iterator.h"
-#include "utl/preprocessor/utl_config.h"
+#include "utl/memory/utl_pointer_traits.h"
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_remove_cv.h"
 
@@ -121,8 +123,8 @@ struct legacy_traits<Iter> : private UTL_SCOPE details::iterator_traits::impl_ta
 } // namespace iterator_traits
 } // namespace details
 
-template <UTL_SCOPE details::iterator_traits::simple_iter Iter>
-struct iterator_traits<Iter> : private UTL_SCOPE details::iterator_traits::impl_tag<Iter> {
+template <details::iterator_traits::simple_iter Iter>
+struct iterator_traits<Iter> : private details::iterator_traits::impl_tag<Iter> {
     using difference_type = typename Iter::difference_type;
     using value_type = typename Iter::value_type;
     using pointer = typename Iter::pointer;
@@ -130,8 +132,8 @@ struct iterator_traits<Iter> : private UTL_SCOPE details::iterator_traits::impl_
     using iterator_category = typename Iter::iterator_category;
 };
 
-template <UTL_SCOPE details::iterator_traits::non_pointer_iter Iter>
-struct iterator_traits<Iter> : private UTL_SCOPE details::iterator_traits::impl_tag<Iter> {
+template <details::iterator_traits::non_pointer_iter Iter>
+struct iterator_traits<Iter> : private details::iterator_traits::impl_tag<Iter> {
     using difference_type = typename Iter::difference_type;
     using value_type = typename Iter::value_type;
     using pointer = void;
@@ -139,18 +141,18 @@ struct iterator_traits<Iter> : private UTL_SCOPE details::iterator_traits::impl_
     using iterator_category = typename Iter::iterator_category;
 };
 
-template <UTL_SCOPE object_type T>
-struct iterator_traits<T*> : private UTL_SCOPE details::iterator_traits::impl_tag<T*> {
-    using difference_type = UTL_SCOPE pointer_traits<T*>::difference_type;
-    using value_type = UTL_SCOPE remove_cv_t<T>;
+template <object_type T>
+struct iterator_traits<T*> : private details::iterator_traits::impl_tag<T*> {
+    using difference_type = pointer_traits<T*>::difference_type;
+    using value_type = remove_cv_t<T>;
     using pointer = T*;
     using reference = T&;
-    using iterator_category = UTL_SCOPE random_access_iterator_tag;
-    using iterator_concept = UTL_SCOPE contiguous_iterator_tag;
+    using iterator_category = random_access_iterator_tag;
+    using iterator_concept = contiguous_iterator_tag;
 };
 
 template <typename T>
-struct iterator_traits : private UTL_SCOPE details::iterator_traits::legacy_traits<T> {};
+struct iterator_traits : private details::iterator_traits::legacy_traits<T> {};
 
 UTL_NAMESPACE_END
 
@@ -170,7 +172,7 @@ namespace details {
 namespace iterator_traits {
 
 template <typename T>
-using simple_iter = conjunction<UTL_SCOPE has_member_difference_type<T>,
+using simple_iter = UTL_SCOPE conjunction<UTL_SCOPE has_member_difference_type<T>,
     UTL_SCOPE has_member_value_type<T>, UTL_SCOPE has_member_reference<T>,
     UTL_SCOPE is_iterator_tag<typename T::iterator_category>>;
 
@@ -237,13 +239,12 @@ struct legacy_traits<Iter, true, true> {
     using value_type = typename UTL_SCOPE indirectly_readable_traits<Iter>::value_type;
     using pointer = decltype(UTL_SCOPE details::iterator_traits::pointer_type<Iter>(0));
     using reference = decltype(UTL_SCOPE details::iterator_traits::reference_type<Iter>(0));
-    using iterator_category =
-        decltype(UTL_SCOPE details::iterator_traits::category_type<Iter>(0, 0));
+    using iterator_category = decltype(category_type<Iter>(0, 0));
 };
 
 template <typename Iter>
 struct legacy_traits<Iter, false, true> {
-    using difference_type = decltype(UTL_SCOPE details::iterator_traits::difference_type<Iter>(0));
+    using difference_type = decltype(difference_type<Iter>(0));
     using value_type = void;
     using pointer = void;
     using reference = void;
@@ -271,13 +272,13 @@ struct pointer_impl<T*, true> {
 
 template <typename Iter>
 struct iterator_traits :
-    UTL_SCOPE details::iterator_traits::traits<Iter>,
-    private UTL_SCOPE details::iterator_traits::impl_tag<Iter> {};
+    details::iterator_traits::traits<Iter>,
+    private details::iterator_traits::impl_tag<Iter> {};
 
 template <typename T>
 struct iterator_traits<T*> :
-    UTL_SCOPE details::iterator_traits::pointer_impl<T*>,
-    private UTL_SCOPE details::iterator_traits::impl_tag<T*> {};
+    details::iterator_traits::pointer_impl<T*>,
+    private details::iterator_traits::impl_tag<T*> {};
 
 UTL_NAMESPACE_END
 

@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "utl/iterator/utl_iter_move.h"
 #include "utl/preprocessor/utl_config.h"
+
+#include "utl/iterator/utl_iter_move.h"
 #include "utl/type_traits/utl_declval.h"
 
 #if UTL_CXX20
@@ -53,6 +54,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <UTL_CONCEPT_CXX20(dereferenceable) T>
-using iter_rvalue_reference_t = decltype(details::iter_rvalue_reference::resolve<T>(0));
+using iter_rvalue_reference_t =
+    decltype(details::iter_rvalue_reference::resolve<UTL_SCOPE remove_cvref_t<T>>(0));
 
 UTL_NAMESPACE_END

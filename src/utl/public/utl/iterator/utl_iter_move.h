@@ -51,7 +51,9 @@ struct iter_move_t {
 };
 } // namespace details
 
+inline namespace iterator {
 UTL_INLINE_CXX17 constexpr details::iter_move_t iter_move = {};
+}
 } // namespace ranges
 
 UTL_NAMESPACE_END
