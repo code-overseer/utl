@@ -3,8 +3,11 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/string/utl_char_traits.h"
 #include "utl/string/utl_libc.h"
+
+UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace string {
@@ -103,6 +106,36 @@ T* find_first_not_of(
 
         len = len - 1;
         ++str;
+    }
+
+    return nullptr;
+}
+
+template <typename Traits, typename T>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+T* find_last_of(
+    T const* str, T const* current, T const* chars, element_count_t char_count) noexcept {
+    while (current >= str) {
+        if (Traits::find(chars, size_t(char_count), *current)) {
+            return current;
+        }
+
+        --current;
+    }
+
+    return nullptr;
+}
+
+template <typename Traits, typename T>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+T* find_last_not_of(
+    T const* str, T const* current, T const* chars, element_count_t char_count) noexcept {
+    while (current >= str) {
+        if (!Traits::find(chars, size_t(char_count), *current)) {
+            return current;
+        }
+
+        --current;
     }
 
     return nullptr;
@@ -236,3 +269,5 @@ constexpr T* find_last_not_of(
 }
 } // namespace string
 } // namespace details
+
+UTL_NAMESPACE_END

@@ -14,6 +14,7 @@
 #include "utl/type_traits/utl_is_nothrow_move_constructible.h"
 #include "utl/type_traits/utl_is_pointer.h"
 #include "utl/type_traits/utl_is_same.h"
+#include "utl/type_traits/utl_is_swappable.h"
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/type_traits/utl_make_unsigned.h"
 #include "utl/type_traits/utl_void_t.h"

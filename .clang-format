@@ -114,3 +114,4 @@ Macros:
 - UTL_CONCEPT_CXX20(X)=typename
 - UTL_NODISCARD=[[nodiscard]]
 - UTL_ENABLE_IF_CXX11(X,Y)=void
+- UTL_ATTRIBUTE(X)=[[X]]
