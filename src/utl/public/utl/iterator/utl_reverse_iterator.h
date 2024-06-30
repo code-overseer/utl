@@ -129,28 +129,28 @@ private:
 
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_random_access_iterator) I UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_random_access_iterator(I))>
-    static constexpr auto subscript(I const& it, difference_type idx) noexcept(
-        UTL_TRAIT_is_nothrow_subscriptable(decltype(it), decltype(idx)))
+    static constexpr auto subscript(I const& current, difference_type idx) noexcept(
+        UTL_TRAIT_is_nothrow_subscriptable(I, difference_type))
         -> decltype(UTL_SCOPE declval<I const&>()[idx]) {
-        return it.current[-idx - 1];
+        return current[-idx - 1];
     }
 
-    static constexpr int subscript(reverse_iterator const&, inaccessible_t) noexcept { return 0; }
+    static constexpr int subscript(iterator_type const&, inaccessible_t) noexcept { return 0; }
 
     template <typename I UTL_REQUIRES_CXX11(UTL_TRAIT_is_pointer(I))>
     UTL_REQUIRES_CXX20(UTL_SCOPE is_pointer_v<I>)
-    static constexpr auto dereference(I current, int) noexcept -> I {
+    static constexpr auto redirect(I current, int) noexcept -> I {
         return current - 1;
     }
 
     template <typename I, bool NoThrow = noexcept(UTL_SCOPE declval<I>().operator->())>
-    static constexpr auto dereference(I const& current, int) noexcept(NoThrow)
+    static constexpr auto redirect(I const& current, unsigned int) noexcept(NoThrow)
         -> decltype(current.operator->()) {
         return UTL_SCOPE prev(current).operator->();
     }
 
     template <typename I>
-    static constexpr int dereference(I const&, short) noexcept {
+    static constexpr pointer redirect(I const&, unsigned short) noexcept {
         return 0;
     }
 
@@ -191,22 +191,24 @@ public:
     }
 
     UTL_ATTRIBUTE(NODISCARD)
-    constexpr auto operator[](offset_t idx) const noexcept(noexcept(subscript(*this, idx)))
-        -> decltype(subscript(*this, idx)) {
-        return subscript(*this, idx);
+    constexpr auto operator[](offset_t idx) const noexcept(noexcept(subscript(this->current, idx)))
+        -> decltype(subscript(this->current, idx)) {
+        return subscript(this->current, idx);
     }
 
     void operator[](invalid_offset_t idx) const = delete;
 
     UTL_ATTRIBUTE(NODISCARD)
-    constexpr reference operator*() const { return *UTL_SCOPE prev(this->current); }
+    constexpr reference operator*() const noexcept(noexcept(*UTL_SCOPE prev(this->current))) {
+        return *UTL_SCOPE prev(this->current);
+    }
 
     UTL_ATTRIBUTE(NODISCARD)
-    constexpr pointer operator->() const noexcept(noexcept(dereference(this->current, 0)))
+    constexpr pointer operator->() const noexcept(noexcept(redirect(this->current, 0u)))
         UTL_REQUIRES_CXX20(UTL_SCOPE is_pointer_v<iterator_type> ||
         requires(iterator_type const i) { i.operator->(); })
     {
-        return dereference(this->current, 0);
+        return redirect(this->current, 0u);
     }
 
     UTL_CONSTEXPR_CXX14 reverse_iterator& operator++() noexcept(noexcept(--this->current)) {
