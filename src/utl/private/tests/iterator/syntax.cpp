@@ -1,3 +1,4 @@
+// Copyright 2023-2024 Bryan Wong
 
 #include "utl/iterator/utl_bidirectional_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator.h"
