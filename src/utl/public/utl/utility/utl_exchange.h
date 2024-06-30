@@ -34,15 +34,25 @@ UTL_PRAGMA_WARN(
 
 UTL_NAMESPACE_BEGIN
 
+#  if UTL_COMPILER_CLANG_AT_LEAST(18, 0, 0)
+template <UTL_CONCEPT_CXX20(move_constructible) T, UTL_CONCEPT_CXX20(assignable_to<T&>) U = T>
+constexpr UTL_ENABLE_IF_CXX11(T, UTL_TRAIT_is_move_constructible(T) && UTL_TRAIT_is_assignable(T&, U)) exchange(T& obj, U&& new_value) noexcept(
+    UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_assignable(T&, U)) {
+    T previous(UTL_SCOPE move(obj));
+    obj = UTL_SCOPE forward<U>(new_value);
+    return previous;
+}
+#  else
 template <UTL_CONCEPT_CXX20(move_constructible) T, UTL_CONCEPT_CXX20(assignable_to<T&>) U = T>
 constexpr UTL_ENABLE_IF_CXX11(
-    T, UTL_TRAIT_is_move_constructible(T) && utl::is_assignable<T&, U>::value)
+    T, UTL_TRAIT_is_move_constructible(T) && UTL_SCOPE is_assignable<T&, U>::value)
     exchange(T& obj, U&& new_value) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_assignable(T&, U)) {
     T previous(UTL_SCOPE move(obj));
     obj = UTL_SCOPE forward<U>(new_value);
     return previous;
 }
+#  endif
 
 UTL_NAMESPACE_END
 
