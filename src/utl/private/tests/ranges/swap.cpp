@@ -1,4 +1,5 @@
 // Copyright 2023-2024 Bryan Wong
+// Credit: This file contains code derived from the GCC test suite.
 
 #include "utl/ranges/utl_swap.h"
 #include "utl/utility/utl_swap.h"
@@ -128,14 +129,14 @@ void swap(ranges_W<T>& x, ranges_W<T>& y) {
     utl::ranges::swap(x.data, y.data);
 }
 
-// DR 809. std::swap should be overloaded for array types.
-void dr809() {
+// DR 809. swap should be overloaded for array types.
+void defect_809() {
     utility_W<std::string[8]> w1, w2; // Two objects of a Swappable type.
     using utl::swap;
     swap(w1, w2);
 }
 
-void dr809_ranges() {
+void defect_809_ranges() {
     ranges_W<std::string[8]> w1, w2;
     utl::ranges::swap(w1, w2);
 }
