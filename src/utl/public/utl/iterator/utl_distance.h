@@ -7,10 +7,10 @@
 #include "utl/iterator/utl_iterator_tags.h"
 #include "utl/iterator/utl_iterator_traits.h"
 #include "utl/iterator/utl_legacy_input_iterator.h"
-#include "utl/string/utl_constant_p.h"
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_nothrow_copy_constructible.h"
+#include "utl/utility/utl_constant_p.h"
 
 UTL_NAMESPACE_BEGIN
 

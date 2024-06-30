@@ -48,7 +48,7 @@ concept nothrow_exchange_swappable = exchange_swappable<L, R> && requires(L&& l,
     { *l = UTL_SCOPE ranges::iter_move(r) } noexcept;
     {
         *r = UTL_SCOPE details::iterator_swap::iter_exchange(
-            UTL_SCOPE forward<L>(l), UTL_SCOPE forward<R>(r));
+            UTL_SCOPE forward<L>(l), UTL_SCOPE forward<R>(r))
     } noexcept;
 };
 
@@ -63,13 +63,13 @@ concept nothrow_dereference_swappable = dereference_swappable<L, R> && requires(
 };
 
 template <typename L, typename R>
-requires dereferenced_swappable<L, R>
+requires dereference_swappable<L, R>
 void default_impl(L&& l, R&& r) noexcept(nothrow_dereference_swappable<L, R>) {
     UTL_SCOPE ranges::swap(*l, *r);
 }
 
 template <typename L, typename R>
-requires (!dereferenced_swappable<L, R> && exchange_swappable<L, R>)
+requires (!dereference_swappable<L, R> && exchange_swappable<L, R>)
 void default_impl(L&& l, R&& r) noexcept(nothrow_exchange_swappable<L, R>) {
     *r = iter_exchange(UTL_SCOPE forward<L>(l), UTL_SCOPE forward<R>(r));
 }
@@ -90,7 +90,7 @@ concept nothrow_defaultable = defaultable<L, R> && requires(L&& l, R&& r) {
 
 template <typename L, typename R>
 requires defaultable<L, R>
-constexpr void iter_swap(L&& l, R&& r) noexcept(is_nothrow_defaultable<L, R>) {
+constexpr void iter_swap(L&& l, R&& r) noexcept(nothrow_defaultable<L, R>) {
     return UTL_SCOPE details::iterator_swap::default_impl(
         UTL_SCOPE forward<L>(l), UTL_SCOPE forward<R>(r));
 }
@@ -233,9 +233,9 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 namespace ranges {
-inline namespace iterator {
+inline namespace cpo {
 UTL_DEFINE_CUSTOMIZATION_POINT(UTL_SCOPE details::iterator_swap::function_t, iter_swap);
-} // namespace iterator
+} // namespace cpo
 } // namespace ranges
 
 UTL_NAMESPACE_END
