@@ -5,11 +5,11 @@
 #include "utl/exception/utl_program_exception.h"
 #include "utl/memory/utl_allocator_fwd.h"
 #include "utl/preprocessor/utl_config.h"
-#include "utl/string/utl_constant_p.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_complete.h"
 #include "utl/type_traits/utl_is_void.h"
 #include "utl/type_traits/utl_type_identity.h"
+#include "utl/utility/utl_constant_p.h"
 
 #include <cstddef>
 #include <new>

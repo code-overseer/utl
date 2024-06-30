@@ -3,9 +3,9 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
-#include "utl/string/utl_constant_p.h"
 #include "utl/string/utl_libc_compile_time.h"
 #include "utl/string/utl_libc_runtime.h"
+#include "utl/utility/utl_constant_p.h"
 
 UTL_NAMESPACE_BEGIN
 #define UTL_LIBC_PURE UTL_ATTRIBUTES(NODISCARD, PURE)

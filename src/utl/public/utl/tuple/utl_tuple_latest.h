@@ -14,6 +14,8 @@
 #  error "Header compiled with invalid standard"
 #endif
 
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/compare/utl_compare_traits.h"
 #include "utl/compare/utl_strong_ordering.h"
 #include "utl/concepts/utl_allocator_type.h"
@@ -29,7 +31,7 @@
 #include "utl/concepts/utl_three_way_comparable.h"
 #include "utl/concepts/utl_variadic_match.h"
 #include "utl/memory/utl_uses_allocator.h"
-#include "utl/preprocessor/utl_config.h"
+#include "utl/ranges/utl_swap.h"
 #include "utl/tuple/utl_tuple_compare_traits.h"
 #include "utl/tuple/utl_tuple_concepts.h"
 #include "utl/type_traits/utl_common_comparison_category.h"
@@ -39,7 +41,10 @@
 #include "utl/type_traits/utl_is_base_of.h"
 #include "utl/type_traits/utl_is_explicit_constructible.h"
 #include "utl/type_traits/utl_is_implicit_constructible.h"
+#include "utl/type_traits/utl_is_move_assignable.h"
+#include "utl/type_traits/utl_is_move_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_constructible.h"
+#include "utl/type_traits/utl_is_nothrow_copy_assignable.h"
 #include "utl/type_traits/utl_is_nothrow_copy_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_default_constructible.h"
 #include "utl/type_traits/utl_is_standard_layout.h"
@@ -50,7 +55,6 @@
 #include "utl/utility/utl_ignore.h"
 #include "utl/utility/utl_move.h"
 #include "utl/utility/utl_sequence.h"
-#include "utl/utility/utl_swap.h"
 
 #define TT_SCOPE UTL_SCOPE tuple_traits::
 
@@ -130,8 +134,10 @@ template <typename T>
 struct storage<T> {
 public:
     using head_type = T;
-    using move_assign_t = conditional_t<is_move_assignable_v<T>, invalid_t, storage>;
-    using move_construct_t = conditional_t<is_move_constructible_v<T>, invalid_t, storage>;
+    using move_assign_t =
+        UTL_SCOPE conditional_t<UTL_SCOPE is_move_assignable_v<T>, invalid_t, storage>;
+    using move_construct_t =
+        UTL_SCOPE conditional_t<UTL_SCOPE is_move_constructible_v<T>, invalid_t, storage>;
 
     constexpr storage() noexcept(is_nothrow_default_constructible_v<T>) = default;
     constexpr storage(storage const&) noexcept(is_nothrow_copy_constructible_v<T>) = default;
@@ -191,25 +197,25 @@ public:
 
     template <typename U>
     constexpr void swap(storage<U>& other) noexcept(is_nothrow_swappable_with_v<T&, U&>) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
     }
 
     template <typename U>
     constexpr void swap(storage<U> const& other) noexcept(
         is_nothrow_swappable_with_v<T&, U const&>) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
     }
 
     template <typename U>
     constexpr void swap(storage<U>& other) const
         noexcept(is_nothrow_swappable_with_v<T const&, U&>) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
     }
 
     template <typename U>
     constexpr void swap(storage<U> const& other) const
         noexcept(is_nothrow_swappable_with_v<T const&, U const&>) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
     }
 
     template <typename U>
@@ -347,7 +353,7 @@ public:
     template <typename U, typename... Us>
     constexpr void swap(storage<U, Us...>& other) noexcept(
         (is_nothrow_swappable_with_v<T&, U&> && ... && is_nothrow_swappable_with_v<Tail&, Us&>)) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
         tail.swap(other.tail);
     }
 
@@ -355,7 +361,7 @@ public:
     constexpr void swap(storage<U, Us...>& other) const
         noexcept((is_nothrow_swappable_with_v<T const&, U&> && ... &&
             is_nothrow_swappable_with_v<Tail const&, Us&>)) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
         tail.swap(other.tail);
     }
 
@@ -363,7 +369,7 @@ public:
     constexpr void swap(storage<U, Us...> const& other) noexcept(
         (is_nothrow_swappable_with_v<T&, U const&> && ... &&
             is_nothrow_swappable_with_v<Tail&, Us const&>)) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
         tail.swap(other.tail);
     }
 
@@ -371,7 +377,7 @@ public:
     constexpr void swap(storage<U, Us...> const& other) const
         noexcept((is_nothrow_swappable_with_v<T const&, U const&> && ... &&
             is_nothrow_swappable_with_v<Tail const&, Us const&>)) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
         tail.swap(other.tail);
     }
 

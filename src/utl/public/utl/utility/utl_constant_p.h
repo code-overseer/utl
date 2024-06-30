@@ -14,7 +14,7 @@
 #elif UTL_COMPILER_MSVC
 UTL_NAMESPACE_BEGIN
 namespace details {
-UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE)
+UTL_ATTRIBUTES(NODISCARD, CONST)
 constexpr bool is_constant_evaluated() noexcept {
     struct C {};
     struct M : C {

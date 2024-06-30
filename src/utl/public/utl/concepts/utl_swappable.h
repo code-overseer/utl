@@ -5,21 +5,18 @@
 #include "utl/preprocessor/utl_config.h"
 
 #if UTL_CXX20
-#  include "utl/utility/utl_forward.h"
-#  include "utl/utility/utl_swap.h"
+
+#  include "utl/concepts/utl_common_reference_with.h"
+#  include "utl/ranges/utl_swap.h"
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T>
-concept swappable = requires(T& l, T& r) { UTL_SCOPE utility::swap(l, r); };
-
 template <typename T, typename U>
-concept swappable_with = requires(T&& t, U&& u) {
-    UTL_SCOPE utility::swap(UTL_SCOPE forward<T>(t), UTL_SCOPE forward<T>(t));
-    UTL_SCOPE utility::swap(UTL_SCOPE forward<U>(u), UTL_SCOPE forward<U>(u));
-    UTL_SCOPE utility::swap(UTL_SCOPE forward<T>(t), UTL_SCOPE forward<U>(u));
-    UTL_SCOPE utility::swap(UTL_SCOPE forward<U>(u), UTL_SCOPE forward<T>(t));
-};
+concept swappable_with = common_reference_with<T, U> && ranges::details::swap::invocable<T, U> &&
+    ranges::details::swap::invocable<U, U> && ranges::details::swap::invocable<T, T>;
+
+template <typename T>
+concept swappable = swappable_with<T&, T&>;
 
 UTL_NAMESPACE_END
 

@@ -33,11 +33,11 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T, size_t Dim>
+template <typename T, size_t Dim = 0>
 struct extent : size_constant<UTL_BUILTIN_array_extent(T, Dim)> {};
 
 #    if UTL_CXX14
-template <typename T, size_t Dim>
+template <typename T, size_t Dim = 0>
 UTL_INLINE_CXX17 constexpr size_t extent_v = UTL_BUILTIN_array_extent(T, Dim);
 #    endif // UTL_CXX14
 
