@@ -154,7 +154,7 @@ using unqualified_swappable = decltype(unqualified_swappable_impl<L, R>(0));
 template <typename L, typename R>
 using nothrow_unqualified_swappable = decltype(nothrow_unqualified_swappable_impl<L, R>(0));
 template <typename L, typename R, size_t N>
-using unqualified_swappable_array = decltype(unqualified_swappable_array_impl<L, R>(0));
+using unqualified_swappable_array = decltype(unqualified_swappable_array_impl<L, R, N>(0));
 
 struct function_t {
 private:
@@ -167,14 +167,14 @@ private:
 
     template <typename L, typename R>
     UTL_ATTRIBUTE(ALWAYS_INLINE)
-    UTL_CONSTEXPR_CXX14 UTL_SCOPE enable_if_t<unqualified_swappable<L, R>::value> operator()(
+    UTL_CONSTEXPR_CXX14 UTL_SCOPE enable_if_t<unqualified_swappable<L, R>::value> dispatch(
         L&& l, R&& r, first_t) const noexcept(nothrow_unqualified_swappable<L, R>::value) {
         swap(UTL_SCOPE forward<L>(l), UTL_SCOPE forward<R>(r));
     }
 
     template <typename L, typename R, size_t N>
     UTL_ATTRIBUTE(ALWAYS_INLINE)
-    UTL_CONSTEXPR_CXX14 UTL_SCOPE enable_if_t<unqualified_swappable_array<L, R, N>::value> operator()(
+    UTL_CONSTEXPR_CXX14 UTL_SCOPE enable_if_t<unqualified_swappable_array<L, R, N>::value> dispatch(
         L (&l)[N], R (&r)[N], second_t) const noexcept(noexcept((*this)(*l, *r))) {
         for (decltype(N) i = 0; i < N; ++i) {
             (*this)(l[i], r[i]);
@@ -184,17 +184,19 @@ private:
     template <typename T>
     UTL_ATTRIBUTE(ALWAYS_INLINE)
     UTL_CONSTEXPR_CXX14 UTL_SCOPE
-        enable_if_t<UTL_TRAIT_is_move_constructible(T) && UTL_TRAIT_is_move_assignable(T)>
-        operator()(T& l, T& r, third_t) const noexcept(
-            UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_move_assignable(T)) {
+        enable_if_t<UTL_TRAIT_is_move_constructible(T) && UTL_TRAIT_is_move_assignable(T)> dispatch(
+            T& l, T& r, third_t) const noexcept(UTL_TRAIT_is_nothrow_move_constructible(T) &&
+            UTL_TRAIT_is_nothrow_move_assignable(T)) {
         r = UTL_SCOPE exchange(l, UTL_SCOPE move(r));
     }
 
 public:
     template <typename L, typename R>
-    UTL_CONSTEXPR_CXX14 auto operator()(L& l, R& r) const noexcept(noexcept((*this)(l, r, function_t::first)))
-        -> decltype((*this)(l, r, function_t::first)) {
-        (*this)(l, r, function_t::first);
+    UTL_CONSTEXPR_CXX14 auto operator()(L&& l, R&& r) const noexcept(
+        noexcept(this->dispatch(UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>(), function_t::first)))
+        -> decltype(this->dispatch(
+            UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>(), function_t::first)) {
+        this->dispatch(UTL_SCOPE forward<L>(l), UTL_SCOPE forward<R>(r), function_t::first);
     }
 };
 } // namespace swap
