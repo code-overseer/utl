@@ -1,5 +1,7 @@
-// Copyright 2023-2024 Bryan Wong
-// Credit: This file contains code derived from the GCC test suite.
+/**
+ * Copyright 2023-2024 Bryan Wong
+ * Credit: This file contains code derived from the GCC test suite.
+ */
 
 #include "utl/ranges/utl_swap.h"
 #include "utl/utility/utl_swap.h"
