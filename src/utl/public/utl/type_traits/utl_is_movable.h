@@ -7,7 +7,7 @@
 #include "utl/type_traits/utl_is_assignable.h"
 #include "utl/type_traits/utl_is_move_constructible.h"
 #include "utl/type_traits/utl_is_object.h"
-#include "utl/utility/utl_swap.h"
+#include "utl/type_traits/utl_is_swappable.h"
 
 UTL_NAMESPACE_BEGIN
 

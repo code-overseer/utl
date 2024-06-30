@@ -6,16 +6,14 @@
  * Standard Tuple implementation up to and including C++17
  */
 
-#include "utl/preprocessor/utl_pragma.h"
-
 #if !defined(UTL_TUPLE_PRIVATE_HEADER_GUARD)
 #  error "Private header accessed"
 #endif
 
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/memory/utl_uses_allocator.h"
-#include "utl/preprocessor/utl_attributes.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/ranges/utl_swap.h"
 #include "utl/tuple/utl_tuple_compare_traits.h"
 #include "utl/tuple/utl_tuple_fwd.h"
 #include "utl/tuple/utl_tuple_traits.h"
@@ -26,6 +24,7 @@
 #include "utl/type_traits/utl_is_copy_constructible.h"
 #include "utl/type_traits/utl_is_default_constructible.h"
 #include "utl/type_traits/utl_is_explicit_constructible.h"
+#include "utl/type_traits/utl_is_move_assignable.h"
 #include "utl/type_traits/utl_is_move_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_copy_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_default_constructible.h"
@@ -39,7 +38,6 @@
 #include "utl/utility/utl_ignore.h"
 #include "utl/utility/utl_move.h"
 #include "utl/utility/utl_sequence.h"
-#include "utl/utility/utl_swap.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -187,25 +185,25 @@ public:
     template <typename U = T>
     UTL_CONSTEXPR_CXX14 void swap(storage<U>& other) noexcept(
         traits::template is_nothrow_swappable_with<U&>::value) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
     }
 
     template <typename U = T>
     UTL_CONSTEXPR_CXX14 void swap(storage<U> const& other) noexcept(
         traits::template is_nothrow_swappable_with<U const&>::value) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
     }
 
     template <typename U = T>
     UTL_CONSTEXPR_CXX14 void swap(storage<U>& other) const
         noexcept(traits::template is_nothrow_const_swappable_with<U&>::value) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
     }
 
     template <typename U = T>
     UTL_CONSTEXPR_CXX14 void swap(storage<U> const& other) const
         noexcept(traits::template is_nothrow_const_swappable_with<U const&>::value) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
     }
 
     template <typename U>
@@ -345,7 +343,7 @@ struct storage<T, Tail...> : variadic_traits<T, Tail...> {
     UTL_ATTRIBUTE(ALWAYS_INLINE)
     UTL_CONSTEXPR_CXX14 void swap(storage<Us&...>& other) noexcept(
         traits::template is_nothrow_swappable_with<Us&...>::value) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
         tail.swap(other.tail);
     }
 
@@ -353,7 +351,7 @@ struct storage<T, Tail...> : variadic_traits<T, Tail...> {
     UTL_ATTRIBUTE(ALWAYS_INLINE)
     UTL_CONSTEXPR_CXX14 void swap(storage<Us...> const& other) const
         noexcept(traits::template is_nothrow_const_swappable_with<Us const&...>::value) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
         tail.swap(other.tail);
     }
 
@@ -361,7 +359,7 @@ struct storage<T, Tail...> : variadic_traits<T, Tail...> {
     UTL_ATTRIBUTE(ALWAYS_INLINE)
     UTL_CONSTEXPR_CXX14 void swap(storage<Us...>& other) const
         noexcept(traits::template is_nothrow_const_swappable_with<Us&...>::value) {
-        UTL_SCOPE utility::swap(head, other.head);
+        UTL_SCOPE ranges::swap(head, other.head);
         tail.swap(other.tail);
     }
 

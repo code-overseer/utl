@@ -14,7 +14,7 @@ struct integral_constant {
     static constexpr T value = N;
     using value_type = T;
     using type = integral_constant;
-    constexpr            operator value_type() const noexcept { return N; }
+    constexpr operator value_type() const noexcept { return N; }
     constexpr value_type operator()() const noexcept { return N; }
 };
 
@@ -30,13 +30,20 @@ template <bool B>
 using bool_constant = integral_constant<bool, B>;
 using true_type = bool_constant<true>;
 using false_type = bool_constant<false>;
+template <typename...>
+using always_true = true_type;
+template <typename...>
+using always_false = false_type;
 
 #if UTL_CXX14
 template <typename T, T N>
 UTL_INLINE_CXX17 constexpr T integral_constant_v = N;
-
 template <typename T, T N>
 UTL_INLINE_CXX17 constexpr T value_constant_v = N;
+template <typename...>
+UTL_INLINE_CXX17 constexpr bool always_true_v = true;
+template <typename...>
+UTL_INLINE_CXX17 constexpr bool always_false_v = false;
 #endif
 
 UTL_NAMESPACE_END

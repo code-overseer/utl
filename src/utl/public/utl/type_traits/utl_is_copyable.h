@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/type_traits/utl_common.h"
+#include "utl/type_traits/utl_is_copy_assignable.h"
 #include "utl/type_traits/utl_is_copy_constructible.h"
 #include "utl/type_traits/utl_is_movable.h"
 

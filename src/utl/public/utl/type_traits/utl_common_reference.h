@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/type_traits/utl_add_const.h"
+#include "utl/type_traits/utl_add_pointer.h"
 #include "utl/type_traits/utl_add_rvalue_reference.h"
 #include "utl/type_traits/utl_common.h"
 #include "utl/type_traits/utl_common_type.h"
@@ -101,15 +102,17 @@ struct simple_common_ref;
 template <typename T0, typename T1>
 using simple_common_ref_t = typename simple_common_ref<T0, T1>::type;
 
-template <typename T0, typename T1>
-struct simple_common_ref<T0&, T1&,
-    void_t<ternary_result_t<merge_cv_t<T0, type_list<T0, T1>>&,
-        merge_cv_t<T1, type_list<T0, T1>>&> // ternary_result_t
-        >                                   // void_t
-    > : ternary_result<merge_cv_t<T0, type_list<T0, T1>>&, merge_cv_t<T1, type_list<T0, T1>>&> {};
-
 template <typename Target, typename... Ts>
 using all_convertible_to = conjunction<is_convertible<Ts, Target>...>;
+
+template <typename T0, typename T1>
+struct simple_common_ref<T0&, T1&,
+    UTL_SCOPE enable_if_t<all_convertible_to<
+        UTL_SCOPE add_pointer_t<ternary_result_t<merge_cv_t<T0, type_list<T0, T1>>&,
+            merge_cv_t<T1, type_list<T0, T1>>&>>,
+        UTL_SCOPE add_pointer_t<T0&>, UTL_SCOPE add_pointer_t<T1&>>::value>> :
+    ternary_result<merge_cv_t<T0, type_list<T0, T1>>&, merge_cv_t<T1, type_list<T0, T1>>&> {};
+
 template <typename T>
 using rvalue_ref = add_rvalue_reference<remove_reference_t<T>>;
 template <typename T>
@@ -117,8 +120,11 @@ using rvalue_ref_t = typename rvalue_ref<T>::type;
 
 template <typename T0, typename T1>
 struct simple_common_ref<T0&&, T1&&,
-    enable_if_t<all_convertible_to<rvalue_ref_t<simple_common_ref_t<T0&, T1&>>, T0&&,
-        T1&&>::value> // enable_if_t
+    enable_if_t<
+        conjunction<all_convertible_to<rvalue_ref_t<simple_common_ref_t<T0&, T1&>>, T0&&, T1&&>,
+            all_convertible_to<UTL_SCOPE add_pointer_t<rvalue_ref_t<simple_common_ref_t<T0&, T1&>>>,
+                UTL_SCOPE add_pointer_t<T0&&>,
+                UTL_SCOPE add_pointer_t<T1&&>>>::value> // enable_if_t
     > : rvalue_ref<simple_common_ref_t<T0&, T1&>> {};
 
 template <typename T0, typename T1>
