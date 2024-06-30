@@ -2,11 +2,12 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/iterator/utl_iter_move.h"
 #include "utl/iterator/utl_iter_reference_t.h"
 #include "utl/iterator/utl_iter_rvalue_reference_t.h"
 #include "utl/iterator/utl_iter_value_t.h"
-#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_remove_cvref.h"
@@ -67,7 +68,7 @@ struct trait<T,
 } // namespace details
 
 template <typename T>
-struct is_indirectly_readable : details::indirectly_readable::trait<T> {};
+struct is_indirectly_readable : details::indirectly_readable::trait<UTL_SCOPE remove_cvref_t<T>> {};
 
 #  if UTL_CXX14
 template <typename T>

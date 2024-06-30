@@ -80,12 +80,16 @@ IncludeBlocks:   Regroup
 IncludeCategories:
   - Regex:           '.*\.generated\.h'
     Priority:        100
+  - Regex:           '"utl/preprocessor/utl_config.h"'
+    Priority:        0
+  - Regex:           '"utl/preprocessor/.*"'
+    Priority:        5
   - Regex:           '".*"'
-    Priority:        1
+    Priority:        10
   - Regex:           '^<.*\.(h)>'
-    Priority:        3
+    Priority:        30
   - Regex:           '^<.*>'
-    Priority:        4
+    Priority:        40
 
 IfMacros: ['UTL_TRY']
 AttributeMacros: []
@@ -101,11 +105,12 @@ Macros:
 - UTL_CONSTEXPR_CXX20=constexpr
 - UTL_CONSTEXPR_CXX23=constexpr
 - UTL_CONSTEVAL=consteval
-- UTL_REQUIRES_CXX11(X)=,typename=void
-- UTL_REQUIRES_CXX11(X,Y)=,typename=void
-- UTL_REQUIRES_CXX11(X,Y,Z)=,typename=void
+- UTL_REQUIRES_CXX11(X)=,typename=enable_if_t<X>
+- UTL_REQUIRES_CXX11(X,Y)=,typename=enable_if_t<X,Y>
+- UTL_REQUIRES_CXX11(X,Y,Z)=,typename=enable_if_t<X,Y,Z>
 - UTL_REQUIRES_CXX20(X)=requires (X)
 - UTL_REQUIRES_CXX20(X,Y)=requires (X,Y)
 - UTL_REQUIRES_CXX20(X,Y,Z)=requires (X,Y,Z)
 - UTL_CONCEPT_CXX20(X)=typename
 - UTL_NODISCARD=[[nodiscard]]
+- UTL_ENABLE_IF_CXX11(X,Y)=void

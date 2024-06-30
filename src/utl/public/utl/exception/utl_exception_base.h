@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_assertion.h"
-#include "utl/preprocessor/utl_attributes.h"
 #include "utl/preprocessor/utl_config.h"
-#include "utl/preprocessor/utl_namespace.h"
+
+#include "utl/preprocessor/utl_assertion.h"
+
+#include "utl/type_traits/utl_constants.h"
 
 #if UTL_WITH_EXCEPTIONS
 
@@ -59,17 +60,13 @@ public:
     virtual char const* what() const noexcept { return nullptr; }
 };
 UTL_INLINE_CXX17 constexpr bool with_exceptions = false;
+
 namespace details {
 namespace exception {
-template <typename... A>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr bool always_false(A&&...) noexcept {
+template <typename F>
+UTL_ATTRIBUTES(NODISCARD)
+constexpr bool catch_statement(F&&) noexcept {
     return false;
-}
-template <typename... A>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr bool always_true(A&&...) noexcept {
-    return true;
 }
 } // namespace exception
 } // namespace details
@@ -84,18 +81,20 @@ UTL_NAMESPACE_END
 #    define UTL_NOEXCEPT(...) noexcept(__VA_ARGS__)
 #  endif
 
-#  define UTL_THROW(...)                                                   \
-      UTL_ASSERT(UTL_SCOPE details::exception::always_false(__VA_ARGS__)); \
+#  define UTL_THROW(...)                                                \
+      UTL_ASSERT(UTL_SCOPE always_false<decltype(__VA_ARGS__)>::value); \
       UTL_BUILTIN_unreachable()
 #  define UTL_RETHROW(...)            \
       UTL_ASSERT(false, __VA_ARGS__); \
       UTL_BUILTIN_unreachable()
 #  define UTL_TRY if UTL_CONSTEXPR_CXX17 (1)
 
-#  define UTL_THROW_IF(CONDITION, ...)                                                     \
-      UTL_ASSERT(!(CONDITION) && UTL_SCOPE details::exception::always_false(__VA_ARGS__)); \
+#  define UTL_THROW_IF(CONDITION, ...)                                                  \
+      UTL_ASSERT(!(CONDITION) && UTL_SCOPE always_false<decltype(__VA_ARGS__)>::value); \
       UTL_BUILTIN_unreachable()
 
-#  define UTL_CATCH(...) else if (UTL_SCOPE always_false([](__VA_ARGS__) -> void {}))
+#  define UTL_CATCH(...)                                                          \
+      else if UTL_CONSTEXPR_CXX17 (UTL_SCOPE details::exception::catch_statement( \
+                                       [](__VA_ARGS__) -> void {}))
 
 #endif // UTL_WITH_EXCEPTIONS

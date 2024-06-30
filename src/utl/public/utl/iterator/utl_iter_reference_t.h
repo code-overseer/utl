@@ -2,10 +2,12 @@
 
 #pragma once
 
-#include "utl/concepts/utl_dereferenceable.h"
 #include "utl/preprocessor/utl_config.h"
+
+#include "utl/concepts/utl_dereferenceable.h"
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_is_dereferenceable.h"
+#include "utl/type_traits/utl_remove_cvref.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -20,6 +22,6 @@ auto resolve(int) noexcept -> decltype(*UTL_SCOPE declval<T&>());
 } // namespace details
 
 template <UTL_CONCEPT_CXX20(dereferenceable) T>
-using iter_reference_t = decltype(details::iter_reference::resolve<T>(0));
+using iter_reference_t = decltype(details::iter_reference::resolve<UTL_SCOPE remove_cvref_t<T>>(0));
 
 UTL_NAMESPACE_END
