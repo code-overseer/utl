@@ -176,9 +176,9 @@ public:
         UTL_TRAIT_is_nothrow_copy_assignable(iterator_type)) = default;
     UTL_CONSTEXPR_CXX14 reverse_iterator& operator=(reverse_iterator&&) noexcept(
         UTL_TRAIT_is_nothrow_move_assignable(iterator_type)) = default;
-    template <typename U UTL_REQUIRES_CXX11(!UTL_TRAIT_is_same(U,
-        iterator_type) && UTL_TRAIT_is_convertible(
-            U const&, iterator_type)&& UTL_TRAIT_is_assignable(iterator_type&, U const&))>
+    template <typename U UTL_REQUIRES_CXX11(!UTL_TRAIT_is_same(U, iterator_type) &&
+        UTL_TRAIT_is_convertible(U const&, iterator_type) &&
+        UTL_TRAIT_is_assignable(iterator_type&, U const&))>
     UTL_REQUIRES_CXX20(!UTL_SCOPE same_as<U, iterator_type> &&
         UTL_SCOPE convertible_to<U const&, iterator_type> &&
         UTL_SCOPE assignable_from<iterator_type&, U const&>)
