@@ -24,7 +24,6 @@ UTL_NAMESPACE_END
 #  include "utl/type_traits/utl_is_dereferenceable.h"
 #  include "utl/type_traits/utl_is_member_function_pointer.h"
 #  include "utl/type_traits/utl_is_member_object_pointer.h"
-#  include "utl/type_traits/utl_is_nothrow_dereferenceable.h"
 #  include "utl/type_traits/utl_is_nothrow_destructible.h"
 #  include "utl/type_traits/utl_is_reference_wrapper.h"
 #  include "utl/type_traits/utl_remove_cvref.h"

@@ -7,8 +7,8 @@
 #include "utl/concepts/utl_lvalue_reference.h"
 #include "utl/concepts/utl_rvalue_reference.h"
 #include "utl/type_traits/utl_enable_if.h"
+#include "utl/type_traits/utl_is_dereferenceable.h"
 #include "utl/type_traits/utl_is_lvalue_reference.h"
-#include "utl/type_traits/utl_is_nothrow_dereferenceable.h"
 #include "utl/type_traits/utl_is_rvalue_reference.h"
 #include "utl/type_traits/utl_is_void.h"
 #include "utl/type_traits/utl_void_t.h"
@@ -20,8 +20,8 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace iterator_move {
 template <typename T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_lvalue_reference(decltype(*UTL_SCOPE declval<T>())) &&
-    UTL_TRAIT_is_rvalue_reference(decltype(UTL_SCOPE move(*UTL_SCOPE declval<T>()))))>
+    UTL_TRAIT_is_lvalue_reference(decltype(*UTL_SCOPE declval<T&>())) &&
+    UTL_TRAIT_is_rvalue_reference(decltype(UTL_SCOPE move(*UTL_SCOPE declval<T&>()))))>
 UTL_REQUIRES_CXX20(requires(T&& it) {
     { *it } -> lvalue_reference;
     UTL_SCOPE move(*it);
@@ -32,7 +32,7 @@ constexpr auto iter_move(T&& it) noexcept(UTL_TRAIT_is_nothrow_dereferenceable(T
 }
 
 template <typename T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_rvalue_reference(decltype(*UTL_SCOPE declval<T>())))>
+    UTL_TRAIT_is_rvalue_reference(decltype(*UTL_SCOPE declval<T&>())))>
 UTL_REQUIRES_CXX20(requires(T&& it) {
     { *it } -> rvalue_reference;
 })

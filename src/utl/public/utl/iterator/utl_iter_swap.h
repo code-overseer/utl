@@ -125,9 +125,9 @@ template <typename L, typename R>
 auto exchange_swappable(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R>
 auto exchange_swappable(int) noexcept -> UTL_SCOPE always_true<UTL_SCOPE iter_value_t<L>,
-    decltype(UTL_SCOPE iter_value_t<L>(UTL_SCOPE ranges::iter_move(UTL_SCOPE declval<L>()))),
-    decltype(*l = UTL_SCOPE ranges::iter_move(r)),
-    decltype(*r = UTL_SCOPE details::iterator_swap::iter_exchange(
+    decltype(UTL_SCOPE iter_value_t<L>(UTL_SCOPE ranges::iter_move(UTL_SCOPE declval<L&>()))),
+    decltype(*UTL_SCOPE declval<L&>() = UTL_SCOPE ranges::iter_move(UTL_SCOPE declval<R&>())),
+    decltype(*UTL_SCOPE declval<R&>() = UTL_SCOPE details::iterator_swap::iter_exchange(
                  UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>()))>;
 
 template <typename L, typename R>
@@ -139,9 +139,9 @@ auto nothrow_exchange_swappable(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R>
 auto nothrow_exchange_swappable(int) noexcept
     -> UTL_SCOPE bool_constant<noexcept(UTL_SCOPE iter_value_t<L>(
-                                   UTL_SCOPE ranges::iter_move(UTL_SCOPE declval<L>()))) &&
-        noexcept(*l = UTL_SCOPE ranges::iter_move(r)) &&
-        noexcept(*r = UTL_SCOPE details::iterator_swap::iter_exchange(
+                                   UTL_SCOPE ranges::iter_move(UTL_SCOPE declval<L&>()))) &&
+        noexcept(*UTL_SCOPE declval<L&>() = UTL_SCOPE ranges::iter_move(UTL_SCOPE declval<R&>())) &&
+        noexcept(*UTL_SCOPE declval<R&>() = UTL_SCOPE details::iterator_swap::iter_exchange(
                      UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>()))>;
 
 template <typename L, typename R>
@@ -228,7 +228,7 @@ struct function_t {
 } // namespace details
 UTL_NAMESPACE_END
 
-#endif
+#endif // UTL_CXX20
 
 UTL_NAMESPACE_BEGIN
 

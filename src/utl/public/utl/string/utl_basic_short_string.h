@@ -4,6 +4,8 @@
 
 #include "utl/preprocessor/utl_config.h"
 
+#include "utl/algorithm/utl_remove.h"
+#include "utl/algorithm/utl_remove_if.h"
 #include "utl/concepts/utl_convertible_to.h"
 #include "utl/concepts/utl_integral.h"
 #include "utl/exception.h"
@@ -98,11 +100,11 @@ public:
         using base_type = contiguous_iterator_base<iterator, value_type>;
 
     public:
-        using value_type = base_type::value_type;
-        using pointer = base_type::pointer;
-        using reference = base_type::reference;
-        using difference_type = base_type::difference_type;
-        using iterator_concept = base_type::iterator_concept;
+        using typename base_type::difference_type;
+        using typename base_type::iterator_concept;
+        using typename base_type::pointer;
+        using typename base_type::reference;
+        using typename base_type::value_type;
 
         constexpr iterator() noexcept = default;
         constexpr iterator(iterator const& other) noexcept = default;
@@ -123,11 +125,11 @@ public:
         using base_type = contiguous_iterator_base<iterator, value_type>;
 
     public:
-        using value_type = base_type::value_type;
-        using pointer = base_type::pointer;
-        using reference = base_type::reference;
-        using difference_type = base_type::difference_type;
-        using iterator_concept = base_type::iterator_concept;
+        using typename base_type::difference_type;
+        using typename base_type::iterator_concept;
+        using typename base_type::pointer;
+        using typename base_type::reference;
+        using typename base_type::value_type;
 
         constexpr const_iterator() noexcept = default;
         constexpr const_iterator(const_iterator const& other) noexcept = default;
@@ -255,7 +257,7 @@ public:
         : storage_(other.storage_)
         , size_(other.size_)
         , is_heap_(other.is_heap_) {
-        other.reset_to_short();
+        UTL_SCOPE move(other).reset_to_short();
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string(basic_short_string&& other, size_type pos, size_type count,
@@ -270,7 +272,7 @@ public:
         traits_type::move(this->data(), this->data() + pos, new_size);
         this->resize(new_size);
 
-        other.reset_to_short();
+        UTL_SCOPE move(other).reset_to_short();
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string(basic_short_string&& other, size_type pos,
@@ -519,6 +521,9 @@ public:
     UTL_CONSTEXPR_CXX14 basic_short_string& assign(
         View const& view, size_type subidx, size_type subcount = npos) UTL_THROWS {
         view_type const v(view);
+        UTL_THROW_IF(subidx > v.size(),
+            program_exception<void>("[UTL] `basic_short_string::assign` operation failed, "
+                                    "Reason=[argument substring index out of range]"));
         return assign(v.substr(subidx, subcount));
     }
 
@@ -630,6 +635,9 @@ public:
     UTL_CONSTEXPR_CXX14 basic_short_string& insert(
         size_type pos, View const& view, size_type subidx, size_type subcount = npos) UTL_THROWS {
         view_type const v(view);
+        UTL_THROW_IF(subidx > v.size(),
+            program_exception<void>("[UTL] `basic_short_string::insert` operation failed, "
+                                    "Reason=[argument substring index out of range]"));
         return insert(pos, v.substr(subidx, subcount));
     }
 
@@ -701,6 +709,9 @@ public:
     UTL_CONSTEXPR_CXX14 basic_short_string& append(
         View const& view, size_type subidx, size_type subcount = npos) UTL_THROWS {
         view_type const v(view);
+        UTL_THROW_IF(subidx > v.size(),
+            program_exception<void>("[UTL] `basic_short_string::assign` operation failed, "
+                                    "Reason=[argument substring index out of range]"));
         return insert(end(), v.substr(subidx, subcount));
     }
 
@@ -1239,7 +1250,7 @@ private:
     }
 
     UTL_CONSTEXPR_CXX14 void swap(basic_short_string& other, false_type) noexcept {
-        swap(storage_.first(), other.storage_.first());
+        ranges::swap(storage_.first(), other.storage_.first());
         auto size_tmp = size_;
         auto heap_tmp = is_heap_;
         size_ = other.size_;
@@ -1250,7 +1261,7 @@ private:
 
     UTL_CONSTEXPR_CXX14 void swap(basic_short_string& other, true_type) noexcept {
         swap(other, false_type{});
-        swap(allocator_ref(), other.allocator_ref());
+        ranges::swap(allocator_ref(), other.allocator_ref());
     }
 
     UTL_CONSTEXPR_CONSTRUCTS_AT void transfer_to_heap(size_t new_capacity) UTL_THROWS {
@@ -1258,7 +1269,7 @@ private:
         auto const result = alloc_traits::allocate_at_least(allocator_ref(), new_capacity + 1);
         heap_type new_heap{result.ptr, result.count};
         traits_type::copy(new_heap.data_, data(), size());
-        construct_at(addressof(get_heap()), new_heap);
+        UTL_SCOPE construct_at(UTL_SCOPE addressof(get_heap()), new_heap);
         is_heap_ = true;
     }
 
@@ -1302,11 +1313,12 @@ private:
         }
     }
 
-    UTL_CONSTEXPR_CXX14 void reset_to_short() {
+    UTL_CONSTEXPR_CXX14 void reset_to_short() && {
+        // constexpr only if `is_heap_` is `false` because constexpr placement new is not portable
         if (is_heap_) {
             size_ = 0;
             is_heap_ = false;
-            ::new (addressof(get_short())) short_type;
+            ::new (UTL_SCOPE addressof(get_short())) short_type;
         }
     }
 
@@ -1319,7 +1331,7 @@ private:
         size_ = other.size_;
         is_heap_ = other.is_heap_;
 
-        other.reset_to_short();
+        UTL_SCOPE move(other).reset_to_short();
     }
 
     UTL_STRING_CONST UTL_CONSTEXPR_CXX14 short_type& get_short() noexcept { return storage_.first().short_; }
@@ -1348,23 +1360,23 @@ private:
     size_type is_heap_ : 1;
 };
 
-// template <typename CharT, size_t N, typename Traits, typename Alloc, typename U>
-// UTL_CONSTEXPR_CXX14 basic_short_string<CharT, N, Traits, Alloc>::size_type erase(
-//     basic_short_string<CharT, N, Traits, Alloc>& c, U const& value) {
-//     auto const it = remove(c.begin(), c.end(), value);
-//     auto const result = c.end() - it;
-//     c.erase(it, c.end());
-//     return result;
-// }
+template <typename CharT, size_t N, typename Traits, typename Alloc, typename U>
+UTL_CONSTEXPR_CXX14 typename basic_short_string<CharT, N, Traits, Alloc>::size_type erase(
+    basic_short_string<CharT, N, Traits, Alloc>& c, U const& value) {
+    auto const it = UTL_SCOPE remove(c.begin(), c.end(), value);
+    auto const result = c.end() - it;
+    c.erase(it, c.end());
+    return result;
+}
 
-// template <typename CharT, size_t N, typename Traits, typename Alloc, typename Pred>
-// UTL_CONSTEXPR_CXX14 basic_short_string<CharT, N, Traits, Alloc>::size_type erase_if(
-//     basic_short_string<CharT, N, Traits, Alloc>& c, Pred const& pred) {
-//     auto const it = remove_if(c.begin(), c.end(), pred);
-//     auto const result = c.end() - it;
-//     c.erase(it, c.end());
-//     return result;
-// }
+template <typename CharT, size_t N, typename Traits, typename Alloc, typename Pred>
+UTL_CONSTEXPR_CXX14 typename basic_short_string<CharT, N, Traits, Alloc>::size_type erase_if(
+    basic_short_string<CharT, N, Traits, Alloc>& c, Pred const& pred) {
+    auto const it = UTL_SCOPE remove_if(c.begin(), c.end(), pred);
+    auto const result = c.end() - it;
+    c.erase(it, c.end());
+    return result;
+}
 
 #undef UTL_STRING_PURE
 #undef UTL_STRING_CONST

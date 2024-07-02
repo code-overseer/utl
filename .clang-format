@@ -111,7 +111,7 @@ Macros:
 - UTL_REQUIRES_CXX20(X)=requires (X)
 - UTL_REQUIRES_CXX20(X,Y)=requires (X,Y)
 - UTL_REQUIRES_CXX20(X,Y,Z)=requires (X,Y,Z)
-- UTL_CONCEPT_CXX20(X)=typename
+- UTL_CONCEPT_CXX20(X)=type<X>
 - UTL_NODISCARD=[[nodiscard]]
 - UTL_ENABLE_IF_CXX11(X,Y)=void
 - UTL_ATTRIBUTE(X)=[[X]]
