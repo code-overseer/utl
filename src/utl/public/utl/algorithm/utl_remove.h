@@ -13,7 +13,8 @@
 
 UTL_NAMESPACE_BEGIN
 
-template <UTL_CONCEPT_CXX20(forward_iterator) It, typename T = iterator_traits<It>::value_type>
+template <
+    UTL_CONCEPT_CXX20(forward_iterator) It, typename T = typename iterator_traits<It>::value_type>
 constexpr It remove(It first, It last, T const& val) {
     static_assert(UTL_TRAIT_is_invocable(equal_to<void>, decltype(*first), T const&),
         "Arguments must be comparable");
@@ -23,7 +24,7 @@ constexpr It remove(It first, It last, T const& val) {
 }
 
 // TODO
-template <typename ExPolicy, typename It, typename T = iterator_traits<It>::value_type>
+template <typename ExPolicy, typename It, typename T = typename iterator_traits<It>::value_type>
 It remove(ExPolicy&& policy, It first, It last, T const& val) = delete;
 
 UTL_NAMESPACE_END

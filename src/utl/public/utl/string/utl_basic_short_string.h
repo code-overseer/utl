@@ -4,6 +4,8 @@
 
 #include "utl/preprocessor/utl_config.h"
 
+#include "utl/algorithm/utl_max.h"
+#include "utl/algorithm/utl_min.h"
 #include "utl/algorithm/utl_remove.h"
 #include "utl/algorithm/utl_remove_if.h"
 #include "utl/concepts/utl_convertible_to.h"
@@ -39,6 +41,7 @@
 UTL_NAMESPACE_BEGIN
 template <typename CharType, size_t ShortSize, typename Traits, typename Alloc>
 class basic_short_string {
+
 public:
     using allocator_type = Alloc;
     using value_type = CharType;
@@ -56,12 +59,11 @@ public:
     class const_iterator;
 
 private:
-    UTL_STRING_CONST
-    static constexpr size_type min(size_type x, size_type y) noexcept { return x < y ? x : y; }
-    UTL_STRING_CONST
-    static constexpr size_type max(size_type x, size_type y) noexcept { return x > y ? x : y; }
+    static constexpr size_type inline_size =
+        UTL_SCOPE numeric_max<size_type>(ShortSize + 1, 16 / sizeof(CharType));
+
     struct alignas(16) short_type {
-        value_type data_[max(ShortSize, 15) + 1];
+        value_type data_[inline_size];
     };
 
     struct heap_type {
@@ -121,8 +123,8 @@ public:
             : iterator(const_cast<pointer>(other.operator->())) {}
     };
 
-    class const_iterator : UTL_SCOPE contiguous_iterator_base<iterator, value_type const> {
-        using base_type = contiguous_iterator_base<iterator, value_type>;
+    class const_iterator : UTL_SCOPE contiguous_iterator_base<const_iterator, value_type const> {
+        using base_type = contiguous_iterator_base<const_iterator, value_type const>;
 
     public:
         using typename base_type::difference_type;
@@ -142,8 +144,7 @@ public:
     private:
         friend basic_short_string;
         constexpr const_iterator(pointer data) noexcept : base_type(data) {}
-        constexpr const_iterator(
-            contiguous_iterator_base<iterator, basic_short_string::value_type> other) noexcept
+        constexpr const_iterator(contiguous_iterator_base<iterator, value_type> other) noexcept
             : base_type(other) {}
     };
 
@@ -221,16 +222,14 @@ public:
         : storage_(other.storage_.first(), alloc)
         , size_(other.size_)
         , is_heap_(other.is_heap_) {
-        UTL_THROW(pos > other.size(),
+        UTL_THROW_IF(pos > other.size(),
             program_exception<void>("[UTL] basic_short_string construction failed, "
                                     "Reason=[index out of range]"));
 
         if (other.is_heap_) {
             storage_.get_heap() = clone_heap(allocator_ref(), other);
         }
-        auto const new_size = min(other.size() - pos, count);
-        traits_type::move(this->data(), this->data() + pos, new_size);
-        this->resize(new_size);
+        inline_substring(pos, count);
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string(basic_short_string const& other, size_type pos,
@@ -238,7 +237,7 @@ public:
         : basic_short_string(other, pos, other.size(), alloc) {}
 
     UTL_CONSTEXPR_CXX14 basic_short_string& operator=(basic_short_string const& other) UTL_THROWS {
-        if (this != addressof(other)) {
+        if (this != UTL_SCOPE addressof(other)) {
             destroy();
             storage_.first() = other.storage_.first();
             alloc_traits::assign(allocator_ref(), other.allocator_ref());
@@ -262,24 +261,21 @@ public:
 
     UTL_CONSTEXPR_CXX14 basic_short_string(basic_short_string&& other, size_type pos, size_type count,
         allocator_type const& alloc = allocator_type()) UTL_THROWS
-        : storage_(other.storage_)
+        : storage_(other.storage_.first(), alloc)
         , size_(other.size_)
         , is_heap_(other.is_heap_) {
-        UTL_THROW(pos > other.size(),
+        UTL_THROW_IF(pos > other.size(),
             program_exception<void>("[UTL] basic_short_string construction failed, "
                                     "Reason=[index out of range]"));
-        auto const new_size = min(other.size() - pos, count);
-        traits_type::move(this->data(), this->data() + pos, new_size);
-        this->resize(new_size);
 
-        UTL_SCOPE move(other).reset_to_short();
+        on_move_construct_with_alloc(other, pos, count, alloc_traits::is_always_equal);
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string(basic_short_string&& other, size_type pos,
         allocator_type const& alloc = allocator_type()) UTL_THROWS
-        : basic_short_string(move(other), pos, other.size(), alloc) {}
+        : basic_short_string(UTL_SCOPE move(other), pos, other.size(), alloc) {}
 
-    UTL_CONSTEXPR_CXX20 ~basic_short_string() noexcept { destroy(); }
+    // TODO: container-compatible-ranges ctor
 
     UTL_CONSTEXPR_CXX14 basic_short_string& operator=(basic_short_string&& other) noexcept(
         (alloc_traits::propagate_on_container_move_assignment::value &&
@@ -293,6 +289,8 @@ public:
         move_assign(other, can_move_t());
         return *this;
     }
+
+    UTL_CONSTEXPR_CXX20 ~basic_short_string() noexcept { destroy(); }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 pointer data() noexcept {
         return !is_heap_ ? get_short().data_ : get_heap().data_;
@@ -338,7 +336,7 @@ public:
 
     UTL_CONSTEXPR_CXX14 void resize(size_type new_size, value_type ch) UTL_THROWS {
         reserve(new_size);
-        traits_type::assign(data() + size(), max(new_size, size()) - size(), ch);
+        traits_type::assign(data() + size(), UTL_SCOPE numeric_max(new_size, size()) - size(), ch);
         data()[new_size] = value_type();
         size_ = new_size;
     }
@@ -428,7 +426,7 @@ public:
 
     basic_short_string& assign(decltype(nullptr)) = delete;
 
-    UTL_CONSTEXPR_CXX14 basic_short_string& assign(size_type count, value_type ch) UTL_THROWS {
+    UTL_CONSTEXPR_WITH_TRY basic_short_string& assign(size_type count, value_type ch) UTL_THROWS {
         UTL_ATTRIBUTE(MAYBE_UNUSED) size_type const old_size = exchange(size_, 0);
         UTL_TRY {
             resize(count, ch);
@@ -568,7 +566,7 @@ public:
         UTL_THROW_IF(idx > str.size(),
             program_exception<void>("[UTL] `basic_short_string::insert` operation failed, "
                                     "Reason=[argument substring index out of range]"));
-        auto const copy_size = min(str.size() - idx, count);
+        auto const copy_size = UTL_SCOPE numeric_min(str.size() - idx, count);
         return insert(pos, str.data() + idx, copy_size);
     }
 
@@ -643,7 +641,7 @@ public:
 
     UTL_CONSTEXPR_CXX14 basic_short_string& erase(size_type idx = 0, size_type count = npos)
         UTL_THROWS {
-        auto const length = min(size() - idx, count);
+        auto const length = UTL_SCOPE numeric_min(size() - idx, count);
         auto const first = begin() + idx;
         return erase(first, first + length), *this;
     }
@@ -879,7 +877,7 @@ public:
             program_exception<void>("[UTL] `basic_short_string::copy` operation failed, "
                                     "Reason=[index out of range]"));
 
-        auto const copied = min(count, size() - pos);
+        auto const copied = UTL_SCOPE numeric_min(count, size() - pos);
         traits_type::copy(dst, data(), copied);
         return copied;
     }
@@ -1038,6 +1036,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(is_convertible<View, view_type>::value)>
+    UTL_STRING_PURE
     UTL_CONSTEXPR_CXX14 size_type find_first_not_of(View const& view, size_type pos = 0) const
         noexcept(!utl::with_exceptions && is_nothrow_convertible<View, view_type>::value) {
         view_type const v(view);
@@ -1102,9 +1101,10 @@ public:
         return find_last_not_of(&ch, pos, 1);
     }
 
-    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(is_convertible<View, view_type>::value)>
-    UTL_CONSTEXPR_CXX14 size_type find_last_not_of(View const& view, size_type pos = npos) const
-        noexcept(is_nothrow_convertible<View, view_type>::value) {
+    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
+        is_convertible<View, view_type>::value)>
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_last_not_of(View const& view,
+        size_type pos = npos) const noexcept(is_nothrow_convertible<View, view_type>::value) {
         view_type const v(view);
         return find_last_not_of(v.data(), pos, v.size());
     }
@@ -1152,13 +1152,13 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(is_convertible<View, view_type>::value)>
     UTL_STRING_PURE constexpr int compare(View const& view) const
-        noexcept(!utl::with_exceptions && is_nothrow_convertible<View, view_type>::value) {
+        UTL_NOEXCEPT(is_nothrow_convertible<View, view_type>::value) {
         return compare_str(view_type(*this), view);
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(is_convertible<View, view_type>::value)>
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count, View const& view) const
-        noexcept(!utl::with_exceptions && is_nothrow_convertible<View, view_type>::value) {
+        UTL_NOEXCEPT(is_nothrow_convertible<View, view_type>::value) {
         UTL_THROW_IF(pos > size(),
             program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
                                     "Reason=[index out of range]"));
@@ -1168,7 +1168,7 @@ public:
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(is_convertible<View, view_type>::value)>
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count, View const& view,
         size_type pos2, size_type count2 = npos) const
-        noexcept(!utl::with_exceptions && is_nothrow_convertible<View, view_type>::value) {
+        UTL_NOEXCEPT(is_nothrow_convertible<View, view_type>::value) {
         UTL_THROW_IF(pos > size(),
             program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
                                     "Reason=[index out of range]"));
@@ -1240,10 +1240,11 @@ private:
     }
 
     UTL_STRING_PURE static constexpr int compare_str(view_type left, view_type right) noexcept {
-        return compare_size(
-            traits_type::compare(left.data(), right.data(), min(left.size(), right.size())),
+        return compare_size(traits_type::compare(left.data(), right.data(),
+                                UTL_SCOPE numeric_min(left.size(), right.size())),
             left.size(), right.size());
     }
+
     UTL_STRING_CONST static constexpr int compare_size(
         int strcmp, size_type left, size_type right) noexcept {
         return strcmp != 0 ? strcmp : left == right ? 0 : left < right ? -1 : 1;
@@ -1313,7 +1314,7 @@ private:
         }
     }
 
-    UTL_CONSTEXPR_CXX14 void reset_to_short() && {
+    UTL_CONSTEXPR_CXX14 void reset_to_short() && noexcept {
         // constexpr only if `is_heap_` is `false` because constexpr placement new is not portable
         if (is_heap_) {
             size_ = 0;
@@ -1327,10 +1328,34 @@ private:
     UTL_CONSTEXPR_CXX14 void move_assign(basic_short_string& other, true_type) noexcept {
         destroy();
         storage_.first() = other.storage_.first();
-        alloc_traits::assign(allocator_ref(), move(other.allocator_ref()));
+        alloc_traits::assign(allocator_ref(), UTL_SCOPE move(other.allocator_ref()));
         size_ = other.size_;
         is_heap_ = other.is_heap_;
 
+        UTL_SCOPE move(other).reset_to_short();
+    }
+
+    UTL_CONSTEXPR_CXX14 void inline_substring(size_type pos, size_type count) noexcept {
+        auto const new_size = UTL_SCOPE numeric_min(this->size() - pos, count);
+        traits_type::move(this->data(), this->data() + pos, new_size);
+        this->resize(new_size);
+    }
+
+    UTL_CONSTEXPR_CXX14 void on_move_construct_with_alloc(
+        basic_short_string& other, size_type pos, size_type count, true_type) UTL_THROWS {
+        if (!alloc_traits::equals(allocator_ref(), other.allocator_ref()) && other.is_heap_) {
+            storage_.get_heap() = clone_heap(allocator_ref(), other);
+
+            inline_substring(pos, count);
+        } else {
+            on_move_construct_with_alloc(other, pos, count, false_type{});
+        }
+    }
+
+    UTL_CONSTEXPR_CXX14 void on_move_construct_with_alloc(
+        basic_short_string& other, size_type pos, size_type count, false_type) noexcept {
+
+        inline_substring(pos, count);
         UTL_SCOPE move(other).reset_to_short();
     }
 
@@ -1359,6 +1384,12 @@ private:
      */
     size_type is_heap_ : 1;
 };
+
+#if !UTL_CXX14
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+constexpr typename basic_short_string<CharT, N, Traits, Alloc>::size_type
+    basic_short_string<CharT, N, Traits, Alloc>::npos;
+#endif
 
 template <typename CharT, size_t N, typename Traits, typename Alloc, typename U>
 UTL_CONSTEXPR_CXX14 typename basic_short_string<CharT, N, Traits, Alloc>::size_type erase(
