@@ -2,13 +2,14 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/iterator/utl_iter_reference_t.h"
 #include "utl/iterator/utl_iter_value_t.h"
 #include "utl/iterator/utl_iterator_concept_t.h"
 #include "utl/iterator/utl_iterator_tags.h"
 #include "utl/iterator/utl_random_access_iterator.h"
-#include "utl/memory/utl_pointer_traits.h"
-#include "utl/preprocessor/utl_config.h"
+#include "utl/memory/utl_to_address.h"
 #include "utl/type_traits/utl_add_pointer.h"
 #include "utl/type_traits/utl_remove_cvref.h"
 
