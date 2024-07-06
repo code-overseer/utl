@@ -54,7 +54,7 @@ public:
     using const_reference = CharType const&;
     using alloc_traits = allocator_traits<allocator_type>;
     using view_type = basic_string_view<value_type, traits_type>;
-    static constexpr size_type npos = (size_type)-1;
+    static constexpr size_type npos = details::string::npos;
     class iterator;
     class const_iterator;
 
@@ -900,8 +900,7 @@ public:
 
     UTL_STRING_PURE constexpr size_type find(
         const_pointer str, size_type pos, size_type str_len) const noexcept {
-        return details::string::to_index(
-            data(), details::string::find<traits_type>(data(), size(), str, str_len, pos));
+        return details::string::find<traits_type>(data(), size(), str, str_len, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find(const_pointer str, size_type pos = 0) const noexcept {
@@ -909,7 +908,7 @@ public:
     }
 
     UTL_STRING_PURE constexpr size_type find(value_type ch, size_type pos = 0) const noexcept {
-        return details::string::to_index(data(), details::string::find(data(), size(), ch, pos));
+        return details::string::find<traits_type>(data(), size(), ch, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find(view_type view, size_type pos = 0) const noexcept {
@@ -930,8 +929,7 @@ public:
 
     UTL_STRING_PURE constexpr size_type rfind(
         const_pointer str, size_type pos, size_type str_len) const noexcept {
-        return details::string::to_index(
-            data(), details::string::rfind<traits_type>(data(), size(), str, str_len, pos));
+        return details::string::rfind<traits_type>(data(), size(), str, str_len, pos);
     }
 
     UTL_STRING_PURE constexpr size_type rfind(
@@ -941,8 +939,7 @@ public:
     }
 
     UTL_STRING_PURE constexpr size_type rfind(value_type ch, size_type pos = npos) const noexcept {
-        return details::string::to_index(
-            details::string::rfind<traits_type>(data(), size(), ch, pos));
+        return details::string::rfind<traits_type>(data(), size(), ch, pos);
     }
 
     UTL_STRING_PURE constexpr size_type rfind(view_type view, size_type pos = npos) const noexcept {
@@ -963,8 +960,7 @@ public:
 
     UTL_STRING_PURE constexpr size_type find_first_of(
         const_pointer chars, size_type pos, size_type chars_count) const noexcept {
-        return details::string::to_index(data(),
-            details::string::find_first_of<traits_type>(data(), size(), chars, chars_count, pos));
+        return details::string::find_first_of<traits_type>(data(), size(), chars, chars_count, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find_first_of(
@@ -974,8 +970,7 @@ public:
 
     UTL_STRING_PURE constexpr size_type find_first_of(
         value_type ch, size_type pos = 0) const noexcept {
-        return details::string::to_index(
-            data(), details::string::find_first_of<traits_type>(data(), size(), ch, pos));
+        return details::string::find_first_of<traits_type>(data(), size(), ch, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find_first_of(
@@ -997,9 +992,8 @@ public:
 
     UTL_STRING_PURE constexpr size_type find_first_not_of(
         const_pointer chars, size_type pos, size_type chars_count) const noexcept {
-        return details::string::to_index(data(),
-            details::string::find_first_not_of<traits_type>(
-                data(), size(), chars, chars_count, pos));
+        return details::string::find_first_not_of<traits_type>(
+            data(), size(), chars, chars_count, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find_first_not_of(
@@ -1031,8 +1025,7 @@ public:
 
     UTL_STRING_PURE constexpr size_type find_last_of(
         const_pointer chars, size_type pos, size_type chars_count) const noexcept {
-        return details::string::to_index(data(),
-            details::string::find_last_of<traits_type>(data(), size(), chars, chars_count, pos));
+        return details::string::find_last_of<traits_type>(data(), size(), chars, chars_count, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find_last_of(
@@ -1063,8 +1056,7 @@ public:
 
     UTL_STRING_PURE constexpr size_type find_last_not_of(
         const_pointer str, size_type pos, size_type count) const UTL_THROWS {
-        return details::string::to_index(data(),
-            details::string::find_last_not_of<traits_type>(data(), size(), str, count, pos));
+        return details::string::find_last_not_of<traits_type>(data(), size(), str, count, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find_last_not_of(
@@ -1089,7 +1081,7 @@ public:
         return find_last_not_of(view_type(view), pos);
     }
 
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(basic_short_string const& other) const noexcept {
+    UTL_STRING_PURE constexpr int compare(basic_short_string const& other) const noexcept {
         return details::string::compare<traits_type>(data(), size(), other.data(), other.size());
     }
 
@@ -1098,7 +1090,7 @@ public:
         return details::string::compare<traits_type>(data(), size(), str, traits_type::length(str));
     }
 
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(view_type view) const noexcept {
+    UTL_STRING_PURE constexpr int compare(view_type view) const noexcept {
         return details::string::compare<traits_type>(data(), size(), view.data(), view.size());
     }
 
