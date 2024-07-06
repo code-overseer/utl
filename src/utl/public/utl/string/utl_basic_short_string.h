@@ -370,28 +370,28 @@ public:
         size_ = 0;
     }
 
-    UTL_STRING_PURE constexpr iterator begin() noexcept { return iterator(data()); }
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 iterator begin() noexcept { return iterator(data()); }
     UTL_STRING_PURE constexpr const_iterator cbegin() const noexcept {
         return const_iterator(data());
     }
     UTL_STRING_PURE constexpr const_iterator begin() const noexcept {
         return const_iterator(data());
     }
-    UTL_STRING_PURE constexpr iterator end() noexcept { return iterator(data() + size()); }
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 iterator end() noexcept { return iterator(data() + size()); }
     UTL_STRING_PURE constexpr const_iterator cend() const noexcept {
         return const_iterator(data() + size());
     }
     UTL_STRING_PURE constexpr const_iterator end() const noexcept {
         return const_iterator(data() + size());
     }
-    UTL_STRING_PURE constexpr iterator rbegin() noexcept { return reverse_iterator(end()); }
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 iterator rbegin() noexcept { return reverse_iterator(end()); }
     UTL_STRING_PURE constexpr const_iterator crbegin() const noexcept {
         return const_reverse_iterator(end());
     }
     UTL_STRING_PURE constexpr const_iterator rbegin() const noexcept {
         return const_reverse_iterator(end());
     }
-    UTL_STRING_PURE constexpr iterator rend() noexcept { return reverse_iterator(begin()); }
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 iterator rend() noexcept { return reverse_iterator(begin()); }
     UTL_STRING_PURE constexpr const_iterator crend() const noexcept {
         return const_reverse_iterator(begin());
     }
@@ -399,14 +399,14 @@ public:
         return const_reverse_iterator(begin());
     }
     UTL_STRING_PURE constexpr const_reference front() const noexcept { return *data(); }
-    UTL_STRING_PURE constexpr reference front() noexcept { return *data(); }
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 reference front() noexcept { return *data(); }
     UTL_STRING_PURE constexpr const_reference back() const noexcept { return data()[size() - 1]; }
-    UTL_STRING_PURE constexpr reference back() noexcept { return data()[size() - 1]; }
-    UTL_STRING_PURE constexpr reference operator[](size_type idx) noexcept { return data()[idx]; }
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 reference back() noexcept { return data()[size() - 1]; }
     UTL_STRING_PURE constexpr const_reference operator[](size_type idx) const noexcept {
         return data()[idx];
     }
-    UTL_STRING_PURE constexpr reference at(size_type idx) UTL_THROWS {
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 reference operator[](size_type idx) noexcept { return data()[idx]; }
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 reference at(size_type idx) UTL_THROWS {
         return const_cast<reference>(as_const(*this).data()[idx]);
     }
     UTL_STRING_PURE constexpr const_reference at(size_type idx) const UTL_THROWS {
@@ -893,229 +893,237 @@ public:
         l.swap(r);
     }
 
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find(
-        basic_short_string const& str, size_type pos = 0) const UTL_THROWS {
-        UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] `basic_short_string::find` operation failed, "
-                                    "Reason=[index out of range]"));
-        return to_index(data(),
-            UTL_SCOPE details::string::find<traits_type>(
-                data(), size(), str.data(), str.size(), pos));
+    UTL_STRING_PURE constexpr size_type find(
+        basic_short_string const& str, size_type pos = 0) const noexcept {
+        return find(str.data(), pos, str.size());
     }
 
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find(
-        const_pointer str, size_type pos, size_type count) const UTL_THROWS {
-        UTL_ASSERT(str != nullptr);
-        UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] `basic_short_string::find` operation failed, "
-                                    "Reason=[index out of range]"));
-        return to_index(
-            data(), details::string::find<traits_type>(data(), size(), str, count, pos));
+    UTL_STRING_PURE constexpr size_type find(
+        const_pointer str, size_type pos, size_type str_len) const noexcept {
+        return details::string::to_index(
+            data(), details::string::find<traits_type>(data(), size(), str, str_len, pos));
     }
 
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find(const_pointer str, size_type pos = 0) const UTL_THROWS {
-        UTL_ASSERT(str != nullptr);
-        return find(str, pos, traits_type::length(str));
+    UTL_STRING_PURE constexpr size_type find(const_pointer str, size_type pos = 0) const noexcept {
+        return str != nullptr ? find(str, pos, traits_type::length(str)) : npos;
     }
 
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find(value_type ch, size_type pos = 0) const UTL_THROWS {
-        UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] `basic_short_string::find` operation failed, "
-                                    "Reason=[index out of range]"));
-        auto const v = view_type(*this).substr(pos);
-        return to_index(data(), traits_type::find(v.data(), v.size(), ch));
+    UTL_STRING_PURE constexpr size_type find(value_type ch, size_type pos = 0) const noexcept {
+        return details::string::to_index(data(), details::string::find(data(), size(), ch, pos));
     }
 
-    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(is_convertible<View, view_type>::value)>
-    UTL_CONSTEXPR_CXX14 size_type find(View const& view, size_type pos = 0) const
-        noexcept(!utl::with_exceptions && is_nothrow_convertible<View, view_type>::value) {
-        view_type const v(view);
-        return find(v.data(), pos, v.size());
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type rfind(
-        basic_short_string const& str, size_type pos = npos) const noexcept {
-        return to_index(data(),
-            details::string::rfind<traits_type>(
-                data(), size_clamp(last_to_size(pos)), str.data(), str.size()));
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type rfind(
-        const_pointer str, size_type pos, size_type count) const noexcept {
-        return to_index(data(),
-            details::string::rfind<traits_type>(data(), size_clamp(last_to_size(pos)), str, count));
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type rfind(
-        const_pointer str, size_type pos = npos) const noexcept {
-        return to_index(data(),
-            details::string::rfind<traits_type>(
-                data(), size_clamp(last_to_size(pos)), str, Traits::length(str)));
-    }
-
-    UTL_STRING_PURE constexpr size_type rfind(value_type ch, size_type pos = npos) const noexcept {
-        return to_index(data(), details::string::rfind(data(), size_clamp(last_to_size(pos)), ch));
-    }
-
-    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(is_convertible<View, view_type>::value)>
-    UTL_CONSTEXPR_CXX14 size_type rfind(View const& view, size_type pos = npos) const
-        noexcept(is_nothrow_convertible<View, view_type>::value) {
-        view_type const v(view);
-        return rfind(v.data(), pos, v.size());
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_first_of(
-        basic_short_string const& str, size_type pos = 0) const UTL_THROWS {
-        UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] `basic_short_string::find_first_of` operation failed, "
-                                    "Reason=[index out of range]"));
-        return to_index(data(),
-            details::string::find_first_of<traits_type>(
-                data() + pos, size() - pos, str.data(), str.size()));
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_first_of(
-        const_pointer str, size_type pos, size_type count) const UTL_THROWS {
-        UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] `basic_short_string::find_first_of` operation failed, "
-                                    "Reason=[index out of range]"));
-        return to_index(data(),
-            details::string::find_first_of<traits_type>(data() + pos, size() - pos, str, count));
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_first_of(const_pointer str, size_type pos = 0) const {
-        UTL_ASSERT(str != nullptr);
-        return find_first_of(str, pos, traits_type::length(str));
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_first_of(value_type ch, size_type pos = 0) const {
-        UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] `basic_short_string::find_first_of` operation failed, "
-                                    "Reason=[index out of range]"));
-        return to_index(data(), traits_type::find(data() + pos, size() - pos, ch));
-    }
-
-    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(is_convertible<View, view_type>::value)>
-    UTL_CONSTEXPR_CXX14 size_type find_first_of(View const& view, size_type pos = 0) const
-        noexcept(!utl::with_exceptions && is_nothrow_convertible<View, view_type>::value) {
-        view_type const v(view);
-        return find_first_of(v.data(), pos, v.size());
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_first_not_of(
-        basic_short_string const& str, size_type pos = 0) const UTL_THROWS {
-        UTL_THROW_IF(pos > size(),
-            program_exception<void>(
-                "[UTL] `basic_short_string::find_first_not_of` operation failed, "
-                "Reason=[index out of range]"));
-        return to_index(data(),
-            details::string::find_first_not_of<traits_type>(
-                data() + pos, size() - pos, str.data(), str.size()));
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_first_not_of(
-        const_pointer str, size_type pos, size_type count) const UTL_THROWS {
-        UTL_THROW_IF(pos > size(),
-            program_exception<void>(
-                "[UTL] `basic_short_string::find_first_not_of` operation failed, "
-                "Reason=[index out of range]"));
-        return to_index(data(),
-            details::string::find_first_not_of<traits_type>(
-                data() + pos, size() - pos, str, count));
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_first_not_of(
-        const_pointer str, size_type pos = 0) const noexcept(!with_exceptions) {
-        return find_first_not_of(str, pos, traits_type::length(str));
-    }
-
-    UTL_STRING_PURE
-    UTL_CONSTEXPR_CXX14 size_type find_first_not_of(value_type ch, size_type pos = 0) const
-        noexcept(!with_exceptions) {
-        return find_first_not_of(&ch, pos, 1);
-    }
-
-    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(is_convertible<View, view_type>::value)>
-    UTL_STRING_PURE
-    UTL_CONSTEXPR_CXX14 size_type find_first_not_of(View const& view, size_type pos = 0) const
-        noexcept(!utl::with_exceptions && is_nothrow_convertible<View, view_type>::value) {
-        view_type const v(view);
-        return find_first_not_of(v.data(), pos, v.size());
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_last_of(
-        basic_short_string const& str, size_type pos = npos) const noexcept {
-        return to_index(data(),
-            details::string::find_last_of<traits_type>(
-                data(), size_clamp(last_to_size(pos)), str.data(), str.size()));
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_last_of(
-        const_pointer str, size_type pos, size_type count) const noexcept {
-        UTL_ASSERT(str != nullptr);
-        return to_index(data(),
-            details::string::find_last_of<traits_type>(
-                data(), size_clamp(last_to_size(pos)), str, count));
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_last_of(
-        const_pointer str, size_type pos = npos) const noexcept {
-        UTL_ASSERT(str != nullptr);
-        return find_last_of(str, pos, traits_type::length(str));
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_last_of(
-        value_type ch, size_type pos = npos) const noexcept {
-        return find_last_of(&ch, pos, 1);
-    }
-
-    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(is_convertible<View, view_type>::value)>
-    UTL_CONSTEXPR_CXX14 size_type find_last_of(View const& view, size_type pos = npos) const
-        noexcept(is_nothrow_convertible<View, view_type>::value) {
-        view_type const v(view);
-        return find_last_of(v.data(), pos, v.size());
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_last_not_of(
-        basic_short_string const& str, size_type pos = npos) const noexcept {
-        return to_index(data(),
-            details::string::find_last_not_of<traits_type>(
-                data(), size_clamp(last_to_size(pos)), str.data(), str.size()));
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_last_not_of(
-        const_pointer str, size_type pos, size_type count) const noexcept {
-        return to_index(data(),
-            details::string::find_last_not_of<traits_type>(
-                data(), size_clamp(last_to_size(pos)), str, count));
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_last_not_of(
-        const_pointer str, size_type pos = npos) const noexcept {
-        UTL_ASSERT(str != nullptr);
-        return find_last_not_of(str, pos, traits_type::length(str));
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_last_not_of(
-        value_type ch, size_type pos = npos) const noexcept {
-        return find_last_not_of(&ch, pos, 1);
+    UTL_STRING_PURE constexpr size_type find(view_type view, size_type pos = 0) const noexcept {
+        return find(view.data(), pos, view.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 size_type find_last_not_of(View const& view,
-        size_type pos = npos) const noexcept(is_nothrow_convertible<View, view_type>::value) {
-        view_type const v(view);
-        return find_last_not_of(v.data(), pos, v.size());
+    UTL_ATTRIBUTE(NODISCARD) constexpr size_type find(View const& view, size_type pos = 0) const
+        noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
+        return find(view_type(view), pos);
     }
 
-    UTL_STRING_PURE constexpr int compare(basic_short_string const& other) const noexcept {
-        return compare_str(view_type(*this), view_type(other));
+    UTL_STRING_PURE constexpr size_type rfind(
+        basic_short_string const& str, size_type pos = npos) const noexcept {
+        return rfind(str.data(), pos, str.size());
+    }
+
+    UTL_STRING_PURE constexpr size_type rfind(
+        const_pointer str, size_type pos, size_type str_len) const noexcept {
+        return details::string::to_index(
+            data(), details::string::rfind<traits_type>(data(), size(), str, str_len, pos));
+    }
+
+    UTL_STRING_PURE constexpr size_type rfind(
+        const_pointer str, size_type pos = npos) const noexcept {
+        UTL_ASSERT(str != nullptr);
+        return rfind(str, pos, traits_type::length(str));
+    }
+
+    UTL_STRING_PURE constexpr size_type rfind(value_type ch, size_type pos = npos) const noexcept {
+        return details::string::to_index(
+            details::string::rfind<traits_type>(data(), size(), ch, pos));
+    }
+
+    UTL_STRING_PURE constexpr size_type rfind(view_type view, size_type pos = npos) const noexcept {
+        return rfind(view.data(), pos, view.size());
+    }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
+        is_convertible<View, view_type>::value)>
+    UTL_ATTRIBUTE(NODISCARD) constexpr size_type rfind(View const& view, size_type pos = npos) const
+        noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
+        return rfind(view_type(view), pos);
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_of(
+        basic_short_string const& str, size_type pos = 0) const noexcept {
+        return pos < size() ? details::string::to_index(data(),
+                                  details::string::find_first_of<traits_type>(
+                                      data() + pos, size() - pos, str.data(), str.size()))
+                            : npos;
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_of(
+        const_pointer chars, size_type pos, size_type chars_count) const noexcept {
+        return pos < size() ? details::string::to_index(data(),
+                                  details::string::find_first_of<traits_type>(
+                                      data() + pos, size() - pos, chars, chars_count))
+                            : npos;
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_of(
+        const_pointer str, size_type pos = 0) const noexcept {
+        return str != nullptr ? find_first_of(str, pos, traits_type::length(str)) : npos;
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_of(
+        value_type ch, size_type pos = 0) const noexcept {
+        return pos < size()
+            ? details::string::to_index(data(), traits_type::find(data() + pos, size() - pos, ch))
+            : npos;
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_of(
+        view_type view, size_type pos = 0) const noexcept {
+        return find_first_of(view.data(), pos, view.size());
+    }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
+        is_convertible<View, view_type>::value)>
+    UTL_ATTRIBUTE(NODISCARD) constexpr size_type find_first_of(View const& view, size_type pos = 0) const
+        noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
+        return find_first_of(view_type(view), pos);
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_not_of(
+        basic_short_string const& str, size_type pos = 0) const noexcept {
+        return pos < size() ? details::string::to_index(data(),
+                                  details::string::find_first_not_of<traits_type>(
+                                      data() + pos, size() - pos, str.data(), str.size()))
+                            : npos;
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_not_of(
+        const_pointer str, size_type pos, size_type count) const noexcept {
+        return pos < size() ? details::string::to_index(data(),
+                                  details::string::find_first_not_of<traits_type>(
+                                      data() + pos, size() - pos, str, count))
+                            : npos;
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_not_of(
+        const_pointer str, size_type pos = 0) const noexcept {
+        return pos < size() ? details::string::to_index(data(),
+                                  details::string::find_first_not_of<traits_type>(
+                                      data() + pos, size() - pos, str, traits_type::length(str)))
+                            : npos;
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_not_of(
+        value_type ch, size_type pos = 0) const noexcept {
+        return find_first_not_of(&ch, pos, 1);
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_not_of(
+        view_type view, size_type pos = 0) const noexcept {
+        return find_first_not_of(view.data(), pos, view.size());
+    }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
+        is_convertible<View, view_type>::value)>
+    UTL_ATTRIBUTE(NODISCARD) constexpr size_type find_first_not_of(View const& view, size_type pos = 0) const
+        noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
+        return find_first_not_of(view_type(view), pos);
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_of(
+        basic_short_string const& str, size_type pos = npos) const noexcept {
+        return details::string::to_index(data(),
+            details::string::find_last_of<traits_type>(
+                data(), size_clamp(last_to_size(pos)), str.data(), str.size()));
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_of(
+        const_pointer str, size_type pos, size_type count) const noexcept {
+        return str != nullptr ? details::string::to_index(data(),
+                                    details::string::find_last_of<traits_type>(
+                                        data(), size_clamp(last_to_size(pos)), str, count))
+                              : npos;
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_of(
+        const_pointer str, size_type pos = npos) const noexcept {
+        return str != nullptr
+            ? details::string::to_index(data(),
+                  details::string::find_last_of<traits_type>(
+                      data(), size_clamp(last_to_size(pos)), str, traits_type::length(str)))
+            : npos;
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_of(
+        value_type ch, size_type pos = npos) const noexcept {
+        return find_last_of(&ch, pos, 1);
+    }
+
+    constexpr size_type find_last_of(view_type view, size_type pos = npos) const noexcept {
+        return find_last_of(view.data(), pos, view.size());
+    }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
+        is_convertible<View, view_type>::value)>
+    constexpr size_type find_last_of(View const& view, size_type pos = npos) const
+        noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
+        return find_last_of(view_type(view), pos);
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_not_of(
+        basic_short_string const& str, size_type pos = npos) const noexcept {
+        return details::string::to_index(data(),
+            details::string::find_last_not_of<traits_type>(
+                data(), size_clamp(last_to_size(pos)), str.data(), str.size()));
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_not_of(
+        const_pointer str, size_type pos, size_type count) const UTL_THROWS {
+        return details::string::to_index(data(),
+            details::string::find_last_not_of<traits_type>(
+                data(), size_clamp(last_to_size(pos)), str, count));
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_not_of(
+        const_pointer str, size_type pos = npos) const UTL_THROWS {
+        return str != nullptr
+            ? details::string::to_index(data(),
+                  details::string::find_last_not_of<traits_type>(
+                      data(), size_clamp(last_to_size(pos)), str, traits_type::length(str)))
+            : npos;
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_not_of(
+        value_type ch, size_type pos = npos) const UTL_THROWS {
+        return find_last_not_of(&ch, pos, 1);
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_not_of(
+        view_type view, size_type pos = npos) const UTL_THROWS {
+        return find_last_not_of(view.data(), pos, view.size());
+    }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
+        is_convertible<View, view_type>::value)>
+    UTL_ATTRIBUTE(NODISCARD) constexpr size_type find_last_not_of(View const& view, size_type pos = npos) const UTL_NOEXCEPT(
+        UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
+        return find_last_not_of(view_type(view), pos);
+    }
+
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(basic_short_string const& other) const noexcept {
+        return details::string::compare<traits_type>(data(), size(), other.data(), other.size());
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
         size_type pos, size_type count, basic_short_string const& other) const UTL_THROWS {
-        return compare(pos, count, other, 0);
+        return compare(pos, count, other.data(), other.size());
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
@@ -1126,22 +1134,22 @@ public:
         UTL_THROW_IF(pos2 > other.size(),
             program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
                                     "Reason=[argument index out of range]"));
-        return compare_str(
-            view_type(*this).substr(pos, count), view_type(other).substr(pos2, count2));
+        return details::string::compare<traits_type>(data() + pos, substr_clamp(pos, count),
+            other.data() + pos2, other.substr_clamp(pos2, count2));
     }
 
-    UTL_STRING_PURE constexpr int compare(const_pointer str) const noexcept {
-        UTL_ASSERT_CXX14(str != nullptr);
-        return compare_str(view_type(*this), view_type(str));
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(const_pointer str) const noexcept {
+        UTL_ASSERT(str != nullptr);
+        return details::string::compare<traits_type>(data(), size(), str, traits_type::length(str));
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
         size_type pos, size_type count, const_pointer str, size_type count2) const UTL_THROWS {
-        UTL_ASSERT(str != nullptr);
         UTL_THROW_IF(pos > size(),
             program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
                                     "Reason=[index out of range]"));
-        return compare_str(view_type(*this).substr(pos, count), view_type(str, count2));
+        return details::string::compare<traits_type>(
+            data() + pos, substr_clamp(pos, count), str, count2);
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
@@ -1150,29 +1158,47 @@ public:
         return compare(pos, count, str, traits_type::length(str));
     }
 
-    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(is_convertible<View, view_type>::value)>
-    UTL_STRING_PURE constexpr int compare(View const& view) const
-        UTL_NOEXCEPT(is_nothrow_convertible<View, view_type>::value) {
-        return compare_str(view_type(*this), view);
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(view_type view) const noexcept {
+        return details::string::compare<traits_type>(data(), size(), view.data(), view.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(is_convertible<View, view_type>::value)>
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count, View const& view) const
-        UTL_NOEXCEPT(is_nothrow_convertible<View, view_type>::value) {
+    UTL_ATTRIBUTE(NODISCARD) UTL_CONSTEXPR_CXX14 int compare(View const& view) const
+        noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
+        return compare(view_type(view));
+    }
+
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
+        size_type pos, size_type count, view_type view) const UTL_THROWS {
         UTL_THROW_IF(pos > size(),
             program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
                                     "Reason=[index out of range]"));
-        return compare_str(view_type(*this).substr(pos, count), view);
+        return details::string::compare<traits_type>(
+            data() + pos, substr_clamp(pos, count), view.data(), view.size());
     }
 
-    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(is_convertible<View, view_type>::value)>
+    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
+        is_convertible<View, view_type>::value)>
+    UTL_ATTRIBUTE(NODISCARD)
+    UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count, View const& view) const UTL_NOEXCEPT(
+        UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
+        return compare(pos, count, view_type(view));
+    }
+
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count, view_type view,
+        size_type pos2, size_type count2 = npos) const UTL_THROWS {
+        UTL_THROW_IF(pos2 > view.size(),
+            program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
+                                    "Reason=[argument index out of range]"));
+        return compare(pos, count, view.substr(pos2, count2));
+    }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
+        is_convertible<View, view_type>::value)>
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count, View const& view,
-        size_type pos2, size_type count2 = npos) const
-        UTL_NOEXCEPT(is_nothrow_convertible<View, view_type>::value) {
-        UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
-                                    "Reason=[index out of range]"));
-        return compare_str(view_type(*this).substr(pos, count), view, pos2, count2);
+        size_type pos2, size_type count2 = npos) const UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_convertible(View,
+        view_type)) {
+        return compare(pos, count, view_type(view), pos2, count2);
     }
 
     constexpr bool starts_with(view_type view) const noexcept {
@@ -1182,8 +1208,7 @@ public:
     constexpr bool starts_with(value_type ch) const noexcept { return !empty() && front() == ch; }
 
     constexpr bool starts_with(const_pointer str) const noexcept {
-        UTL_ASSERT_CXX14(str != nullptr);
-        return starts_with(view_type(str));
+        return str != nullptr ? starts_with(view_type(str)) : false;
     }
 
     constexpr bool ends_with(view_type view) const noexcept {
@@ -1195,8 +1220,7 @@ public:
     constexpr bool ends_with(value_type ch) const noexcept { return !empty() && back() == ch; }
 
     constexpr bool ends_with(const_pointer str) const noexcept {
-        UTL_ASSERT_CXX14(str != nullptr);
-        return ends_with(view_type(str));
+        return str != nullptr ? ends_with(view_type(str)) : false;
     }
 
     constexpr bool contains(view_type view) const noexcept { return find(view) != npos; }
@@ -1205,49 +1229,35 @@ public:
         return traits_type::find(data(), size(), ch) != nullptr;
     }
 
-    constexpr bool contains(const_pointer str) const noexcept {
-        UTL_ASSERT_CXX14(str != nullptr);
+    UTL_CONSTEXPR_CXX14 bool contains(const_pointer str) const noexcept {
+        UTL_ASSERT(str != nullptr);
         return contains(view_type(str));
     }
 
-    UTL_CONSTEXPR_CXX14 basic_short_string substr(size_type pos = 0, size_type count = npos) const& {
+    constexpr basic_short_string substr(size_type pos = 0, size_type count = npos) const& {
         return basic_short_string(*this, pos, count);
     }
 
-    UTL_CONSTEXPR_CXX14 basic_short_string substr(size_type pos = 0, size_type count = npos) const&& {
-        return basic_short_string(move(*this), pos, count);
+    constexpr basic_short_string substr(size_type pos = 0, size_type count = npos) const&& {
+        return basic_short_string(UTL_SCOPE move(*this), pos, count);
     }
 
 private:
-    UTL_STRING_PURE static constexpr size_type to_index(
-        const_pointer base, const_pointer ptr) noexcept {
-        return ptr ? ptr - base : npos;
-    }
     UTL_STRING_PURE constexpr size_type last_to_size(size_type val) noexcept {
         return val + (val < size());
     }
 
+    UTL_STRING_CONST static constexpr size_type size_clamp(size_type val, size_type max) noexcept {
+        return val > max ? max : val;
+    }
+
     UTL_STRING_PURE constexpr size_type size_clamp(size_type val) const noexcept {
-        return val > size() ? size() : val;
+        return size_clamp(val, size());
     }
 
-    UTL_STRING_PURE static UTL_CONSTEXPR_CXX14 int compare_str(
-        view_type left, view_type right, size_type pos2, size_type count2) UTL_THROWS {
-        UTL_THROW_IF(pos2 > right.size(),
-            program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
-                                    "Reason=[index out of range]"));
-        return compare_str(left, right.substr(pos2, count2));
-    }
-
-    UTL_STRING_PURE static constexpr int compare_str(view_type left, view_type right) noexcept {
-        return compare_size(traits_type::compare(left.data(), right.data(),
-                                UTL_SCOPE numeric_min(left.size(), right.size())),
-            left.size(), right.size());
-    }
-
-    UTL_STRING_CONST static constexpr int compare_size(
-        int strcmp, size_type left, size_type right) noexcept {
-        return strcmp != 0 ? strcmp : left == right ? 0 : left < right ? -1 : 1;
+    UTL_STRING_PURE constexpr size_type substr_clamp(
+        size_type pos, size_type count) const noexcept {
+        return size_clamp(count, size() - pos);
     }
 
     UTL_CONSTEXPR_CXX14 void swap(basic_short_string& other, false_type) noexcept {
@@ -1385,7 +1395,7 @@ private:
     size_type is_heap_ : 1;
 };
 
-#if !UTL_CXX14
+#if !UTL_CXX17
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 constexpr typename basic_short_string<CharT, N, Traits, Alloc>::size_type
     basic_short_string<CharT, N, Traits, Alloc>::npos;
