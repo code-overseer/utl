@@ -957,19 +957,14 @@ public:
     }
 
     UTL_STRING_PURE constexpr size_type find_first_of(
-        basic_short_string const& str, size_type pos = 0) const noexcept {
-        return pos < size() ? details::string::to_index(data(),
-                                  details::string::find_first_of<traits_type>(
-                                      data() + pos, size() - pos, str.data(), str.size()))
-                            : npos;
+        basic_short_string const& chars, size_type pos = 0) const noexcept {
+        return find_first_of(chars.data(), pos, chars.size());
     }
 
     UTL_STRING_PURE constexpr size_type find_first_of(
         const_pointer chars, size_type pos, size_type chars_count) const noexcept {
-        return pos < size() ? details::string::to_index(data(),
-                                  details::string::find_first_of<traits_type>(
-                                      data() + pos, size() - pos, chars, chars_count))
-                            : npos;
+        return details::string::to_index(data(),
+            details::string::find_first_of<traits_type>(data(), size(), chars, chars_count, pos));
     }
 
     UTL_STRING_PURE constexpr size_type find_first_of(
@@ -979,9 +974,8 @@ public:
 
     UTL_STRING_PURE constexpr size_type find_first_of(
         value_type ch, size_type pos = 0) const noexcept {
-        return pos < size()
-            ? details::string::to_index(data(), traits_type::find(data() + pos, size() - pos, ch))
-            : npos;
+        return details::string::to_index(
+            data(), details::string::find_first_of<traits_type>(data(), size(), ch, pos));
     }
 
     UTL_STRING_PURE constexpr size_type find_first_of(
@@ -997,27 +991,20 @@ public:
     }
 
     UTL_STRING_PURE constexpr size_type find_first_not_of(
-        basic_short_string const& str, size_type pos = 0) const noexcept {
-        return pos < size() ? details::string::to_index(data(),
-                                  details::string::find_first_not_of<traits_type>(
-                                      data() + pos, size() - pos, str.data(), str.size()))
-                            : npos;
+        basic_short_string const& chars, size_type pos = 0) const noexcept {
+        return find_first_not_of(chars.data(), pos, chars.size());
     }
 
     UTL_STRING_PURE constexpr size_type find_first_not_of(
-        const_pointer str, size_type pos, size_type count) const noexcept {
-        return pos < size() ? details::string::to_index(data(),
-                                  details::string::find_first_not_of<traits_type>(
-                                      data() + pos, size() - pos, str, count))
-                            : npos;
+        const_pointer chars, size_type pos, size_type chars_count) const noexcept {
+        return details::string::to_index(data(),
+            details::string::find_first_not_of<traits_type>(
+                data(), size(), chars, chars_count, pos));
     }
 
     UTL_STRING_PURE constexpr size_type find_first_not_of(
-        const_pointer str, size_type pos = 0) const noexcept {
-        return pos < size() ? details::string::to_index(data(),
-                                  details::string::find_first_not_of<traits_type>(
-                                      data() + pos, size() - pos, str, traits_type::length(str)))
-                            : npos;
+        const_pointer chars, size_type pos = 0) const noexcept {
+        return chars != nullptr ? find_first_not_of(chars, pos, traits_type::length(chars)) : npos;
     }
 
     UTL_STRING_PURE constexpr size_type find_first_not_of(
@@ -1038,27 +1025,19 @@ public:
     }
 
     UTL_STRING_PURE constexpr size_type find_last_of(
-        basic_short_string const& str, size_type pos = npos) const noexcept {
+        basic_short_string const& chars, size_type pos = npos) const noexcept {
+        return find_last_of(chars.data(), pos, chars.size());
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_of(
+        const_pointer chars, size_type pos, size_type chars_count) const noexcept {
         return details::string::to_index(data(),
-            details::string::find_last_of<traits_type>(
-                data(), size_clamp(last_to_size(pos)), str.data(), str.size()));
+            details::string::find_last_of<traits_type>(data(), size(), chars, chars_count, pos));
     }
 
     UTL_STRING_PURE constexpr size_type find_last_of(
-        const_pointer str, size_type pos, size_type count) const noexcept {
-        return str != nullptr ? details::string::to_index(data(),
-                                    details::string::find_last_of<traits_type>(
-                                        data(), size_clamp(last_to_size(pos)), str, count))
-                              : npos;
-    }
-
-    UTL_STRING_PURE constexpr size_type find_last_of(
-        const_pointer str, size_type pos = npos) const noexcept {
-        return str != nullptr
-            ? details::string::to_index(data(),
-                  details::string::find_last_of<traits_type>(
-                      data(), size_clamp(last_to_size(pos)), str, traits_type::length(str)))
-            : npos;
+        const_pointer chars, size_type pos = npos) const noexcept {
+        return chars != nullptr ? find_last_of(chars, pos, traits_type::length(chars)) : npos;
     }
 
     UTL_STRING_PURE constexpr size_type find_last_of(
@@ -1078,26 +1057,19 @@ public:
     }
 
     UTL_STRING_PURE constexpr size_type find_last_not_of(
-        basic_short_string const& str, size_type pos = npos) const noexcept {
-        return details::string::to_index(data(),
-            details::string::find_last_not_of<traits_type>(
-                data(), size_clamp(last_to_size(pos)), str.data(), str.size()));
+        basic_short_string const& chars, size_type pos = npos) const noexcept {
+        return find_last_not_of(chars.data(), pos, chars.size());
     }
 
     UTL_STRING_PURE constexpr size_type find_last_not_of(
         const_pointer str, size_type pos, size_type count) const UTL_THROWS {
         return details::string::to_index(data(),
-            details::string::find_last_not_of<traits_type>(
-                data(), size_clamp(last_to_size(pos)), str, count));
+            details::string::find_last_not_of<traits_type>(data(), size(), str, count, pos));
     }
 
     UTL_STRING_PURE constexpr size_type find_last_not_of(
-        const_pointer str, size_type pos = npos) const UTL_THROWS {
-        return str != nullptr
-            ? details::string::to_index(data(),
-                  details::string::find_last_not_of<traits_type>(
-                      data(), size_clamp(last_to_size(pos)), str, traits_type::length(str)))
-            : npos;
+        const_pointer chars, size_type pos = npos) const UTL_THROWS {
+        return chars != nullptr ? find_last_not_of(chars, pos, traits_type::length(chars)) : npos;
     }
 
     UTL_STRING_PURE constexpr size_type find_last_not_of(
@@ -1121,41 +1093,9 @@ public:
         return details::string::compare<traits_type>(data(), size(), other.data(), other.size());
     }
 
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
-        size_type pos, size_type count, basic_short_string const& other) const UTL_THROWS {
-        return compare(pos, count, other.data(), other.size());
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
-        basic_short_string const& other, size_type pos2, size_type count2 = npos) const UTL_THROWS {
-        UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
-                                    "Reason=[index out of range]"));
-        UTL_THROW_IF(pos2 > other.size(),
-            program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
-                                    "Reason=[argument index out of range]"));
-        return details::string::compare<traits_type>(data() + pos, substr_clamp(pos, count),
-            other.data() + pos2, other.substr_clamp(pos2, count2));
-    }
-
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(const_pointer str) const noexcept {
         UTL_ASSERT(str != nullptr);
         return details::string::compare<traits_type>(data(), size(), str, traits_type::length(str));
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
-        size_type pos, size_type count, const_pointer str, size_type count2) const UTL_THROWS {
-        UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
-                                    "Reason=[index out of range]"));
-        return details::string::compare<traits_type>(
-            data() + pos, substr_clamp(pos, count), str, count2);
-    }
-
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
-        size_type pos, size_type count, const_pointer str) const UTL_THROWS {
-        UTL_ASSERT(str != nullptr);
-        return compare(pos, count, str, traits_type::length(str));
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(view_type view) const noexcept {
@@ -1169,12 +1109,27 @@ public:
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
-        size_type pos, size_type count, view_type view) const UTL_THROWS {
+        size_type pos, size_type count, basic_short_string const& other) const UTL_THROWS {
+        return compare(pos, count, other.data(), other.size());
+    }
+
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
+        size_type pos, size_type count, const_pointer str, size_type count2) const UTL_THROWS {
         UTL_THROW_IF(pos > size(),
             program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
                                     "Reason=[index out of range]"));
-        return details::string::compare<traits_type>(
-            data() + pos, substr_clamp(pos, count), view.data(), view.size());
+        auto const view = view_type(data(), size()).substr(pos, count);
+        return details::string::compare<traits_type>(view.data(), view.size(), str, count2);
+    }
+
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
+        size_type pos, size_type count, const_pointer str) const UTL_THROWS {
+        return str != nullptr ? compare(pos, count, str, traits_type::length(str)) : str == data();
+    }
+
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
+        size_type pos, size_type count, view_type view) const UTL_THROWS {
+        return compare(pos, count, view.data(), view.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
@@ -1183,6 +1138,14 @@ public:
     UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count, View const& view) const UTL_NOEXCEPT(
         UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return compare(pos, count, view_type(view));
+    }
+
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
+        basic_short_string const& other, size_type pos2, size_type count2 = npos) const UTL_THROWS {
+        UTL_THROW_IF(pos2 > other.size(),
+            program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
+                                    "Reason=[argument index out of range]"));
+        return compare(pos, count, view_type(other).substr(pos2, count2));
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count, view_type view,
@@ -1243,23 +1206,6 @@ public:
     }
 
 private:
-    UTL_STRING_PURE constexpr size_type last_to_size(size_type val) noexcept {
-        return val + (val < size());
-    }
-
-    UTL_STRING_CONST static constexpr size_type size_clamp(size_type val, size_type max) noexcept {
-        return val > max ? max : val;
-    }
-
-    UTL_STRING_PURE constexpr size_type size_clamp(size_type val) const noexcept {
-        return size_clamp(val, size());
-    }
-
-    UTL_STRING_PURE constexpr size_type substr_clamp(
-        size_type pos, size_type count) const noexcept {
-        return size_clamp(count, size() - pos);
-    }
-
     UTL_CONSTEXPR_CXX14 void swap(basic_short_string& other, false_type) noexcept {
         ranges::swap(storage_.first(), other.storage_.first());
         auto size_tmp = size_;

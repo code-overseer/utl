@@ -285,38 +285,80 @@ inline UTL_CONSTEXPR_CXX14 CharType const* rfind(CharType const* const l, size_t
 
 template <typename Traits, typename T>
 UTL_ATTRIBUTES(NODISCARD, PURE)
-constexpr T* find_first_of(
-    T const* str, element_count_t len, T const* chars, element_count_t char_count) noexcept {
+constexpr T* find_first_of(T const* str, size_t len, T const* chars, size_t char_count) noexcept {
     return UTL_CONSTANT_P((str != chars) + len + char_count)
-        ? compile_time::find_first_of<Traits>(str, len, chars, char_count)
-        : runtime::find_first_of<Traits>(str, len, chars, char_count);
+        ? compile_time::find_first_of<Traits>(
+              str, element_count_t(len), chars, element_count_t(char_count))
+        : runtime::find_first_of<Traits>(
+              str, element_count_t(len), chars, element_count_t(char_count));
+}
+
+template <typename Traits, typename T>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+constexpr T* find_first_of(
+    T const* str, size_t len, T const* chars, size_t char_count, size_t pos) noexcept {
+    return find_first_of<Traits>(
+        str + UTL_SCOPE numeric_min(pos, len), saturated_subtract(len, pos), chars, char_count);
+}
+
+template <typename Traits, typename T>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+constexpr T* find_first_of(T const* str, size_t len, T const ch, size_t pos) noexcept {
+    return Traits::find(str + UTL_SCOPE numeric_min(pos, len), saturated_subtract(len, pos), ch);
 }
 
 template <typename Traits, typename T>
 UTL_ATTRIBUTES(NODISCARD, PURE)
 constexpr T* find_first_not_of(
-    T const* str, element_count_t len, T const* chars, element_count_t char_count) noexcept {
+    T const* str, size_t len, T const* chars, size_t char_count) noexcept {
     return UTL_CONSTANT_P((str != chars) + len + char_count)
-        ? compile_time::find_first_not_of<Traits>(str, len, chars, char_count)
-        : runtime::find_first_not_of<Traits>(str, len, chars, char_count);
+        ? compile_time::find_first_not_of<Traits>(
+              str, element_count_t(len), chars, element_count_t(char_count))
+        : runtime::find_first_not_of<Traits>(
+              str, element_count_t(len), chars, element_count_t(char_count));
+}
+
+template <typename Traits, typename T>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+constexpr T* find_first_not_of(
+    T const* str, size_t len, T const* chars, size_t char_count, size_t pos) noexcept {
+    return find_first_not_of<Traits>(
+        str + UTL_SCOPE numeric_min(pos, len), saturated_subtract(len, pos), chars, char_count);
+}
+
+template <typename Traits, typename T>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+constexpr T* find_last_of(T const* str, size_t len, T const* chars, size_t char_count) noexcept {
+    return UTL_CONSTANT_P((str != chars) + len + char_count)
+        ? compile_time::find_last_of<Traits>(
+              str, str + element_count_t(len - 1), chars, element_count_t(char_count))
+        : runtime::find_last_of<Traits>(
+              str, str + element_count_t(len - 1), chars, element_count_t(char_count));
 }
 
 template <typename Traits, typename T>
 UTL_ATTRIBUTES(NODISCARD, PURE)
 constexpr T* find_last_of(
-    T const* str, element_count_t len, T const* chars, element_count_t char_count) noexcept {
-    return UTL_CONSTANT_P((str != chars) + len + char_count)
-        ? compile_time::find_last_of<Traits>(str, str + len - 1, chars, char_count)
-        : runtime::find_last_of<Traits>(str, str + len - 1, chars, char_count);
+    T const* str, size_t len, T const* chars, size_t char_count, size_t pos) noexcept {
+    return find_last_of(str, UTL_SCOPE numeric_min(len, pos), chars, char_count);
 }
 
 template <typename Traits, typename T>
 UTL_ATTRIBUTES(NODISCARD, PURE)
 constexpr T* find_last_not_of(
-    T const* str, element_count_t len, T const* chars, element_count_t char_count) noexcept {
+    T const* str, size_t len, T const* chars, size_t char_count) noexcept {
     return UTL_CONSTANT_P((str != chars) + len + char_count)
-        ? compile_time::find_last_not_of<Traits>(str, str + len - 1, chars, char_count)
-        : runtime::find_last_not_of<Traits>(str, str + len - 1, chars, char_count);
+        ? compile_time::find_last_not_of<Traits>(
+              str, str + element_count_t(len - 1), chars, element_count_t(char_count))
+        : runtime::find_last_not_of<Traits>(
+              str, str + element_count_t(len - 1), chars, element_count_t(char_count));
+}
+
+template <typename Traits, typename T>
+UTL_ATTRIBUTES(NODISCARD, PURE)
+constexpr T* find_last_not_of(
+    T const* str, size_t len, T const* chars, size_t char_count, size_t pos) noexcept {
+    return find_last_not_of(str, UTL_SCOPE numeric_min(len, pos), chars, char_count);
 }
 
 UTL_ATTRIBUTES(NODISCARD, CONST)
@@ -326,11 +368,9 @@ constexpr int compare_size(int strcmp, size_t left, size_t right) noexcept {
 
 template <typename Traits, typename T>
 UTL_ATTRIBUTES(NODISCARD, PURE)
-UTL_CONSTEXPR_CXX14 int compare(
-    T const* left, element_count_t l_len, T const* right, element_count_t r_len) noexcept {
-    auto const len = UTL_SCOPE numeric_min(size_t(l_len), size_t(r_len));
-    auto const cmp = Traits::compare(left, right, len);
-    return compare_size(cmp, size_t(l_len), size_t(r_len));
+UTL_CONSTEXPR_CXX14 int compare(T const* left, size_t l_len, T const* right, size_t r_len) noexcept {
+    auto const cmp = Traits::compare(left, right, UTL_SCOPE numeric_min(l_len, r_len));
+    return compare_size(cmp, l_len, r_len);
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
