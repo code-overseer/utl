@@ -294,7 +294,7 @@ T impl(T left, T right) noexcept {
 } // namespace runtime
 
 template <UTL_CONCEPT_CXX20(signed_integral) T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_signed(T) && UTL_TRAIT_is_integral(T) && !)>
+    UTL_TRAIT_is_signed(T) && UTL_TRAIT_is_integral(T) && !has_overload<T>::value)>
 constexpr T impl(T left, T right) noexcept {
     return UTL_CONSTANT_P(left == right)
         ? UTL_SCOPE details::add_sat::compile_time::impl(left, right)
