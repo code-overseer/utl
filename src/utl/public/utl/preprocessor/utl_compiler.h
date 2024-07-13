@@ -69,3 +69,7 @@
 /* Clang has a preprocessor bug in 3.3 */
 #  error "Minimum version for Clang not met"
 #endif
+
+#if UTL_COMPILER_CLANG | UTL_COMPILER_GCC | UTL_COMPILER_ICC | UTL_COMPILER_ICX
+#  define UTL_SUPPORTS_GNU_ASM 1
+#endif

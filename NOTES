@@ -7,3 +7,4 @@
 # TODO: Shorten UTL_SCOPE to _UTL
 # TODO: Map APPLE Clang to LLVM
 # TODO: fix UTL_TRAIT_* for llvm < 18
+# TODO: Fix UTL_HAS_BUILTIN for MSVC
