@@ -95,15 +95,19 @@ constexpr int impl(int left, int right) noexcept {
 }
 #endif
 } // namespace compile_time
+} // namespace sub_sat
+} // namespace details
+UTL_NAMESPACE_END
 
+#if UTL_ARCH_x86
+
+#  if UTL_SUPPORTS_GNU_ASM
+
+UTL_NAMESPACE_BEGIN
+namespace details {
+namespace sub_sat {
 namespace runtime {
 
-#if UTL_SUPPORTS_GNU_ASM
-
-template <typename T>
-auto has_overload_impl(float) noexcept -> UTL_SCOPE false_type;
-
-#  if UTL_ARCH_x86
 #    if UTL_ARCH_x86_64
 
 template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<8>) T
@@ -190,15 +194,102 @@ T impl(T l, T r) noexcept {
     return sat;
 }
 
-#  elif UTL_ARCH_ARM
-#    if UTL_ARCH_AARCH64
+} // namespace runtime
+} // namespace sub_sat
+} // namespace details
+UTL_NAMESPACE_END
 
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<8>) T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_sized_signed_integral(8, T))>
+#  elif UTL_COMPILER_MSVC // UTL_SUPPORTS_GNU_ASM
+
+#    include <intrin.h>
+
+UTL_NAMESPACE_BEGIN
+namespace details {
+namespace sub_sat {
+namespace runtime {
+
+#    if UTL_ARCH_x86_64
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<8>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(8, T))>
 auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
 
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<8>) T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_sized_signed_integral(8, T))>
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<8>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(8, T))>
+T impl(T l, T r) noexcept {
+    static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
+    T const sat = (l >> shift) ^ UTL_NUMERIC_max(T);
+    UTL_SCOPE make_unsigned_t<T> tmp;
+    return !_subborrow_u64(0, l, r, &tmp) ? (T)tmp : sat;
+}
+#    endif // UTL_ARCH_x86_64
+
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<4>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(4, T))>
+auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
+
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<4>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(4, T))>
+T impl(T l, T r) noexcept {
+    static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
+    T const sat = (l >> shift) ^ UTL_NUMERIC_max(T);
+    UTL_SCOPE make_unsigned_t<T> tmp;
+    return !_subborrow_u32(0, l, r, &tmp) ? (T)tmp : sat;
+}
+
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(2, T))>
+auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
+
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(2, T))>
+T impl(T l, T r) noexcept {
+    static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
+    T const sat = (l >> shift) ^ UTL_NUMERIC_max(T);
+    UTL_SCOPE make_unsigned_t<T> tmp;
+    return !_subborrow_u16(0, l, r, &tmp) ? (T)tmp : sat;
+}
+
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(1, T))>
+auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
+
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(1, T))>
+T impl(T l, T r) noexcept {
+    static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
+    T const sat = (l >> shift) ^ UTL_NUMERIC_max(T);
+    UTL_SCOPE make_unsigned_t<T> tmp;
+    return !_subborrow_u8(0, l, r, &tmp) ? (T)tmp : sat;
+}
+
+} // namespace runtime
+} // namespace sub_sat
+} // namespace details
+UTL_NAMESPACE_END
+
+#  endif // UTL_SUPPORTS_GNU_ASM
+
+#elif UTL_ARCH_ARM
+
+#  if UTL_SIMD_ARM_NEON
+#    include <arm_neon.h>
+#  endif
+
+#  if UTL_SUPPORTS_GNU_ASM
+
+UTL_NAMESPACE_BEGIN
+namespace details {
+namespace sub_sat {
+namespace runtime {
+
+#    if UTL_ARCH_AARCH64
+
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<8>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(8, T))>
+auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
+
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<8>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(8, T))>
 T impl(T l, T r) noexcept {
     static constexpr auto min = UTL_NUMERIC_min(T);
     static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
@@ -214,18 +305,18 @@ T impl(T l, T r) noexcept {
 
 #    endif
 
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<4>) T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_sized_signed_integral(4, T))>
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<4>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(4, T))>
 auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_sized_signed_integral(2, T))>
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(2, T))>
 auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_sized_signed_integral(1, T))>
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(1, T))>
 auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
 
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<4>) T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_sized_signed_integral(4, T))>
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<4>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(4, T))>
 T impl(T l, T r) noexcept {
     static constexpr auto min = UTL_NUMERIC_min(T);
     static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
@@ -239,8 +330,8 @@ T impl(T l, T r) noexcept {
     return l;
 }
 
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_sized_signed_integral(2, T))>
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(2, T))>
 T impl(T l, T r) noexcept {
     using w_type = int32_t;
     static constexpr auto min = UTL_NUMERIC_min(T);
@@ -259,8 +350,8 @@ T impl(T l, T r) noexcept {
     return l;
 }
 
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_sized_signed_integral(1, T))>
+template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T
+        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(1, T))>
 T impl(T l, T r) noexcept {
     using w_type = int32_t;
     static constexpr auto min = UTL_NUMERIC_min(T);
@@ -279,17 +370,64 @@ T impl(T l, T r) noexcept {
     return l;
 }
 
-#  endif
+#    if UTL_SIMD_ARM_NEON
+int16_t impl(int16_t l, int16_t r) noexcept {
+    return vqsubh_s16(l, r);
+}
 
-#endif // UTL_SUPPORTS_GNU_ASM
+int8_t impl(int8_t l, int8_t r) noexcept {
+    return vqsubb_s8(l, r);
+}
+#    endif
 
+} // namespace runtime
+} // namespace sub_sat
+} // namespace details
+UTL_NAMESPACE_END
+
+#  elif UTL_SIMD_ARM_NEON
+
+UTL_NAMESPACE_BEGIN
+namespace details {
+namespace sub_sat {
+namespace runtime {
+int64_t impl(int64_t l, int64_t r) noexcept {
+    return vqsubd_s64(l, r);
+}
+
+int32_t impl(int32_t l, int32_t r) noexcept {
+    return vqsubs_s32(l, r);
+}
+
+int16_t impl(int16_t l, int16_t r) noexcept {
+    return vqsubh_s16(l, r);
+}
+
+int8_t impl(int8_t l, int8_t r) noexcept {
+    return vqsubb_s8(l, r);
+}
+} // namespace runtime
+} // namespace sub_sat
+} // namespace details
+UTL_NAMESPACE_END
+
+#  endif //  UTL_SUPPORTS_GNU_ASM
+
+#endif
+
+UTL_NAMESPACE_BEGIN
+namespace details {
+namespace sub_sat {
+namespace runtime {
 template <typename T>
-using has_overload = decltype(UTL_SCOPE details::add_sat::runtime::has_overload_impl<T>(0));
+auto has_overload_impl(float) noexcept -> UTL_SCOPE false_type;
+template <typename T>
+using has_overload = decltype(UTL_SCOPE details::sub_sat::runtime::has_overload_impl<T>(0));
 
 template <UTL_CONCEPT_CXX20(signed_integral) T UTL_REQUIRES_CXX11(
     UTL_TRAIT_is_signed(T) && UTL_TRAIT_is_integral(T) && !has_overload<T>::value)>
 T impl(T left, T right) noexcept {
-    return UTL_SCOPE details::add_sat::compile_time::impl(left, right);
+    return UTL_SCOPE details::sub_sat::compile_time::impl(left, right);
 }
 
 } // namespace runtime
