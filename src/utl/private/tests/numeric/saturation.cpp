@@ -1,3 +1,4 @@
+// Copyright 2023-2024 Bryan Wong
 
 #include "utl/numeric/utl_add_sat.h"
 #include "utl/numeric/utl_sub_sat.h"
