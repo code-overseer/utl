@@ -184,7 +184,8 @@ constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool> cmp_
 template <typename R, typename T>
 UTL_ATTRIBUTES(NODISCARD, CONST)
 constexpr enable_if_t<is_integral<T>::value && is_integral<R>::value, bool> in_range(T t) noexcept {
-    return cmp_greater_equal(t, UTL_NUMERIC_min(R)) && cmp_less_equal(t, UTL_NUMERIC_max(R));
+    return cmp_greater_equal(t, UTL_NUMERIC_minimum(R)) &&
+        cmp_less_equal(t, UTL_NUMERIC_maximum(R));
 }
 
 UTL_NAMESPACE_END
@@ -222,7 +223,8 @@ constexpr bool cmp_greater_equal(L l, R r) noexcept {
 template <integral R, integral T>
 UTL_ATTRIBUTES(NODISCARD, CONST)
 constexpr bool in_range(T t) noexcept {
-    return cmp_greater_equal(t, UTL_NUMERIC_min(R)) && cmp_less_equal(t, UTL_NUMERIC_max(R));
+    return cmp_greater_equal(t, UTL_NUMERIC_minimum(R)) &&
+        cmp_less_equal(t, UTL_NUMERIC_maximum(R));
 }
 
 UTL_NAMESPACE_END

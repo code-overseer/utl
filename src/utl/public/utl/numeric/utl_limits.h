@@ -135,9 +135,9 @@ struct min_impl<bfloat16> {
 } // namespace details
 
 template <typename T>
-struct max : details::max_impl<remove_cv_t<T>> {};
+struct maximum : details::max_impl<remove_cv_t<T>> {};
 template <typename T>
-struct min : details::min_impl<remove_cv_t<T>> {};
+struct minimum : details::min_impl<remove_cv_t<T>> {};
 template <typename T>
 struct lowest : details::min_impl<T> {};
 template <typename T>
@@ -148,59 +148,59 @@ template <typename T>
 struct lowest<T const volatile> : lowest<T> {};
 template <>
 struct lowest<float> {
-    static constexpr float value = -max<float>::value;
+    static constexpr float value = -maximum<float>::value;
 };
 template <>
 struct lowest<double> {
-    static constexpr double value = -max<double>::value;
+    static constexpr double value = -maximum<double>::value;
 };
 template <>
 struct lowest<long double> {
-    static constexpr long double value = -max<long double>::value;
+    static constexpr long double value = -maximum<long double>::value;
 };
 #if UTL_SUPPORTS_FLOAT16
 template <>
 struct lowest<float16> {
-    static constexpr float16 value = -max<float16>::value;
+    static constexpr float16 value = -maximum<float16>::value;
 };
 #endif
 #if UTL_SUPPORTS_FLOAT32
 template <>
 struct lowest<float32> {
-    static constexpr float32 value = -max<float32>::value;
+    static constexpr float32 value = -maximum<float32>::value;
 };
 #endif
 #if UTL_SUPPORTS_FLOAT64
 template <>
 struct lowest<float64> {
-    static constexpr float64 value = -max<float64>::value;
+    static constexpr float64 value = -maximum<float64>::value;
 };
 #endif
 #if UTL_SUPPORTS_FLOAT128
 template <>
 struct lowest<float128> {
-    static constexpr float128 value = -max<float128>::value;
+    static constexpr float128 value = -maximum<float128>::value;
 };
 #endif
 #if UTL_SUPPORTS_BFLOAT16
 template <>
 struct lowest<bfloat16> {
-    static constexpr bfloat16 value = -max<bfloat16>::value;
+    static constexpr bfloat16 value = -maximum<bfloat16>::value;
 };
 #endif
 #if UTL_CXX14
 template <typename T>
-UTL_INLINE_CXX17 constexpr auto max_v = max<T>::value;
+UTL_INLINE_CXX17 constexpr auto maximum_v = maximum<T>::value;
 template <typename T>
-UTL_INLINE_CXX17 constexpr auto min_v = min<T>::value;
+UTL_INLINE_CXX17 constexpr auto minimum_v = minimum<T>::value;
 template <typename T>
 UTL_INLINE_CXX17 constexpr auto lowest_v = lowest<T>::value;
-#  define UTL_NUMERIC_max(TYPE) UTL_SCOPE numeric::max_v<TYPE>
-#  define UTL_NUMERIC_min(TYPE) UTL_SCOPE numeric::min_v<TYPE>
+#  define UTL_NUMERIC_maximum(TYPE) UTL_SCOPE numeric::maximum_v<TYPE>
+#  define UTL_NUMERIC_minimum(TYPE) UTL_SCOPE numeric::minimum_v<TYPE>
 #  define UTL_NUMERIC_lowest(TYPE) UTL_SCOPE numeric::lowest_v<TYPE>
 #else
-#  define UTL_NUMERIC_max(TYPE) UTL_SCOPE numeric::max<TYPE>::value;
-#  define UTL_NUMERIC_min(TYPE) UTL_SCOPE numeric::min<TYPE>::value;
+#  define UTL_NUMERIC_maximum(TYPE) UTL_SCOPE numeric::maximum<TYPE>::value;
+#  define UTL_NUMERIC_minimum(TYPE) UTL_SCOPE numeric::minimum<TYPE>::value;
 #  define UTL_NUMERIC_lowest(TYPE) UTL_SCOPE numeric::lowest<TYPE>::value;
 #endif
 } // namespace numeric

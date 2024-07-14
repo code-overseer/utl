@@ -23,7 +23,7 @@ namespace compile_time {
 template <typename T>
 class signed_impl {
     using value_type = UTL_SCOPE remove_cv_t<T>;
-    static constexpr value_type max = UTL_NUMERIC_max(value_type);
+    static constexpr value_type max = UTL_NUMERIC_maximum(value_type);
     static constexpr value_type shift = CHAR_BIT * sizeof(value_type) - 1;
 
 public:

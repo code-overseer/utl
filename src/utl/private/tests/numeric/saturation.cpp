@@ -7,11 +7,13 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace sub_sat {
 namespace compile_time {
-static_assert(signed_impl<int>(UTL_NUMERIC_max(int), -1).result() == UTL_NUMERIC_max(int));
-static_assert(signed_impl<int>(UTL_NUMERIC_max(int), 1).result() == UTL_NUMERIC_max(int) - 1);
-static_assert(signed_impl<int>(UTL_NUMERIC_max(int), UTL_NUMERIC_max(int)).result() == 0);
-static_assert(signed_impl<int>(UTL_NUMERIC_min(int), -1).result() == UTL_NUMERIC_min(int) + 1);
-static_assert(signed_impl<int>(UTL_NUMERIC_min(int), 1).result() == UTL_NUMERIC_min(int));
+static_assert(signed_impl<int>(UTL_NUMERIC_maximum(int), -1).result() == UTL_NUMERIC_maximum(int));
+static_assert(
+    signed_impl<int>(UTL_NUMERIC_maximum(int), 1).result() == UTL_NUMERIC_maximum(int) - 1);
+static_assert(signed_impl<int>(UTL_NUMERIC_maximum(int), UTL_NUMERIC_maximum(int)).result() == 0);
+static_assert(
+    signed_impl<int>(UTL_NUMERIC_minimum(int), -1).result() == UTL_NUMERIC_minimum(int) + 1);
+static_assert(signed_impl<int>(UTL_NUMERIC_minimum(int), 1).result() == UTL_NUMERIC_minimum(int));
 
 static_assert(signed_impl<int>(1, -1).result() == 2);
 static_assert(signed_impl<int>(1, 1).result() == 0);
@@ -21,14 +23,16 @@ static_assert(signed_impl<int>(1, 1).result() == 0);
 
 namespace add_sat {
 namespace compile_time {
-static_assert(signed_impl<int>(UTL_NUMERIC_max(int), -1).result() == UTL_NUMERIC_max(int) - 1);
-static_assert(signed_impl<int>(UTL_NUMERIC_max(int), 1).result() == UTL_NUMERIC_max(int));
 static_assert(
-    signed_impl<int>(UTL_NUMERIC_max(int), UTL_NUMERIC_max(int)).result() == UTL_NUMERIC_max(int));
+    signed_impl<int>(UTL_NUMERIC_maximum(int), -1).result() == UTL_NUMERIC_maximum(int) - 1);
+static_assert(signed_impl<int>(UTL_NUMERIC_maximum(int), 1).result() == UTL_NUMERIC_maximum(int));
+static_assert(signed_impl<int>(UTL_NUMERIC_maximum(int), UTL_NUMERIC_maximum(int)).result() ==
+    UTL_NUMERIC_maximum(int));
+static_assert(signed_impl<int>(UTL_NUMERIC_minimum(int), UTL_NUMERIC_minimum(int)).result() ==
+    UTL_NUMERIC_minimum(int));
+static_assert(signed_impl<int>(UTL_NUMERIC_minimum(int), -1).result() == UTL_NUMERIC_minimum(int));
 static_assert(
-    signed_impl<int>(UTL_NUMERIC_min(int), UTL_NUMERIC_min(int)).result() == UTL_NUMERIC_min(int));
-static_assert(signed_impl<int>(UTL_NUMERIC_min(int), -1).result() == UTL_NUMERIC_min(int));
-static_assert(signed_impl<int>(UTL_NUMERIC_min(int), 1).result() == UTL_NUMERIC_min(int) + 1);
+    signed_impl<int>(UTL_NUMERIC_minimum(int), 1).result() == UTL_NUMERIC_minimum(int) + 1);
 static_assert(signed_impl<int>(1, -1).result() == 0);
 static_assert(signed_impl<int>(1, 1).result() == 2);
 } // namespace compile_time
