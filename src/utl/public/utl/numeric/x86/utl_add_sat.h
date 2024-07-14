@@ -88,13 +88,11 @@ T impl(T l, T r) noexcept {
     static constexpr x86w max = UTL_NUMERIC_maximum(T);
     static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
     x86w sat = l;
-    x86w wleft;
     __asm__("sar{w    %[bits], %[sat]   | %[sat], %[bits] }\n\t"
             "xor{w    %[max], %[sat]    | %[sat], %[max] }\n\t"
             "add{b    %[right], %[left] | %[left], %[right] }\n\t"
-            "movsb{w  %[left], %[wleft] | %[wleft], %[left] }\n\t"
-            "cmovno{w %[wleft], %[sat]  | %[sat], %[wleft] }"
-            : [left] "+r"(l), [sat] "+r"(sat), [wleft] "=r"(wleft)
+            "cmovno{w %w[left], %[sat]  | %[sat], %w[left] }"
+            : [left] "+r"(l), [sat] "+r"(sat)
             : [max] "i"(max), [bits] "Ji"(shift), [right] "r"(r)
             : "cc");
     return sat;

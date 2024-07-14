@@ -32,10 +32,10 @@ T impl(T l, T r) noexcept {
     // Need to move imm64 to a register before it is usable
     auto const max = UTL_NUMERIC_maximum(T);
     static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
-    __asm__("sar{q    %[bits], %[sat] | %[sat], %[bits] }\n\t"
-            "xor{q    %[max], %[sat] | %[sat], %[max] }\n\t"
+    __asm__("sar{q    %[bits], %[sat]   | %[sat], %[bits] }\n\t"
+            "xor{q    %[max], %[sat]    | %[sat], %[max] }\n\t"
             "sub{q    %[right], %[left] | %[left], %[right] }\n\t"
-            "cmovno{q %[left],  %[sat]"
+            "cmovno{q %[left], %[sat]   | %[sat], %[left] }"
             : [sat] "+r"(sat), [left] "+r"(l)
             : [right] "r"(r), [max] "r"(max), [bits] "Ji"(shift)
             : "cc");
@@ -51,10 +51,10 @@ T impl(T l, T r) noexcept {
     static constexpr auto max = UTL_NUMERIC_maximum(T);
     static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
     auto sat = l;
-    __asm__("sar{l    %[bits], %[sat] | %[sat], %[bits] }\n\t"
-            "xor{l    %[max], %[sat] | %[sat], %[max] }\n\t"
+    __asm__("sar{l    %[bits], %[sat]   | %[sat], %[bits] }\n\t"
+            "xor{l    %[max], %[sat]    | %[sat], %[max] }\n\t"
             "sub{l    %[right], %[left] | %[left], %[right] }\n\t"
-            "cmovno{l %[left], %[sat] | %[sat], %[left] }"
+            "cmovno{l %[left], %[sat]   | %[sat], %[left] }"
             : [left] "+r"(l), [sat] "+r"(sat)
             : [max] "i"(max), [bits] "Ji"(shift), [right] "r"(r)
             : "cc");
@@ -69,10 +69,10 @@ T impl(T l, T r) noexcept {
     static constexpr auto max = UTL_NUMERIC_maximum(T);
     static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
     auto sat = l;
-    __asm__("sar{w    %[bits], %[sat] | %[sat], %[bits] }\n\t"
-            "xor{w    %[max], %[sat] | %[sat], %[max] }\n\t"
+    __asm__("sar{w    %[bits], %[sat]   | %[sat], %[bits] }\n\t"
+            "xor{w    %[max], %[sat]    | %[sat], %[max] }\n\t"
             "sub{w    %[right], %[left] | %[left], %[right] }\n\t"
-            "cmovno{w %[left], %[sat] | %[sat], %[left] }"
+            "cmovno{w %[left], %[sat]   | %[sat], %[left] }"
             : [left] "+r"(l), [sat] "+r"(sat)
             : [max] "i"(max), [bits] "Ji"(shift), [right] "r"(r)
             : "cc");
@@ -89,12 +89,11 @@ T impl(T l, T r) noexcept {
     static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
     x86w sat = l;
     x86w wleft;
-    __asm__("sar{w    %[bits], %[sat] | %[sat], %[bits] }\n\t"
-            "xor{w    %[max], %[sat] | %[sat], %[max] }\n\t"
+    __asm__("sar{w    %[bits], %[sat]   | %[sat], %[bits] }\n\t"
+            "xor{w    %[max], %[sat]    | %[sat], %[max] }\n\t"
             "sub{b    %[right], %[left] | %[left], %[right] }\n\t"
-            "movsb{w  %[left], %[wleft] | %[wleft], %[left] }\n\t"
-            "cmovno{w %[wleft], %[sat] | %[sat], %[wleft] }"
-            : [left] "+r"(l), [sat] "+r"(sat), [wleft] "=r"(wleft)
+            "cmovno{w %w[left], %[sat]  | %[sat], %w[left] }"
+            : [left] "+r"(l), [sat] "+r"(sat)
             : [max] "i"(max), [bits] "Ji"(shift), [right] "r"(r)
             : "cc");
     return sat;
