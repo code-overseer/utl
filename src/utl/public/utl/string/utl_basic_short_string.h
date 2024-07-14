@@ -904,7 +904,8 @@ public:
     }
 
     UTL_STRING_PURE constexpr size_type find(const_pointer str, size_type pos = 0) const noexcept {
-        return str != nullptr ? find(str, pos, traits_type::length(str)) : npos;
+        // CONSTEXPR_ASSERT(str != nullptr);
+        return find(str, pos, traits_type::length(str));
     }
 
     UTL_STRING_PURE constexpr size_type find(value_type ch, size_type pos = 0) const noexcept {
@@ -929,12 +930,13 @@ public:
 
     UTL_STRING_PURE constexpr size_type rfind(
         const_pointer str, size_type pos, size_type str_len) const noexcept {
+        // CONSTEXPR_ASSERT(str != nullptr);
         return details::string::rfind<traits_type>(data(), size(), str, str_len, pos);
     }
 
     UTL_STRING_PURE constexpr size_type rfind(
         const_pointer str, size_type pos = npos) const noexcept {
-        UTL_ASSERT(str != nullptr);
+        // CONSTEXPR_ASSERT(str != nullptr);
         return rfind(str, pos, traits_type::length(str));
     }
 
@@ -960,12 +962,13 @@ public:
 
     UTL_STRING_PURE constexpr size_type find_first_of(
         const_pointer chars, size_type pos, size_type chars_count) const noexcept {
+        // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_first_of<traits_type>(data(), size(), chars, chars_count, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find_first_of(
-        const_pointer str, size_type pos = 0) const noexcept {
-        return str != nullptr ? find_first_of(str, pos, traits_type::length(str)) : npos;
+        const_pointer chars, size_type pos = 0) const noexcept {
+        return find_first_of(chars, pos, traits_type::length(chars));
     }
 
     UTL_STRING_PURE constexpr size_type find_first_of(
@@ -992,13 +995,14 @@ public:
 
     UTL_STRING_PURE constexpr size_type find_first_not_of(
         const_pointer chars, size_type pos, size_type chars_count) const noexcept {
+        // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_first_not_of<traits_type>(
             data(), size(), chars, chars_count, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find_first_not_of(
         const_pointer chars, size_type pos = 0) const noexcept {
-        return chars != nullptr ? find_first_not_of(chars, pos, traits_type::length(chars)) : npos;
+        return find_first_not_of(chars, pos, traits_type::length(chars));
     }
 
     UTL_STRING_PURE constexpr size_type find_first_not_of(
@@ -1025,12 +1029,13 @@ public:
 
     UTL_STRING_PURE constexpr size_type find_last_of(
         const_pointer chars, size_type pos, size_type chars_count) const noexcept {
+        // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_last_of<traits_type>(data(), size(), chars, chars_count, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find_last_of(
         const_pointer chars, size_type pos = npos) const noexcept {
-        return chars != nullptr ? find_last_of(chars, pos, traits_type::length(chars)) : npos;
+        return find_last_of(chars, pos, traits_type::length(chars));
     }
 
     UTL_STRING_PURE constexpr size_type find_last_of(
@@ -1055,13 +1060,14 @@ public:
     }
 
     UTL_STRING_PURE constexpr size_type find_last_not_of(
-        const_pointer str, size_type pos, size_type count) const UTL_THROWS {
-        return details::string::find_last_not_of<traits_type>(data(), size(), str, count, pos);
+        const_pointer chars, size_type pos, size_type count) const UTL_THROWS {
+        // CONSTEXPR_ASSERT(chars != nullptr);
+        return details::string::find_last_not_of<traits_type>(data(), size(), chars, count, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find_last_not_of(
         const_pointer chars, size_type pos = npos) const UTL_THROWS {
-        return chars != nullptr ? find_last_not_of(chars, pos, traits_type::length(chars)) : npos;
+        return find_last_not_of(chars, pos, traits_type::length(chars));
     }
 
     UTL_STRING_PURE constexpr size_type find_last_not_of(
@@ -1107,6 +1113,7 @@ public:
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
         size_type pos, size_type count, const_pointer str, size_type count2) const UTL_THROWS {
+        UTL_ASSERT(str != nullptr);
         UTL_THROW_IF(pos > size(),
             program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
                                     "Reason=[index out of range]"));
@@ -1116,7 +1123,7 @@ public:
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
         size_type pos, size_type count, const_pointer str) const UTL_THROWS {
-        return str != nullptr ? compare(pos, count, str, traits_type::length(str)) : str == data();
+        return compare(pos, count, str, traits_type::length(str));
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
@@ -1163,7 +1170,8 @@ public:
     constexpr bool starts_with(value_type ch) const noexcept { return !empty() && front() == ch; }
 
     constexpr bool starts_with(const_pointer str) const noexcept {
-        return str != nullptr ? starts_with(view_type(str)) : false;
+        // CONSTEXPR_ASSERT(str != nullptr);
+        return starts_with(view_type(str));
     }
 
     constexpr bool ends_with(view_type view) const noexcept {
@@ -1175,7 +1183,8 @@ public:
     constexpr bool ends_with(value_type ch) const noexcept { return !empty() && back() == ch; }
 
     constexpr bool ends_with(const_pointer str) const noexcept {
-        return str != nullptr ? ends_with(view_type(str)) : false;
+        // CONSTEXPR_ASSERT(str != nullptr);
+        return ends_with(view_type(str));
     }
 
     constexpr bool contains(view_type view) const noexcept { return find(view) != npos; }
@@ -1184,8 +1193,8 @@ public:
         return traits_type::find(data(), size(), ch) != nullptr;
     }
 
-    UTL_CONSTEXPR_CXX14 bool contains(const_pointer str) const noexcept {
-        UTL_ASSERT(str != nullptr);
+    constexpr bool contains(const_pointer str) const noexcept {
+        // CONSTEXPR_ASSERT(str != nullptr);
         return contains(view_type(str));
     }
 
