@@ -98,7 +98,7 @@ Macros:
 - UTL_CATCH(X)=else if(X)
 - UTL_NOEXCEPT(X)=noexcept(X)
 - UTL_THROWS=noexcept
-- UTL_INLINE_CXX17=constexpr
+- UTL_INLINE_CXX17=inline
 - UTL_CONSTEXPR_CXX11=constexpr
 - UTL_CONSTEXPR_CXX14=constexpr
 - UTL_CONSTEXPR_CXX17=constexpr
@@ -111,6 +111,7 @@ Macros:
 - UTL_REQUIRES_CXX20(X)=requires (X)
 - UTL_REQUIRES_CXX20(X,Y)=requires (X,Y)
 - UTL_REQUIRES_CXX20(X,Y,Z)=requires (X,Y,Z)
-- UTL_CONCEPT_CXX20(X)=typename
+- UTL_CONCEPT_CXX20(X)=type<X>
 - UTL_NODISCARD=[[nodiscard]]
 - UTL_ENABLE_IF_CXX11(X,Y)=void
+- UTL_ATTRIBUTE(X)=[[X]]

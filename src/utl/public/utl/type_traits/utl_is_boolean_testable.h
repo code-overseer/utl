@@ -2,9 +2,11 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_namespace.h"
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_enable_if.h"
+#include "utl/type_traits/utl_is_boolean.h"
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/type_traits/utl_void_t.h"
 
@@ -12,18 +14,6 @@ UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace bool_testable {
-
-template <typename T>
-struct is_boolean : false_type {};
-
-template <>
-struct is_boolean<bool> : true_type {};
-template <>
-struct is_boolean<bool const> : true_type {};
-template <>
-struct is_boolean<bool volatile> : true_type {};
-template <>
-struct is_boolean<bool const volatile> : true_type {};
 
 /**
  *  These checks don't check the result of mixed types operations, only with boolean
