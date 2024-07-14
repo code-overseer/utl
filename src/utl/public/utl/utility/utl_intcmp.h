@@ -22,7 +22,7 @@ UTL_NAMESPACE_END
 
 #else // UTL_CXX20 && UTL_USE_STD_cmp_utility
 
-#  include "utl/limits.h"
+#  include "utl/numeric/utl_limits.h"
 #  include "utl/type_traits/utl_enable_if.h"
 #  include "utl/type_traits/utl_is_integral.h"
 #  include "utl/type_traits/utl_is_signed.h"
@@ -117,7 +117,7 @@ UTL_NAMESPACE_END
 
 #  else // elif !UTL_CXX20
 
-#    include "utl/concepts.h"
+#    include "utl/concepts/utl_integral.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -183,14 +183,15 @@ constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool> cmp_
 
 template <typename R, typename T>
 UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool> in_range(T t) noexcept {
-    return cmp_greater_equal(t, numeric_limits<R>::min()) &&
-        cmp_less_equal(t, numeric_limits<R>::max());
+constexpr enable_if_t<is_integral<T>::value && is_integral<R>::value, bool> in_range(T t) noexcept {
+    return cmp_greater_equal(t, UTL_NUMERIC_min(R)) && cmp_less_equal(t, UTL_NUMERIC_max(R));
 }
 
 UTL_NAMESPACE_END
 
 #  else // UTL_CXX20
+
+#    include "utl/concepts/utl_integral.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -221,8 +222,7 @@ constexpr bool cmp_greater_equal(L l, R r) noexcept {
 template <integral R, integral T>
 UTL_ATTRIBUTES(NODISCARD, CONST)
 constexpr bool in_range(T t) noexcept {
-    return cmp_greater_equal(t, numeric_limits<R>::min()) &&
-        cmp_less_equal(t, numeric_limits<R>::max());
+    return cmp_greater_equal(t, UTL_NUMERIC_min(R)) && cmp_less_equal(t, UTL_NUMERIC_max(R));
 }
 
 UTL_NAMESPACE_END

@@ -19,17 +19,6 @@ UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace add_sat {
-
-template <typename T>
-constexpr T saturate(T result, T left) noexcept {
-    return result | -(result < left);
-}
-
-template <UTL_CONCEPT_CXX20(unsigned_integral) T UTL_REQUIRES_CXX11(UTL_TRAIT_is_unsigned(T))>
-constexpr T impl(T left, T right) noexcept {
-    return UTL_SCOPE details::add_sat::saturate(left + right, left);
-}
-
 namespace compile_time {
 template <typename T>
 class signed_impl {
@@ -99,245 +88,20 @@ constexpr int impl(int left, int right) noexcept {
 } // namespace details
 UTL_NAMESPACE_END
 
-#if UTL_SUPPORTS_GNU_ASM
+#define UTL_NUMERIC_PRIVATE_HEADER_GUARD
+#if UTL_ARCH_x86
+#  include "utl/numeric/arm/utl_add_sat.h"
+#elif UTL_ARCH_ARM
+#  include "utl/numeric/x86/utl_add_sat.h"
+#endif
+#undef UTL_NUMERIC_PRIVATE_HEADER_GUARD
 
 UTL_NAMESPACE_BEGIN
 namespace details {
 namespace add_sat {
 namespace runtime {
-
 template <typename T>
 auto has_overload_impl(float) noexcept -> UTL_SCOPE false_type;
-
-#  if UTL_ARCH_x86
-#    if UTL_ARCH_x86_64
-
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<8>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(8, T))>
-auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
-
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<8>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(8, T))>
-T impl(T l, T r) noexcept {
-    auto sat = l;
-    // Need to move imm64 to a register before it is usable
-    auto const max = UTL_NUMERIC_max(T);
-    static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
-    __asm__("sarq    %[bits], %[sat]\n\t"
-            "xorq    %[max], %[sat]\n\t"
-            "addq    %[right], %[left]\n\t"
-            "cmovoq  %[sat],  %[left]"
-            : [sat] "+r"(sat), [left] "+r"(l)
-            : [right] "r"(r), [max] "r"(max), [bits] "Ji"(shift)
-            : "cc");
-    return l;
-}
-#    endif // UTL_ARCH_x86_64
-
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<4>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(4, T))>
-auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(2, T))>
-auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(1, T))>
-auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
-
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<4>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(4, T))>
-T impl(T l, T r) noexcept {
-    static constexpr auto max = UTL_NUMERIC_max(T);
-    static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
-    auto sat = l;
-    __asm__("sarl    %[bits], %[sat]\n\t"
-            "xorl    %[max], %[sat]\n\t"
-            "addl    %[right], %[left]\n\t"
-            "cmovnol  %[left], %[sat]"
-            : [left] "+r"(l), [sat] "+r"(sat)
-            : [max] "i"(max), [bits] "Ji"(shift), [right] "r"(r)
-            : "cc");
-    return sat;
-}
-
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(2, T))>
-T impl(T l, T r) noexcept {
-    static constexpr auto max = UTL_NUMERIC_max(T);
-    static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
-    auto sat = l;
-    __asm__("sarw    %[bits], %[sat]\n\t"
-            "xorw    %[max], %[sat]\n\t"
-            "addw    %[right], %[left]\n\t"
-            "cmovnow  %[left], %[sat]"
-            : [left] "+r"(l), [sat] "+r"(sat)
-            : [max] "i"(max), [bits] "Ji"(shift), [right] "r"(r)
-            : "cc");
-    return sat;
-}
-
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(1, T))>
-T impl(T l, T r) noexcept {
-    using x86w = int16_t;
-    static constexpr x86w max = UTL_NUMERIC_max(T);
-    static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
-    x86w sat = l;
-    x86w wleft;
-    __asm__("sarw    %[bits], %[sat]\n\t"
-            "xorw    %[max], %[sat]\n\t"
-            "addb    %[right], %[left]\n\t"
-            "movsbw  %[left], %[wleft]\n\t"
-            "cmovnow %[wleft], %[sat]"
-            : [left] "+r"(l), [sat] "+r"(sat), [wleft] "=r"(wleft)
-            : [max] "i"(max), [bits] "Ji"(shift), [right] "r"(r)
-            : "cc");
-    return sat;
-}
-
-#  elif UTL_ARCH_ARM
-#    if UTL_ARCH_AARCH64
-
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<8>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(8, T))>
-auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
-
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<8>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(8, T))>
-T impl(T l, T r) noexcept {
-    static constexpr auto max = UTL_NUMERIC_max(T);
-    static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
-    __asm("adds    %x[left], %x[left], %x[right]\n\t"
-          "asr     %x[right], %x[right], %x[bits]\n\t"
-          "eor     %x[right], %x[right], %x[max]\n\t"
-          "csel    %x[left], %x[right], %x[left], vs"
-          : [left] "+r"(l), [right] "+r"(r)
-          : [max] "i"(max), [bits] "Ji"(shift)
-          : "cc");
-    return l;
-}
-
-#    endif
-
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<4>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(4, T))>
-auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(2, T))>
-auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(1, T))>
-auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
-
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<4>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(4, T))>
-T impl(T l, T r) noexcept {
-    static constexpr auto max = UTL_NUMERIC_max(T);
-    static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
-    __asm("adds    %w[left], %w[left], %w[right]\n\t"
-          "asr     %w[right], %w[right], %w[bits]\n\t"
-          "eor     %w[right], %w[right], %w[max]\n\t"
-          "csel    %w[left], %w[right], %w[left], vs"
-          : [left] "+r"(l), [right] "+r"(r)
-          : [max] "i"(max), [bits] "Ji"(shift)
-          : "cc");
-    return l;
-}
-
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(2, T))>
-T impl(T l, T r) noexcept {
-    using w_type = int32_t;
-    static constexpr auto max = UTL_NUMERIC_max(w_type);
-    static constexpr int ls = 2 * CHAR_BIT;
-    static constexpr int rs = sizeof(l) * CHAR_BIT - 1;
-    __asm("lsl     %w[left], %w[left], %w[ls]\n\t"
-          "lsl     %w[right], %w[right], %w[ls]\n\t"
-          "adds    %w[left], %w[left], %w[right]\n\t"
-          "asr     %w[right], %w[right], %w[bits]\n\t"
-          "eor     %w[right], %w[right], %w[max]\n\t"
-          "csel    %w[left], %w[right], %w[left], vs\n\t"
-          "lsr     %w[left], %w[left], %w[ls]"
-          : [left] "+r"(l), [right] "+r"(r)
-          : [max] "i"(max), [ls] "Ji"(ls), [bits] "Ji"(rs)
-          : "cc");
-    return l;
-}
-
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T
-        UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(1, T))>
-T impl(T l, T r) noexcept {
-    using w_type = int32_t;
-    static constexpr auto max = UTL_NUMERIC_max(w_type);
-    static constexpr int ls = 3 * CHAR_BIT;
-    static constexpr int rs = sizeof(l) * CHAR_BIT - 1;
-    __asm("lsl     %w[left], %w[left], %w[ls]\n\t"
-          "lsl     %w[right], %w[right], %w[ls]\n\t"
-          "adds    %w[left], %w[left], %w[right]\n\t"
-          "asr     %w[right], %w[right], %w[bits]\n\t"
-          "eor     %w[right], %w[right], %w[max]\n\t"
-          "csel    %w[left], %w[right], %w[left], vs\n\t"
-          "lsr     %w[left], %w[left], %w[ls]"
-          : [left] "+r"(l), [right] "+r"(r)
-          : [max] "i"(max), [ls] "Ji"(ls), [bits] "Ji"(rs)
-          : "cc");
-    return l;
-}
-
-#  endif
-
-} // namespace runtime
-} // namespace add_sat
-} // namespace details
-UTL_NAMESPACE_END
-
-#elif UTL_SIMD_X86_SSE4_2 // UTL_SUPPORTS_GNU_ASM
-
-#  include <immintrin.h>
-
-UTL_NAMESPACE_BEGIN
-namespace details {
-namespace add_sat {
-namespace runtime {
-
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_sized_signed_integral(2, T))>
-T impl(T l, T r) noexcept {
-    struct alignas(16) buffer {
-        T value;
-    } lb{l}, rb{r};
-    __m128i lreg = _mm_load_si128((__m128i const*)&lb);
-    __m128i rreg = _mm_load_si128((__m128i const*)&rb);
-    lreg = _mm_subs_epi16(lreg, rreg);
-    _mm_store_si128((__m128i*)&lb, lreg);
-    return lb.value;
-}
-
-template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_sized_signed_integral(1, T))>
-T impl(T l, T r) noexcept {
-    struct alignas(16) buffer {
-        T value;
-    } lb{l}, rb{r};
-    __m128i lreg = _mm_load_si128((__m128i const*)&lb);
-    __m128i rreg = _mm_load_si128((__m128i const*)&rb);
-    lreg = _mm_subs_epi8(lreg, rreg);
-    _mm_store_si128((__m128i*)&lb, lreg);
-    return lb.value;
-}
-
-} // namespace runtime
-} // namespace add_sat
-} // namespace details
-UTL_NAMESPACE_END
-
-#endif // UTL_SUPPORTS_GNU_ASM
-
-UTL_NAMESPACE_BEGIN
-namespace details {
-namespace add_sat {
-namespace runtime {
-
 template <typename T>
 using has_overload = decltype(UTL_SCOPE details::add_sat::runtime::has_overload_impl<T>(0));
 
@@ -355,6 +119,16 @@ constexpr T impl(T left, T right) noexcept {
     return UTL_CONSTANT_P(left == right)
         ? UTL_SCOPE details::add_sat::compile_time::impl(left, right)
         : UTL_SCOPE details::add_sat::runtime::impl(left, right);
+}
+
+template <typename T>
+constexpr T saturate(T result, T left) noexcept {
+    return result | -(result < left);
+}
+
+template <UTL_CONCEPT_CXX20(unsigned_integral) T UTL_REQUIRES_CXX11(UTL_TRAIT_is_unsigned(T))>
+constexpr T impl(T left, T right) noexcept {
+    return UTL_SCOPE details::add_sat::saturate(left + right, left);
 }
 
 } // namespace add_sat
