@@ -370,6 +370,18 @@ UTL_STRING_CONST constexpr bool operator==(
     return lhs.size() == rhs.size() && lhs.compare(rhs) == 0;
 }
 
+template <typename CharType, typename Traits>
+UTL_STRING_CONST constexpr bool operator==(
+    basic_string_view<CharType, Traits> lhs, CharType const* rhs) noexcept {
+    return lhs.compare(rhs) == 0;
+}
+
+template <typename CharType, typename Traits>
+UTL_STRING_CONST constexpr bool operator==(
+    CharType const* lhs, basic_string_view<CharType, Traits> rhs) noexcept {
+    return rhs.compare(lhs) == 0;
+}
+
 UTL_NAMESPACE_END
 
 #if UTL_CXX20
@@ -382,11 +394,7 @@ template <typename CharType, typename Traits>
 UTL_STRING_CONST constexpr typename Traits::comparison_category operator<=>(
     basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
     using result_type = typename Traits::comparison_category;
-    auto i = lhs.compare(rhs);
-    if (i == 0) {
-        return result_type::equal;
-    }
-    return i < 0 ? result_type::less : result_type::greater;
+    return static_cast<result_type>(lhs.compare(rhs) <=> 0);
 }
 
 UTL_NAMESPACE_END

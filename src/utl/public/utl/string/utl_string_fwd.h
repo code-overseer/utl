@@ -29,18 +29,26 @@ namespace details {
 namespace string {
 
 template <typename CharType>
-struct standard_size {
-    static constexpr size_t value = (48 - sizeof(size_t)) / sizeof(CharType) - 1;
+struct default_inline_size {
+private:
+    static constexpr size_t bytes = 32;
+
+public:
+    static constexpr size_t value = bytes / sizeof(CharType) - 1;
 };
 
 template <>
-struct standard_size<char> {
-    static constexpr size_t value = 32 - sizeof(size_t) - sizeof(char);
+struct default_inline_size<char> {
+private:
+    static constexpr size_t bytes = 24;
+
+public:
+    static constexpr size_t value = bytes - 1;
 };
 
 #ifdef UTL_SUPPORTS_CHAR8_T
 template <>
-struct standard_size<char8_t> : standard_size<char> {};
+struct default_inline_size<char8_t> : default_inline_size<char> {};
 #endif
 
 } // namespace string
@@ -48,8 +56,8 @@ struct standard_size<char8_t> : standard_size<char> {};
 
 template <typename CharType, typename Traits = char_traits<CharType>,
     typename Alloc = allocator<CharType>>
-using basic_string =
-    basic_short_string<CharType, details::string::standard_size<CharType>::value, Traits, Alloc>;
+using basic_string = basic_short_string<CharType,
+    details::string::default_inline_size<CharType>::value, Traits, Alloc>;
 
 using string = basic_string<char>;
 using wstring = basic_string<wchar_t>;

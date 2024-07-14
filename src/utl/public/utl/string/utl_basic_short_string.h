@@ -41,6 +41,8 @@
 UTL_NAMESPACE_BEGIN
 template <typename CharType, size_t ShortSize, typename Traits, typename Alloc>
 class basic_short_string {
+    static_assert(ShortSize >= details::string::default_inline_size<CharType>::value,
+        "Default inline size must be longer");
 
 public:
     using allocator_type = Alloc;
@@ -59,8 +61,7 @@ public:
     class const_iterator;
 
 private:
-    static constexpr size_type inline_size =
-        UTL_SCOPE numeric_max<size_type>(ShortSize + 1, 16 / sizeof(CharType));
+    static constexpr size_type inline_size = ShortSize + 1;
 
     struct alignas(16) short_type {
         value_type data_[inline_size];
@@ -190,7 +191,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_CONSTEXPR_CXX14 basic_short_string(View const& view,
+    explicit UTL_CONSTEXPR_CXX14 basic_short_string(View const& view,
         allocator_type const& a = allocator_type()) noexcept(!utl::with_exceptions &&
         is_nothrow_convertible<View, view_type>::value)
         : basic_short_string(a) {
@@ -211,7 +212,6 @@ public:
               alloc_traits::select_on_container_copy_construction(other.allocator_ref()))
         , size_(other.size_)
         , is_heap_(other.is_heap_) {
-
         if (other.is_heap_) {
             storage_.get_heap() = clone_heap(allocator_ref(), other);
         }
@@ -277,11 +277,12 @@ public:
 
     // TODO: container-compatible-ranges ctor
 
+    constexpr operator view_type() const { return view_type{data(), size()}; }
+
     UTL_CONSTEXPR_CXX14 basic_short_string& operator=(basic_short_string&& other) noexcept(
         (alloc_traits::propagate_on_container_move_assignment::value &&
             alloc_traits::is_always_equal::value) ||
         !utl::with_exceptions) {
-
         using can_move_t =
             conjunction<typename alloc_traits::propagate_on_container_move_assignment,
                 typename alloc_traits::is_always_equal>;
@@ -1317,7 +1318,6 @@ private:
 
     UTL_CONSTEXPR_CXX14 void on_move_construct_with_alloc(
         basic_short_string& other, size_type pos, size_type count, false_type) noexcept {
-
         inline_substring(pos, count);
         UTL_SCOPE move(other).reset_to_short();
     }
@@ -1391,11 +1391,14 @@ UTL_STRING_PURE constexpr typename Traits::comparison_category operator<=>(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     using result_type = typename Traits::comparison_category;
-    auto i = lhs.compare(rhs);
-    if (i == 0) {
-        return result_type::equal;
-    }
-    return i < 0 ? result_type::less : result_type::greater;
+    return static_cast<result_type>(lhs.compare(rhs) <=> 0);
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_STRING_CONST constexpr typename Traits::comparison_category operator<=>(
+    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
+    using result_type = typename Traits::comparison_category;
+    return static_cast<result_type>(lhs.compare(rhs) <=> 0);
 }
 
 UTL_NAMESPACE_END
@@ -1411,8 +1414,32 @@ UTL_STRING_PURE constexpr bool operator<(basic_short_string<CharT, N, Traits, Al
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_STRING_CONST constexpr bool operator<(
+    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharType const* rhs) noexcept {
+    return lhs.compare(rhs) < 0;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_STRING_CONST constexpr bool operator<(
+    CharType const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
+    return rhs.compare(lhs) > 0;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_STRING_PURE constexpr bool operator>(basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
+    return rhs < lhs;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_STRING_CONST constexpr bool operator>(
+    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharType const* rhs) noexcept {
+    return rhs < lhs;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_STRING_CONST constexpr bool operator>(
+    CharType const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return rhs < lhs;
 }
 
@@ -1423,14 +1450,50 @@ UTL_STRING_PURE constexpr bool operator>=(basic_short_string<CharT, N, Traits, A
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_STRING_CONST constexpr bool operator>=(
+    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharType const* rhs) noexcept {
+    return !(lhs < rhs);
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_STRING_CONST constexpr bool operator>=(
+    CharType const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
+    return !(lhs < rhs);
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_STRING_PURE constexpr bool operator<=(basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(rhs < lhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_STRING_PURE constexpr bool operator<=(
+    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
+    return !(rhs < lhs);
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_STRING_PURE constexpr bool operator<=(
+    CharT const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
+    return !(rhs < lhs);
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_STRING_PURE constexpr bool operator!=(basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
+    return !(lhs == rhs);
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_STRING_CONST constexpr bool operator!=(
+    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharType const* rhs) noexcept {
+    return !(lhs == rhs);
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_STRING_CONST constexpr bool operator!=(
+    CharType const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(lhs == rhs);
 }
 
