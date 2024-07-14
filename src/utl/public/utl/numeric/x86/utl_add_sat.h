@@ -108,6 +108,9 @@ UTL_NAMESPACE_END
 
 #elif UTL_COMPILER_MSVC // UTL_SUPPORTS_GNU_ASM
 
+#  include "utl/type_traits/utl_make_unsigned.h"
+#  include "utl/utility/utl_signs.h"
+
 #  include <intrin.h>
 
 UTL_NAMESPACE_BEGIN
@@ -124,7 +127,7 @@ T impl(T l, T r) noexcept {
     static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
     T const sat = (l >> shift) ^ UTL_NUMERIC_maximum(T);
     UTL_SCOPE make_unsigned_t<T> tmp;
-    return !_addcarry_u64(0, l, r, &tmp) ? (T)tmp : sat;
+    return !_addcarry_u64(0, l, r, &tmp) ? UTL_SCOPE to_signed(tmp) : sat;
 }
 #  endif // UTL_ARCH_x86_64
 
@@ -136,7 +139,7 @@ T impl(T l, T r) noexcept {
     static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
     T const sat = (l >> shift) ^ UTL_NUMERIC_maximum(T);
     UTL_SCOPE make_unsigned_t<T> tmp;
-    return !_addcarry_u32(0, l, r, &tmp) ? (T)tmp : sat;
+    return !_addcarry_u32(0, l, r, &tmp) ? UTL_SCOPE to_signed(tmp) : sat;
 }
 
 template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_is_sized_signed_integral(2, T))>
@@ -147,7 +150,7 @@ T impl(T l, T r) noexcept {
     static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
     T const sat = (l >> shift) ^ UTL_NUMERIC_maximum(T);
     UTL_SCOPE make_unsigned_t<T> tmp;
-    return !_addcarry_u16(0, l, r, &tmp) ? (T)tmp : sat;
+    return !_addcarry_u16(0, l, r, &tmp) ? UTL_SCOPE to_signed(tmp) : sat;
 }
 
 template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_is_sized_signed_integral(1, T))>
@@ -158,7 +161,7 @@ T impl(T l, T r) noexcept {
     static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
     T const sat = (l >> shift) ^ UTL_NUMERIC_maximum(T);
     UTL_SCOPE make_unsigned_t<T> tmp;
-    return !_addcarry_u8(0, l, r, &tmp) ? (T)tmp : sat;
+    return !_addcarry_u8(0, l, r, &tmp) ? UTL_SCOPE to_signed(tmp) : sat;
 }
 } // namespace runtime
 } // namespace add_sat
