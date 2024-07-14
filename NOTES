@@ -9,4 +9,5 @@
 # TODO: fix UTL_TRAIT_* for llvm < 18
 # TODO: Define GNU Attributes
 # TODO: Define declspec Attributes
-# TODO: deinf CONSTEXPR_ASSERT for C++11
+# TODO: define CONSTEXPR_ASSERT for C++11
+# TODO: Fix UTL_HAS_BUILTIN for MSVC

@@ -38,12 +38,14 @@
 #  define UTL_OPTIMIZATIONS_ENABLED 1
 #endif
 
+#include "utl/preprocessor/utl_architecture.h"
 #include "utl/preprocessor/utl_attributes.h"
 #include "utl/preprocessor/utl_builtins.h"
 #include "utl/preprocessor/utl_compiler.h"
 #include "utl/preprocessor/utl_exceptions.h"
 #include "utl/preprocessor/utl_namespace.h"
 #include "utl/preprocessor/utl_pragma.h"
+#include "utl/preprocessor/utl_simd.h"
 #include "utl/preprocessor/utl_standard.h"
 #include "utl/preprocessor/utl_target.h"
 
