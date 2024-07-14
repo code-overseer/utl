@@ -166,45 +166,192 @@ public:
             : basic_string_view(data() + pos, UTL_SCOPE numeric_min(count, size() - pos));
     }
 
-    constexpr int compare(basic_string_view other) const noexcept {
+    UTL_STRING_PURE constexpr int compare(basic_string_view other) const noexcept {
         return details::string::compare<traits_type>(data(), size(), other.data(), other.size());
     }
-    constexpr int compare(size_type pos, size_type count, basic_string_view other) const UTL_THROWS {
+    UTL_STRING_PURE constexpr int compare(
+        size_type pos, size_type count, basic_string_view other) const UTL_THROWS {
         return substr(pos, count).compare(other);
     }
-    constexpr int compare(size_type pos, size_type count, basic_string_view other,
+    UTL_STRING_PURE constexpr int compare(size_type pos, size_type count, basic_string_view other,
         size_type other_pos, size_type other_count) const UTL_THROWS {
         return substr(pos, count).compare(other.substr(other_pos, other_count));
     }
-    constexpr int compare(const_pointer other) const { return compare(basic_string_view(other)); }
-    constexpr int compare(size_type pos, size_type count, const_pointer other) const UTL_THROWS {
+    UTL_STRING_PURE constexpr int compare(const_pointer other) const {
+        return compare(basic_string_view(other));
+    }
+    UTL_STRING_PURE constexpr int compare(
+        size_type pos, size_type count, const_pointer other) const UTL_THROWS {
         return substr(pos, count).compare(basic_string_view(other));
     }
-    constexpr int compare(
+    UTL_STRING_PURE constexpr int compare(
         size_type pos, size_type count, const_pointer other, size_type other_count) const UTL_THROWS {
         return substr(pos, count).compare(basic_string_view(other, other_count));
     }
-    constexpr bool starts_with(basic_string_view other) const noexcept {
+    UTL_STRING_PURE constexpr bool starts_with(basic_string_view other) const noexcept {
         return size() >= other.size() &&
             traits_type::compare(data(), other.data(), other.size()) == 0;
     }
-    constexpr bool starts_with(value_type ch) const noexcept { return !empty() && front() == ch; }
-    constexpr bool starts_with(const_pointer other) const noexcept {
+    UTL_STRING_PURE constexpr bool starts_with(value_type ch) const noexcept {
+        return !empty() && front() == ch;
+    }
+    UTL_STRING_PURE constexpr bool starts_with(const_pointer other) const noexcept {
+        // CONSTEXPR_ASSERT(other != nullptr);
         return starts_with(basic_string_view(other));
     }
-    constexpr bool ends_with(basic_string_view other) const noexcept {
+    UTL_STRING_PURE constexpr bool ends_with(basic_string_view other) const noexcept {
         return size() >= other.size() &&
             traits_type::compare(data() + size() - other.size(), other.data(), other.size()) == 0;
     }
-    constexpr bool ends_with(value_type ch) const noexcept { return !empty() && back() == ch; }
-    constexpr bool ends_with(const_pointer other) const noexcept {
+    UTL_STRING_PURE constexpr bool ends_with(value_type ch) const noexcept {
+        return !empty() && back() == ch;
+    }
+
+    UTL_STRING_PURE constexpr bool ends_with(const_pointer other) const noexcept {
+        // CONSTEXPR_ASSERT(other != nullptr);
         return ends_with(basic_string_view(other));
     }
-    constexpr bool contains(basic_string_view other) const noexcept { return find(other) != npos; }
-    constexpr bool contains(value_type ch) const noexcept { return find(other) != npos; }
-    constexpr bool contains(const_pointer other) const UTL_THROWS { return find(other) != npos; }
-    constexpr size_type find(basic_string_view other, size_type pos = 0) const noexcept {
-        return details::string::find<traits_type>(data(), size(), str.data(), str.size(), pos);
+
+    UTL_STRING_PURE constexpr bool contains(basic_string_view other) const noexcept {
+        return find(other) != npos;
+    }
+
+    UTL_STRING_PURE constexpr bool contains(value_type ch) const noexcept {
+        return find(other) != npos;
+    }
+
+    UTL_STRING_PURE constexpr bool contains(const_pointer other) const UTL_THROWS {
+        return find(other) != npos;
+    }
+
+    UTL_STRING_PURE constexpr size_type find(
+        basic_string_view other, size_type pos = 0) const noexcept {
+        return find(str.data(), pos, str.size());
+    }
+
+    UTL_STRING_PURE constexpr size_type find(value_type ch, size_type pos = 0) const noexcept {
+        return details::string::find<traits_type>(data(), size(), ch, pos);
+    }
+
+    UTL_STRING_PURE constexpr size_type find(
+        const_pointer str, size_type pos, size_type str_len) const noexcept {
+        // CONSTEXPR_ASSERT(str != nullptr);
+        return details::string::find<traits_type>(data(), size(), str, str_len, pos);
+    }
+
+    UTL_STRING_PURE constexpr size_type find(const_pointer str, size_type pos = 0) const noexcept {
+        // CONSTEXPR_ASSERT(str != nullptr);
+        return find(str, pos, traits_type::length(str));
+    }
+
+    UTL_STRING_PURE constexpr size_type rfind(
+        basic_string_view other, size_type pos = npos) const noexcept {
+        return rfind(other.data(), pos, other.size());
+    }
+
+    UTL_STRING_PURE constexpr size_type rfind(
+        const_pointer str, size_type pos, size_type str_len) const noexcept {
+        // CONSTEXPR_ASSERT(str != nullptr);
+        return details::string::rfind<traits_type>(data(), size(), str, str_len, pos);
+    }
+
+    UTL_STRING_PURE constexpr size_type rfind(
+        const_pointer str, size_type pos = npos) const noexcept {
+        // CONSTEXPR_ASSERT(str != nullptr);
+        return rfind(str, pos, traits_type::length(str));
+    }
+
+    UTL_STRING_PURE constexpr size_type rfind(value_type ch, size_type pos = npos) const noexcept {
+        return details::string::rfind<traits_type>(data(), size(), ch, pos);
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_of(
+        basic_string_view other, size_type pos = 0) const noexcept {
+        return find_first_of(other.data(), pos, other.size());
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_of(
+        const_pointer chars, size_type pos, size_type chars_count) const noexcept {
+        // CONSTEXPR_ASSERT(chars != nullptr);
+        return details::string::find_first_of<traits_type>(data(), size(), chars, chars_count, pos);
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_of(
+        const_pointer chars, size_type pos = 0) const noexcept {
+        // CONSTEXPR_ASSERT(chars != nullptr);
+        return find_first_of(chars, pos, traits_type::length(chars));
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_of(
+        value_type ch, size_type pos = 0) const noexcept {
+        return details::string::find_first_of<traits_type>(data(), size(), ch, pos);
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_not_of(
+        basic_string_view other, size_type pos = 0) const noexcept {
+        return find_first_not_of(other.data(), pos, other.size());
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_not_of(
+        const_pointer chars, size_type pos, size_type chars_count) const noexcept {
+        // CONSTEXPR_ASSERT(chars != nullptr);
+        return details::string::find_first_not_of<traits_type>(
+            data(), size(), chars, chars_count, pos);
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_not_of(
+        const_pointer chars, size_type pos = 0) const noexcept {
+        // CONSTEXPR_ASSERT(chars != nullptr);
+        return find_first_not_of(chars, pos, traits_type::length(chars));
+    }
+
+    UTL_STRING_PURE constexpr size_type find_first_not_of(
+        value_type ch, size_type pos = 0) const noexcept {
+        return find_first_not_of(&ch, pos, 1);
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_of(
+        basic_string_view other, size_type pos = npos) const noexcept {
+        return find_last_of(other.data(), pos, other.size());
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_of(
+        const_pointer chars, size_type pos, size_type chars_count) const noexcept {
+        // CONSTEXPR_ASSERT(chars != nullptr);
+        return details::string::find_last_of<traits_type>(data(), size(), chars, chars_count, pos);
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_of(
+        const_pointer chars, size_type pos = npos) const noexcept {
+        // CONSTEXPR_ASSERT(chars != nullptr);
+        return find_last_of(chars, pos, traits_type::length(chars));
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_of(
+        value_type ch, size_type pos = npos) const noexcept {
+        return find_last_of(&ch, pos, 1);
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_not_of(
+        basic_string_view other, size_type pos = npos) const UTL_THROWS {
+        return find_last_not_of(other.data(), pos, other.size());
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_not_of(
+        const_pointer chars, size_type pos, size_type count) const UTL_THROWS {
+        // CONSTEXPR_ASSERT(chars != nullptr);
+        return details::string::find_last_not_of<traits_type>(data(), size(), chars, count, pos);
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_not_of(
+        const_pointer chars, size_type pos = npos) const UTL_THROWS {
+        // CONSTEXPR_ASSERT(chars != nullptr);
+        return find_last_not_of(chars, pos, traits_type::length(chars));
+    }
+
+    UTL_STRING_PURE constexpr size_type find_last_not_of(
+        value_type ch, size_type pos = npos) const UTL_THROWS {
+        return find_last_not_of(&ch, pos, 1);
     }
 
 private:
@@ -217,7 +364,70 @@ private:
     size_type size_;
 };
 
+template <typename CharType, typename Traits>
+UTL_STRING_CONST constexpr bool operator==(
+    basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
+    return lhs.size() == rhs.size() && lhs.compare(rhs) == 0;
+}
+
 UTL_NAMESPACE_END
+
+#if UTL_CXX20
+
+#  include "utl/compare/utl_strong_ordering.h"
+
+UTL_NAMESPACE_BEGIN
+
+template <typename CharType, typename Traits>
+UTL_STRING_CONST constexpr typename Traits::comparison_category operator<=>(
+    basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
+    using result_type = typename Traits::comparison_category;
+    auto i = lhs.compare(rhs);
+    if (i == 0) {
+        return result_type::equal;
+    }
+    return i < 0 ? result_type::less : result_type::greater;
+}
+
+UTL_NAMESPACE_END
+
+#else
+
+UTL_NAMESPACE_BEGIN
+
+template <typename CharType, typename Traits>
+UTL_STRING_CONST constexpr bool operator<(
+    basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
+    return lhs.size() < rhs.size() || lhs.compare(rhs) < 0;
+}
+
+template <typename CharType, typename Traits>
+UTL_STRING_CONST constexpr bool operator>(
+    basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
+    return rhs < lhs;
+}
+
+template <typename CharType, typename Traits>
+UTL_STRING_CONST constexpr bool operator>=(
+    basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
+    return !(lhs < rhs);
+}
+
+template <typename CharType, typename Traits>
+UTL_STRING_CONST constexpr bool operator<=(
+    basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
+    return !(rhs < lhs);
+}
+
+template <typename CharType, typename Traits>
+UTL_STRING_CONST constexpr bool operator!=(
+    basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
+    return !(lhs == rhs);
+}
+
+UTL_NAMESPACE_END
+
+#endif
 
 #undef UTL_STRING_PURE
 #undef UTL_STRING_CONST

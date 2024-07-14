@@ -18,6 +18,8 @@ struct allocation_result;
 
 template <typename CharType, typename Traits = char_traits<CharType>>
 class basic_string_view;
+template <typename CharType, typename Traits = char_traits<CharType>>
+class basic_zstring_view;
 
 template <typename CharType, size_t ShortSize, typename Traits = char_traits<CharType>,
     typename Alloc = allocator<CharType>>
@@ -76,6 +78,14 @@ using u16string_view = basic_string_view<char16_t>;
 using u32string_view = basic_string_view<char32_t>;
 #ifdef UTL_SUPPORTS_CHAR8_T
 using u8string_view = basic_string_view<char8_t>;
+#endif
+
+using zstring_view = basic_zstring_view<char>;
+using zwstring_view = basic_zstring_view<wchar_t>;
+using zu16string_view = basic_zstring_view<char16_t>;
+using zu32string_view = basic_zstring_view<char32_t>;
+#ifdef UTL_SUPPORTS_CHAR8_T
+using zu8string_view = basic_zstring_view<char8_t>;
 #endif
 
 UTL_NAMESPACE_END

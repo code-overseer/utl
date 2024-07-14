@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_attributes.h"
+
 #include "utl/compare/utl_compare_fwd.h"
 #include "utl/concepts/utl_same_as.h"
-#include "utl/preprocessor/utl_attributes.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -14,7 +15,7 @@ class partial_ordering {
     using value_t = details::compare::value_t;
     using order_t = details::compare::order_t;
     using unorder_t = details::compare::unorder_t;
-    using zero_t = details::compare::obscure::zero_t;
+    using zero_t = details::compare::zero_t;
     friend class strong_ordering;
     friend class weak_ordering;
 

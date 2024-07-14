@@ -390,7 +390,7 @@ constexpr size_t rfind(CharType const* str, size_t length, CharType const ch) no
 template <typename Traits, typename CharType>
 UTL_ATTRIBUTES(NODISCARD, PURE)
 constexpr size_t rfind(CharType const* str, size_t length, CharType const ch, size_t pos) noexcept {
-    return rfind(str, UTL_SCOPE numeric_min(length, UTL_SCOPE add_sat(pos, 1)), ch);
+    return rfind(str, UTL_SCOPE numeric_min(length, UTL_SCOPE add_sat<size_t>(pos, 1)), ch);
 }
 
 template <typename Traits, typename CharType>
@@ -399,7 +399,7 @@ constexpr size_t rfind(
     CharType const* l, size_t l_count, CharType const* r, size_t r_count, size_t l_pos) noexcept {
     return to_index(l,
         rsearch_substring<Traits>(
-            l, UTL_SCOPE numeric_min(UTL_SCOPE add_sat(l_pos, 1), l_count), r, r_count));
+            l, UTL_SCOPE numeric_min(UTL_SCOPE add_sat<size_t>(l_pos, 1), l_count), r, r_count));
 }
 
 template <typename Traits, typename T>
@@ -483,7 +483,7 @@ UTL_ATTRIBUTES(NODISCARD, PURE)
 constexpr size_t find_last_not_of(
     T const* str, size_t len, T const* chars, size_t chars_count, size_t pos) noexcept {
     return find_last_not_of<Traits>(
-        str, UTL_SCOPE numeric_min(len, UTL_SCOPE add_sat(pos, 1)), chars, chars_count);
+        str, UTL_SCOPE numeric_min(len, UTL_SCOPE add_sat<size_t>(pos, 1)), chars, chars_count);
 }
 
 template <typename Traits, typename T>
