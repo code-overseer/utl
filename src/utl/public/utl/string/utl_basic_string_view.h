@@ -152,11 +152,13 @@ public:
         other = UTL_SCOPE exchange(*this, other);
     }
 
-    UTL_CONSTEXPR_CXX14 void copy(pointer dest, size_type count, size_type pos = 0) const UTL_THROWS {
+    UTL_CONSTEXPR_CXX14 size_t copy(pointer dest, size_type count, size_type pos = 0) const UTL_THROWS {
         UTL_THROW_IF(pos > size(),
             program_exception<void>("[UTL] basic_string_view::copy operation failed, "
                                     "Reason=[index out of range]"));
-        traits_type::copy(dest, data() + pos, UTL_SCOPE numeric_min(count, size() - pos));
+        auto const copied = UTL_SCOPE numeric_min(count, size() - pos);
+        traits_type::copy(dest, data() + pos, copied);
+        return copied;
     }
 
     UTL_STRING_PURE
@@ -355,7 +357,7 @@ public:
     }
 
 private:
-    [[noreturn]] static basic_string_view substr_throw() const UTL_THROWS {
+    [[noreturn]] static basic_string_view substr_throw() UTL_THROWS {
         UTL_THROW(program_exception<void>("[UTL] basic_string_view::substr operation failed, "
                                           "Reason=[index out of range]"));
     }
@@ -367,19 +369,7 @@ private:
 template <typename CharType, typename Traits>
 UTL_STRING_CONST constexpr bool operator==(
     basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
-    return lhs.size() == rhs.size() && lhs.compare(rhs) == 0;
-}
-
-template <typename CharType, typename Traits>
-UTL_STRING_CONST constexpr bool operator==(
-    basic_string_view<CharType, Traits> lhs, CharType const* rhs) noexcept {
-    return lhs.compare(rhs) == 0;
-}
-
-template <typename CharType, typename Traits>
-UTL_STRING_CONST constexpr bool operator==(
-    CharType const* lhs, basic_string_view<CharType, Traits> rhs) noexcept {
-    return rhs.compare(lhs) == 0;
+    return lhs.size() == rhs.size() && (lhs.data() == rhs.data() || lhs.compare(rhs) == 0);
 }
 
 UTL_NAMESPACE_END
