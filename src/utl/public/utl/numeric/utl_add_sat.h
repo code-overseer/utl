@@ -90,9 +90,9 @@ UTL_NAMESPACE_END
 
 #define UTL_NUMERIC_PRIVATE_HEADER_GUARD
 #if UTL_ARCH_x86
-#  include "utl/numeric/arm/utl_add_sat.h"
-#elif UTL_ARCH_ARM
 #  include "utl/numeric/x86/utl_add_sat.h"
+#elif UTL_ARCH_ARM
+#  include "utl/numeric/arm/utl_add_sat.h"
 #endif
 #undef UTL_NUMERIC_PRIVATE_HEADER_GUARD
 

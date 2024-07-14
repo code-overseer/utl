@@ -6,32 +6,32 @@
 
 #include "utl/type_traits/utl_constants.h"
 
-#ifdef UTL_CXX20
+#if UTL_CXX20
 #  include "utl/concepts/utl_integral.h"
 #  include "utl/concepts/utl_signed_integral.h"
 #  include "utl/concepts/utl_unsigned_integral.h"
 
 UTL_NAMESPACE_BEGIN
 
-template <size_t N, typename T>
+template <typename T, size_t N>
 concept sized_integral = integral<T> && sizeof(T) == N;
-template <size_t N, typename T>
-concept sized_unsigned_integral = unsigned_integral<T> && sized_integral<N, T>;
-template <size_t N, typename T>
-concept sized_signed_integral = signed_integral<T> && sized_integral<N, T>;
+template <typename T, size_t N>
+concept sized_unsigned_integral = unsigned_integral<T> && sized_integral<T, N>;
+template <typename T, size_t N>
+concept sized_signed_integral = signed_integral<T> && sized_integral<T, N>;
 
 template <size_t N, typename T>
-struct is_sized_integral : bool_constant<sized_integral<N, T>> {};
+struct is_sized_integral : bool_constant<sized_integral<T, N>> {};
 template <size_t N, typename T>
-struct is_sized_unsigned_integral : bool_constant<sized_unsigned_integral<N, T>> {};
+struct is_sized_unsigned_integral : bool_constant<sized_unsigned_integral<T, N>> {};
 template <size_t N, typename T>
-struct is_sized_signed_integral : bool_constant<sized_signed_integral<N, T>> {};
+struct is_sized_signed_integral : bool_constant<sized_signed_integral<T, N>> {};
 template <size_t N, typename T>
-inline constexpr bool is_sized_integral_v = sized_integral<N, T>;
+inline constexpr bool is_sized_integral_v = sized_integral<T, N>;
 template <size_t N, typename T>
-inline constexpr bool is_sized_unsigned_integral_v = sized_unsigned_integral<N, T>;
+inline constexpr bool is_sized_unsigned_integral_v = sized_unsigned_integral<T, N>;
 template <size_t N, typename T>
-inline constexpr bool is_sized_signed_integral_v = sized_signed_integral<N, T>;
+inline constexpr bool is_sized_signed_integral_v = sized_signed_integral<T, N>;
 
 #  define UTL_TRAIT_is_sized_integral(...) sized_integral<__VA_ARGS__>
 #  define UTL_TRAIT_is_sized_unsigned_integral(...) sized_unsigned_integral<__VA_ARGS__>

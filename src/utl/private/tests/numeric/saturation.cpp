@@ -17,8 +17,13 @@ static_assert(signed_impl<int>(UTL_NUMERIC_minimum(int), 1).result() == UTL_NUME
 
 static_assert(signed_impl<int>(1, -1).result() == 2);
 static_assert(signed_impl<int>(1, 1).result() == 0);
-
 } // namespace compile_time
+namespace runtime {
+template long impl(long, long) noexcept;
+template int impl(int, int) noexcept;
+template short impl(short, short) noexcept;
+template signed char impl(signed char, signed char) noexcept;
+} // namespace runtime
 } // namespace sub_sat
 
 namespace add_sat {
@@ -36,6 +41,12 @@ static_assert(
 static_assert(signed_impl<int>(1, -1).result() == 0);
 static_assert(signed_impl<int>(1, 1).result() == 2);
 } // namespace compile_time
+namespace runtime {
+template long impl(long, long) noexcept;
+template int impl(int, int) noexcept;
+template short impl(short, short) noexcept;
+template signed char impl(signed char, signed char) noexcept;
+} // namespace runtime
 } // namespace add_sat
 } // namespace details
 UTL_NAMESPACE_END

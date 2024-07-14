@@ -64,18 +64,17 @@ template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T
         UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(2, T))>
 T impl(T l, T r) noexcept {
     using w_type = int32_t;
-    static constexpr auto min = UTL_NUMERIC_minimum(T);
+    static constexpr auto max = UTL_NUMERIC_maximum(T);
     static constexpr int ls = 2 * CHAR_BIT;
     static constexpr int rs = sizeof(l) * CHAR_BIT - 1;
-    __asm("lsl     %w[left], %w[left], %w[ls]\n\t"
-          "lsl     %w[right], %w[right], %w[ls]\n\t"
-          "subs    %w[left], %w[left], %w[right]\n\t"
-          "asr     %w[right], %w[right], %w[bits]\n\t"
-          "eor     %w[right], %w[right], %w[min]\n\t"
-          "csel    %w[left], %w[right], %w[left], vs\n\t"
-          "lsr     %w[left], %w[left], %w[ls]"
+    __asm("lsl     %w[left], %w[left], %[ls]\n\t"
+          "subs    %w[right], %w[left], %w[right], lsl#%[ls]\n\t"
+          "asr     %w[left], %w[left], %[bits]\n\t"
+          "eor     %w[left], %w[left], %[max]\n\t"
+          "csel    %w[left], %w[left], %w[right], vs\n\t"
+          "lsr     %w[left], %w[left], %[ls]"
           : [left] "+r"(l), [right] "+r"(r)
-          : [min] "i"(min), [ls] "Ji"(ls), [bits] "Ji"(rs)
+          : [max] "i"(max), [ls] "Ji"(ls), [bits] "Ji"(rs)
           : "cc");
     return l;
 }
@@ -86,18 +85,17 @@ template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T
         UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(1, T))>
 T impl(T l, T r) noexcept {
     using w_type = int32_t;
-    static constexpr auto min = UTL_NUMERIC_minimum(T);
+    static constexpr auto max = UTL_NUMERIC_maximum(T);
     static constexpr int ls = 3 * CHAR_BIT;
     static constexpr int rs = sizeof(l) * CHAR_BIT - 1;
-    __asm("lsl     %w[left], %w[left], %w[ls]\n\t"
-          "lsl     %w[right], %w[right], %w[ls]\n\t"
-          "subs    %w[left], %w[left], %w[right]\n\t"
-          "asr     %w[right], %w[right], %w[bits]\n\t"
-          "eor     %w[right], %w[right], %w[min]\n\t"
-          "csel    %w[left], %w[right], %w[left], vs\n\t"
-          "lsr     %w[left], %w[left], %w[ls]"
+    __asm("lsl     %w[left], %w[left], %[ls]\n\t"
+          "subs    %w[right], %w[left], %w[right], lsl#%[ls]\n\t"
+          "asr     %w[left], %w[left], %[bits]\n\t"
+          "eor     %w[left], %w[left], %[max]\n\t"
+          "csel    %w[left], %w[left], %w[right], vs\n\t"
+          "lsr     %w[left], %w[left], %[ls]"
           : [left] "+r"(l), [right] "+r"(r)
-          : [min] "i"(min), [ls] "Ji"(ls), [bits] "Ji"(rs)
+          : [max] "i"(max), [ls] "Ji"(ls), [bits] "Ji"(rs)
           : "cc");
     return l;
 }
@@ -160,19 +158,19 @@ namespace details {
 namespace sub_sat {
 namespace runtime {
 int64_t impl(int64_t l, int64_t r) noexcept {
-    return vqaddd_s64(l, r);
+    return vqsubd_s64(l, r);
 }
 
 int32_t impl(int32_t l, int32_t r) noexcept {
-    return vqadds_s32(l, r);
+    return vqsubs_s32(l, r);
 }
 
 int16_t impl(int16_t l, int16_t r) noexcept {
-    return vqaddh_s16(l, r);
+    return vqsubh_s16(l, r);
 }
 
 int8_t impl(int8_t l, int8_t r) noexcept {
-    return vqaddb_s8(l, r);
+    return vqsubb_s8(l, r);
 }
 } // namespace runtime
 } // namespace sub_sat

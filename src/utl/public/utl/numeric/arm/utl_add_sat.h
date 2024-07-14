@@ -16,7 +16,6 @@
 #include "utl/numeric/utl_sized_integral.h"
 
 #if UTL_SUPPORTS_GNU_ASM
-
 #  if UTL_ARCH_AARCH64
 
 UTL_NAMESPACE_BEGIN
@@ -67,13 +66,12 @@ T impl(T l, T r) noexcept {
     static constexpr auto max = UTL_NUMERIC_maximum(w_type);
     static constexpr int ls = 2 * CHAR_BIT;
     static constexpr int rs = sizeof(l) * CHAR_BIT - 1;
-    __asm("lsl     %w[left], %w[left], %w[ls]\n\t"
-          "lsl     %w[right], %w[right], %w[ls]\n\t"
-          "adds    %w[left], %w[left], %w[right]\n\t"
-          "asr     %w[right], %w[right], %w[bits]\n\t"
-          "eor     %w[right], %w[right], %w[max]\n\t"
-          "csel    %w[left], %w[right], %w[left], vs\n\t"
-          "lsr     %w[left], %w[left], %w[ls]"
+    __asm("lsl     %w[left], %w[left], %[ls]\n\t"
+          "adds    %w[right], %w[left], %w[right], lsl#%[ls]\n\t"
+          "asr     %w[left], %w[left], %[bits]\n\t"
+          "eor     %w[left], %w[left], %[max]\n\t"
+          "csel    %w[left], %w[left], %w[right], vs\n\t"
+          "lsr     %w[left], %w[left], %[ls]"
           : [left] "+r"(l), [right] "+r"(r)
           : [max] "i"(max), [ls] "Ji"(ls), [bits] "Ji"(rs)
           : "cc");
@@ -89,13 +87,12 @@ T impl(T l, T r) noexcept {
     static constexpr auto max = UTL_NUMERIC_maximum(w_type);
     static constexpr int ls = 3 * CHAR_BIT;
     static constexpr int rs = sizeof(l) * CHAR_BIT - 1;
-    __asm("lsl     %w[left], %w[left], %w[ls]\n\t"
-          "lsl     %w[right], %w[right], %w[ls]\n\t"
-          "adds    %w[left], %w[left], %w[right]\n\t"
-          "asr     %w[right], %w[right], %w[bits]\n\t"
-          "eor     %w[right], %w[right], %w[max]\n\t"
-          "csel    %w[left], %w[right], %w[left], vs\n\t"
-          "lsr     %w[left], %w[left], %w[ls]"
+    __asm("lsl     %w[left], %w[left], %[ls]\n\t"
+          "adds    %w[right], %w[left], %w[right], lsl#%[ls]\n\t"
+          "asr     %w[left], %w[left], %[bits]\n\t"
+          "eor     %w[left], %w[left], %[max]\n\t"
+          "csel    %w[left], %w[left], %w[right], vs\n\t"
+          "lsr     %w[left], %w[left], %[ls]"
           : [left] "+r"(l), [right] "+r"(r)
           : [max] "i"(max), [ls] "Ji"(ls), [bits] "Ji"(rs)
           : "cc");
@@ -157,25 +154,25 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 namespace details {
-namespace sub_sat {
+namespace add_sat {
 namespace runtime {
 int64_t impl(int64_t l, int64_t r) noexcept {
-    return vqsubd_s64(l, r);
+    return vqaddd_s64(l, r);
 }
 
 int32_t impl(int32_t l, int32_t r) noexcept {
-    return vqsubs_s32(l, r);
+    return vqadds_s32(l, r);
 }
 
 int16_t impl(int16_t l, int16_t r) noexcept {
-    return vqsubh_s16(l, r);
+    return vqaddh_s16(l, r);
 }
 
 int8_t impl(int8_t l, int8_t r) noexcept {
-    return vqsubb_s8(l, r);
+    return vqaddb_s8(l, r);
 }
 } // namespace runtime
-} // namespace sub_sat
+} // namespace add_sat
 } // namespace details
 UTL_NAMESPACE_END
 
