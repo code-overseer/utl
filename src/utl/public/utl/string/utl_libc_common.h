@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/string/utl_is_string_char.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_empty.h"
@@ -11,27 +12,7 @@
 #include "utl/type_traits/utl_is_unsigned.h"
 #include "utl/type_traits/utl_remove_cv.h"
 
-#include <string.h>
-
-#if UTL_DISABLE_SSE_LIBC
-#  define UTL_DISABLE_SIMD_LIBC 1
-#elif UTL_DISABLE_AVX_LIBC
-#  define UTL_DISABLE_AVX512_LIBC 1
-#endif
-
-#if !UTL_DISABLE_SIMD_LIBC
-#  if UTL_SUPPORTS_SIMD_INTRINSICS && UTL_ARCH_x86
-#    include <immintrin.h>
-#  endif // UTL_SUPPORTS_SIMD_INTRINSICS && UTL_ARCH_x86
-
-#  if UTL_SIMD_ARM_SVE && !UTL_DISABLE_SVE_LIBC
-#    include <arm_sve.h>
-#  elif UTL_SIMD_ARM_NEON && !UTL_DISABLE_NEON_LIBC
-#    include <arm_neon.h>
-#  else
-#    define UTL_DISABLE_SIMD_LIBC 1
-#  endif
-#endif
+#include <cstring>
 
 UTL_NAMESPACE_BEGIN
 
