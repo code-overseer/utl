@@ -1124,8 +1124,8 @@ public:
         UTL_THROW_IF(pos > size(),
             program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
                                     "Reason=[index out of range]"));
-        auto const view = view_type(data(), size()).substr(pos, count);
-        return details::string::compare<traits_type>(view.data(), view.size(), str, str_len);
+        return details::string::compare<traits_type>(
+            data() + pos, UTL_SCOPE numeric_min(count, size() - pos), str, str_len);
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
