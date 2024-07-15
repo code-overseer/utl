@@ -4,6 +4,8 @@
 
 #include "utl/preprocessor/utl_config.h"
 
+#include "utl/string/utl_string_fwd.h"
+
 #include "utl/algorithm/utl_max.h"
 #include "utl/algorithm/utl_min.h"
 #include "utl/algorithm/utl_remove.h"
@@ -18,15 +20,15 @@
 #include "utl/iterator/utl_reverse_iterator.h"
 #include "utl/memory/utl_allocator_traits.h"
 #include "utl/memory/utl_construct_at.h"
+#include "utl/string/utl_basic_string_view.h"
+#include "utl/string/utl_basic_zstring_view.h"
 #include "utl/string/utl_string_details.h"
-#include "utl/string/utl_string_fwd.h"
 #include "utl/type_traits/utl_is_convertible.h"
 #include "utl/type_traits/utl_is_nothrow_convertible.h"
 #include "utl/utility/utl_as_const.h"
 #include "utl/utility/utl_compressed_pair.h"
 
-#include <limits.h>
-
+#include <climits>
 #include <initializer_list>
 
 #if UTL_WITH_EXCEPTIONS
@@ -278,6 +280,9 @@ public:
     // TODO: container-compatible-ranges ctor
 
     constexpr operator view_type() const { return view_type{data(), size()}; }
+    explicit constexpr operator basic_zstring_view<value_type, traits_type>() const {
+        return basic_zstring_view<value_type, traits_type>{data(), size()};
+    }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& operator=(basic_short_string&& other) noexcept(
         (alloc_traits::propagate_on_container_move_assignment::value &&

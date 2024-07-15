@@ -84,6 +84,8 @@ IncludeCategories:
     Priority:        0
   - Regex:           '"utl/preprocessor/.*"'
     Priority:        5
+  - Regex:           '"utl/.*_fwd.h"'
+    Priority:        8
   - Regex:           '".*"'
     Priority:        10
   - Regex:           '^<.*\.(h)>'
