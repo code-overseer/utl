@@ -396,7 +396,7 @@ UTL_NAMESPACE_BEGIN
 template <typename CharType, typename Traits>
 UTL_STRING_CONST constexpr bool operator<(
     basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
-    return lhs.size() < rhs.size() || lhs.compare(rhs) < 0;
+    return lhs.compare(rhs) < 0;
 }
 
 template <typename CharType, typename Traits>

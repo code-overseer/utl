@@ -1098,8 +1098,8 @@ public:
         return details::string::compare<traits_type>(data(), size(), other.data(), other.size());
     }
 
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(const_pointer str) const noexcept {
-        UTL_ASSERT(str != nullptr);
+    UTL_STRING_PURE constexpr int compare(const_pointer str) const noexcept {
+        // CONSTEXPR_ASSERT(str != nullptr);
         return details::string::compare<traits_type>(data(), size(), str, traits_type::length(str));
     }
 
@@ -1119,13 +1119,13 @@ public:
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
-        size_type pos, size_type count, const_pointer str, size_type count2) const UTL_THROWS {
+        size_type pos, size_type count, const_pointer str, size_type str_len) const UTL_THROWS {
         UTL_ASSERT(str != nullptr);
         UTL_THROW_IF(pos > size(),
             program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
                                     "Reason=[index out of range]"));
         auto const view = view_type(data(), size()).substr(pos, count);
-        return details::string::compare<traits_type>(view.data(), view.size(), str, count2);
+        return details::string::compare<traits_type>(view.data(), view.size(), str, str_len);
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
@@ -1410,7 +1410,7 @@ UTL_NAMESPACE_BEGIN
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_STRING_PURE constexpr bool operator<(basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
-    return lhs.size() < rhs.size() || lhs.compare(rhs) < 0;
+    return lhs.compare(rhs) < 0;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>

@@ -46,7 +46,7 @@ public:
         : base_type(data, size) {
         UTL_THROW_IF(data_[size] != 0,
             program_exception<void>(
-                "zstring_view construction failed, Reason=[candidate string not null-terminated]"));
+                "zstring_view construction failed, Reason=[argument string not null-terminated]"));
     }
     constexpr basic_zstring_view(const_pointer data)
         UTL_NOEXCEPT(noexcept(traits_type::length(data)))
@@ -165,7 +165,7 @@ UTL_NAMESPACE_BEGIN
 template <typename CharType, typename Traits>
 UTL_STRING_CONST constexpr bool operator<(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
-    return lhs.size() < rhs.size() || lhs.compare(rhs) < 0;
+    return lhs.compare(rhs) < 0;
 }
 
 template <typename CharType, typename Traits>
