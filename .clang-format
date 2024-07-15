@@ -117,3 +117,7 @@ Macros:
 - UTL_NODISCARD=[[nodiscard]]
 - UTL_ENABLE_IF_CXX11(X,Y)=void
 - UTL_ATTRIBUTE(X)=[[X]]
+- UTL_ATTRIBUTES(X)=[[X]]
+- UTL_ATTRIBUTES(X,Y)=[[X,Y]]
+- UTL_ATTRIBUTES(X,Y,Z)=[[X,Y,Z]]
+- UTL_ATTRIBUTES(X,Y,Z,W)=[[X,Y,Z,W]]
