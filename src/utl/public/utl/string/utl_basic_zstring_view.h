@@ -4,6 +4,8 @@
 
 #include "utl/preprocessor/utl_config.h"
 
+#include "utl/string/utl_string_fwd.h"
+
 #include "utl/algorithm/utl_max.h"
 #include "utl/algorithm/utl_min.h"
 #include "utl/exception.h"
@@ -15,6 +17,7 @@
 #include "utl/iterator/utl_reverse_iterator.h"
 #include "utl/iterator/utl_sized_sentinel_for.h"
 #include "utl/memory/utl_to_address.h"
+#include "utl/string/utl_string_details.h"
 
 #define UTL_STRING_PURE UTL_ATTRIBUTES(NODISCARD, PURE)
 #define UTL_STRING_CONST UTL_ATTRIBUTES(NODISCARD, CONST)

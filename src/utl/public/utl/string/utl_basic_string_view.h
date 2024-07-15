@@ -4,6 +4,8 @@
 
 #include "utl/preprocessor/utl_config.h"
 
+#include "utl/string/utl_string_fwd.h"
+
 #include "utl/algorithm/utl_max.h"
 #include "utl/algorithm/utl_min.h"
 #include "utl/exception.h"
@@ -15,6 +17,7 @@
 #include "utl/iterator/utl_reverse_iterator.h"
 #include "utl/iterator/utl_sized_sentinel_for.h"
 #include "utl/memory/utl_to_address.h"
+#include "utl/string/utl_string_details.h"
 
 #define UTL_STRING_PURE UTL_ATTRIBUTES(NODISCARD, PURE)
 #define UTL_STRING_CONST UTL_ATTRIBUTES(NODISCARD, CONST)
@@ -219,7 +222,7 @@ public:
     }
 
     UTL_STRING_PURE constexpr bool contains(value_type ch) const noexcept {
-        return find(other) != npos;
+        return find(ch) != npos;
     }
 
     UTL_STRING_PURE constexpr bool contains(const_pointer other) const UTL_THROWS {
@@ -228,7 +231,7 @@ public:
 
     UTL_STRING_PURE constexpr size_type find(
         basic_string_view other, size_type pos = 0) const noexcept {
-        return find(str.data(), pos, str.size());
+        return find(other.data(), pos, other.size());
     }
 
     UTL_STRING_PURE constexpr size_type find(value_type ch, size_type pos = 0) const noexcept {
