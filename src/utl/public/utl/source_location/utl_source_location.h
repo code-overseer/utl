@@ -12,7 +12,8 @@
 #  define UTL_D129488_FIXED 0
 #endif
 
-#if UTL_USE_STD_SOURCE_LOCATION && defined(UTL_BUILTIN_source_location) && UTL_CXX20
+#if (UTL_D129488_FIXED | UTL_USE_STD_SOURCE_LOCATION) && defined(UTL_BUILTIN_source_location) && \
+    UTL_CXX20
 
 #  define UTL_COMPILER_SUPPORTS_SOURCE_LOCATION 1
 #  include <source_location>
@@ -27,6 +28,12 @@ UTL_NAMESPACE_END
 
 #  define UTL_COMPILER_SUPPORTS_SOURCE_LOCATION 1
 
+#  if UTL_CXX20 & UTL_D129488_FIXED
+#    define UTL_SOURCE_LOCATION_CONSTEVAL consteval
+#  else
+#    define UTL_SOURCE_LOCATION_CONSTEVAL constexpr
+#  endif
+
 #  ifdef UTL_BUILTIN_FUNCSIG
 #    define UTL_BUILTIN_FUNCTION_NAME() UTL_BUILTIN_FUNCSIG()
 #  else
@@ -37,15 +44,8 @@ UTL_NAMESPACE_END
 #    define UTL_BUILTIN_COLUMN_INDEX() UTL_BUILTIN_COLUMN()
 #  else
 #    define UTL_BUILTIN_COLUMN_INDEX() -1
+#    include "utl/type_traits/utl_constants.h"
 #  endif
-
-#  if UTL_CXX20 & UTL_D129488_FIXED
-#    define UTL_SOURCE_LOCATION_CONSTEVAL consteval
-#  else
-#    define UTL_SOURCE_LOCATION_CONSTEVAL constexpr
-#  endif
-
-#  include "utl/type_traits/utl_constants.h"
 
 UTL_NAMESPACE_BEGIN
 
