@@ -18,10 +18,20 @@
 #    define UTL_MSVC_SUPPORTS__builtin_is_constant_evaluated 1
 #  endif
 
+#  if UTL_COMPILER_MSVC_AT_LEAST(1927)
+#    define UTL_MSVC_SUPPORTS__builtin_FILE 1
+#    define UTL_MSVC_SUPPORTS__builtin_FUNCTION 1
+#    define UTL_MSVC_SUPPORTS__builtin_LINE 1
+#  endif
+
 #  if UTL_COMPILER_MSVC_AT_LEAST(1929)
 #    define UTL_MSVC_SUPPORTS__is_layout_compatible 1
 #    define UTL_MSVC_SUPPORTS__is_pointer_interconvertible_base_of
 #    define UTL_MSVC_SUPPORTS__is_corresponding_member
+#  endif
+
+#  if UTL_COMPILER_MSVC_AT_LEAST(1935)
+#    define UTL_MSVC_SUPPORTS__builtin_FUNCSIG 1
 #  endif
 
 #  define UTL_MSVC_SUPPORTS__builtin_addressof 1
