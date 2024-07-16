@@ -81,16 +81,16 @@ UTL_NAMESPACE_END
 #    define UTL_NOEXCEPT(...) noexcept(__VA_ARGS__)
 #  endif
 
-#  define UTL_THROW(...)                                                \
-      UTL_ASSERT(UTL_SCOPE always_false<decltype(__VA_ARGS__)>::value); \
+#  define UTL_THROW(...)                                           \
+      UTL_ASSERT(UTL_SCOPE always_false<decltype(__VA_ARGS__)>()); \
       UTL_BUILTIN_unreachable()
 #  define UTL_RETHROW(...)            \
       UTL_ASSERT(false, __VA_ARGS__); \
       UTL_BUILTIN_unreachable()
 #  define UTL_TRY if UTL_CONSTEXPR_CXX17 (1)
 
-#  define UTL_THROW_IF(CONDITION, ...)                                                  \
-      UTL_ASSERT(!(CONDITION) && UTL_SCOPE always_false<decltype(__VA_ARGS__)>::value); \
+#  define UTL_THROW_IF(CONDITION, ...)                                             \
+      UTL_ASSERT(!(CONDITION) && UTL_SCOPE always_false<decltype(__VA_ARGS__)>()); \
       UTL_BUILTIN_unreachable()
 
 #  define UTL_CATCH(...)                                                          \

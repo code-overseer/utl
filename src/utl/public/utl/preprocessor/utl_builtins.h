@@ -85,3 +85,27 @@ void abort(void);
 #  define UTL_BUILTIN_is_pointer_interconvertible_base_of(...) \
       __is_pointer_interconvertible_base_of(__VA_ARGS__)
 #endif
+
+#if UTL_HAS_BUILTIN(__builtin_source_location)
+#  define UTL_BUILTIN_source_location() __builtin_source_location()
+#endif
+
+#if UTL_HAS_BUILTIN(__builtin_FILE)
+#  define UTL_BUILTIN_FILE() __builtin_FILE()
+#endif
+
+#if UTL_HAS_BUILTIN(__builtin_FUNCTION)
+#  define UTL_BUILTIN_FUNCTION() __builtin_FUNCTION()
+#endif
+
+#if UTL_HAS_BUILTIN(__builtin_LINE)
+#  define UTL_BUILTIN_LINE() __builtin_LINE()
+#endif
+
+#if UTL_HAS_BUILTIN(__builtin_COLUMN)
+#  define UTL_BUILTIN_COLUMN() __builtin_COLUMN()
+#endif
+
+#if UTL_HAS_BUILTIN(__builtin_FUNCSIG)
+#  define UTL_BUILTIN_FUNCSIG() __builtin_FUNCSIG()
+#endif
