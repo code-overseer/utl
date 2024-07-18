@@ -198,7 +198,7 @@ private:
         allocator_type const& alloc, message_header* head) UTL_THROWS {
         UTL_ASSERT(head != nullptr);
 
-        auto const copied_head = message_header::copy(*head, alloc);
+        auto const copied_head = message_header::clone(*head, alloc);
         auto to_copy = next(*head);
         auto copied_prev = copied_head;
         while (to_copy != nullptr) {

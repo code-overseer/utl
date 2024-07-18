@@ -18,7 +18,7 @@ namespace exceptions {
 class message_header {
 public:
     template <typename Alloc>
-    UTL_ATTRIBUTE(NODISCARD) static message_header* copy(message_header const& src, Alloc const& alloc) {
+    UTL_ATTRIBUTE(NODISCARD) static message_header* clone(message_header const& src, Alloc const& alloc) {
         constexpr auto header_size = sizeof(message_header);
         auto const buffer_size = src.size() + 1;
         auto const count = (header_size + buffer_size - 1) / buffer_size;
@@ -27,11 +27,11 @@ public:
         auto raw_bytes = ::new (ptr) unsigned char[count * header_size];
         auto header = ::new (raw_bytes) message_header(src.location(), src.size());
         auto str = ::new (raw_bytes + header_size) char[buffer_size];
-        memcpy(str, src.message(), buffer_size);
+        libc::unsafe::memcpy(str, src.message(), libc::element_count_t(buffer_size));
 
         return header;
     }
-    message_header(source_location location, size_t size)
+    constexpr message_header(source_location location, size_t size)
         : location_(UTL_SCOPE move(location))
         , size_(size) {}
     message_header(message_header const&) = delete;
@@ -46,7 +46,7 @@ public:
         return reinterpret_cast<char const*>(this) + sizeof(*this);
 #endif
     }
-    UTL_ATTRIBUTES(NODISCARD, PURE) size_t size() const noexcept { return size_; }
+    UTL_ATTRIBUTES(NODISCARD, PURE) constexpr size_t size() const noexcept { return size_; }
 
 private:
     UTL_SCOPE source_location location_;
