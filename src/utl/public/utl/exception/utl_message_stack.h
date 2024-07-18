@@ -4,10 +4,11 @@
 
 #include "utl/preprocessor/utl_config.h"
 
+#include "utl/exception/utl_exception_base.h"
 #include "utl/exception/utl_message_format.h"
 #include "utl/exception/utl_message_header.h"
 #include "utl/iterator/utl_iterator_tags.h"
-#include "utl/memory/utl_allocator_fwd.h"
+#include "utl/memory/utl_allocator_decl.h"
 #include "utl/memory/utl_allocator_traits.h"
 #include "utl/type_traits/utl_is_nothrow_default_constructible.h"
 #include "utl/utility/utl_exchange.h"
@@ -53,8 +54,9 @@ public:
         }
     }
     UTL_CONSTEXPR_CXX14 basic_message_stack(basic_message_stack&& other,
-        allocator_type const& alloc) UTL_NOEXCEPT(alloc_traits::is_always_equal)
-        : basic_message_stack(UTL_SCOPE move(other), alloc, alloc_traits::is_always_equal{}) {}
+        allocator_type const& alloc) UTL_NOEXCEPT(alloc_traits::is_always_equal::value)
+        : basic_message_stack(
+              UTL_SCOPE move(other), alloc, typename alloc_traits::is_always_equal{}) {}
 
     UTL_CONSTEXPR_CXX14 basic_message_stack& operator=(basic_message_stack const& other)
         UTL_THROWS {
@@ -159,17 +161,15 @@ public:
         va_copy(args2, args1);
         auto const str_size = vsnprintf(nullptr, 0, fmt.format, args1);
         va_end(args1);
+        auto const buffer_size = str_size + 1;
+        auto const count = (buffer_size + sizeof(message_header) - 1) / sizeof(message_header) + 1;
 
         UTL_TRY {
-            auto const buffer_size = str_size + 1;
-            auto const additional = buffer_size / header_size + ((buffer_size % header_size) > 0);
-            auto const count = 1 + additional;
-            auto const bytes = count * header_size;
             // restart lifetime (null operation)
-            auto raw_bytes = ::new (allocator_.allocate(count)) unsigned char[bytes];
+            auto raw_bytes = ::new (allocator_.allocate(count)) unsigned char[count * header_size];
             // start lifetime of header
             auto header = ::new (raw_bytes) message_header(UTL_SCOPE move(fmt.location), str_size);
-            // start lifetime of string
+            // start lifetime of string (null operation)
             auto str = ::new (raw_bytes + header_size) char[buffer_size];
             UTL_ASSERT(str == header->message());
             vsnprintf(str, buffer_size, fmt.format, args2);
@@ -219,8 +219,10 @@ private:
     }
 
     UTL_CONSTEXPR_CXX20 void destroy(message_header* msg) noexcept {
+        auto const buffer_size = msg->size() + 1;
+        auto const count = (buffer_size + header_size - 1) / header_size + 1;
         msg->~message_header();
-        allocator_.deallocate(msg);
+        allocator_.deallocate(msg, count);
     }
 
     UTL_CONSTEXPR_CXX14 void move_assign(basic_message_stack& other, true_type always_equal, bool) noexcept {

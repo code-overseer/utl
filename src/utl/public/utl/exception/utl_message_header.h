@@ -15,13 +15,13 @@ UTL_NAMESPACE_BEGIN
 
 namespace exceptions {
 
-class message_header {
+class message_header final {
 public:
     template <typename Alloc>
     UTL_ATTRIBUTE(NODISCARD) static message_header* clone(message_header const& src, Alloc const& alloc) {
-        constexpr auto header_size = sizeof(message_header);
+        static constexpr auto header_size = sizeof(message_header);
         auto const buffer_size = src.size() + 1;
-        auto const count = (header_size + buffer_size - 1) / buffer_size;
+        auto const count = (buffer_size + header_size - 1) / header_size + 1;
         auto ptr = allocator_traits<Alloc>::allocate(alloc, count);
 
         auto raw_bytes = ::new (ptr) unsigned char[count * header_size];
