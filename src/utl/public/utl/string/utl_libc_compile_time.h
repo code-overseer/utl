@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/string/utl_libc_common.h"
 
 UTL_NAMESPACE_BEGIN
@@ -43,9 +44,8 @@ UTL_CONSTEVAL int memcmp(T const* left, U const* right, element_count_t count) n
                            : memcmp(left + 1, right + 1, count - 1);
 }
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T,
-    UTL_CONCEPT_CXX20(exact_size<1>)
-        U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
+template <UTL_CONCEPT_CXX20(exact_size<1>) T, UTL_CONCEPT_CXX20(exact_size<1>) U UTL_REQUIRES_CXX11(
+    exact_size<T, 1>::value && exact_size<U, 1>::value)>
 UTL_CONSTEVAL T* memchr(T const* str, U value, size_t bytes) noexcept {
     return bytes == 0   ? nullptr
         : *str == value ? const_cast<T*>(str)
@@ -93,9 +93,9 @@ UTL_CONSTEVAL T* strnset(T* dst, T const val, element_count_t count, T* org) noe
 
 } // namespace recursive
 
-template <UTL_CONCEPT_CXX20(trivially_copyable)
-        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
-UTL_CONSTEVAL T* memcpy(T* dst, T const* src, element_count_t count) noexcept {
+template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
+    is_trivially_copyable<T>::value)>
+constexpr T* memcpy(T* dst, T const* src, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
     return __builtin_memcpy(dst, src, byte_count<T>(count)), dst;
 #else
@@ -103,10 +103,10 @@ UTL_CONSTEVAL T* memcpy(T* dst, T const* src, element_count_t count) noexcept {
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(trivially_copyable)
-        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value&& exact_size<T, 1>::value)>
+template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
+    is_trivially_copyable<T>::value && exact_size<T, 1>::value)>
 UTL_REQUIRES_CXX20(exact_size<T, 1>)
-UTL_CONSTEVAL T* memset(T* dst, T const src, element_count_t count) noexcept {
+constexpr T* memset(T* dst, T const src, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memset)
     return __builtin_memset(dst, as_byte(src), byte_count<T>(count)), dst;
 #else
@@ -114,9 +114,9 @@ UTL_CONSTEVAL T* memset(T* dst, T const src, element_count_t count) noexcept {
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(trivially_copyable)
-        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
-UTL_CONSTEVAL T* memmove(T* dst, T const* src, element_count_t count) noexcept {
+template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
+    is_trivially_copyable<T>::value)>
+constexpr T* memmove(T* dst, T const* src, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memmove)
     return __builtin_memmove(dst, src, byte_count<T>(count)), dst;
 #else
@@ -125,7 +125,7 @@ UTL_CONSTEVAL T* memmove(T* dst, T const* src, element_count_t count) noexcept {
 }
 
 template <typename T, typename U>
-UTL_CONSTEVAL int memcmp(T const* left, U const* right, element_count_t count) noexcept {
+constexpr int memcmp(T const* left, U const* right, element_count_t count) noexcept {
     static_assert(is_trivially_lexicographically_comparable<T, U>::value,
         "Types must be lexicographically comparable");
 #if UTL_HAS_BUILTIN(__builtin_char_memcmp)
@@ -135,7 +135,7 @@ UTL_CONSTEVAL int memcmp(T const* left, U const* right, element_count_t count) n
 #endif
 }
 
-UTL_CONSTEVAL char* memchr(char const* str, char value, size_t bytes) noexcept {
+constexpr char* memchr(char const* str, char value, size_t bytes) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_char_memchr)
     return __builtin_char_memchr(str, (int)value, bytes);
 #else
@@ -143,14 +143,13 @@ UTL_CONSTEVAL char* memchr(char const* str, char value, size_t bytes) noexcept {
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T,
-    UTL_CONCEPT_CXX20(exact_size<1>)
-        U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
-UTL_CONSTEVAL T* memchr(T const* str, U value, size_t bytes) noexcept {
+template <UTL_CONCEPT_CXX20(exact_size<1>) T, UTL_CONCEPT_CXX20(exact_size<1>) U UTL_REQUIRES_CXX11(
+    exact_size<T, 1>::value && exact_size<U, 1>::value)>
+constexpr T* memchr(T const* str, U value, size_t bytes) noexcept {
     return recursive::memchr(str, as_byte(value), bytes);
 }
 
-UTL_CONSTEVAL size_t strlen(char const* str) noexcept {
+constexpr size_t strlen(char const* str) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_strlen)
     return __builtin_strlen(str);
 #else
