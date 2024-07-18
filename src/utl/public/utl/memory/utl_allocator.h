@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/exception/utl_program_exception.h"
 #include "utl/memory/utl_allocator_fwd.h"
-#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_complete.h"
 #include "utl/type_traits/utl_is_void.h"
@@ -200,11 +201,7 @@ public:
             program_exception<void>("[UTL] allocator::allocate operation failed, Reason=[element "
                                     "count limit exceeded]"));
 
-        UTL_TRY {
-            return memory::allocate<value_type>(count);
-        } UTL_CATCH(...) {
-            UTL_RETHROW("Allocation failed");
-        }
+        return memory::allocate<value_type>(count);
     }
 
     UTL_NODISCARD UTL_CONSTEXPR_CXX20 result_type allocate_at_least(size_type count) noexcept(
