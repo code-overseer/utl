@@ -120,12 +120,12 @@ constexpr T& assign(T& dst, U&&, false_type) noexcept {
 }
 
 template <typename T>
-UTL_CONSTEXPR_CXX14 T& assign(T& dst, T&& src, propagate_on_container_move_assignment<T>) noexcept {
+UTL_CONSTEXPR_CXX14 T& assign(T& dst, T&& src, true_type) noexcept {
     return dst = move(src);
 }
 
 template <typename T>
-UTL_CONSTEXPR_CXX14 T& assign(T& dst, T const& src, propagate_on_container_copy_assignment<T>) noexcept {
+UTL_CONSTEXPR_CXX14 T& assign(T& dst, T const& src, true_type) noexcept {
     return dst = src;
 }
 
@@ -155,7 +155,7 @@ using implements_reallocate = decltype(implements_reallocate_impl<T>(0));
 
 template <typename T>
 concept implements_reallocate = requires(T& alloc, result_type_t<T> r, size_type_t<T> s) {
-    { alloc.reallocate(r, s) } -> pointer_t<T>;
+    { alloc.reallocate(r, s) } -> UTL_SCOPE same_as<pointer_t<T>>;
 };
 
 #endif
@@ -210,7 +210,7 @@ using implements_allocate_at_least = decltype(implements_allocate_at_least_impl<
 
 template <typename T>
 concept implements_allocate_at_least = requires(T& alloc, size_type_t<T> size) {
-    { alloc.allocate_at_least(size) } -> result_type_t<T>;
+    { alloc.allocate_at_least(size) } -> UTL_SCOPE same_as<result_type_t<T>>;
 };
 
 #endif
@@ -242,13 +242,12 @@ using implements_reallocate_at_least = decltype(implements_reallocate_at_least_i
 
 template <typename T>
 concept implements_reallocate_at_least = requires(T& alloc, result_type_t<T> r, size_type_t<T> s) {
-    { alloc.reallocate_at_least(r, s) } -> result_type_t<T>;
+    { alloc.reallocate_at_least(r, s) } -> UTL_SCOPE same_as<result_type_t<T>>;
 };
 
 #endif
 
-template <UTL_CONCEPT_CXX20(implements_reallocate_at_least) T UTL_REQUIRES_CXX11(
-    !implements_reallocate_at_least<T>::value)>
+template <typename T UTL_REQUIRES_CXX11(!implements_reallocate_at_least<T>::value)>
 UTL_CONSTEXPR_CXX20 result_type_t<T> reallocate_at_least(
     T& allocator, result_type_t<T> arg, size_type_t<T> new_size) {
     return UTL_SCOPE details::allocator::reallocate(allocator, new_size);
