@@ -65,8 +65,11 @@
 #  if UTL_CXX >= 202302L
 #    define UTL_CXX23 1
 #    define UTL_CONSTEXPR_CXX23 constexpr
+#    define UTL_IF_CONSTEVAL(...) if consteval
 #  else /* UTL_CXX >= 202302L */
 #    define UTL_CONSTEXPR_CXX23
+/* This requires including 'utl_constant_p.h' */
+#    define UTL_IF_CONSTEVAL(...) if (UTL_CONSTANT_P(__VA_ARGS__))
 #  endif /* UTL_CXX >= 202302L */
 
 #else /* ifdef UTL_CXX */
