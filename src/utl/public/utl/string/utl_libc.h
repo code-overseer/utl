@@ -14,42 +14,6 @@ UTL_NAMESPACE_BEGIN
 namespace libc {
 
 namespace unsafe {
-/* consteval needs to be evaluated in a consteval scope */
-#if UTL_CXX20
-template <typename T>
-constexpr T* memcpy(
-    T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count) noexcept {
-    UTL_IF_CONSTEVAL(*dst == *src && src + count != dst) {
-        return compile_time::memcpy(dst, src, count);
-    }
-    return runtime::memcpy(dst, src, count);
-}
-
-template <typename T>
-constexpr T* memmove(T* dst, T const* src, element_count_t count) noexcept {
-    UTL_IF_CONSTEVAL(*dst == *src && src + count != dst) {
-        return compile_time::memmove(dst, src, count);
-    }
-    return runtime::memmove(dst, src, count);
-}
-
-template <typename T>
-constexpr T* memset(T* dst, T const src, element_count_t count) noexcept {
-    UTL_IF_CONSTEVAL(*dst == *src && src + count != dst) {
-        return compile_time::memset(dst, src, count);
-    }
-    return runtime::memset(dst, src, count);
-}
-
-template <typename T, typename U>
-UTL_LIBC_PURE constexpr int memcmp(T const* lhs, U const* rhs, element_count_t count) noexcept {
-    UTL_IF_CONSTEVAL(*dst == *src && src + count != dst) {
-        return compile_time::memcmp(lhs, rhs, count);
-    }
-    return runtime::memcmp(lhs, rhs, count);
-}
-
-#else
 template <typename T>
 constexpr T* memcpy(
     T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count) noexcept {
@@ -74,7 +38,6 @@ constexpr T* memset(T* dst, T const src, element_count_t count) noexcept {
     return UTL_CONSTANT_P(src != *(dst + count - 1)) ? compile_time::memset(dst, src, count)
                                                      : runtime::memset(dst, src, count);
 }
-#endif
 } // namespace unsafe
 
 template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
@@ -88,6 +51,13 @@ template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
     is_trivially_copyable<T>::value)>
 constexpr T* memmove(T* dst, T const* src, element_count_t count) noexcept {
     return unsafe::memmove(dst, src, count);
+}
+
+template <UTL_CONCEPT_CXX20(exact_size<1>) T, UTL_CONCEPT_CXX20(exact_size<1>) U UTL_REQUIRES_CXX11(
+    exact_size<T, 1>::value && exact_size<U, 1>::value)>
+UTL_LIBC_PURE constexpr T* memchr(T const* str, U value, size_t bytes) noexcept {
+    return UTL_CONSTANT_P((value, str + bytes)) ? compile_time::memchr(str, value, bytes)
+                                                : runtime::memchr(str, value, bytes);
 }
 
 template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
@@ -104,95 +74,26 @@ UTL_LIBC_PURE constexpr int memcmp(T const* lhs, U const* rhs, element_count_t c
     return unsafe::memcmp(lhs, rhs, count);
 }
 
-#if UTL_CXX20
-
-template <UTL_CONCEPT_CXX20(exact_size<1>) T, UTL_CONCEPT_CXX20(exact_size<1>) U
-    UTL_REQUIRES_CXX11( exact_size<T, 1>::value && exact_size<U, 1>::value)>
-UTL_LIBC_PURE constexpr T* memchr(T const* str, U value, size_t bytes) noexcept {
-    UTL_IF_CONSTEVAL(str + (*str != value) + bytes) {
-        return compile_time::memchr(str, value, bytes);
-    }
-    return runtime::memchr(str, value, bytes);
-}
-
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
 UTL_LIBC_PURE constexpr size_t strlen(T const* str) noexcept {
-    UTL_IF_CONSTEVAL(str && *str > 0) {
-        return compile_time::strlen(str);
-    }
-    return runtime::strlen(str);
+    return UTL_CONSTANT_P(str) ? compile_time::strlen(str) : runtime::strlen(str);
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
 UTL_LIBC_PURE constexpr T* strchr(T const* str, T const ch) noexcept {
-    UTL_IF_CONSTEVAL(*str != ch) {
-        return compile_time::strchr(str, ch);
-    }
-    return runtime::strchr(str, ch);
+    return UTL_CONSTANT_P((ch, str)) ? compile_time::strchr(str, ch) : runtime::strchr(str, ch);
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
 UTL_LIBC_PURE constexpr int strcmp(T const* left, T const* right) noexcept {
-    UTL_IF_CONSTEVAL(*left != *right && left != right) {
-        return compile_time::strcmp(left, right);
-    }
-    return runtime::strcmp(left, right);
+    return UTL_CONSTANT_P(left != right) ? compile_time::strcmp(left, right)
+                                         : runtime::strcmp(left, right);
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
 UTL_LIBC_PURE constexpr int strncmp(
     T const* left, T const* right, element_count_t max_len) noexcept {
-    UTL_IF_CONSTEVAL(*left != *right && left + max_len != right + max_len) {
-        return compile_time::strncmp(left, right, max_len);
-    }
-    return runtime::strncmp(left, right, max_len);
-}
-
-template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_LIBC_PURE constexpr T* strnset(T* dst, T const val, element_count_t max_len) noexcept {
-    UTL_IF_CONSTEVAL(dst + max_len + (*dst != val)) {
-        return compile_time::strnset(dst, val, max_len);
-    }
-    return runtime::strnset(dst, val, max_len);
-}
-
-template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_LIBC_PURE constexpr T* strnchr(T const* str, T const ch, element_count_t max_len) noexcept {
-    UTL_IF_CONSTEVAL(str + max_len + (*str == ch)) {
-        return compile_time::strnchr(str, ch, max_len);
-    }
-    return runtime::strnchr(str, ch, max_len);
-}
-
-#else
-
-template <UTL_CONCEPT_CXX20(exact_size<1>) T, UTL_CONCEPT_CXX20(exact_size<1>) U UTL_REQUIRES_CXX11(
-    exact_size<T, 1>::value && exact_size<U, 1>::value)>
-UTL_LIBC_PURE constexpr T* memchr(T const* str, U value, size_t bytes) noexcept {
-    return UTL_CONSTANT_P((value, str + bytes)) ? compile_time::memchr(str, value, bytes)
-                                                : runtime::memchr(str, value, bytes);
-}
-
-template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_LIBC_PURE constexpr size_t strlen(T const* str) noexcept {
-    return UTL_CONSTANT_P(str && *str > 0) ? compile_time::strlen(str) : runtime::strlen(str);
-}
-
-template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_LIBC_PURE constexpr T* strchr(T const* str, T const ch) noexcept {
-    return UTL_CONSTANT_P(*str != ch) ? compile_time::strchr(str, ch) : runtime::strchr(str, ch);
-}
-
-template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_LIBC_PURE constexpr int strcmp(T const* left, T const* right) noexcept {
-    return UTL_CONSTANT_P(*left != *right && left != right) ? compile_time::strcmp(left, right)
-                                                            : runtime::strcmp(left, right);
-}
-
-template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_LIBC_PURE constexpr int strncmp(
-    T const* left, T const* right, element_count_t max_len) noexcept {
-    return UTL_CONSTANT_P(*left != *right && left + max_len != right + max_len)
+    return UTL_CONSTANT_P(left + max_len != right + max_len)
         ? compile_time::strncmp(left, right, max_len)
         : runtime::strncmp(left, right, max_len);
 }
@@ -208,8 +109,6 @@ UTL_LIBC_PURE constexpr T* strnchr(T const* str, T const ch, element_count_t max
     return UTL_CONSTANT_P((str + max_len, ch)) ? compile_time::strnchr(str, ch, max_len)
                                                : runtime::strnchr(str, ch, max_len);
 }
-
-#endif
 } // namespace libc
 
 #undef UTL_LIBC_PURE
