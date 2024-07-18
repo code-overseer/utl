@@ -20,7 +20,6 @@
 #include "utl/type_traits/utl_void_t.h"
 #include "utl/utility/utl_forward.h"
 #include "utl/utility/utl_move.h"
-#include "utl/utility/utl_swap.h"
 
 UTL_NAMESPACE_BEGIN
 

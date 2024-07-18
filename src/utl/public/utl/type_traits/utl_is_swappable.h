@@ -23,8 +23,8 @@ UTL_NAMESPACE_END
 
 #else // if UTL_USE_STD_TYPE_TRAITS && UTL_USE_STD_swap && UTL_CXX20
 
+#  include "utl/ranges/utl_swap.h"
 #  include "utl/type_traits/utl_constants.h"
-#  include "utl/utility/utl_swap.h"
 
 #  if UTL_CXX20
 
