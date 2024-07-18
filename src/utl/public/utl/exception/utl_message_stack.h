@@ -49,14 +49,12 @@ public:
         : size_(other.size_)
         , allocator_(alloc) {
         if (size_ > 0) {
-            head_ = clone(allocator_, other.head_);
+            head_ = clone(other.head_, allocator_);
         }
     }
     UTL_CONSTEXPR_CXX14 basic_message_stack(basic_message_stack&& other,
         allocator_type const& alloc) UTL_NOEXCEPT(alloc_traits::is_always_equal)
-        : allocator_(alloc) {
-        move_construct(other, alloc_traits::is_always_equal);
-    }
+        : basic_message_stack(UTL_SCOPE move(other), alloc, alloc_traits::is_always_equal{}) {}
 
     UTL_CONSTEXPR_CXX14 basic_message_stack& operator=(basic_message_stack const& other)
         UTL_THROWS {
@@ -67,7 +65,7 @@ public:
         size_ = other.size_;
         alloc_traits::assign(allocator_, other.allocator_);
         if (size_ > 0) {
-            head_ = clone(allocator_, other.head_);
+            head_ = clone(other.head_, allocator_);
         }
 
         return *this;
@@ -195,7 +193,7 @@ public:
 
 private:
     UTL_ATTRIBUTE(NODISCARD) static UTL_CONSTEXPR_CXX20 message_header* clone(
-        allocator_type const& alloc, message_header* head) UTL_THROWS {
+        message_header* head, allocator_type const& alloc) UTL_THROWS {
         UTL_ASSERT(head != nullptr);
 
         auto const copied_head = message_header::clone(*head, alloc);
@@ -244,22 +242,24 @@ private:
 
     UTL_CONSTEXPR_CXX14 void move_assign(basic_message_stack& other, false_type, false_type) noexcept {
         destroy_all();
-        head_ = clone(allocator_, other.head_);
+        head_ = clone(other.head_, allocator_);
         size_ = other.size_;
     }
 
-    UTL_CONSTEXPR_CXX14 void move_construct(basic_message_stack& other, true_type always_equal) noexcept {
-        head_ = UTL_SCOPE exchange(other.head_, nullptr);
-        size_ = UTL_SCOPE exchange(other.size_, 0);
-    }
+    constexpr basic_message_stack(basic_message_stack&& other, allocator_type const& alloc,
+        bool_constant<alloc_traits::is_always_equal::value == true>) noexcept
+        : head_(UTL_SCOPE exchange(other.head_, nullptr))
+        , size_(UTL_SCOPE exchange(other.size_, 0)) {}
 
-    UTL_CONSTEXPR_CXX14 void move_construct(basic_message_stack& other, false_type always_equal)
-        UTL_THROWS {
+    UTL_CONSTEXPR_CXX14 basic_message_stack(basic_message_stack&& other, allocator_type const& alloc,
+        bool_constant<alloc_traits::is_always_equal::value == false>) UTL_THROWS
+        : allocator_(alloc) {
         if (!alloc_traits::equals(allocator_, other.allocator_)) {
-            head_ = clone(allocator_, other.head_);
+            head_ = clone(other.head_, allocator_);
             size_ = other.size_;
         } else {
-            move_construct(other, false_type{});
+            head_ = UTL_SCOPE exchange(other.head_, nullptr);
+            size_ = UTL_SCOPE exchange(other.size_, 0);
         }
     }
 
