@@ -38,14 +38,19 @@ public:
     message_header& operator=(message_header const&) = delete;
 
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr UTL_SCOPE source_location const& location() const noexcept { return location_; }
-    UTL_ATTRIBUTES(NODISCARD, PURE) char const* message() const noexcept {
+    constexpr UTL_SCOPE source_location const& location() const noexcept UTL_ATTRIBUTE(
+        LIFETIMEBOUND) {
+        return location_;
+    }
+
+    UTL_ATTRIBUTES(NODISCARD, PURE) char const* message() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) {
 #ifdef UTL_BUILTIN_launder
         return UTL_BUILTIN_launder(reinterpret_cast<char const*>(this) + sizeof(*this));
 #else
         return reinterpret_cast<char const*>(this) + sizeof(*this);
 #endif
     }
+
     UTL_ATTRIBUTES(NODISCARD, PURE) constexpr size_t size() const noexcept { return size_; }
 
 private:

@@ -27,7 +27,11 @@ class basic_message_stack {
 public:
     using allocator_type = Alloc;
     using size_type = size_t;
-    using element_type = message_header;
+    using value_type = message_header;
+    using reference = value_type&;
+    using const_reference = value_type const&;
+    class const_iterator;
+    using iterator = const_iterator;
 
 private:
     static constexpr auto header_size = sizeof(message_header);
