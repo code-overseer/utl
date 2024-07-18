@@ -207,6 +207,8 @@ struct pointer_traits<T*> {
     using pointer = T*;
     using element_type = T;
     using difference_type = details::pointer_traits::diff_type_t<T*>;
+    template <typename U>
+    using rebind = U*;
 
     static constexpr pointer pointer_to(element_type& ref) noexcept {
         return UTL_SCOPE addressof(ref);
