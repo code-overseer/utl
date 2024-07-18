@@ -21,15 +21,15 @@
 #  define UTL_CXX11 1
 
 #  if UTL_CXX >= 201402L
-#    define UTL_CONSTEXPR_CXX14 constexpr
 #    define UTL_CXX14 1
+#    define UTL_CONSTEXPR_CXX14 constexpr
 #  else /* UTL_CXX >= 201402L */
 #    define UTL_CONSTEXPR_CXX14
 #  endif /* UTL_CXX >= 201402L */
 
 #  if UTL_CXX >= 201703L
-#    define UTL_CONSTEXPR_CXX17 constexpr
 #    define UTL_CXX17 1
+#    define UTL_CONSTEXPR_CXX17 constexpr
 #    define UTL_INLINE_CXX17 inline
 #  else /* UTL_CXX >= 201703L */
 #    define UTL_INLINE_CXX17
@@ -40,7 +40,6 @@
 #    define UTL_CXX20 1
 #    define UTL_CONSTEXPR_CXX20 constexpr
 #    define UTL_CONSTEVAL consteval
-#    define UTL_CONSTEVAL_CXX14 consteval
 #    define UTL_EXPLICIT_IF(...) explicit(__VA_ARGS__)
 #    define UTL_IMPLICIT_IF(...) explicit(!(__VA_ARGS__))
 
@@ -53,7 +52,6 @@
 
 #    define UTL_CONSTEXPR_CXX20
 #    define UTL_CONSTEVAL constexpr
-#    define UTL_CONSTEVAL_CXX14 UTL_CONSTEXPR_CXX14
 #    define UTL_EXPLICIT_IF(...)
 #    define UTL_IMPLICIT_IF(...) explicit
 #    define UTL_ENABLE_IF_CXX11(TYPE, ...) UTL_SCOPE enable_if_t<(__VA_ARGS__), TYPE>
@@ -65,11 +63,14 @@
 #  if UTL_CXX >= 202302L
 #    define UTL_CXX23 1
 #    define UTL_CONSTEXPR_CXX23 constexpr
+#    define UTL_CONSTEVAL_CXX23 consteval
 #    define UTL_IF_CONSTEVAL(...) if consteval
 #  else /* UTL_CXX >= 202302L */
 #    define UTL_CONSTEXPR_CXX23
-/* This requires including 'utl_constant_p.h' */
-#    define UTL_IF_CONSTEVAL(...) if (UTL_CONSTANT_P(__VA_ARGS__))
+#    define UTL_CONSTEVAL_CXX23 constexpr
+#    define UTL_IF_CONSTEVAL(...) \
+        if (UTL_CONSTANT_P(__VA_ARGS__)) /* This requires including 'utl_constant_p.h' */
+
 #  endif /* UTL_CXX >= 202302L */
 
 #else /* ifdef UTL_CXX */
@@ -81,6 +82,5 @@
 #  define UTL_CONSTEXPR_CXX20 const
 #  define UTL_CONSTEXPR_CXX23 const
 #  define UTL_CONSTEVAL
-#  define UTL_CONSTEVAL_CXX14
 
 #endif /* ifdef UTL_CXX */
