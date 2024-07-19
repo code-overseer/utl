@@ -2,12 +2,13 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/atomic.h"
 #include "utl/compare/utl_pointer_comparable.h"
 #include "utl/exception/utl_program_exception.h"
 #include "utl/memory/utl_addressof.h"
 #include "utl/memory/utl_reference_counter.h"
-#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/declval.h"
 #include "utl/utility/utl_exchange.h"
 #include "utl/utility/utl_forward.h"

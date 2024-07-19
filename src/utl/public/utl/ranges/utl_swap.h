@@ -132,7 +132,7 @@ template <typename L, typename R>
 auto unqualified_swappable_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R>
 auto unqualified_swappable_impl(int) noexcept
-    -> UTL_SCOPE always_true<decltype(swap(UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>()))>;
+    -> UTL_SCOPE always_true_type<decltype(swap(UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>()))>;
 
 template <typename L, typename R>
 auto nothrow_unqualified_swappable_impl(float) noexcept -> UTL_SCOPE false_type;
@@ -146,7 +146,7 @@ auto unqualified_swappable_array_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R, size_t N, typename F = function_t const&>
 auto unqualified_swappable_array_impl(int) noexcept -> UTL_SCOPE
     conjunction<UTL_SCOPE bool_constant<(UTL_SCOPE extent_v<L> == UTL_SCOPE extent_v<R>)>,
-        UTL_SCOPE always_true<decltype(UTL_SCOPE declval<F>()(
+        UTL_SCOPE always_true_type<decltype(UTL_SCOPE declval<F>()(
             UTL_SCOPE declval<L&>(), UTL_SCOPE declval<R&>()))>>;
 
 template <typename L, typename R>
@@ -174,8 +174,8 @@ private:
 
     template <typename L, typename R, size_t N>
     UTL_ATTRIBUTE(ALWAYS_INLINE)
-    UTL_CONSTEXPR_CXX14 UTL_SCOPE enable_if_t<unqualified_swappable_array<L, R, N>::value> dispatch(
-        L (&l)[N], R (&r)[N], second_t) const noexcept(noexcept((*this)(*l, *r))) {
+    UTL_CONSTEXPR_CXX14 UTL_SCOPE enable_if_t<unqualified_swappable_array<L, R, N>::value>
+    dispatch(L (&l)[N], R (&r)[N], second_t) const noexcept(noexcept((*this)(*l, *r))) {
         for (decltype(N) i = 0; i < N; ++i) {
             (*this)(l[i], r[i]);
         }
@@ -184,9 +184,9 @@ private:
     template <typename T>
     UTL_ATTRIBUTE(ALWAYS_INLINE)
     UTL_CONSTEXPR_CXX14 UTL_SCOPE
-        enable_if_t<UTL_TRAIT_is_move_constructible(T) && UTL_TRAIT_is_move_assignable(T)> dispatch(
-            T& l, T& r, third_t) const noexcept(UTL_TRAIT_is_nothrow_move_constructible(T) &&
-            UTL_TRAIT_is_nothrow_move_assignable(T)) {
+        enable_if_t<UTL_TRAIT_is_move_constructible(T) && UTL_TRAIT_is_move_assignable(T)>
+        dispatch(T& l, T& r, third_t) const noexcept(
+            UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_move_assignable(T)) {
         r = UTL_SCOPE exchange(l, UTL_SCOPE move(r));
     }
 

@@ -35,15 +35,15 @@ UTL_NAMESPACE_END
 #  endif
 
 #  ifdef UTL_BUILTIN_FUNCSIG
-#    define UTL_BUILTIN_FUNCTION_NAME() UTL_BUILTIN_FUNCSIG()
+#    define UTL_SL_LOCATION_FUNCTION() UTL_BUILTIN_FUNCSIG()
 #  else
-#    define UTL_BUILTIN_FUNCTION_NAME() UTL_BUILTIN_FUNCTION()
+#    define UTL_SL_LOCATION_FUNCTION() UTL_BUILTIN_FUNCTION()
 #  endif
 
 #  ifdef UTL_BUILTIN_COLUMN
-#    define UTL_BUILTIN_COLUMN_INDEX() UTL_BUILTIN_COLUMN()
+#    define UTL_SL_LOCATION_COLUMN() UTL_BUILTIN_COLUMN()
 #  else
-#    define UTL_BUILTIN_COLUMN_INDEX() -1
+#    define UTL_SL_LOCATION_COLUMN() -1
 #    include "utl/type_traits/utl_constants.h"
 #  endif
 
@@ -53,8 +53,8 @@ class source_location {
 public:
     static UTL_SOURCE_LOCATION_CONSTEVAL source_location current(
         char const* file_name = UTL_BUILTIN_FILE(),
-        char const* function_name = UTL_BUILTIN_FUNCTION_NAME(), unsigned line = UTL_BUILTIN_LINE(),
-        unsigned column = UTL_BUILTIN_COLUMN_INDEX()) noexcept {
+        char const* function_name = UTL_SL_LOCATION_FUNCTION(), unsigned line = UTL_BUILTIN_LINE(),
+        unsigned column = UTL_SL_LOCATION_COLUMN()) noexcept {
         source_location location;
         location.file_name_ = file_name;
         location.function_name_ = function_name;
@@ -101,9 +101,10 @@ private:
 };
 
 UTL_NAMESPACE_END
+static_assert(sizeof(UTL_SCOPE source_location) > 0);
 
-#  undef UTL_BUILTIN_FUNCTION_NAME
-#  undef UTL_BUILTIN_COLUMN_INDEX
+#  undef UTL_SL_LOCATION_FUNCTION
+#  undef UTL_SL_LOCATION_COLUMN
 #  define UTL_SOURCE_LOCATION() UTL_SCOPE source_location::current()
 
 #else // UTL_USE_STD_SOURCE_LOCATION && defined(UTL_BUILTIN_source_location) && UTL_CXX20
