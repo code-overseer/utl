@@ -47,8 +47,8 @@ class intrusive_ptr : private pointer_comparable<intrusive_ptr<T>> {
     static UTL_CONSTEXPR_CXX14 auto iff_notnull(T* ptr, F&& func) UTL_THROWS
         -> decltype(declval<F>()((T*)nullptr)) {
         UTL_THROW_IF(ptr == nullptr,
-            utl::program_exception(
-                "[UTL] intrusive_ptr operation failed, Reason=[Unexpected nullptr argument]"));
+            utl::program_exception(UTL_MESSAGE_FORMAT(
+                "[UTL] intrusive_ptr operation failed, Reason=[Unexpected nullptr argument]")));
 
         return forward<F>(func)(ptr);
     }

@@ -19,8 +19,17 @@ UTL_NAMESPACE_BEGIN
 
 namespace exceptions {
 
+/**
+ * @brief Represents a message header in a doubly linked list node stack implementation.
+ *
+ * This final class implements a reference-counted message header used in a doubly
+ * linked list. The tail is the owner of the linked list, essentially the first element
+ * on the stack. New elements are pushed onto the head. The class also provides methods
+ * to manage memory allocation, access message details, and handle linked list operations.
+ */
 class message_header final : reference_count<message_header> {
 public:
+    // Deleted new and delete operators to prevent direct allocation
     static void* operator new(size_t) = delete;
     static void* operator new[](size_t) = delete;
     static void operator delete(void*) = delete;
@@ -34,25 +43,54 @@ public:
     static void operator delete[](void*, size_t, align_val_t) = delete;
 #endif
 
+    // Deleted copy constructor and copy assignment operator
     message_header(message_header const&) = delete;
     message_header& operator=(message_header const&) = delete;
 
+    /**
+     * @brief Retrieves the source location the message was created
+     *
+     * This function returns a constant reference to the source location of the message header.
+     *
+     * @return The constant reference to the source location.
+     */
     UTL_ATTRIBUTES(NODISCARD, CONST)
     constexpr UTL_SCOPE source_location const& location() const noexcept UTL_ATTRIBUTE(
         LIFETIMEBOUND) {
         return location_;
     }
 
+    /**
+     * @brief Retrieves the message associated with the message header.
+     *
+     * This function returns a pointer to the message string associated with the message header.
+     *
+     * @return The constant pointer to the message string.
+     */
     UTL_ATTRIBUTES(NODISCARD, PURE) char const* message() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) {
-#ifdef UTL_BUILTIN_launder
-        return UTL_BUILTIN_launder(reinterpret_cast<char const*>(this) + sizeof(*this));
-#else
         return reinterpret_cast<char const*>(this) + sizeof(*this);
-#endif
     }
 
+    /**
+     * @brief Retrieves the size of the message string.
+     *
+     * This function returns the size of the message string.
+     *
+     * @return The size of the message string.
+     */
     UTL_ATTRIBUTES(NODISCARD, PURE) constexpr size_t size() const noexcept { return size_; }
 
+    /**
+     * @brief Creates a new message.
+     *
+     * This static function creates a new message with the provided message format and
+     * arguments.
+     *
+     * @param fmt The message format object containing the format string.
+     * @param ... Variadic arguments for the message format.
+     * @return A pointer to the header of the newly created message.
+     * @throws std::bad_alloc on memory allocation failure.
+     */
     static message_header* create(message_format fmt, ...) UTL_THROWS {
         static constexpr auto header_size = sizeof(message_header);
         va_list args1;
@@ -92,10 +130,27 @@ private:
     message_header* prev_ = nullptr;
     size_t size_ = 0;
 
-    constexpr message_header(source_location&& location, size_t size)
+    /**
+     * @brief Constructs a message header with the given source location and size.
+     *
+     * This constructor initializes the message header with the provided source location and size.
+     *
+     * @param location The source location of the message header.
+     * @param size The size of the message header.
+     */
+    constexpr message_header(source_location&& location, size_t size) noexcept
         : location_(UTL_SCOPE move(location))
         , size_(size) {}
 
+    /**
+     * @brief Sets the next message header in the linked list.
+     *
+     * This friend function sets the next message header in the linked list and updates
+     * the previous pointer of the next message header.
+     *
+     * @param h The current message header.
+     * @param value The next message header to be set.
+     */
     friend void set_next(message_header& h, message_header* value) noexcept {
         if (value != nullptr) {
             value->prev_ = UTL_SCOPE addressof(h);
@@ -104,10 +159,23 @@ private:
         h.next_ = value;
     }
 
+    /**
+     * @brief Retrieves the next message header in the linked list.
+     *
+     * This friend function returns a pointer to the next message header in the linked list.
+     *
+     * @param h The current message header.
+     * @return A pointer to the next message header.
+     */
     UTL_ATTRIBUTES(NODISCARD, PURE) friend message_header* next(message_header const& h) noexcept {
         return h.next_;
     }
 
+    /**
+     * @brief Destroys the message given it's header and all messages above it.
+     *
+     * @param ptr The initial pointer to the message to be destroyed.
+     */
     friend void destroy(message_header* ptr) noexcept {
         UTL_ASSERT(ptr != nullptr);
         static constexpr size_t header_size = sizeof(message_header);
