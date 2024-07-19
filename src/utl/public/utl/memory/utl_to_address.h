@@ -40,7 +40,7 @@ template <typename Ptr>
 auto has_to_address_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename Ptr>
 auto has_to_address_impl(int) noexcept
-    -> UTL_SCOPE always_true<decltype(UTL_SCOPE pointer_traits<Ptr>::to_address(
+    -> UTL_SCOPE always_true_type<decltype(UTL_SCOPE pointer_traits<Ptr>::to_address(
         UTL_SCOPE declval<Ptr const&>()))>;
 
 template <typename Ptr>
@@ -50,7 +50,7 @@ template <typename Ptr>
 auto has_arrow_operator_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename Ptr>
 auto has_arrow_operator_impl(int) noexcept
-    -> UTL_SCOPE always_true<decltype(UTL_SCOPE declval<Ptr const&>().operator->())>;
+    -> UTL_SCOPE always_true_type<decltype(UTL_SCOPE declval<Ptr const&>().operator->())>;
 
 template <typename Ptr>
 using has_arrow_operator = decltype(has_arrow_operator_impl<Ptr>(0));
