@@ -2,9 +2,11 @@
 
 #pragma once
 
-#include "utl/atomic.h"
 #include "utl/preprocessor/utl_config.h"
-#include "utl_reference_countable_destroy.h"
+
+#include "utl/atomic.h"
+#include "utl/memory/utl_addressof.h"
+#include "utl/memory/utl_reference_counting_destroy.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -48,37 +50,13 @@ private:
     using this_type = atomic_reference_count<T>;
 
     /**
-     * ADL function to increment the reference count.
-     *
-     * @param obj The reference_count object to increment the count for.
-     */
-    friend void increment(atomic_reference_count& obj) noexcept {
-        obj.count_.fetch_add(1, memory_order_relaxed);
-    }
-
-    /**
-     * ADL function to decrement the reference count. Destroys the object when the count reaches
-     * zero.
-     *
-     * @param obj The reference_count object to decrement the count for.
-     */
-    friend void decrement(atomic_reference_count& obj) noexcept {
-        int const result = obj.count_.fetch_sub(1, memory_order_acq_rel);
-        if (result <= 1) {
-            UTL_ASSERT(result > 0);
-            reference_counting::details::destroy(UTL_SCOPE addressof(obj));
-        }
-    }
-
-    /**
      * ADL function to increment the reference count for objects of type T.
      *
      * @param obj The object of type T to increment the count for.
      */
     friend void increment(T& obj) noexcept {
-        static_assert(
-            UTL_TRAIT_VALUE(is_base_of<atomic_reference_count, T>), "Invalid type relation");
-        increment((atomic_reference_count&)obj);
+        static_assert(UTL_TRAIT_is_base_of(atomic_reference_count, T), "Invalid type relation");
+        ((atomic_reference_count&)obj).count_.fetch_add(1, UTL_SCOPE memory_order_relaxed);
     }
 
     /**
@@ -87,9 +65,13 @@ private:
      * @param obj The object of type T to decrement the count for.
      */
     friend void decrement(T& obj) noexcept {
-        static_assert(
-            UTL_TRAIT_VALUE(is_base_of<atomic_reference_count, T>), "Invalid type relation");
-        decrement((atomic_reference_count&)obj);
+        static_assert(UTL_TRAIT_is_base_of(atomic_reference_count, T), "Invalid type relation");
+        int const result =
+            ((atomic_reference_count&)obj).count_.fetch_sub(1, UTL_SCOPE memory_order_acq_rel);
+        if (result <= 1) {
+            UTL_ASSERT(result > 0);
+            reference_counting::destroy(UTL_SCOPE addressof(obj));
+        }
     }
 
     /**

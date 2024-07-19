@@ -124,7 +124,7 @@ namespace iterator_swap {
 template <typename L, typename R>
 auto exchange_swappable(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R>
-auto exchange_swappable(int) noexcept -> UTL_SCOPE always_true<UTL_SCOPE iter_value_t<L>,
+auto exchange_swappable(int) noexcept -> UTL_SCOPE always_true_type<UTL_SCOPE iter_value_t<L>,
     decltype(UTL_SCOPE iter_value_t<L>(UTL_SCOPE ranges::iter_move(UTL_SCOPE declval<L>()))),
     decltype(*UTL_SCOPE declval<L&>() = UTL_SCOPE ranges::iter_move(UTL_SCOPE declval<R>())),
     decltype(*UTL_SCOPE declval<R&>() = UTL_SCOPE details::iterator_swap::iter_exchange(
