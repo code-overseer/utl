@@ -2,11 +2,12 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/compare/utl_pointer_comparable.h"
 #include "utl/concepts.h" // convertible_to
 #include "utl/exception/utl_program_exception.h"
 #include "utl/memory/utl_addressof.h"
-#include "utl/preprocessor/utl_config.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -32,12 +33,12 @@ public:
      *
      * @param ptr A pointer to the object. It must be non-null.
      *
-     * @throws utl::program_exception<void> If the pointer is null and exceptions are enabled
+     * @throws utl::program_exception If the pointer is null and exceptions are enabled
      */
     UTL_CONSTEXPR_CXX14 nonnull_ptr(T* ptr) UTL_THROWS : ptr_(ptr) {
         UTL_THROW_IF(ptr == nullptr,
-            utl::program_exception<void>("[UTL] nonnull_ptr construction failed, "
-                                         "Reason=[Pointer argument cannot be null]"));
+            utl::program_exception("[UTL] nonnull_ptr construction failed, "
+                                   "Reason=[Pointer argument cannot be null]"));
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<T*>) U UTL_REQUIRES_CXX11(

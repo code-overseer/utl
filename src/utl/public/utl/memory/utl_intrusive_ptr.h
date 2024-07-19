@@ -41,13 +41,13 @@ class intrusive_ptr : private pointer_comparable<intrusive_ptr<T>> {
      *
      * @return The result of executing the callable.
      *
-     * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
+     * @throws utl::program_exception - if ptr is null and exceptions are enabled
      */
     template <typename F>
     static UTL_CONSTEXPR_CXX14 auto iff_notnull(T* ptr, F&& func) UTL_THROWS
         -> decltype(declval<F>()((T*)nullptr)) {
         UTL_THROW_IF(ptr == nullptr,
-            utl::program_exception<void>(
+            utl::program_exception(
                 "[UTL] intrusive_ptr operation failed, Reason=[Unexpected nullptr argument]"));
 
         return forward<F>(func)(ptr);
@@ -69,7 +69,7 @@ public:
      *
      * @note Adoption transfers ownership without incrementing the reference count.
      *
-     * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
+     * @throws utl::program_exception - if ptr is null and exceptions are enabled
      */
     UTL_CONSTEXPR_CXX14 intrusive_ptr(adopt_object_t, T* ptr) UTL_THROWS
         : resource_(iff_notnull(ptr, [](T* ptr) { return ptr; })) {}
@@ -84,7 +84,7 @@ public:
      * @note Retention of ownership involves incrementing the reference count of the object.
      * @note The pointer to the object cannot be null
      *
-     * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
+     * @throws utl::program_exception - if ptr is null and exceptions are enabled
      */
     UTL_CONSTEXPR_CXX14 intrusive_ptr(retain_object_t, T* ptr) UTL_THROWS
         : resource_(iff_notnull(ptr, [](T* ptr) {
@@ -186,7 +186,7 @@ public:
      * @param retain_object_t Tag type indicating retention of ownership.
      * @param ptr The pointer to the object to retain.
      *
-     * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
+     * @throws utl::program_exception - if ptr is null and exceptions are enabled
      */
     UTL_CONSTEXPR_CXX14 void reset(retain_object_t, T* ptr) UTL_THROWS {
         reset();
@@ -202,7 +202,7 @@ public:
      * @param adopt_object_t Tag type indicating adoption of ownership.
      * @param ptr The pointer to the object to adopt.
      *
-     * @throws utl::program_exception<void> - if ptr is null and exceptions are enabled
+     * @throws utl::program_exception - if ptr is null and exceptions are enabled
      */
     UTL_CONSTEXPR_CXX14 void reset(adopt_object_t, T* ptr) UTL_THROWS {
         reset();
