@@ -99,7 +99,7 @@ private:
  */
 template <typename T>
 class basic_exception : public basic_exception<void> {
-    using base_type = basic_exception<void>;
+    using base_tagype = basic_exception<void>;
 
 public:
     /**
@@ -118,7 +118,7 @@ public:
         is_constructible<T, U>::value)>
     basic_exception(U&& u, exceptions::message_format fmt, Args... args) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, U))
-        : base_type(UTL_SCOPE move(fmt), args...)
+        : base_tagype(UTL_SCOPE move(fmt), args...)
         , data_(UTL_SCOPE forward<U>(u)) {}
 
     /**
@@ -165,6 +165,38 @@ private:
     T data_;
 };
 
+namespace exceptions {
+template <typename Tag, typename Base = basic_exception<void>>
+class alias : public Base {
+    static_assert(UTL_TRAIT_is_base_of(basic_exception<void>, Base), "Invalid base argument");
+
+public:
+    using Base::Base;
+    using Base::operator=;
+    using Base::what;
+};
+struct out_of_range_tag;
+struct invalid_argument_tag;
+struct length_error_tag;
+struct range_error_tag;
+struct bad_optional_access_tag;
+struct bad_expected_access_tag;
+struct bad_variant_access_tag;
+struct bad_variant_access_tag;
+struct bad_alloc_tag;
+struct bad_array_new_length_tag;
+} // namespace exceptions
+
 using program_exception = basic_exception<void>;
+using out_of_range = exceptions::alias<exceptions::out_of_range_tag>;
+using invalid_argument = exceptions::alias<exceptions::invalid_argument_tag>;
+using length_error = exceptions::alias<exceptions::length_error_tag>;
+using range_error = exceptions::alias<exceptions::range_error_tag>;
+using bad_optional_access = exceptions::alias<exceptions::bad_optional_access_tag>;
+using bad_expected_access = exceptions::alias<exceptions::bad_expected_access_tag>;
+using bad_variant_access = exceptions::alias<exceptions::bad_variant_access_tag>;
+using bad_variant_access = exceptions::alias<exceptions::bad_variant_access_tag>;
+using bad_alloc = exceptions::alias<exceptions::bad_alloc_tag>;
+using bad_array_new_length = exceptions::alias<exceptions::bad_array_new_length_tag, bad_alloc>;
 
 UTL_NAMESPACE_END

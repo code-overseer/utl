@@ -23,9 +23,10 @@ namespace exceptions {
  */
 struct message_format {
     /**
-     * Internal use only
+     * Internal use only to prevent assignment
      */
-    constexpr message_format&& forward(message_format&& src) noexcept {
+    static constexpr message_format&& forward(message_format&& src UTL_ATTRIBUTE(
+        LIFETIMEBOUND)) noexcept {
         return static_cast<message_format&&>(src);
     }
 #if UTL_COMPILER_SUPPORTS_SOURCE_LOCATION

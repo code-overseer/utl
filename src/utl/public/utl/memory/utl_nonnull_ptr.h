@@ -33,12 +33,12 @@ public:
      *
      * @param ptr A pointer to the object. It must be non-null.
      *
-     * @throws utl::program_exception If the pointer is null and exceptions are enabled
+     * @throws utl::invalid_argument If the pointer is null and exceptions are enabled
      */
     UTL_CONSTEXPR_CXX14 nonnull_ptr(T* ptr) UTL_THROWS : ptr_(ptr) {
         UTL_THROW_IF(ptr == nullptr,
-            utl::program_exception(UTL_MESSAGE_FORMAT("[UTL] nonnull_ptr construction failed, "
-                                                      "Reason=[Pointer argument cannot be null]")));
+            invalid_argument(UTL_MESSAGE_FORMAT("[UTL] nonnull_ptr construction failed, "
+                                                "Reason=[Pointer argument cannot be null]")));
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<T*>) U UTL_REQUIRES_CXX11(
