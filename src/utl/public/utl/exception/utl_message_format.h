@@ -16,7 +16,7 @@ struct message_format {
 #if UTL_COMPILER_SUPPORTS_SOURCE_LOCATION
     template <size_t N>
     message_format(char const (&fmt)[N] UTL_ATTRIBUTE(LIFETIMEBOUND),
-        UTL_SCOPE source_location src = UTL_SCOPE source_location::current()) noexcept
+        UTL_SCOPE source_location src = UTL_SOURCE_LOCATION()) noexcept
         : format(fmt)
         , location(src) {}
 #else
