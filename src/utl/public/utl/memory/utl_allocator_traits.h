@@ -20,7 +20,6 @@
 #include "utl/type_traits/utl_void_t.h"
 #include "utl/utility/utl_forward.h"
 #include "utl/utility/utl_move.h"
-#include "utl/utility/utl_swap.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -121,12 +120,12 @@ constexpr T& assign(T& dst, U&&, false_type) noexcept {
 }
 
 template <typename T>
-UTL_CONSTEXPR_CXX14 T& assign(T& dst, T&& src, propagate_on_container_move_assignment<T>) noexcept {
+UTL_CONSTEXPR_CXX14 T& assign(T& dst, T&& src, true_type) noexcept {
     return dst = move(src);
 }
 
 template <typename T>
-UTL_CONSTEXPR_CXX14 T& assign(T& dst, T const& src, propagate_on_container_copy_assignment<T>) noexcept {
+UTL_CONSTEXPR_CXX14 T& assign(T& dst, T const& src, true_type) noexcept {
     return dst = src;
 }
 

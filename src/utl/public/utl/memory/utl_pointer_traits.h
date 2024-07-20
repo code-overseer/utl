@@ -131,7 +131,7 @@ template <typename T, typename U>
 auto has_rebind_impl(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T, typename U>
-auto has_rebind_impl(int) noexcept -> UTL_SCOPE always_true<typename T::template rebind<U>>;
+auto has_rebind_impl(int) noexcept -> UTL_SCOPE always_true_type<typename T::template rebind<U>>;
 
 template <typename T, typename U>
 using has_rebind = decltype(has_rebind_impl<T, U>(0));
@@ -207,6 +207,8 @@ struct pointer_traits<T*> {
     using pointer = T*;
     using element_type = T;
     using difference_type = details::pointer_traits::diff_type_t<T*>;
+    template <typename U>
+    using rebind = U*;
 
     static constexpr pointer pointer_to(element_type& ref) noexcept {
         return UTL_SCOPE addressof(ref);

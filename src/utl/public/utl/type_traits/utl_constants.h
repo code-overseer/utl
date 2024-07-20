@@ -31,9 +31,18 @@ using bool_constant = integral_constant<bool, B>;
 using true_type = bool_constant<true>;
 using false_type = bool_constant<false>;
 template <typename...>
-using always_true = true_type;
+using always_true_type = true_type;
 template <typename...>
-using always_false = false_type;
+using always_false_type = false_type;
+
+template <typename...>
+UTL_CONSTEVAL bool always_true() noexcept {
+    return true;
+}
+template <typename...>
+UTL_CONSTEVAL bool always_false() noexcept {
+    return false;
+}
 
 #if UTL_CXX14
 template <typename T, T N>

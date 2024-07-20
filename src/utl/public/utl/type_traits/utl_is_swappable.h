@@ -23,8 +23,8 @@ UTL_NAMESPACE_END
 
 #else // if UTL_USE_STD_TYPE_TRAITS && UTL_USE_STD_swap && UTL_CXX20
 
+#  include "utl/ranges/utl_swap.h"
 #  include "utl/type_traits/utl_constants.h"
-#  include "utl/utility/utl_swap.h"
 
 #  if UTL_CXX20
 
@@ -71,8 +71,9 @@ namespace swappable {
 template <typename L, typename R>
 auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R>
-auto trait_impl(int) noexcept -> UTL_SCOPE
-    always_true<decltype(UTL_SCOPE ranges::swap(UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>())),
+auto trait_impl(int) noexcept
+    -> UTL_SCOPE always_true_type<decltype(UTL_SCOPE ranges::swap(
+                                      UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>())),
         decltype(UTL_SCOPE ranges::swap(UTL_SCOPE declval<R>(), UTL_SCOPE declval<L>()))>;
 
 template <typename L, typename R>

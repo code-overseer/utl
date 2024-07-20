@@ -3,7 +3,9 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/type_traits/utl_is_base_of.h"
+#include "utl/type_traits/utl_logical_traits.h"
 #include "utl_reference_counting_fwd.h"
 
 UTL_NAMESPACE_BEGIN

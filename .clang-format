@@ -93,7 +93,7 @@ IncludeCategories:
   - Regex:           '^<.*>'
     Priority:        40
 
-IfMacros: ['UTL_TRY']
+IfMacros: ['UTL_TRY','UTL_IF_CONSTEVAL']
 AttributeMacros: []
 StatementMacros: ['UTL_NAMESPACE_BEGIN', 'UTL_NAMESPACE_END']
 Macros:

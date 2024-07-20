@@ -4,7 +4,9 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
-#include "utl_is_reference_countable.h"
+
+#include "utl/memory/utl_is_reference_countable.h"
+#include "utl/utility/utl_customization_point.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -33,28 +35,40 @@ namespace reference_counting {
  * @note The behavior of this function is undefined if `ptr` does not point to a valid object
  *       managed by reference counting.
  */
-template <typename T>
-UTL_CONSTEXPR_CXX20 void destroy(atomic_reference_count<T>* ptr) noexcept {
-    static_assert(is_base_of<atomic_reference_count<T>, T>::value, "invalid type");
-    delete (T*)ptr;
-}
 
+namespace details {
 template <typename T>
-UTL_CONSTEXPR_CXX20 void destroy(reference_count<T>* ptr) noexcept {
-    static_assert(is_base_of<reference_count<T>, T>::value, "invalid type");
-    delete (T*)ptr;
-}
+void destroy(T*) noexcept = delete;
 
 struct destroy_cpo_t {
-    template <UTL_CONCEPT_CXX20(reference_countable)
-            T UTL_REQUIRES_CXX11(is_reference_countable<T>::value)>
+private:
+    template <typename T>
+    static auto has_custom_destroy_impl(int) noexcept -> always_true_type<decltype(destroy((T*)0))>;
+    template <typename T>
+    static auto has_custom_destroy_impl(float) noexcept -> false_type;
+
+    template <typename T>
+    using has_custom_destroy = decltype(has_custom_destroy_impl<T>(0));
+
+public:
+    template <UTL_CONCEPT_CXX20(reference_countable) T UTL_REQUIRES_CXX11(
+        is_reference_countable<T>::value && has_custom_destroy<T>::value)>
+    UTL_REQUIRES_CXX20(requires(T* p) {
+        destroy(p); })
     UTL_CONSTEXPR_CXX20 void operator()(T* ptr) const noexcept {
         destroy(ptr);
     }
-};
 
-namespace details {
-UTL_INLINE_CXX17 constexpr destroy_cpo_t destroy = {};
+    template <UTL_CONCEPT_CXX20(reference_countable) T UTL_REQUIRES_CXX11(
+        is_reference_countable<T>::value && !has_custom_destroy<T>::value)>
+    UTL_CONSTEXPR_CXX20 void operator()(T* ptr) const noexcept {
+        delete ptr;
+    }
+};
+} // namespace details
+
+inline namespace cpo {
+UTL_DEFINE_CUSTOMIZATION_POINT(UTL_SCOPE reference_counting::details::destroy_cpo_t, destroy);
 }
 
 } // namespace reference_counting
