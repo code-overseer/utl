@@ -4,12 +4,14 @@
 
 #include "utl/preprocessor/utl_compiler.h"
 
-#if defined(__cpp_exceptions)
-#  define UTL_WITH_EXCEPTIONS 1
-#elif UTL_COMPILER_MSVC && defined(_CPPUNWIND)
-#  if _CPPUNWIND
+#ifndef _LIBCPP_HAS_NO_EXCEPTIONS
+#  if defined(__cpp_exceptions)
+#    define UTL_WITH_EXCEPTIONS 1
+#  elif UTL_COMPILER_MSVC && defined(_CPPUNWIND)
+#    if _CPPUNWIND
+#      define UTL_WITH_EXCEPTIONS 1
+#    endif
+#  elif defined(__EXCEPTIONS)
 #    define UTL_WITH_EXCEPTIONS 1
 #  endif
-#elif defined(__EXCEPTIONS)
-#  define UTL_WITH_EXCEPTIONS 1
 #endif

@@ -24,7 +24,7 @@ UTL_NAMESPACE_BEGIN
  *           is provided in the form void destroy(atomic_reference_count<T>* ptr).
  */
 template <typename T>
-class atomic_reference_count {
+class UTL_PUBLIC_TEMPLATE atomic_reference_count {
 public:
     /**
      * The type of the value managed by atomic_reference_count.
@@ -35,8 +35,8 @@ protected:
     /**
      * Constructs the reference_count object with an initial count of 1.
      */
-    constexpr atomic_reference_count() noexcept : count_(1) {}
-    UTL_CONSTEXPR_CXX20 ~atomic_reference_count() noexcept = default;
+    UTL_HIDE_FROM_ABI constexpr atomic_reference_count() noexcept : count_(1) {}
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~atomic_reference_count() noexcept = default;
 
     /**
      * Copy and move operations are deleted to enforce non-copyability and non-movability
@@ -54,7 +54,7 @@ private:
      *
      * @param obj The object of type T to increment the count for.
      */
-    friend void increment(T& obj) noexcept {
+    UTL_HIDE_FROM_ABI friend void increment(T& obj) noexcept {
         static_assert(UTL_TRAIT_is_base_of(atomic_reference_count, T), "Invalid type relation");
         ((atomic_reference_count&)obj).count_.fetch_add(1, UTL_SCOPE memory_order_relaxed);
     }
@@ -64,7 +64,7 @@ private:
      *
      * @param obj The object of type T to decrement the count for.
      */
-    friend void decrement(T& obj) noexcept {
+    UTL_HIDE_FROM_ABI friend void decrement(T& obj) noexcept {
         static_assert(UTL_TRAIT_is_base_of(atomic_reference_count, T), "Invalid type relation");
         int const result =
             ((atomic_reference_count&)obj).count_.fetch_sub(1, UTL_SCOPE memory_order_acq_rel);

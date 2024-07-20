@@ -10,12 +10,12 @@ UTL_NAMESPACE_BEGIN
 using size_t = decltype(sizeof(0));
 
 template <typename T, T N>
-struct integral_constant {
+struct UTL_PUBLIC_TEMPLATE integral_constant {
     static constexpr T value = N;
     using value_type = T;
     using type = integral_constant;
-    constexpr operator value_type() const noexcept { return N; }
-    constexpr value_type operator()() const noexcept { return N; }
+    UTL_HIDE_FROM_ABI constexpr operator value_type() const noexcept { return N; }
+    UTL_HIDE_FROM_ABI constexpr value_type operator()() const noexcept { return N; }
 };
 
 template <typename T, T N>
@@ -36,11 +36,11 @@ template <typename...>
 using always_false_type = false_type;
 
 template <typename...>
-UTL_CONSTEVAL bool always_true() noexcept {
+UTL_HIDE_FROM_ABI UTL_CONSTEVAL bool always_true() noexcept {
     return true;
 }
 template <typename...>
-UTL_CONSTEVAL bool always_false() noexcept {
+UTL_HIDE_FROM_ABI UTL_CONSTEVAL bool always_false() noexcept {
     return false;
 }
 

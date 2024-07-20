@@ -2,17 +2,19 @@
 
 #pragma once
 
-#include "utl/exception/utl_exception_base.h"
 #include "utl/preprocessor/utl_config.h"
+
+#include "utl/exception/utl_exception_base.h"
 
 #include <string.h>
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-class program_exception;
+class UTL_PUBLIC_TEMPLATE program_exception;
+
 template <>
-class program_exception<void> : public exception {
+class UTL_PUBLIC_TEMPLATE program_exception<void> : public exception {
 
 public:
     program_exception(char const* msg) : msg_ptr_(msg_buffer_) {
@@ -30,9 +32,7 @@ public:
         }
     }
 
-    UTL_ATTRIBUTE(NODISCARD) char const* what() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) final {
-        return msg_ptr_;
-    }
+    UTL_ATTRIBUTE(NODISCARD) char const* what() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) final { return msg_ptr_; }
 
     // TODO add non-const what
 
@@ -45,7 +45,7 @@ private:
 };
 
 template <typename T>
-class program_exception : public program_exception<void> {
+class UTL_PUBLIC_TEMPLATE program_exception : public program_exception<void> {
     using base_type = program_exception<void>;
 
 public:
@@ -55,9 +55,7 @@ public:
         return data_;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, CONST) T& data() noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) {
-        return data_;
-    }
+    UTL_ATTRIBUTES(NODISCARD, CONST) T& data() noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) { return data_; }
 
 private:
     T data_;

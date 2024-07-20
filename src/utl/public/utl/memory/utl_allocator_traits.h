@@ -115,37 +115,37 @@ struct rebind<Alloc<From, Args...>, To, false> {
 };
 
 template <typename T, typename U>
-constexpr T& assign(T& dst, U&&, false_type) noexcept {
+UTL_HIDE_FROM_ABI constexpr T& assign(T& dst, U&&, false_type) noexcept {
     return dst;
 }
 
 template <typename T>
-UTL_CONSTEXPR_CXX14 T& assign(T& dst, T&& src, true_type) noexcept {
+UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 T& assign(T& dst, T&& src, true_type) noexcept {
     return dst = move(src);
 }
 
 template <typename T>
-UTL_CONSTEXPR_CXX14 T& assign(T& dst, T const& src, true_type) noexcept {
+UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 T& assign(T& dst, T const& src, true_type) noexcept {
     return dst = src;
 }
 
 template <typename T>
-constexpr T copy(T const& dst, false_type) noexcept {
+UTL_HIDE_FROM_ABI constexpr T copy(T const& dst, false_type) noexcept {
     return dst;
 }
 
 template <typename T>
-constexpr T copy(T const& dst, selectable_copy_construction<T>) noexcept {
+UTL_HIDE_FROM_ABI constexpr T copy(T const& dst, selectable_copy_construction<T>) noexcept {
     return dst.select_on_container_copy_construction();
 }
 
 #if !UTL_CXX20
 
 template <typename T>
-auto implements_reallocate_impl(float) noexcept -> false_type;
+UTL_HIDE_FROM_ABI auto implements_reallocate_impl(float) noexcept -> false_type;
 
 template <typename T>
-auto implements_reallocate_impl(int) noexcept -> is_same<pointer_t<T>,
+UTL_HIDE_FROM_ABI auto implements_reallocate_impl(int) noexcept -> is_same<pointer_t<T>,
     decltype(declval<T>().reallocate(result_type_t<T>{}, size_type_t<T>{}))>;
 
 template <typename T>
@@ -160,7 +160,7 @@ concept implements_reallocate = requires(T& alloc, result_type_t<T> r, size_type
 
 #endif
 template <typename T>
-UTL_CONSTEXPR_CXX20 pointer_t<T> fallback_reallocate(
+UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 pointer_t<T> fallback_reallocate(
     T& allocator, result_type_t<T> arg, size_type_t<T> size) {
     static_assert(
         is_pointer<pointer_t<T>>::value, "Only raw pointers can use the fallback reallocation");
@@ -173,7 +173,8 @@ UTL_CONSTEXPR_CXX20 pointer_t<T> fallback_reallocate(
 template <UTL_CONCEPT_CXX20(implements_reallocate) T UTL_REQUIRES_CXX11(
     implements_reallocate<T>::value && is_pointer<pointer_t<T>>::value)>
 UTL_REQUIRES_CXX20(is_pointer_v<pointer_t<T>>)
-UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(T& allocator, result_type_t<T> arg, size_type_t<T> size) {
+UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
+    T& allocator, result_type_t<T> arg, size_type_t<T> size) {
 #if UTL_CXX20
     if (UTL_BUILTIN_is_constant_evaluated()) {
         return fallback_reallocate(allocator, arg, size);
@@ -185,22 +186,24 @@ UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(T& allocator, result_type_t<T> arg, 
 template <UTL_CONCEPT_CXX20(implements_reallocate) T UTL_REQUIRES_CXX11(
     implements_reallocate<T>::value && !is_pointer<pointer_t<T>>::value)>
 UTL_REQUIRES_CXX20(!is_pointer_v<pointer_t<T>>)
-UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(T& allocator, result_type_t<T> arg, size_type_t<T> size) {
+UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
+    T& allocator, result_type_t<T> arg, size_type_t<T> size) {
     return allocator.reallocate(arg, size);
 }
 
 template <typename T UTL_REQUIRES_CXX11(!implements_reallocate<T>::value)>
-UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(T& allocator, result_type_t<T> arg, size_type_t<T> size) {
+UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
+    T& allocator, result_type_t<T> arg, size_type_t<T> size) {
     return fallback_reallocate(allocator, arg, size);
 }
 
 #if !UTL_CXX20
 
 template <typename T>
-auto implements_allocate_at_least_impl(float) noexcept -> false_type;
+UTL_HIDE_FROM_ABI auto implements_allocate_at_least_impl(float) noexcept -> false_type;
 
 template <typename T>
-auto implements_allocate_at_least_impl(int) noexcept -> is_same<result_type_t<T>,
+UTL_HIDE_FROM_ABI auto implements_allocate_at_least_impl(int) noexcept -> is_same<result_type_t<T>,
     decltype(declval<T>().allocate_at_least(result_type_t<T>{}, size_type_t<T>{}))>;
 
 template <typename T>
@@ -216,24 +219,25 @@ concept implements_allocate_at_least = requires(T& alloc, size_type_t<T> size) {
 #endif
 
 template <typename T UTL_REQUIRES_CXX11(!implements_allocate_at_least<T>::value)>
-UTL_CONSTEXPR_CXX20 result_type_t<T> allocate_at_least(T& allocator, size_type_t<T> size) {
+UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 result_type_t<T> allocate_at_least(T& allocator, size_type_t<T> size) {
     return {allocate(allocator, size), size};
 }
 
 template <UTL_CONCEPT_CXX20(implements_allocate_at_least) T UTL_REQUIRES_CXX11(
     implements_allocate_at_least<T>::value)>
-UTL_CONSTEXPR_CXX20 result_type_t<T> allocate_at_least(T& allocator, size_type_t<T> size) {
+UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 result_type_t<T> allocate_at_least(T& allocator, size_type_t<T> size) {
     return allocator.allocate_at_least(size);
 }
 
 #if !UTL_CXX20
 
 template <typename T>
-auto implements_reallocate_at_least_impl(float) noexcept -> false_type;
+UTL_HIDE_FROM_ABI auto implements_reallocate_at_least_impl(float) noexcept -> false_type;
 
 template <typename T>
-auto implements_reallocate_at_least_impl(int) noexcept -> is_same<result_type_t<T>,
-    decltype(declval<T>().reallocate_at_least(result_type_t<T>{}, size_type_t<T>{}))>;
+UTL_HIDE_FROM_ABI auto implements_reallocate_at_least_impl(int) noexcept
+    -> is_same<result_type_t<T>,
+        decltype(declval<T>().reallocate_at_least(result_type_t<T>{}, size_type_t<T>{}))>;
 
 template <typename T>
 using implements_reallocate_at_least = decltype(implements_reallocate_at_least_impl<T>(0));
@@ -248,14 +252,14 @@ concept implements_reallocate_at_least = requires(T& alloc, result_type_t<T> r, 
 #endif
 
 template <typename T UTL_REQUIRES_CXX11(!implements_reallocate_at_least<T>::value)>
-UTL_CONSTEXPR_CXX20 result_type_t<T> reallocate_at_least(
+UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 result_type_t<T> reallocate_at_least(
     T& allocator, result_type_t<T> arg, size_type_t<T> new_size) {
     return UTL_SCOPE details::allocator::reallocate(allocator, new_size);
 }
 
 template <UTL_CONCEPT_CXX20(implements_reallocate_at_least) T UTL_REQUIRES_CXX11(
     implements_reallocate_at_least<T>::value)>
-UTL_CONSTEXPR_CXX20 result_type_t<T> reallocate_at_least(
+UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 result_type_t<T> reallocate_at_least(
     T& allocator, result_type_t<T> arg, size_type_t<T> size) {
     return allocator.reallocate_at_least(arg, size);
 }
@@ -264,7 +268,7 @@ UTL_CONSTEXPR_CXX20 result_type_t<T> reallocate_at_least(
 } // namespace details
 
 template <typename Alloc>
-struct allocator_traits {
+struct UTL_PUBLIC_TEMPLATE allocator_traits {
     using allocator_type = Alloc;
     using value_type = typename allocator_type::value_type;
     using pointer = details::allocator::pointer_t<allocator_type>;
@@ -306,52 +310,55 @@ struct allocator_traits {
             UTL_SCOPE is_nothrow_swappable<allocator_type>::value,
         "If propogation on swap is required, allocator must be nothrow swappable");
 
-    UTL_NODISCARD static UTL_CONSTEXPR_CXX20 pointer allocate(allocator_type& alloc, size_type size) {
+    UTL_NODISCARD UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX20 pointer allocate(
+        allocator_type& alloc, size_type size) {
         return alloc.allocate(size);
     }
 
-    UTL_NODISCARD static UTL_CONSTEXPR_CXX20 allocation_result allocate_at_least(
+    UTL_NODISCARD UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX20 allocation_result allocate_at_least(
         allocator_type& alloc, size_type size) {
         return details::allocator::allocate_at_least(alloc, size);
     }
 
-    static UTL_CONSTEXPR_CXX20 void deallocate(allocator_type& alloc, pointer ptr, size_type size) {
+    UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX20 void deallocate(
+        allocator_type& alloc, pointer ptr, size_type size) {
         alloc.deallocate(ptr, size);
     }
 
-    UTL_NODISCARD static UTL_CONSTEXPR_CXX20 pointer reallocate(
+    UTL_NODISCARD UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX20 pointer reallocate(
         allocator_type& alloc, allocation_result arg, size_type new_size) {
         return details::allocator::reallocate(alloc, arg, new_size);
     }
 
-    UTL_NODISCARD static UTL_CONSTEXPR_CXX20 allocation_result reallocate_at_least(
+    UTL_NODISCARD UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX20 allocation_result reallocate_at_least(
         allocator_type& alloc, allocation_result arg, size_type new_size) {
         return details::allocator::reallocate_at_least(alloc, arg, new_size);
     }
 
-    static UTL_CONSTEXPR_CXX14 allocator_type& assign(
+    UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX14 allocator_type& assign(
         allocator_type& dst, allocator_type const& src) noexcept {
         return details::allocator::assign(dst, src, propagate_on_container_copy_assignment{});
     }
 
-    static UTL_CONSTEXPR_CXX14 allocator_type& assign(allocator_type& dst, allocator_type&& src) noexcept {
+    UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX14 allocator_type& assign(
+        allocator_type& dst, allocator_type&& src) noexcept {
         return details::allocator::assign(dst, move(src), propagate_on_container_move_assignment{});
     }
 
-    UTL_NODISCARD static UTL_CONSTEXPR_CXX14 allocator_type select_on_container_copy_construction(
-        allocator_type const& p) noexcept {
+    UTL_NODISCARD UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX14 allocator_type
+    select_on_container_copy_construction(allocator_type const& p) noexcept {
         return details::allocator::copy(p, selectable_copy_construction{});
     }
 
     template <typename T = allocator_type>
-    UTL_NODISCARD static constexpr enable_if_t<
+    UTL_NODISCARD UTL_HIDE_FROM_ABI static constexpr enable_if_t<
         is_same<T, allocator_type>::value && is_always_equal::value, bool>
     equals(T const&, T const&) noexcept {
         return true;
     }
 
     template <typename T = allocator_type>
-    UTL_NODISCARD static constexpr enable_if_t<
+    UTL_NODISCARD UTL_HIDE_FROM_ABI static constexpr enable_if_t<
         is_same<T, allocator_type>::value && !is_always_equal::value, bool>
     equals(T const& left, T const& right) noexcept {
         return left == right;

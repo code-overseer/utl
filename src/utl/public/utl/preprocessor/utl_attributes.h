@@ -2,21 +2,10 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_attribute_check.h"
 #include "utl/preprocessor/utl_attribute_list.h"
 #include "utl/preprocessor/utl_builtins.h"
 #include "utl/preprocessor/utl_compiler.h"
-
-#ifdef __has_cpp_attribute
-#  define UTL_HAS_CPP_ATTRIBUTE(...) __has_cpp_attribute(__VA_ARGS__)
-#else /* ifdef __has_cpp_attribute */
-#  define UTL_HAS_CPP_ATTRIBUTE(...) 0
-#endif /* ifdef __has_cpp_attribute */
-
-#ifdef __has_attribute
-#  define UTL_HAS_ATTRIBUTE(...) __has_attribute(__VA_ARGS__)
-#else /* ifdef __has_attribute */
-#  define UTL_HAS_ATTRIBUTE(...) 0
-#endif /* ifdef __has_attribute */
 
 #if UTL_HAS_CPP_ATTRIBUTE(nodiscard)
 

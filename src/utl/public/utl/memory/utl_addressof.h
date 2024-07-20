@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/type_traits/utl_add_lvalue_reference.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_copy_cvref.h"
@@ -19,15 +20,17 @@ constexpr T* addressof(T&&) = delete;
 
 template <typename T>
 UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr enable_if_t<UTL_TRAIT_VALUE(is_object, remove_reference_t<T>), T*> addressof(
-    T& arg UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
+UTL_HIDE_FROM_ABI
+    constexpr enable_if_t<UTL_TRAIT_VALUE(is_object, remove_reference_t<T>), T*> addressof(
+        T& arg UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
     return UTL_BUILTIN_addressof(arg);
 }
 
 template <typename T>
 UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr enable_if_t<!UTL_TRAIT_VALUE(is_object, remove_reference_t<T>), T*> addressof(
-    T& arg UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
+UTL_HIDE_FROM_ABI
+    constexpr enable_if_t<!UTL_TRAIT_VALUE(is_object, remove_reference_t<T>), T*> addressof(
+        T& arg UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
     return &arg;
 }
 
@@ -66,14 +69,14 @@ using has_overload =
 
 template <typename T>
 UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC)
-inline enable_if_t<details::addressof::has_overload<T>::value, T*> addressof(
+inline UTL_HIDE_FROM_ABI enable_if_t<details::addressof::has_overload<T>::value, T*> addressof(
     T& arg UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
     return reinterpret_cast<T*>(&reinterpret_cast<copy_cvref_t<T&, char>>(arg));
 }
 
 template <typename T>
 UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr enable_if_t<!details::addressof::has_overload<T>::value, T*> addressof(
+constexpr UTL_HIDE_FROM_ABI enable_if_t<!details::addressof::has_overload<T>::value, T*> addressof(
     T& arg UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
     return &arg;
 }
