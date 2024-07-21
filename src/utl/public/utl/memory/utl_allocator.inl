@@ -15,14 +15,12 @@ UTL_NAMESPACE_BEGIN
 template <typename T>
 UTL_CONSTEXPR_CXX20 auto allocator<T>::allocate(size_type count) UTL_THROWS -> pointer {
     UTL_THROW_IF(count > memory::max_size<T>::value,
-        program_exception<void>("[UTL] allocator::allocate operation failed, Reason=[element "
-                                "count limit exceeded]"));
+        bad_array_new_length(
+            UTL_MESSAGE_FORMAT("[UTL] allocation operation failed, Reason=[element count "
+                               "limit exceeded], count=[%s], limit=[%s]"),
+            count, memory::max_size<T>::value));
 
-    UTL_TRY {
-        return memory::allocate<value_type>(count);
-    } UTL_CATCH(...) {
-        UTL_RETHROW("Allocation failed");
-    }
+    return memory::allocate<value_type>(count);
 }
 
 template <typename T>
