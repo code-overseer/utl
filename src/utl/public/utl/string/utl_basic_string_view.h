@@ -90,15 +90,9 @@ public:
     UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE) constexpr const_pointer data() const noexcept {
         return data_;
     }
-    UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE) constexpr bool empty() const noexcept {
-        return !size();
-    }
-    UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE) constexpr size_type size() const noexcept {
-        return size_;
-    }
-    UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE) constexpr size_type length() const noexcept {
-        return size_;
-    }
+    UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE) constexpr bool empty() const noexcept { return !size(); }
+    UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE) constexpr size_type size() const noexcept { return size_; }
+    UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE) constexpr size_type length() const noexcept { return size_; }
     UTL_STRING_CONST constexpr size_type max_size() const noexcept { return npos; }
 
     UTL_STRING_PURE constexpr const_iterator cbegin() const noexcept {
@@ -125,18 +119,22 @@ public:
     UTL_STRING_PURE constexpr const_iterator rend() const noexcept {
         return const_reverse_iterator(begin());
     }
-    UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE)
-    constexpr const_reference front() const noexcept { return *data_; }
+    UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE) constexpr const_reference front() const noexcept {
+        return *data_;
+    }
     UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE) constexpr const_reference back() const noexcept {
         return data_[size_ - 1];
     }
-    UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE)
-    constexpr const_reference operator[](size_type idx) const noexcept { return data_[idx]; }
+    UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE) constexpr const_reference operator[](
+        size_type idx) const noexcept {
+        return data_[idx];
+    }
 
     UTL_STRING_PURE constexpr const_reference at(size_type idx) const UTL_THROWS {
-        UTL_THROW_IF(idx >= size(),
-            program_exception<void>("[UTL] basic_string_view::at operation failed, "
-                                    "Reason=[index out of range]"));
+        UTL_THROW_IF(idx > size(),
+            out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_string_view::at` operation failed, "
+                                            "Reason=[index out of range], pos=[%zu], size=[%zu]"),
+                idx, size()));
         return *this[idx];
     }
 
@@ -156,9 +154,11 @@ public:
     }
 
     UTL_CONSTEXPR_CXX14 size_t copy(pointer dest, size_type count, size_type pos = 0) const UTL_THROWS {
+        UTL_ASSERT(dest != nullptr);
         UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] basic_string_view::copy operation failed, "
-                                    "Reason=[index out of range]"));
+            out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_string_view::copy` operation failed, "
+                                            "Reason=[index out of range], pos=[%zu], size=[%zu]"),
+                pos, size()));
         auto const copied = UTL_SCOPE numeric_min(count, size() - pos);
         traits_type::copy(dest, data() + pos, copied);
         return copied;
@@ -167,7 +167,7 @@ public:
     UTL_STRING_PURE
     constexpr basic_string_view substr(size_type pos = 0, size_type count = npos) const UTL_THROWS {
         return pos >= size()
-            ? substr_throw()
+            ? substr_throw(UTL_SOURCE_LOCATION(), pos, size())
             : basic_string_view(data() + pos, UTL_SCOPE numeric_min(count, size() - pos));
     }
 
@@ -360,9 +360,12 @@ public:
     }
 
 private:
-    [[noreturn]] static basic_string_view substr_throw() UTL_THROWS {
-        UTL_THROW(program_exception<void>("[UTL] basic_string_view::substr operation failed, "
-                                          "Reason=[index out of range]"));
+    [[noreturn]] static basic_string_view substr_throw(
+        UTL_SCOPE source_location src, size_t pos, size_t size) UTL_THROWS {
+        exceptions::message_format format = {"[UTL] `basic_string_view::substr` operation failed, "
+                                             "Reason=[index out of range], pos=[%zu], size=[%zu]",
+            src};
+        UTL_THROW(out_of_range(format, pos, size));
     }
 
     pointer data_;

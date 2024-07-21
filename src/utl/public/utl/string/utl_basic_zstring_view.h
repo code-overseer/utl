@@ -48,8 +48,8 @@ public:
     UTL_CONSTEXPR_CXX14 basic_zstring_view(const_pointer data, size_type size) UTL_THROWS
         : base_type(data, size) {
         UTL_THROW_IF(data_[size] != 0,
-            program_exception<void>(
-                "zstring_view construction failed, Reason=[argument string not null-terminated]"));
+            invalid_argument(UTL_MESSAGE_FORMAT(
+                "zstring_view construction failed, Reason=[argument string not null-terminated]")));
     }
     constexpr basic_zstring_view(const_pointer data)
         UTL_NOEXCEPT(noexcept(traits_type::length(data)))
@@ -89,9 +89,10 @@ public:
     using base_type::operator[];
 
     UTL_STRING_PURE constexpr const_reference at(size_type idx) const UTL_THROWS {
-        UTL_THROW_IF(idx >= size(),
-            program_exception<void>("[UTL] basic_zstring_view::at operation failed, "
-                                    "Reason=[index out of range]"));
+        UTL_THROW_IF(idx > size(),
+            out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_zstring_view::at` operation failed, "
+                                            "Reason=[index out of range], pos=[%zu], size=[%zu]"),
+                idx, size()));
         return *this[idx];
     }
 
@@ -105,15 +106,16 @@ public:
 
     UTL_CONSTEXPR_CXX14 size_type copy(pointer dest, size_type count, size_type pos = 0) const UTL_THROWS {
         UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] basic_zstring_view::copy operation failed, "
-                                    "Reason=[index out of range]"));
+            out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_zstring_view::copy` operation failed, "
+                                            "Reason=[index out of range], pos=[%zu], size=[%zu]"),
+                pos, size()));
         auto const copied = UTL_SCOPE numeric_min(count, size() - pos);
         traits_type::copy(dest, data() + pos, copied);
         return copied;
     }
 
     constexpr base_type substr(size_type pos = 0, size_type count = npos) const UTL_THROWS {
-        return pos >= size() ? substr_throw()
+        return pos >= size() ? substr_throw(UTL_SOURCE_LOCATION(), pos, size())
                              : base_type(data() + pos, UTL_SCOPE numeric_min(count, size() - pos));
     }
 
@@ -129,9 +131,12 @@ public:
     using base_type::starts_with;
 
 private:
-    [[noreturn]] static basic_zstring_view substr_throw() UTL_THROWS {
-        UTL_THROW(program_exception<void>("[UTL] basic_zstring_view::substr operation failed, "
-                                          "Reason=[index out of range]"));
+    [[noreturn]] static basic_zstring_view substr_throw(
+        UTL_SCOPE source_location src, size_t pos, size_t size) UTL_THROWS {
+        exceptions::message_format format = {"[UTL] `basic_zstring_view::substr` operation failed, "
+                                             "Reason=[index out of range], pos=[%zu], size=[%zu]",
+            src};
+        UTL_THROW(out_of_range(format, pos, size));
     }
 
     pointer data_;

@@ -97,7 +97,7 @@ IfMacros: ['UTL_TRY','UTL_IF_CONSTEVAL']
 AttributeMacros: []
 StatementMacros: ['UTL_NAMESPACE_BEGIN', 'UTL_NAMESPACE_END']
 Macros:
-- UTL_CATCH(X)=else if(X)
+- UTL_CATCH(X)=else if ([](X){ return true; }())
 - UTL_NOEXCEPT(X)=noexcept(X)
 - UTL_THROWS=noexcept
 - UTL_INLINE_CXX17=inline

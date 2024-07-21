@@ -225,8 +225,10 @@ public:
         , size_(other.size_)
         , is_heap_(other.is_heap_) {
         UTL_THROW_IF(pos > other.size(),
-            program_exception<void>("[UTL] basic_short_string construction failed, "
-                                    "Reason=[index out of range]"));
+            out_of_range(UTL_MESSAGE_FORMAT(
+                             "[UTL] basic_short_string construction failed, Reason=[index out of "
+                             "range], pos=[%zu], size=[%zu]"),
+                pos, other.size()));
 
         if (other.is_heap_) {
             storage_.get_heap() = clone_heap(allocator_ref(), other);
@@ -267,8 +269,10 @@ public:
         , size_(other.size_)
         , is_heap_(other.is_heap_) {
         UTL_THROW_IF(pos > other.size(),
-            program_exception<void>("[UTL] basic_short_string construction failed, "
-                                    "Reason=[index out of range]"));
+            out_of_range(UTL_MESSAGE_FORMAT(
+                             "[UTL] basic_short_string construction failed, Reason=[index out of "
+                             "range], pos=[%zu], size=[%zu]"),
+                pos, other.size()));
 
         on_move_construct_with_alloc(other, pos, count, alloc_traits::is_always_equal);
     }
@@ -333,8 +337,10 @@ public:
         }
 
         UTL_THROW_IF(new_capacity > max_size(),
-            program_exception<void>("[UTL] basic_short_string::reserve operation failed, "
-                                    "Reason=[Requested capacity exceeds maximum size]"));
+            length_error(UTL_MESSAGE_FORMAT("[UTL] basic_short_string::reserve operation failed, "
+                                            "Reason=[Requested capacity exceeds maximum size], "
+                                            "capacity=[%zu], limit=[%zu]"),
+                new_capacity, max_size()));
         reserve_impl(new_capacity);
     }
 
@@ -417,8 +423,9 @@ public:
     }
     UTL_STRING_PURE constexpr const_reference at(size_type idx) const UTL_THROWS {
         UTL_THROW_IF(idx >= size(),
-            program_exception<void>("[UTL] basic_short_string::at operation failed, "
-                                    "Reason=[index out of range]"));
+            out_of_range(UTL_MESSAGE_FORMAT("[UTL] basic_short_string::at operation failed, "
+                                            "Reason=[index out of range], idx=[%zu], size=[%zu]"),
+                idx, size()));
         return data()[idx];
     }
 
@@ -455,8 +462,11 @@ public:
         }
 
         UTL_THROW_IF(pos > other.size(),
-            program_exception<void>("[UTL] basic_short_string::assign operation failed, "
-                                    "Reason=[substring argument index is out of range]"));
+            out_of_range(UTL_MESSAGE_FORMAT("[UTL] basic_short_string::assign operation failed, "
+                                            "Reason=[substring argument index is out of range], "
+                                            "pos=[%zu], size=[%zu], str=[%.*s%s"),
+                pos, other.size()));
+
         count = count > other.size() ? other.size() : count;
         resize(count);
         traits_type::copy(data(), other.data() + pos, count + 1);
@@ -526,16 +536,20 @@ public:
         View const& view, size_type subidx, size_type subcount = npos) UTL_THROWS {
         view_type const v(view);
         UTL_THROW_IF(subidx > v.size(),
-            program_exception<void>("[UTL] `basic_short_string::assign` operation failed, "
-                                    "Reason=[argument substring index out of range]"));
+            out_of_range(
+                UTL_MESSAGE_FORMAT(
+                    "[UTL] `basic_short_string::assign` operation failed, "
+                    "Reason=[argument substring index out of range], idx=[%zu], size=[%zu]"),
+                subidx, v.size()));
         return assign(v.substr(subidx, subcount));
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& insert(size_type pos, size_type count, value_type ch)
         UTL_THROWS {
         UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] `basic_short_string::insert` operation failed, "
-                                    "Reason=[index out of range]"));
+            out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::insert` operation failed, "
+                                            "Reason=[index out of range], pos=[%zu], size=[%zu]"),
+                pos, size()));
         reserve(size() + count);
         auto const src = data() + pos;
         auto const dst = src + count;
@@ -548,8 +562,9 @@ public:
     UTL_CONSTEXPR_CXX14 basic_short_string& insert(
         size_type pos, const_pointer str, size_type length) UTL_THROWS {
         UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] basic_short_string::insert operation failed, "
-                                    "Reason=[index out of range]"));
+            out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::insert` operation failed, "
+                                            "Reason=[index out of range], pos=[%zu], size=[%zu]"),
+                pos, size()));
         reserve(size() + length);
         auto const src = data() + pos;
         auto const dst = src + length;
@@ -570,8 +585,11 @@ public:
     UTL_CONSTEXPR_CXX14 basic_short_string& insert(size_type pos, basic_short_string const& str,
         size_type idx, size_type count = npos) UTL_THROWS {
         UTL_THROW_IF(idx > str.size(),
-            program_exception<void>("[UTL] `basic_short_string::insert` operation failed, "
-                                    "Reason=[argument substring index out of range]"));
+            out_of_range(
+                UTL_MESSAGE_FORMAT(
+                    "[UTL] `basic_short_string::insert` operation failed, "
+                    "Reason=[argument substring index out of range], idx=[%zu], size=[%zu]"),
+                idx, str.size()));
         auto const copy_size = UTL_SCOPE numeric_min(str.size() - idx, count);
         return insert(pos, str.data() + idx, copy_size);
     }
@@ -640,8 +658,11 @@ public:
         size_type pos, View const& view, size_type subidx, size_type subcount = npos) UTL_THROWS {
         view_type const v(view);
         UTL_THROW_IF(subidx > v.size(),
-            program_exception<void>("[UTL] `basic_short_string::insert` operation failed, "
-                                    "Reason=[argument substring index out of range]"));
+            out_of_range(
+                UTL_MESSAGE_FORMAT(
+                    "[UTL] `basic_short_string::insert` operation failed, "
+                    "Reason=[argument substring index out of range], idx=[%zu], size=[%zu]"),
+                subidx, v.size()));
         return insert(pos, v.substr(subidx, subcount));
     }
 
@@ -714,8 +735,11 @@ public:
         View const& view, size_type subidx, size_type subcount = npos) UTL_THROWS {
         view_type const v(view);
         UTL_THROW_IF(subidx > v.size(),
-            program_exception<void>("[UTL] `basic_short_string::assign` operation failed, "
-                                    "Reason=[argument substring index out of range]"));
+            out_of_range(
+                UTL_MESSAGE_FORMAT(
+                    "[UTL] `basic_short_string::append` operation failed, "
+                    "Reason=[argument substring index out of range], idx=[%zu], size=[%zu]"),
+                subidx, v.size()));
         return insert(end(), v.substr(subidx, subcount));
     }
 
@@ -751,8 +775,11 @@ public:
     UTL_CONSTEXPR_CXX14 basic_short_string& replace(size_type pos, size_type count,
         basic_short_string const& str, size_type subidx, size_type subcount = npos) UTL_THROWS {
         UTL_THROW_IF(subidx > str.size(),
-            program_exception<void>("[UTL] `basic_short_string::replace` operation failed, "
-                                    "Reason=[argument substring index out of range]"));
+            out_of_range(
+                UTL_MESSAGE_FORMAT(
+                    "[UTL] `basic_short_string::replace` operation failed, "
+                    "Reason=[argument substring index out of range], idx=[%zu], size=[%zu]"),
+                subidx, str.size()));
         view_type const view = view_type(str).substr(subidx, subcount);
         return replace(pos, count, view.data(), view.size());
     }
@@ -760,8 +787,9 @@ public:
     UTL_CONSTEXPR_CXX14 basic_short_string& replace(
         size_type pos, size_type count, const_pointer str, size_type length) UTL_THROWS {
         UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] `basic_short_string::replace` operation failed, "
-                                    "Reason=[index out of range]"));
+            out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::replace` operation failed, "
+                                            "Reason=[index out of range], pos=[%zu], size=[%zu]"),
+                pos, size()));
         auto const first = begin() + pos;
         return replace(first, first + count, str, length);
     }
@@ -798,8 +826,9 @@ public:
     UTL_CONSTEXPR_CXX14 basic_short_string& replace(
         size_type pos, size_type count, size_type char_count, value_type ch) UTL_THROWS {
         UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] `basic_short_string::replace` operation failed, "
-                                    "Reason=[index out of range]"));
+            out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::replace` operation failed, "
+                                            "Reason=[index out of range], pos=[%zu], size=[%zu]"),
+                pos, size()));
         auto const first = cbegin() + pos;
         return replace(first, first + count, char_count, ch);
     }
@@ -855,8 +884,11 @@ public:
         View const& view, size_type subidx, size_type subcount = npos) UTL_THROWS {
         view_type const v(view);
         UTL_THROW_IF(subidx > v.size(),
-            program_exception<void>("[UTL] `basic_short_string::replace` operation failed, "
-                                    "Reason=[argument substring index out of range]"));
+            out_of_range(
+                UTL_MESSAGE_FORMAT(
+                    "[UTL] `basic_short_string::insert` operation failed, "
+                    "Reason=[argument substring index out of range], idx=[%zu], size=[%zu]"),
+                subidx, v.size()));
         return replace(first, last, v.substr(subidx, subcount));
     }
 
@@ -872,16 +904,21 @@ public:
         is_convertible<View, view_type>::value)>
     UTL_CONSTEXPR_CXX14 basic_short_string& replace(size_type idx, size_type count, View const& view,
         size_type subidx, size_type subcount = npos) UTL_THROWS {
-        UTL_THROW_IF(subidx > view.size(),
-            program_exception<void>("[UTL] `basic_short_string::replace` operation failed, "
-                                    "Reason=[argument substring index out of range]"));
-        return replace(idx, count, view_type(view).substr(subidx, subcount));
+        view_type const v(view);
+        UTL_THROW_IF(subidx > v.size(),
+            out_of_range(
+                UTL_MESSAGE_FORMAT(
+                    "[UTL] `basic_short_string::insert` operation failed, "
+                    "Reason=[argument substring index out of range], idx=[%zu], size=[%zu]"),
+                subidx, v.size()));
+        return replace(idx, count, v.substr(subidx, subcount));
     }
 
     UTL_CONSTEXPR_CXX14 size_type copy(pointer dst, size_type count, size_type pos = 0) const UTL_THROWS {
         UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] `basic_short_string::copy` operation failed, "
-                                    "Reason=[index out of range]"));
+            out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::replace` operation failed, "
+                                            "Reason=[index out of range], pos=[%zu], size=[%zu]"),
+                pos, size()));
 
         auto const copied = UTL_SCOPE numeric_min(count, size() - pos);
         traits_type::copy(dst, data(), copied);
@@ -1127,8 +1164,9 @@ public:
         size_type pos, size_type count, const_pointer str, size_type str_len) const UTL_THROWS {
         UTL_ASSERT(str != nullptr);
         UTL_THROW_IF(pos > size(),
-            program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
-                                    "Reason=[index out of range]"));
+            out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::replace` operation failed, "
+                                            "Reason=[index out of range], pos=[%zu], size=[%zu]"),
+                pos, size()));
         return details::string::compare<traits_type>(
             data() + pos, UTL_SCOPE numeric_min(count, size() - pos), str, str_len);
     }
@@ -1154,16 +1192,20 @@ public:
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
         basic_short_string const& other, size_type pos2, size_type count2 = npos) const UTL_THROWS {
         UTL_THROW_IF(pos2 > other.size(),
-            program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
-                                    "Reason=[argument index out of range]"));
+            out_of_range(
+                UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::compare` operation failed, "
+                                   "Reason=[argument index out of range], pos=[%zu], size=[%zu]"),
+                pos2, other.size()));
         return compare(pos, count, view_type(other).substr(pos2, count2));
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count, view_type view,
         size_type pos2, size_type count2 = npos) const UTL_THROWS {
         UTL_THROW_IF(pos2 > view.size(),
-            program_exception<void>("[UTL] `basic_short_string::compare` operation failed, "
-                                    "Reason=[argument index out of range]"));
+            out_of_range(
+                UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::compare` operation failed, "
+                                   "Reason=[argument index out of range], pos=[%zu], size=[%zu]"),
+                pos2, view.size()));
         return compare(pos, count, view.substr(pos2, count2));
     }
 
@@ -1257,9 +1299,11 @@ private:
             } else {
                 grow_heap(new_capacity);
             }
-        } UTL_CATCH(...) {
-            UTL_THROW(program_exception<void>("[UTL] basic_short_string::reserve operation failed, "
-                                              "Reason=[Allocation failed]"));
+        } UTL_CATCH(program_exception& exception) {
+            exception.emplace_message(
+                UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::reserve` operation failed, "
+                                   "Reason=[Allocation failed]"));
+            UTL_RETHROW();
         }
     }
 
@@ -1277,9 +1321,10 @@ private:
             heap_type heap{alloc_traits::allocate(alloc, buffer_capacity), buffer_capacity};
             traits_type::copy(heap.data_, src.data(), src.size() + 1);
             return heap;
-        } UTL_CATCH(...) {
-            UTL_THROW(program_exception<void>("[UTL] basic_short_string copy operation failed, "
-                                              "Reason=[Allocation failed]"));
+        } UTL_CATCH(program_exception& exception) {
+            exception.emplace_message(UTL_MESSAGE_FORMAT(
+                "[UTL] basic_short_string operation failed, Reason=[Allocation failed]"));
+            UTL_RETHROW();
         }
     }
 
