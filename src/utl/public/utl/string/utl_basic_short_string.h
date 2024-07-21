@@ -6,8 +6,6 @@
 
 #include "utl/string/utl_string_fwd.h"
 
-#include "utl/algorithm/utl_max.h"
-#include "utl/algorithm/utl_min.h"
 #include "utl/algorithm/utl_remove.h"
 #include "utl/algorithm/utl_remove_if.h"
 #include "utl/concepts/utl_convertible_to.h"
@@ -20,6 +18,8 @@
 #include "utl/iterator/utl_reverse_iterator.h"
 #include "utl/memory/utl_allocator_traits.h"
 #include "utl/memory/utl_construct_at.h"
+#include "utl/numeric/utl_max.h"
+#include "utl/numeric/utl_min.h"
 #include "utl/string/utl_basic_string_view.h"
 #include "utl/string/utl_basic_zstring_view.h"
 #include "utl/string/utl_string_details.h"
@@ -348,7 +348,7 @@ public:
 
     UTL_CONSTEXPR_CXX14 void resize(size_type new_size, value_type ch) UTL_THROWS {
         reserve(new_size);
-        traits_type::assign(data() + size(), UTL_SCOPE numeric_max(new_size, size()) - size(), ch);
+        traits_type::assign(data() + size(), UTL_SCOPE numeric::max(new_size, size()) - size(), ch);
         data()[new_size] = value_type();
         size_ = new_size;
     }
@@ -590,7 +590,7 @@ public:
                     "[UTL] `basic_short_string::insert` operation failed, "
                     "Reason=[argument substring index out of range], idx=[%zu], size=[%zu]"),
                 idx, str.size()));
-        auto const copy_size = UTL_SCOPE numeric_min(str.size() - idx, count);
+        auto const copy_size = UTL_SCOPE numeric::min(str.size() - idx, count);
         return insert(pos, str.data() + idx, copy_size);
     }
 
@@ -668,7 +668,7 @@ public:
 
     UTL_CONSTEXPR_CXX14 basic_short_string& erase(size_type idx = 0, size_type count = npos)
         UTL_THROWS {
-        auto const length = UTL_SCOPE numeric_min(size() - idx, count);
+        auto const length = UTL_SCOPE numeric::min(size() - idx, count);
         auto const first = begin() + idx;
         return erase(first, first + length), *this;
     }
@@ -920,7 +920,7 @@ public:
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
                 pos, size()));
 
-        auto const copied = UTL_SCOPE numeric_min(count, size() - pos);
+        auto const copied = UTL_SCOPE numeric::min(count, size() - pos);
         traits_type::copy(dst, data(), copied);
         return copied;
     }
@@ -1168,7 +1168,7 @@ public:
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
                 pos, size()));
         return details::string::compare<traits_type>(
-            data() + pos, UTL_SCOPE numeric_min(count, size() - pos), str, str_len);
+            data() + pos, UTL_SCOPE numeric::min(count, size() - pos), str, str_len);
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
@@ -1350,7 +1350,7 @@ private:
     }
 
     UTL_CONSTEXPR_CXX14 void inline_substring(size_type pos, size_type count) noexcept {
-        auto const new_size = UTL_SCOPE numeric_min(this->size() - pos, count);
+        auto const new_size = UTL_SCOPE numeric::min(this->size() - pos, count);
         traits_type::move(this->data(), this->data() + pos, new_size);
         this->resize(new_size);
     }

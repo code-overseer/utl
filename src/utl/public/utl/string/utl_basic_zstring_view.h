@@ -6,8 +6,6 @@
 
 #include "utl/string/utl_string_fwd.h"
 
-#include "utl/algorithm/utl_max.h"
-#include "utl/algorithm/utl_min.h"
 #include "utl/exception.h"
 #include "utl/iterator/utl_contiguous_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator_base.h"
@@ -17,6 +15,8 @@
 #include "utl/iterator/utl_reverse_iterator.h"
 #include "utl/iterator/utl_sized_sentinel_for.h"
 #include "utl/memory/utl_to_address.h"
+#include "utl/numeric/utl_max.h"
+#include "utl/numeric/utl_min.h"
 #include "utl/string/utl_string_details.h"
 
 #define UTL_STRING_PURE UTL_ATTRIBUTES(NODISCARD, PURE)
@@ -97,7 +97,7 @@ public:
     }
 
     UTL_CONSTEXPR_CXX14 void remove_prefix(size_type n) noexcept {
-        n = UTL_SCOPE numeric_min(n, size());
+        n = UTL_SCOPE numeric::min(n, size());
         data_ += n;
         size_ -= n;
     }
@@ -109,14 +109,14 @@ public:
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_zstring_view::copy` operation failed, "
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
                 pos, size()));
-        auto const copied = UTL_SCOPE numeric_min(count, size() - pos);
+        auto const copied = UTL_SCOPE numeric::min(count, size() - pos);
         traits_type::copy(dest, data() + pos, copied);
         return copied;
     }
 
     constexpr base_type substr(size_type pos = 0, size_type count = npos) const UTL_THROWS {
         return pos >= size() ? substr_throw(UTL_SOURCE_LOCATION(), pos, size())
-                             : base_type(data() + pos, UTL_SCOPE numeric_min(count, size() - pos));
+                             : base_type(data() + pos, UTL_SCOPE numeric::min(count, size() - pos));
     }
 
     using base_type::compare;

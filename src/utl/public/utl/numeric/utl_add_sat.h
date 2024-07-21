@@ -135,8 +135,7 @@ constexpr T impl(T left, T right) noexcept {
 } // namespace details
 
 template <UTL_CONCEPT_CXX20(saturatable) T UTL_REQUIRES_CXX11(UTL_TRAIT_is_saturatable(T))>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr T add_sat(T left, T right) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr T add_sat(T left, T right) noexcept {
     return UTL_SCOPE details::add_sat::impl(left, right);
 }
 
