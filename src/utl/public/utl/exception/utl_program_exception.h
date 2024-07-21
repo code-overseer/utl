@@ -139,8 +139,7 @@ public:
      *
      * @return The constant rvalue reference to the data.
      */
-    UTL_ATTRIBUTES(NODISCARD, CONST) T const&& data() const&& noexcept UTL_ATTRIBUTE(
-        LIFETIMEBOUND) {
+    UTL_ATTRIBUTES(NODISCARD, CONST) T const&& data() const&& noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) {
         return data_;
     }
 
@@ -151,9 +150,7 @@ public:
      *
      * @return The reference to the data.
      */
-    UTL_ATTRIBUTES(NODISCARD, CONST) T& data() & noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) {
-        return data_;
-    }
+    UTL_ATTRIBUTES(NODISCARD, CONST) T& data() & noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) { return data_; }
 
     /**
      * @brief Retrieves the data associated with the exception.
@@ -162,9 +159,7 @@ public:
      *
      * @return The rvalue reference to the data.
      */
-    UTL_ATTRIBUTES(NODISCARD, CONST) T&& data() && noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) {
-        return data_;
-    }
+    UTL_ATTRIBUTES(NODISCARD, CONST) T&& data() && noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) { return data_; }
 
 private:
     T data_;
