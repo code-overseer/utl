@@ -8,9 +8,10 @@
 
 #include "utl/type_traits/utl_constants.h"
 
+#include <exception>
+
 #if UTL_WITH_EXCEPTIONS
 
-#  include <exception>
 #  define UTL_THROW(...) throw(__VA_ARGS__)
 #  define UTL_RETHROW(...) throw
 #  define UTL_TRY try
@@ -55,10 +56,8 @@ UTL_NAMESPACE_END
 #else // UTL_WITH_EXCEPTIONS
 
 UTL_NAMESPACE_BEGIN
-class exception {
-public:
-    virtual char const* what() const noexcept { return nullptr; }
-};
+
+using std::exception;
 UTL_INLINE_CXX17 constexpr bool with_exceptions = false;
 
 namespace details {
