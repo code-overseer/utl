@@ -16,6 +16,7 @@
 #include "utl/iterator/utl_legacy_forward_iterator.h"
 #include "utl/iterator/utl_legacy_input_iterator.h"
 #include "utl/iterator/utl_reverse_iterator.h"
+#include "utl/memory/utl_allocator.h"
 #include "utl/memory/utl_allocator_traits.h"
 #include "utl/memory/utl_construct_at.h"
 #include "utl/numeric/utl_max.h"
@@ -76,6 +77,7 @@ private:
          */
         size_type capacity_;
 
+        constexpr heap_type() noexcept = default;
         constexpr heap_type(heap_type const&) noexcept = default;
         UTL_CONSTEXPR_CXX14 heap_type& operator=(heap_type const&) noexcept = default;
 
@@ -87,6 +89,7 @@ private:
             allocation_result<pointer, size_type> const& other) noexcept {
             data_ = other.ptr;
             capacity_ = other.size;
+            return *this;
         }
         constexpr operator allocation_result<pointer, size_type>() const noexcept {
             return {data_, capacity_};
@@ -1279,7 +1282,7 @@ private:
     UTL_CONSTEXPR_CONSTRUCTS_AT void transfer_to_heap(size_t new_capacity) UTL_THROWS {
         UTL_ASSERT(!is_heap_);
         auto const result = alloc_traits::allocate_at_least(allocator_ref(), new_capacity + 1);
-        heap_type new_heap{result.ptr, result.count};
+        heap_type new_heap{result.ptr, result.size};
         traits_type::copy(new_heap.data_, data(), size());
         UTL_SCOPE construct_at(UTL_SCOPE addressof(get_heap()), new_heap);
         is_heap_ = true;
@@ -1428,6 +1431,12 @@ UTL_STRING_PURE constexpr bool operator==(basic_short_string<CharT, N, Traits, A
     return lhs.size() == rhs.size() && lhs.compare(rhs) == 0;
 }
 
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_STRING_PURE constexpr bool operator==(
+    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
+    return lhs.compare(rhs) == 0;
+}
+
 UTL_NAMESPACE_END
 
 #if UTL_CXX20
@@ -1465,7 +1474,7 @@ UTL_STRING_PURE constexpr bool operator<(basic_short_string<CharT, N, Traits, Al
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_STRING_CONST constexpr bool operator<(
-    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharType const* rhs) noexcept {
+    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return lhs.compare(rhs) < 0;
 }
 
@@ -1483,7 +1492,7 @@ UTL_STRING_PURE constexpr bool operator>(basic_short_string<CharT, N, Traits, Al
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_STRING_CONST constexpr bool operator>(
-    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharType const* rhs) noexcept {
+    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return rhs < lhs;
 }
 
@@ -1501,7 +1510,7 @@ UTL_STRING_PURE constexpr bool operator>=(basic_short_string<CharT, N, Traits, A
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_STRING_CONST constexpr bool operator>=(
-    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharType const* rhs) noexcept {
+    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return !(lhs < rhs);
 }
 
@@ -1537,7 +1546,7 @@ UTL_STRING_PURE constexpr bool operator!=(basic_short_string<CharT, N, Traits, A
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_STRING_CONST constexpr bool operator!=(
-    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharType const* rhs) noexcept {
+    basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return !(lhs == rhs);
 }
 

@@ -32,20 +32,17 @@ struct element {
     using const_reference = T const&;
     using value_type = T;
     constexpr element() noexcept(is_nothrow_default_constructible<T>::value) = default;
-    constexpr element(default_initialize_t) noexcept(is_nothrow_default_constructible<T>::value){};
+    constexpr element(default_initialize_t) noexcept(is_nothrow_default_constructible<T>::value)
+        : element() {}
     constexpr element(value_initialize_t) noexcept(is_nothrow_default_constructible<T>::value)
         : value() {}
     template <typename... Args>
     constexpr element(Args&&... args) : value(forward<Args>(args)...) {}
 
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr reference get() & noexcept { return value; }
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr const_reference get() const& noexcept { return value; }
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr value_type&& get() && noexcept { return move(value); }
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr value_type const&& get() const&& noexcept { return move(value); }
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr reference get() & noexcept { return value; }
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr const_reference get() const& noexcept { return value; }
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr value_type&& get() && noexcept { return move(value); }
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr value_type const&& get() const&& noexcept { return move(value); }
 
     T value;
 };
@@ -64,14 +61,10 @@ struct element<T, Idx, enable_if_t<optimizable<T>::value>> : private T {
     constexpr element(Args&&... args) noexcept(is_nothrow_constructible<T, Args...>::value)
         : value_type(forward<Args>(args)...) {}
 
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr reference get() & noexcept { return *this; }
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr const_reference get() const& noexcept { return *this; }
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr value_type&& get() && noexcept { return move(*this); }
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr value_type const&& get() const&& noexcept { return move(*this); }
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr reference get() & noexcept { return *this; }
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr const_reference get() const& noexcept { return *this; }
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr value_type&& get() && noexcept { return move(*this); }
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr value_type const&& get() const&& noexcept { return move(*this); }
 };
 
 } // namespace compressed_pair
