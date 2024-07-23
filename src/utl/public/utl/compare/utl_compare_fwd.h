@@ -41,13 +41,8 @@ enum class order_t : value_t {
 enum class unorder_t : value_t {
     unordered = 2
 };
-class obscure {
-    friend class UTL_SCOPE strong_ordering;
-    friend class UTL_SCOPE partial_ordering;
-    friend class UTL_SCOPE weak_ordering;
-    struct zero_t {
-        UTL_CONSTEVAL zero_t(zero_t*) noexcept {}
-    };
+struct zero_t {
+    UTL_CONSTEVAL zero_t(zero_t*) noexcept {}
 };
 } // namespace compare
 } // namespace details

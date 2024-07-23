@@ -84,6 +84,8 @@ IncludeCategories:
     Priority:        0
   - Regex:           '"utl/preprocessor/.*"'
     Priority:        5
+  - Regex:           '"utl/.*_fwd.h"'
+    Priority:        8
   - Regex:           '".*"'
     Priority:        10
   - Regex:           '^<.*\.(h)>'
@@ -95,7 +97,7 @@ IfMacros: ['UTL_TRY','UTL_IF_CONSTEVAL']
 AttributeMacros: []
 StatementMacros: ['UTL_NAMESPACE_BEGIN', 'UTL_NAMESPACE_END']
 Macros:
-- UTL_CATCH(X)=else if(X)
+- UTL_CATCH(X)=else if ([](X){ return true; }())
 - UTL_NOEXCEPT(X)=noexcept(X)
 - UTL_THROWS=noexcept
 - UTL_INLINE_CXX17=inline
@@ -115,3 +117,7 @@ Macros:
 - UTL_NODISCARD=[[nodiscard]]
 - UTL_ENABLE_IF_CXX11(X,Y)=void
 - UTL_ATTRIBUTE(X)=[[X]]
+- UTL_ATTRIBUTES(X)=[[X]]
+- UTL_ATTRIBUTES(X,Y)=[[X,Y]]
+- UTL_ATTRIBUTES(X,Y,Z)=[[X,Y,Z]]
+- UTL_ATTRIBUTES(X,Y,Z,W)=[[X,Y,Z,W]]

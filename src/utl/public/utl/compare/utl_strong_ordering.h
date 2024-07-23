@@ -12,7 +12,7 @@ UTL_NAMESPACE_BEGIN
 class strong_ordering {
     using value_t = details::compare::value_t;
     using order_t = details::compare::order_t;
-    using zero_t = details::compare::obscure::zero_t;
+    using zero_t = details::compare::zero_t;
 
 public:
     static strong_ordering const less;
@@ -82,10 +82,8 @@ private:
 };
 
 UTL_INLINE_CXX17 constexpr strong_ordering strong_ordering::less{details::compare::order_t::less};
-UTL_INLINE_CXX17 constexpr strong_ordering strong_ordering::equivalent{
-    details::compare::order_t::equal};
+UTL_INLINE_CXX17 constexpr strong_ordering strong_ordering::equivalent{details::compare::order_t::equal};
 UTL_INLINE_CXX17 constexpr strong_ordering strong_ordering::equal{details::compare::order_t::equal};
-UTL_INLINE_CXX17 constexpr strong_ordering strong_ordering::greater{
-    details::compare::order_t::greater};
+UTL_INLINE_CXX17 constexpr strong_ordering strong_ordering::greater{details::compare::order_t::greater};
 
 UTL_NAMESPACE_END

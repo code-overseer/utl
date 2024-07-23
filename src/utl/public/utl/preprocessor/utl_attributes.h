@@ -120,6 +120,32 @@
 #  define UTL_NONSTD_ATTRIBUTE_MALLOC_DEFINED
 #endif /* UTL_HAS_CPP_ATTRIBUTE(clang::malloc) */
 
+#if UTL_HAS_CPP_ATTRIBUTE(clang::reinitializes)
+#  define UTL_ATTRIBUTE_REINITIALIZES clang::reinitializes
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::reinitializes)
+#  define UTL_ATTRIBUTE_REINITIALIZES gnu::reinitializes
+#elif UTL_HAS_ATTRIBUTE(reinitializes)
+#  define UTL_NONSTD_ATTRIBUTE_REINITIALIZES __attribute__((reinitializes))
+#  define UTL_NONSTD_ATTRIBUTE_REINITIALIZES_DEFINED
+#endif /* UTL_HAS_CPP_ATTRIBUTE(clang::reinitializes) */
+
+#if UTL_HAS_CPP_ATTRIBUTE(maybe_unused)
+#  define UTL_ATTRIBUTE_MAYBE_UNUSED maybe_unused
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::unused)
+#  define UTL_ATTRIBUTE_MAYBE_UNUSED gnu::unused
+#elif UTL_HAS_ATTRIBUTE(unused)
+#  define UTL_NONSTD_ATTRIBUTE_MAYBE_UNUSED __attribute__((unused))
+#  define UTL_NONSTD_ATTRIBUTE_MAYBE_UNUSED_DEFINED
+#endif /* UTL_HAS_CPP_ATTRIBUTE(maybe_unused) */
+
+#if UTL_HAS_CPP_ATTRIBUTE(likely)
+#  define UTL_ATTRIBUTE_LIKELY likely
+#endif /* UTL_HAS_CPP_ATTRIBUTE(likely) */
+
+#if UTL_HAS_CPP_ATTRIBUTE(unlikely)
+#  define UTL_ATTRIBUTE_UNLIKELY unlikely
+#endif /* UTL_HAS_CPP_ATTRIBUTE(unlikely) */
+
 #ifndef UTL_NODISCARD
 #  define UTL_NODISCARD
 #endif /* ifndef UTL_NODISCARD */
@@ -150,4 +176,16 @@
 #endif /* #ifndef UTL_ATTRIBUTE_ALWAYS_INLINE */
 #ifndef UTL_ATTRIBUTE_MALLOC
 #  define UTL_ATTRIBUTE_MALLOC
-#endif /* #ifndef UTL_ATTRIBUTE_ALWAYS_INLINE */
+#endif /* #ifndef UTL_ATTRIBUTE_MALLOC */
+#ifndef UTL_ATTRIBUTE_REINITIALIZES
+#  define UTL_ATTRIBUTE_REINITIALIZES
+#endif /* #ifndef UTL_ATTRIBUTE_REINITIALIZES */
+#ifndef UTL_ATTRIBUTE_MAYBE_UNUSED
+#  define UTL_ATTRIBUTE_MAYBE_UNUSED
+#endif /* #ifndef UTL_ATTRIBUTE_MAYBE_UNUSED */
+#ifndef UTL_ATTRIBUTE_LIKELY
+#  define UTL_ATTRIBUTE_LIKELY
+#endif /* #ifndef UTL_ATTRIBUTE_LIKELY */
+#ifndef UTL_ATTRIBUTE_UNLIKELY
+#  define UTL_ATTRIBUTE_UNLIKELY
+#endif /* #ifndef UTL_ATTRIBUTE_UNLIKELY */

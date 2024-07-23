@@ -2,9 +2,11 @@
 
 #pragma once
 
-#include "utl/compare/utl_compare_traits.h"
 #include "utl/memory/utl_allocator_fwd.h"
+
+#include "utl/compare/utl_compare_traits.h"
 #include "utl/memory/utl_pointer_traits.h"
+#include "utl/memory/utl_to_address.h"
 #include "utl/string/utl_libc.h"
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_is_empty.h"
@@ -165,7 +167,8 @@ UTL_CONSTEXPR_CXX20 pointer_t<T> fallback_reallocate(
     static_assert(
         is_pointer<pointer_t<T>>::value, "Only raw pointers can use the fallback reallocation");
     auto dst = allocator.allocate(size);
-    auto blessed = libc::unsafe::memcpy(to_address(dst), to_address(arg.ptr), arg.size);
+    auto blessed = libc::unsafe::memcpy(
+        UTL_SCOPE to_address(dst), to_address(arg.ptr), libc::element_count_t(arg.size));
     allocator.deallocate(arg.ptr, arg.size);
     return blessed;
 }
@@ -250,7 +253,7 @@ concept implements_reallocate_at_least = requires(T& alloc, result_type_t<T> r, 
 template <typename T UTL_REQUIRES_CXX11(!implements_reallocate_at_least<T>::value)>
 UTL_CONSTEXPR_CXX20 result_type_t<T> reallocate_at_least(
     T& allocator, result_type_t<T> arg, size_type_t<T> new_size) {
-    return UTL_SCOPE details::allocator::reallocate(allocator, new_size);
+    return {UTL_SCOPE details::allocator::reallocate(allocator, arg, new_size), new_size};
 }
 
 template <UTL_CONCEPT_CXX20(implements_reallocate_at_least) T UTL_REQUIRES_CXX11(
