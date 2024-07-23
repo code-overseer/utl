@@ -11,7 +11,7 @@ UTL_NAMESPACE_BEGIN
 class weak_ordering {
     using value_t = details::compare::value_t;
     using order_t = details::compare::order_t;
-    using zero_t = details::compare::obscure::zero_t;
+    using zero_t = details::compare::zero_t;
     friend class strong_ordering;
     friend class partial_ordering;
 
@@ -97,8 +97,7 @@ private:
 };
 
 UTL_INLINE_CXX17 constexpr weak_ordering weak_ordering::less{details::compare::order_t::less};
-UTL_INLINE_CXX17 constexpr weak_ordering weak_ordering::equivalent{
-    details::compare::order_t::equal};
+UTL_INLINE_CXX17 constexpr weak_ordering weak_ordering::equivalent{details::compare::order_t::equal};
 UTL_INLINE_CXX17 constexpr weak_ordering weak_ordering::greater{details::compare::order_t::greater};
 
 UTL_NAMESPACE_END

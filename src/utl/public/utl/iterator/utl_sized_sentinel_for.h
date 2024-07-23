@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/iterator/utl_iter_difference_t.h"
 #include "utl/iterator/utl_sentinel_for.h"
-#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_remove_cv.h"
 
@@ -31,6 +32,8 @@ template <typename S, typename I>
 inline constexpr bool is_sized_sentinel_for_v = sized_sentinel_for<S, I>;
 
 UTL_NAMESPACE_END
+
+#  define UTL_TRAIT_is_sized_sentinel_for(...) UTL_SCOPE sized_sentinel_for<__VA_ARGS__>
 
 #else // UTL_CXX20
 
@@ -92,4 +95,7 @@ UTL_INLINE_CXX17 constexpr bool is_sized_sentinel_for_v = is_sized_sentinel_for<
 #  endif
 
 UTL_NAMESPACE_END
+
+#  define UTL_TRAIT_is_sized_sentinel_for(...) UTL_SCOPE is_sized_sentinel_for<__VA_ARGS__>::value
+
 #endif // UTL_CXX20

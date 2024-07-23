@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/string/utl_is_string_char.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_empty.h"
@@ -11,27 +12,7 @@
 #include "utl/type_traits/utl_is_unsigned.h"
 #include "utl/type_traits/utl_remove_cv.h"
 
-#include <string.h>
-
-#if UTL_DISABLE_SSE_LIBC
-#  define UTL_DISABLE_SIMD_LIBC 1
-#elif UTL_DISABLE_AVX_LIBC
-#  define UTL_DISABLE_AVX512_LIBC 1
-#endif
-
-#if !UTL_DISABLE_SIMD_LIBC
-#  if UTL_SUPPORTS_SIMD_INTRINSICS && UTL_ARCH_x86
-#    include <immintrin.h>
-#  endif // UTL_SUPPORTS_SIMD_INTRINSICS && UTL_ARCH_x86
-
-#  if UTL_SIMD_ARM_SVE && !UTL_DISABLE_SVE_LIBC
-#    include <arm_sve.h>
-#  elif UTL_SIMD_ARM_NEON && !UTL_DISABLE_NEON_LIBC
-#    include <arm_neon.h>
-#  else
-#    define UTL_DISABLE_SIMD_LIBC 1
-#  endif
-#endif
+#include <cstring>
 
 UTL_NAMESPACE_BEGIN
 
@@ -41,6 +22,16 @@ enum class element_count_t : size_t {
 };
 
 #define UTL_LIBC_CONST UTL_ATTRIBUTES(NODISCARD, CONST)
+
+UTL_LIBC_CONST
+constexpr element_count_t min(element_count_t l, element_count_t r) noexcept {
+    return (size_t)l < (size_t)r ? l : r;
+}
+
+UTL_LIBC_CONST
+constexpr element_count_t max(element_count_t l, element_count_t r) noexcept {
+    return (size_t)l > (size_t)r ? l : r;
+}
 
 template <typename T>
 UTL_LIBC_CONST constexpr size_t byte_count(element_count_t c) noexcept {
@@ -83,7 +74,7 @@ using exact_size = bool_constant<!UTL_TRAIT_is_empty(T) && (sizeof(T) == N)>;
 #endif
 
 template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
-unsigned char as_byte(T val) noexcept {
+UTL_LIBC_CONST unsigned char as_byte(T val) noexcept {
     return *((unsigned char const*)&val);
 }
 } // namespace libc

@@ -2,12 +2,13 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/iterator/utl_incrementable.h"
 #include "utl/iterator/utl_input_iterator.h"
 #include "utl/iterator/utl_iterator_concept_t.h"
 #include "utl/iterator/utl_iterator_tags.h"
 #include "utl/iterator/utl_sentinel_for.h"
-#include "utl/preprocessor/utl_config.h"
 
 #if UTL_CXX20
 

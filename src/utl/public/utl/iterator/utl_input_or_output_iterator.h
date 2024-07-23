@@ -2,11 +2,12 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/iterator/utl_iter_move.h"
 #include "utl/iterator/utl_iter_reference_t.h"
 #include "utl/iterator/utl_iter_rvalue_reference_t.h"
 #include "utl/iterator/utl_iter_value_t.h"
-#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_remove_cvref.h"
