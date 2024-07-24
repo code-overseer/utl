@@ -121,3 +121,5 @@ Macros:
 - UTL_ATTRIBUTES(X,Y)=[[X,Y]]
 - UTL_ATTRIBUTES(X,Y,Z)=[[X,Y,Z]]
 - UTL_ATTRIBUTES(X,Y,Z,W)=[[X,Y,Z,W]]
+- UTL_ABI_PUBLIC=__attribute__((visibility("default")))
+- UTL_ABI_PRIVATE=__attribute__((visibility("hidden")))

@@ -24,7 +24,7 @@
 
 UTL_NAMESPACE_BEGIN
 template <typename CharType, typename Traits>
-class basic_string_view {
+class UTL_PUBLIC_TEMPLATE basic_string_view {
 public:
     using value_type = CharType;
     using size_type = size_t;

@@ -3,3 +3,7 @@
 #include "utl/string/utl_basic_short_string.h"
 #include "utl/string/utl_basic_string_view.h"
 #include "utl/string/utl_basic_zstring_view.h"
+
+auto find(utl::string s, char const* str) {
+    return s.find(str);
+}
