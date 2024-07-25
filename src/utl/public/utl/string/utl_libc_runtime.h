@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/string/utl_libc_common.h"
 #include "utl/utility/utl_signs.h"
 
@@ -15,10 +16,10 @@ namespace libc {
 namespace runtime {
 namespace standard {
 
-template <UTL_CONCEPT_CXX20(trivially_copyable)
-        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
-UTL_ATTRIBUTE(ALWAYS_INLINE)
-T* memcpy(T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count) noexcept {
+template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
+    is_trivially_copyable<T>::value)>
+UTL_HIDE_FROM_ABI T* memcpy(
+    T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
     return (T*)__builtin_memcpy(dst, src, byte_count<T>(count));
 #else
@@ -26,10 +27,9 @@ T* memcpy(T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count)
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(trivially_copyable)
-        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
-UTL_ATTRIBUTE(ALWAYS_INLINE)
-T* memmove(T* dst, T const* src, element_count_t count) noexcept {
+template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
+    is_trivially_copyable<T>::value)>
+UTL_HIDE_FROM_ABI T* memmove(T* dst, T const* src, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
     return (T*)__builtin_memmove(dst, src, byte_count<T>(count));
 #else
@@ -37,10 +37,10 @@ T* memmove(T* dst, T const* src, element_count_t count) noexcept {
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(trivially_copyable)
-        T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value&& exact_size<T, 1>::value)>
+template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
+    is_trivially_copyable<T>::value && exact_size<T, 1>::value)>
 UTL_REQUIRES_CXX20(exact_size<T, 1>)
-UTL_ATTRIBUTE(ALWAYS_INLINE) T* memset(T* dst, T const value, element_count_t count) noexcept {
+UTL_HIDE_FROM_ABI T* memset(T* dst, T const value, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
     return (T*)__builtin_memset(dst, as_byte(value), byte_count<T>(count));
 #else
@@ -48,10 +48,9 @@ UTL_ATTRIBUTE(ALWAYS_INLINE) T* memset(T* dst, T const value, element_count_t co
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T,
-    UTL_CONCEPT_CXX20(exact_size<1>)
-        U UTL_REQUIRES_CXX11(exact_size<T, 1>::value&& exact_size<U, 1>::value)>
-UTL_LIBC_INLINE_PURE T* memchr(T const* ptr, U value, size_t bytes) noexcept {
+template <UTL_CONCEPT_CXX20(exact_size<1>) T, UTL_CONCEPT_CXX20(exact_size<1>) U UTL_REQUIRES_CXX11(
+    exact_size<T, 1>::value && exact_size<U, 1>::value)>
+UTL_LIBC_PURE UTL_HIDE_FROM_ABI T* memchr(T const* ptr, U value, size_t bytes) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_char_memchr)
     return (T*)__builtin_char_memchr(ptr, as_byte(value), bytes);
 #else
@@ -60,7 +59,8 @@ UTL_LIBC_INLINE_PURE T* memchr(T const* ptr, U value, size_t bytes) noexcept {
 }
 
 template <typename T, typename U>
-UTL_LIBC_INLINE_PURE int memcmp(T const* lhs, U const* rhs, element_count_t count) noexcept {
+UTL_LIBC_PURE UTL_HIDE_FROM_ABI int memcmp(
+    T const* lhs, U const* rhs, element_count_t count) noexcept {
     static_assert(is_trivially_lexicographically_comparable<T, U>::value,
         "Types must be lexicographically comparable");
 #if UTL_HAS_BUILTIN(__builtin_char_memchr)
@@ -87,7 +87,7 @@ UTL_LIBC_INLINE_PURE size_t strlen(wchar_t const* str) noexcept {
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_LIBC_PURE size_t strlen(T const* str) noexcept {
+UTL_LIBC_PURE UTL_HIDE_FROM_ABI size_t strlen(T const* str) noexcept {
     size_t count = 0;
     while (*str) {
         ++str;
@@ -114,7 +114,8 @@ UTL_LIBC_INLINE_PURE wchar_t* strchr(wchar_t const* str, wchar_t const ch) noexc
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_LIBC_PURE T* strnchr(T const* str, T const ch, element_count_t count) noexcept {
+UTL_LIBC_PURE UTL_HIDE_FROM_ABI T* strnchr(
+    T const* str, T const ch, element_count_t count) noexcept {
     size_t len = size_t(count);
     while (len) {
         if (*str == ch) {
@@ -132,7 +133,7 @@ UTL_LIBC_PURE T* strnchr(T const* str, T const ch, element_count_t count) noexce
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_LIBC_PURE T* strchr(T const* str, T const ch) noexcept {
+UTL_LIBC_PURE UTL_HIDE_FROM_ABI T* strchr(T const* str, T const ch) noexcept {
     while (*str != ch) {
         if (!*str) {
             return nullptr;
@@ -162,7 +163,7 @@ int strcmp(wchar_t const* left, wchar_t const* right) noexcept {
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_LIBC_PURE int strcmp(T const* left, T const* right) noexcept {
+UTL_LIBC_PURE UTL_HIDE_FROM_ABI int strcmp(T const* left, T const* right) noexcept {
     while (*left == *right) {
         if (!*left && !*right) {
             return 0;
@@ -194,7 +195,8 @@ int strncmp(wchar_t const* left, wchar_t const* right, element_count_t len) noex
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_LIBC_PURE int strncmp(T const* left, T const* right, element_count_t elements) noexcept {
+UTL_LIBC_PURE UTL_HIDE_FROM_ABI int strncmp(
+    T const* left, T const* right, element_count_t elements) noexcept {
     size_t len = (size_t)elements;
     while (len && *left == *right) {
         if (!*left) {
@@ -210,7 +212,7 @@ UTL_LIBC_PURE int strncmp(T const* left, T const* right, element_count_t element
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_LIBC_PURE T* strnset(T* dst, T const val, element_count_t elements) noexcept {
+UTL_LIBC_PURE UTL_HIDE_FROM_ABI T* strnset(T* dst, T const val, element_count_t elements) noexcept {
     size_t len = (size_t)elements;
     if (!len) {
         return dst;
@@ -248,5 +250,6 @@ using standard::strnset;
 } // namespace runtime
 } // namespace libc
 
+#undef UTL_LIBC_INLINE_PURE
 #undef UTL_LIBC_PURE
 UTL_NAMESPACE_END

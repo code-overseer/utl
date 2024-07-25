@@ -66,7 +66,7 @@
 #  define UTL_PUBLIC_TEMPLATE
 #else
 #  define UTL_PUBLIC_TYPE
-/* For GNU compailers that don't have type visibility we must keep the templates visible */
+/* For GNU compilers that don't have type visibility we must keep the templates visible */
 #  define UTL_PUBLIC_TEMPLATE __attribute__((__visibility__("default")))
 #endif
 

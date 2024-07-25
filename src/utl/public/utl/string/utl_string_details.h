@@ -23,19 +23,27 @@ UTL_ATTRIBUTES(NODISCARD, CONST) UTL_HIDE_FROM_ABI constexpr size_t to_index(
     return ptr ? ptr - base : UTL_SCOPE details::string::npos;
 }
 
-UTL_ATTRIBUTES(NODISCARD, CONST) constexpr int negative_if_true(bool b) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST)
+UTL_ABI_PRIVATE constexpr int negative_if_true(
+    bool b) noexcept {
     return -+b | 1;
 }
 
-UTL_ATTRIBUTES(NODISCARD, CONST) constexpr int other_if_zero(int x, int other) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST)
+UTL_ABI_PRIVATE constexpr int other_if_zero(
+    int x, int other) noexcept {
     return x ? x : other;
 }
 
-UTL_ATTRIBUTES(NODISCARD, CONST) constexpr int value_if_true(bool b, int value) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST)
+UTL_ABI_PRIVATE constexpr int value_if_true(
+    bool b, int value) noexcept {
     return b ? value : 0;
 }
 
-UTL_ATTRIBUTES(NODISCARD, CONST) constexpr int compare_size(int strcmp, size_t left, size_t right) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST)
+UTL_ABI_PRIVATE constexpr int compare_size(
+    int strcmp, size_t left, size_t right) noexcept {
     return other_if_zero(strcmp, value_if_true(left != right, negative_if_true(left < right)));
 }
 

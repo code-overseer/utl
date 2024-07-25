@@ -105,7 +105,8 @@ private:
     using storage_type = compressed_pair<storage_union, allocator_type>;
 
 public:
-    class iterator : UTL_SCOPE contiguous_iterator_base<iterator, value_type> {
+    class UTL_ABI_PUBLIC iterator :
+        UTL_SCOPE contiguous_iterator_base<iterator, value_type> {
         using base_type = contiguous_iterator_base<iterator, value_type>;
 
     public:
@@ -131,7 +132,8 @@ public:
             : iterator(const_cast<pointer>(other.operator->())) {}
     };
 
-    class const_iterator : UTL_SCOPE contiguous_iterator_base<const_iterator, value_type const> {
+    class UTL_ABI_PUBLIC const_iterator :
+        UTL_SCOPE contiguous_iterator_base<const_iterator, value_type const> {
         using base_type = contiguous_iterator_base<const_iterator, value_type const>;
 
     public:
