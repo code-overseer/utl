@@ -281,7 +281,7 @@ UTL_ATTRIBUTES(NODISCARD, PURE) CharType const* search_substring(
     }
     auto const r_first = *r;
     while (true) {
-        auto const l_front = Traits::find(l, UTL_SCOPE sub_sat(l_count + 1, r_count), r_first);
+        auto l_front = Traits::find(l, UTL_SCOPE sub_sat(l_count + 1, r_count), r_first);
         if (l_front == nullptr) {
             return nullptr;
         }
@@ -324,23 +324,23 @@ template <typename Traits, typename CharType>
 UTL_ATTRIBUTES(NODISCARD, PURE) constexpr CharType const* search_substring(
     CharType const* l, size_t l_count, CharType const* r, size_t r_count) noexcept {
     return UTL_CONSTANT_P(l == r && l_count == r_count)
-        ? compile_time::search_substring(l, l_count, r, r_count)
-        : runtime::search_substring(l, l_count, r, r_count);
+        ? compile_time::search_substring<Traits>(l, l_count, r, r_count)
+        : runtime::search_substring<Traits>(l, l_count, r, r_count);
 }
 
 template <typename Traits, typename CharType>
 UTL_ATTRIBUTES(NODISCARD, PURE) constexpr CharType const* rsearch_substring(
     CharType const* l, size_t l_count, CharType const* r, size_t r_count) noexcept {
     return UTL_CONSTANT_P(l == r && l_count == r_count)
-        ? compile_time::rsearch_substring(l, l_count, r, r_count)
-        : runtime::rsearch_substring(l, l_count, r, r_count);
+        ? compile_time::rsearch_substring<Traits>(l, l_count, r, r_count)
+        : runtime::rsearch_substring<Traits>(l, l_count, r, r_count);
 }
 
 template <typename Traits, typename CharType>
 UTL_ATTRIBUTES(NODISCARD, PURE) constexpr CharType const* rfind_char(
     CharType const* str, size_t length, CharType const ch) noexcept {
-    return UTL_CONSTANT_P(*str == ch) ? compile_time::rfind_char(str, ch, length)
-                                      : runtime::rfind_char(str, ch, length);
+    return UTL_CONSTANT_P(*str == ch) ? compile_time::rfind_char<Traits>(str, ch, length)
+                                      : runtime::rfind_char<Traits>(str, ch, length);
 }
 
 template <typename Traits, typename CharType>
@@ -352,7 +352,7 @@ UTL_ATTRIBUTES(NODISCARD, PURE) constexpr size_t find(
 template <typename Traits, typename CharType>
 UTL_ATTRIBUTES(NODISCARD, PURE) constexpr size_t find(
     CharType const* l, size_t l_count, CharType const* r, size_t r_count, size_t l_pos) noexcept {
-    return find(
+    return find<Traits>(
         l + UTL_SCOPE numeric::min(l_pos, l_count), UTL_SCOPE sub_sat(l_count, l_pos), r, r_count);
 }
 

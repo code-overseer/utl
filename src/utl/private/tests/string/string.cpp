@@ -3,3 +3,11 @@
 #include "utl/string/utl_basic_short_string.h"
 #include "utl/string/utl_basic_string_view.h"
 #include "utl/string/utl_basic_zstring_view.h"
+
+int func(utl::string s) {
+    if (s != "hello") {
+        s = "hello";
+    }
+
+    return s.compare("hello") + s.rfind("jasl") + s.find("OIKAOSDJMI");
+}

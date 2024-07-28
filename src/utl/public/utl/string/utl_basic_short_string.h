@@ -26,6 +26,7 @@
 #include "utl/string/utl_string_details.h"
 #include "utl/type_traits/utl_is_convertible.h"
 #include "utl/type_traits/utl_is_nothrow_convertible.h"
+#include "utl/type_traits/utl_type_identity.h"
 #include "utl/utility/utl_as_const.h"
 #include "utl/utility/utl_compressed_pair.h"
 
@@ -1435,6 +1436,130 @@ template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_STRING_PURE constexpr bool operator==(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return lhs.compare(rhs) == 0;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l,
+    basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
+    basic_short_string<CharT, N, Traits, Alloc> output;
+    output.reserve(l.size() + r.size());
+    output += l;
+    output += r;
+    return output;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l, CharT const* r) UTL_THROWS {
+    return l + basic_string_view<CharT, Traits>(r);
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l, CharT r) UTL_THROWS {
+    basic_short_string<CharT, N, Traits, Alloc> output;
+    output.reserve(l.size() + 1);
+    output += l;
+    output += r;
+    return output;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l,
+    type_identity_t<basic_string_view<CharT, Traits>> r) UTL_THROWS {
+    basic_short_string<CharT, N, Traits, Alloc> output;
+    output.reserve(l.size() + r.size());
+    output += l;
+    output += r;
+    return output;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    CharT const* l, basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
+    return basic_string_view<CharT, Traits>(l) + r;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    CharT l, basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
+    basic_short_string<CharT, N, Traits, Alloc> output;
+    output.reserve(l.size() + 1);
+    output += l;
+    output += r;
+    return output;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    type_identity_t<basic_string_view<CharT, Traits>> l,
+    basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
+    basic_short_string<CharT, N, Traits, Alloc> output;
+    output.reserve(l.size() + r.size());
+    output += l;
+    output += r;
+    return output;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l,
+    basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
+    return UTL_SCOPE move(l.append(r));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l,
+    basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
+    return UTL_SCOPE move(l.append(r));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l, CharT const* r) UTL_THROWS {
+    return UTL_SCOPE move(l.append(r));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l, CharT r) UTL_THROWS {
+    return UTL_SCOPE move(l.append(r));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l,
+    type_identity_t<basic_string_view<CharT, Traits>> r) UTL_THROWS {
+    return UTL_SCOPE move(l.append(r));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l,
+    basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
+    return UTL_SCOPE move(r.insert(0, l));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    CharT const* l, basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
+    return UTL_SCOPE move(r.insert(0, l));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    CharT l, basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
+    return UTL_SCOPE move(r.insert(0, l));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    type_identity_t<basic_string_view<CharT, Traits>> l,
+    basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
+    return UTL_SCOPE move(r.insert(0, l));
 }
 
 UTL_NAMESPACE_END
