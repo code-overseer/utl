@@ -61,8 +61,6 @@ public:
     private:
         friend basic_string_view;
         constexpr const_iterator(pointer data) noexcept : base_type(data) {}
-        constexpr const_iterator(contiguous_iterator_base<iterator, value_type> other) noexcept
-            : base_type(other) {}
     };
 
     basic_string_view(decltype(nullptr)) = delete;
