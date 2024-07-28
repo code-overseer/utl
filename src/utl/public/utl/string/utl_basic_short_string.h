@@ -19,6 +19,7 @@
 #include "utl/memory/utl_allocator.h"
 #include "utl/memory/utl_allocator_traits.h"
 #include "utl/memory/utl_construct_at.h"
+#include "utl/memory/utl_to_address.h"
 #include "utl/numeric/utl_max.h"
 #include "utl/numeric/utl_min.h"
 #include "utl/string/utl_basic_string_view.h"
@@ -126,9 +127,9 @@ public:
     private:
         friend basic_short_string;
         constexpr iterator(pointer data) noexcept : base_type(data) {}
-        constexpr iterator(
-            contiguous_iterator_base<const_iterator, value_type const> other) noexcept
-            : iterator(const_cast<pointer>(other.operator->())) {}
+        template <typename It>
+        constexpr iterator(It other) noexcept
+            : iterator(const_cast<pointer>(UTL_SCOPE to_address(other))) {}
     };
 
     class const_iterator : UTL_SCOPE contiguous_iterator_base<const_iterator, value_type const> {
@@ -152,7 +153,8 @@ public:
     private:
         friend basic_short_string;
         constexpr const_iterator(pointer data) noexcept : base_type(data) {}
-        constexpr const_iterator(iterator other) noexcept : base_type(other) {}
+        constexpr const_iterator(iterator other) noexcept
+            : base_type(UTL_SCOPE to_address(other)) {}
     };
 
     using reverse_iterator = UTL_SCOPE reverse_iterator<iterator>;
