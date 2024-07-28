@@ -11,3 +11,7 @@ int func(utl::string s) {
 
     return s.compare("hello") + s.rfind("jasl") + s.find("OIKAOSDJMI");
 }
+
+utl::string repeat3x(utl::string s) {
+    return s.c_str() + s + s.c_str();
+}

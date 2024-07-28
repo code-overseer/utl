@@ -126,7 +126,8 @@ public:
     private:
         friend basic_short_string;
         constexpr iterator(pointer data) noexcept : base_type(data) {}
-        constexpr iterator(contiguous_iterator_base<iterator, value_type const> other) noexcept
+        constexpr iterator(
+            contiguous_iterator_base<const_iterator, value_type const> other) noexcept
             : iterator(const_cast<pointer>(other.operator->())) {}
     };
 
@@ -151,8 +152,7 @@ public:
     private:
         friend basic_short_string;
         constexpr const_iterator(pointer data) noexcept : base_type(data) {}
-        constexpr const_iterator(contiguous_iterator_base<iterator, value_type> other) noexcept
-            : base_type(other) {}
+        constexpr const_iterator(iterator other) noexcept : base_type(other) {}
     };
 
     using reverse_iterator = UTL_SCOPE reverse_iterator<iterator>;
@@ -575,6 +575,7 @@ public:
         traits_type::move(dst, src, size() + 1 - pos);
         traits_type::move(src, str, length);
         size_ = size() + length;
+        return *this;
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& insert(size_type pos, const_pointer str) UTL_THROWS {
@@ -616,10 +617,13 @@ public:
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_input_iterator(It) && !UTL_TRAIT_is_legacy_forward_iterator(It))>
     UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, It first, It last) UTL_THROWS {
+        auto const idx = pos - begin();
         while (first != last) {
             insert(pos, *first);
             ++first;
         }
+
+        return iterator(begin() + idx);
     }
 
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_forward_iterator) It UTL_REQUIRES_CXX11(
@@ -642,6 +646,7 @@ public:
         }
 
         size_ = size() + length;
+        return iterator(data() + idx);
     }
 
     UTL_CONSTEXPR_CXX14 iterator insert(
@@ -700,7 +705,7 @@ public:
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(basic_short_string const& str) UTL_THROWS {
-        return insert(end(), str), *this;
+        return insert(size(), str), *this;
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(
@@ -709,7 +714,7 @@ public:
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(const_pointer str) UTL_THROWS {
-        return insert(end(), str), *this;
+        return insert(size(), str), *this;
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(const_pointer str, size_type count) UTL_THROWS {
@@ -730,7 +735,7 @@ public:
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
     UTL_CONSTEXPR_CXX14 basic_short_string& append(View const& view) UTL_THROWS {
-        return insert(end(), view), *this;
+        return insert(size(), view), *this;
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
@@ -1498,8 +1503,7 @@ UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> o
     basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
     basic_short_string<CharT, N, Traits, Alloc> output;
     output.reserve(l.size() + r.size());
-    output += l;
-    output += r;
+    output.append(l).append(r);
     return output;
 }
 

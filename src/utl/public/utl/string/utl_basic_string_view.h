@@ -368,7 +368,7 @@ private:
         UTL_THROW(out_of_range(format, pos, size));
     }
 
-    pointer data_;
+    const_pointer data_;
     size_type size_;
 };
 
