@@ -703,24 +703,22 @@ public:
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(size_type count, value_type ch) UTL_THROWS {
-        return insert(end(), count, ch), *this;
+        return insert(end(), count, ch);
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(basic_short_string const& str) UTL_THROWS {
-        return insert(size(), str), *this;
+        return insert(size(), str);
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(
         basic_short_string const& str, size_type idx, size_type count = npos) UTL_THROWS {
-        return insert(end(), str, idx, count), *this;
+        return insert(size(), str, idx, count);
     }
 
-    UTL_CONSTEXPR_CXX14 basic_short_string& append(const_pointer str) UTL_THROWS {
-        return insert(size(), str), *this;
-    }
+    UTL_CONSTEXPR_CXX14 basic_short_string& append(const_pointer str) UTL_THROWS { return insert(size(), str); }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(const_pointer str, size_type count) UTL_THROWS {
-        return insert(end(), str, count), *this;
+        return insert(size(), str, count);
     }
 
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
@@ -731,13 +729,13 @@ public:
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(::std::initializer_list<value_type> list)
         UTL_THROWS {
-        return insert(end(), list), *this;
+        return insert(size(), list.begin(), list.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
     UTL_CONSTEXPR_CXX14 basic_short_string& append(View const& view) UTL_THROWS {
-        return insert(size(), view), *this;
+        return insert(size(), view);
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
@@ -751,7 +749,7 @@ public:
                     "[UTL] `basic_short_string::append` operation failed, "
                     "Reason=[argument substring index out of range], idx=[%zu], size=[%zu]"),
                 subidx, v.size()));
-        return insert(end(), v.substr(subidx, subcount));
+        return insert(size(), v.substr(subidx, subcount));
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(basic_short_string const& str) UTL_THROWS {
