@@ -151,6 +151,8 @@ public:
         other = UTL_SCOPE exchange(*this, other);
     }
 
+    friend UTL_CONSTEXPR_CXX14 void swap(basic_string_view& l, basic_string_view& r) noexcept { l.swap(r); }
+
     UTL_CONSTEXPR_CXX14 size_t copy(pointer dest, size_type count, size_type pos = 0) const UTL_THROWS {
         UTL_ASSERT(dest != nullptr);
         UTL_THROW_IF(pos > size(),

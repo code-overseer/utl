@@ -943,7 +943,8 @@ public:
         swap(other, swap_alloc_t{});
     }
 
-    friend void swap(basic_short_string& l, basic_short_string& r) noexcept(noexcept(l.swap(r))) {
+    friend UTL_CONSTEXPR_CXX14 void swap(basic_short_string& l, basic_short_string& r) noexcept(
+        noexcept(l.swap(r))) {
         l.swap(r);
     }
 
