@@ -4,7 +4,7 @@
 #include "utl/string/utl_basic_string_view.h"
 #include "utl/string/utl_basic_zstring_view.h"
 
-int func(utl::string s) {
+int comparable(utl::string s) {
     if (s != "hello") {
         s = "hello";
     }
@@ -12,7 +12,16 @@ int func(utl::string s) {
     return s.compare("hello") + s.rfind("jasl") + s.find("OIKAOSDJMI");
 }
 
-utl::string repeat3x(utl::string s) {
+void iterable(utl::string s) {
+    for (auto c : s) {
+        if (c == '\0') {
+            break;
+        }
+    }
+}
+
+utl::string concatenatable(utl::string s) {
+
     return s.c_str() + s + s.c_str();
 }
 
