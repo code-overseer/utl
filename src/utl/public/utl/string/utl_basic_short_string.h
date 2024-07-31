@@ -601,16 +601,10 @@ public:
         return insert(pos, str.data() + idx, copy_size);
     }
 
-    UTL_CONSTEXPR_CXX14 iterator insert(iterator pos, size_type count, value_type ch) UTL_THROWS {
-        return insert(pos - begin(), count, ch);
-    }
-
     UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, size_type count, value_type ch)
         UTL_THROWS {
         return insert(pos - cbegin(), count, ch);
     }
-
-    UTL_CONSTEXPR_CXX14 iterator insert(iterator pos, value_type ch) UTL_THROWS { return insert(pos, 1, ch); }
 
     UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, value_type ch) UTL_THROWS {
         return insert(pos, 1, ch);
@@ -703,7 +697,7 @@ public:
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(size_type count, value_type ch) UTL_THROWS {
-        return insert(end(), count, ch);
+        return insert(size(), count, ch);
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(basic_short_string const& str) UTL_THROWS {
