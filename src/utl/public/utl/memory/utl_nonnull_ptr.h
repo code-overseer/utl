@@ -10,6 +10,8 @@
 
 #if UTL_WITH_EXCEPTIONS
 #  include "utl/exception/utl_program_exception.h"
+#else
+#  include "utl/exception/utl_exception_base.h"
 #endif
 
 UTL_NAMESPACE_BEGIN
