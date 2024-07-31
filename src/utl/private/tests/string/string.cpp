@@ -15,3 +15,6 @@ int func(utl::string s) {
 utl::string repeat3x(utl::string s) {
     return s.c_str() + s + s.c_str();
 }
+
+// Ensure char_traits specialization is implemented
+static_assert(!utl::char_traits<char>::lt(-1, 1), "Invalid");
