@@ -19,6 +19,7 @@
 #include "utl/memory/utl_allocator.h"
 #include "utl/memory/utl_allocator_traits.h"
 #include "utl/memory/utl_construct_at.h"
+#include "utl/memory/utl_to_address.h"
 #include "utl/numeric/utl_max.h"
 #include "utl/numeric/utl_min.h"
 #include "utl/string/utl_basic_string_view.h"
@@ -26,6 +27,7 @@
 #include "utl/string/utl_string_details.h"
 #include "utl/type_traits/utl_is_convertible.h"
 #include "utl/type_traits/utl_is_nothrow_convertible.h"
+#include "utl/type_traits/utl_type_identity.h"
 #include "utl/utility/utl_as_const.h"
 #include "utl/utility/utl_compressed_pair.h"
 
@@ -125,8 +127,9 @@ public:
     private:
         friend basic_short_string;
         constexpr iterator(pointer data) noexcept : base_type(data) {}
-        constexpr iterator(contiguous_iterator_base<iterator, value_type const> other) noexcept
-            : iterator(const_cast<pointer>(other.operator->())) {}
+        template <typename It>
+        constexpr iterator(It other) noexcept
+            : iterator(const_cast<pointer>(UTL_SCOPE to_address(other))) {}
     };
 
     class const_iterator : UTL_SCOPE contiguous_iterator_base<const_iterator, value_type const> {
@@ -150,8 +153,8 @@ public:
     private:
         friend basic_short_string;
         constexpr const_iterator(pointer data) noexcept : base_type(data) {}
-        constexpr const_iterator(contiguous_iterator_base<iterator, value_type> other) noexcept
-            : base_type(other) {}
+        constexpr const_iterator(iterator other) noexcept
+            : base_type(UTL_SCOPE to_address(other)) {}
     };
 
     using reverse_iterator = UTL_SCOPE reverse_iterator<iterator>;
@@ -574,6 +577,7 @@ public:
         traits_type::move(dst, src, size() + 1 - pos);
         traits_type::move(src, str, length);
         size_ = size() + length;
+        return *this;
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& insert(size_type pos, const_pointer str) UTL_THROWS {
@@ -597,16 +601,10 @@ public:
         return insert(pos, str.data() + idx, copy_size);
     }
 
-    UTL_CONSTEXPR_CXX14 iterator insert(iterator pos, size_type count, value_type ch) UTL_THROWS {
-        return insert(pos - begin(), count, ch);
-    }
-
     UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, size_type count, value_type ch)
         UTL_THROWS {
         return insert(pos - cbegin(), count, ch);
     }
-
-    UTL_CONSTEXPR_CXX14 iterator insert(iterator pos, value_type ch) UTL_THROWS { return insert(pos, 1, ch); }
 
     UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, value_type ch) UTL_THROWS {
         return insert(pos, 1, ch);
@@ -615,10 +613,13 @@ public:
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_input_iterator(It) && !UTL_TRAIT_is_legacy_forward_iterator(It))>
     UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, It first, It last) UTL_THROWS {
+        auto const idx = pos - begin();
         while (first != last) {
             insert(pos, *first);
             ++first;
         }
+
+        return iterator(begin() + idx);
     }
 
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_forward_iterator) It UTL_REQUIRES_CXX11(
@@ -641,6 +642,7 @@ public:
         }
 
         size_ = size() + length;
+        return iterator(data() + idx);
     }
 
     UTL_CONSTEXPR_CXX14 iterator insert(
@@ -695,24 +697,22 @@ public:
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(size_type count, value_type ch) UTL_THROWS {
-        return insert(end(), count, ch), *this;
+        return insert(size(), count, ch);
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(basic_short_string const& str) UTL_THROWS {
-        return insert(end(), str), *this;
+        return insert(size(), str);
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(
         basic_short_string const& str, size_type idx, size_type count = npos) UTL_THROWS {
-        return insert(end(), str, idx, count), *this;
+        return insert(size(), str, idx, count);
     }
 
-    UTL_CONSTEXPR_CXX14 basic_short_string& append(const_pointer str) UTL_THROWS {
-        return insert(end(), str), *this;
-    }
+    UTL_CONSTEXPR_CXX14 basic_short_string& append(const_pointer str) UTL_THROWS { return insert(size(), str); }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(const_pointer str, size_type count) UTL_THROWS {
-        return insert(end(), str, count), *this;
+        return insert(size(), str, count);
     }
 
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
@@ -723,13 +723,13 @@ public:
 
     UTL_CONSTEXPR_CXX14 basic_short_string& append(::std::initializer_list<value_type> list)
         UTL_THROWS {
-        return insert(end(), list), *this;
+        return insert(size(), list.begin(), list.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
     UTL_CONSTEXPR_CXX14 basic_short_string& append(View const& view) UTL_THROWS {
-        return insert(end(), view), *this;
+        return insert(size(), view);
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
@@ -743,7 +743,7 @@ public:
                     "[UTL] `basic_short_string::append` operation failed, "
                     "Reason=[argument substring index out of range], idx=[%zu], size=[%zu]"),
                 subidx, v.size()));
-        return insert(end(), v.substr(subidx, subcount));
+        return insert(size(), v.substr(subidx, subcount));
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(basic_short_string const& str) UTL_THROWS {
@@ -935,7 +935,8 @@ public:
         swap(other, swap_alloc_t{});
     }
 
-    friend void swap(basic_short_string& l, basic_short_string& r) noexcept(noexcept(l.swap(r))) {
+    friend UTL_CONSTEXPR_CXX14 void swap(basic_short_string& l, basic_short_string& r) noexcept(
+        noexcept(l.swap(r))) {
         l.swap(r);
     }
 
@@ -1435,6 +1436,129 @@ template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_STRING_PURE constexpr bool operator==(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return lhs.compare(rhs) == 0;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l,
+    basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
+    basic_short_string<CharT, N, Traits, Alloc> output;
+    output.reserve(l.size() + r.size());
+    output += l;
+    output += r;
+    return output;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l, CharT const* r) UTL_THROWS {
+    return l + basic_string_view<CharT, Traits>(r);
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l, CharT r) UTL_THROWS {
+    basic_short_string<CharT, N, Traits, Alloc> output;
+    output.reserve(l.size() + 1);
+    output += l;
+    output += r;
+    return output;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l,
+    type_identity_t<basic_string_view<CharT, Traits>> r) UTL_THROWS {
+    basic_short_string<CharT, N, Traits, Alloc> output;
+    output.reserve(l.size() + r.size());
+    output += l;
+    output += r;
+    return output;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    CharT const* l, basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
+    return basic_string_view<CharT, Traits>(l) + r;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    CharT l, basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
+    basic_short_string<CharT, N, Traits, Alloc> output;
+    output.reserve(l.size() + 1);
+    output += l;
+    output += r;
+    return output;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    type_identity_t<basic_string_view<CharT, Traits>> l,
+    basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
+    basic_short_string<CharT, N, Traits, Alloc> output;
+    output.reserve(l.size() + r.size());
+    output.append(l).append(r);
+    return output;
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l,
+    basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
+    return UTL_SCOPE move(l.append(r));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l,
+    basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
+    return UTL_SCOPE move(l.append(r));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l, CharT const* r) UTL_THROWS {
+    return UTL_SCOPE move(l.append(r));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l, CharT r) UTL_THROWS {
+    return UTL_SCOPE move(l.append(r));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l,
+    type_identity_t<basic_string_view<CharT, Traits>> r) UTL_THROWS {
+    return UTL_SCOPE move(l.append(r));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l,
+    basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
+    return UTL_SCOPE move(r.insert(0, l));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    CharT const* l, basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
+    return UTL_SCOPE move(r.insert(0, l));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    CharT l, basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
+    return UTL_SCOPE move(r.insert(0, l));
+}
+
+template <typename CharT, size_t N, typename Traits, typename Alloc>
+UTL_ATTRIBUTE(NODISCARD) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    type_identity_t<basic_string_view<CharT, Traits>> l,
+    basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
+    return UTL_SCOPE move(r.insert(0, l));
 }
 
 UTL_NAMESPACE_END

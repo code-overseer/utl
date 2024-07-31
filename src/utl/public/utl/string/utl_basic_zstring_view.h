@@ -43,11 +43,11 @@ public:
     using typename base_type::value_type;
 
     basic_zstring_view(decltype(nullptr)) = delete;
-    constexpr basic_zstring_view() noexcept : data_(), size_() {}
+    constexpr basic_zstring_view() noexcept = default;
     constexpr basic_zstring_view(basic_zstring_view const&) noexcept = default;
     UTL_CONSTEXPR_CXX14 basic_zstring_view(const_pointer data, size_type size) UTL_THROWS
         : base_type(data, size) {
-        UTL_THROW_IF(data_[size] != 0,
+        UTL_THROW_IF(data()[size] != 0,
             invalid_argument(UTL_MESSAGE_FORMAT(
                 "zstring_view construction failed, Reason=[argument string not null-terminated]")));
     }
@@ -87,6 +87,7 @@ public:
     using base_type::rend;
     using base_type::size;
     using base_type::operator[];
+    using base_type::remove_prefix;
 
     UTL_STRING_PURE constexpr const_reference at(size_type idx) const UTL_THROWS {
         UTL_THROW_IF(idx > size(),
@@ -96,13 +97,9 @@ public:
         return *this[idx];
     }
 
-    UTL_CONSTEXPR_CXX14 void remove_prefix(size_type n) noexcept {
-        n = UTL_SCOPE numeric::min(n, size());
-        data_ += n;
-        size_ -= n;
-    }
-
     UTL_CONSTEXPR_CXX14 void swap(basic_zstring_view& other) noexcept { base_type::swap(other); }
+
+    friend UTL_CONSTEXPR_CXX14 void swap(basic_zstring_view& l, basic_zstring_view& r) noexcept { l.swap(r); }
 
     UTL_CONSTEXPR_CXX14 size_type copy(pointer dest, size_type count, size_type pos = 0) const UTL_THROWS {
         UTL_THROW_IF(pos > size(),
@@ -138,9 +135,6 @@ private:
             src};
         UTL_THROW(out_of_range(format, pos, size));
     }
-
-    pointer data_;
-    size_type size_;
 };
 
 template <typename CharType, typename Traits>

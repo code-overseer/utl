@@ -61,8 +61,6 @@ public:
     private:
         friend basic_string_view;
         constexpr const_iterator(pointer data) noexcept : base_type(data) {}
-        constexpr const_iterator(contiguous_iterator_base<iterator, value_type> other) noexcept
-            : base_type(other) {}
     };
 
     basic_string_view(decltype(nullptr)) = delete;
@@ -152,6 +150,8 @@ public:
     UTL_CONSTEXPR_CXX14 void swap(basic_string_view& other) noexcept {
         other = UTL_SCOPE exchange(*this, other);
     }
+
+    friend UTL_CONSTEXPR_CXX14 void swap(basic_string_view& l, basic_string_view& r) noexcept { l.swap(r); }
 
     UTL_CONSTEXPR_CXX14 size_t copy(pointer dest, size_type count, size_type pos = 0) const UTL_THROWS {
         UTL_ASSERT(dest != nullptr);
@@ -368,7 +368,7 @@ private:
         UTL_THROW(out_of_range(format, pos, size));
     }
 
-    pointer data_;
+    const_pointer data_;
     size_type size_;
 };
 

@@ -2,11 +2,13 @@
 
 #pragma once
 
-#include "utl/compare/utl_compare_fwd.h"
 #include "utl/preprocessor/utl_config.h"
+
+#include "utl/compare/utl_compare_fwd.h"
+
 #include "utl/string/utl_libc.h"
 
-#include <wchar.h>
+#include <cwchar>
 
 UTL_NAMESPACE_BEGIN
 template <typename T>
@@ -23,17 +25,16 @@ struct char_traits {
     using comparison_category = strong_ordering;
 #endif
 
-    UTL_ATTRIBUTES(NODISCARD, PURE)
-    static constexpr int compare(
+    UTL_ATTRIBUTES(NODISCARD, PURE) static constexpr int compare(
         char_type const* lhs, char_type const* rhs, size_t length) noexcept {
         return libc::strncmp(lhs, rhs, libc::element_count_t(length));
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE)
-    static constexpr size_t length(char_type const* str) noexcept { return libc::strlen(str); }
+    UTL_ATTRIBUTES(NODISCARD, PURE) static constexpr size_t length(char_type const* str) noexcept {
+        return libc::strlen(str);
+    }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE)
-    static constexpr char_type const* find(
+    UTL_ATTRIBUTES(NODISCARD, PURE) static constexpr char_type const* find(
         char_type const* str, size_t length, char_type const ch) noexcept {
         return libc::strnchr(str, ch, libc::element_count_t(length));
     }
@@ -51,19 +52,42 @@ struct char_traits {
         return libc::strnset(str, ch, libc::element_count_t(length));
     }
 
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    static constexpr int_type not_eof(int_type c) noexcept {
+    UTL_ATTRIBUTES(NODISCARD, CONST) static constexpr int_type not_eof(int_type c) noexcept {
         return eq_int_type(c, eof()) ? ~eof() : c;
     }
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    static constexpr char_type to_char_type(int_type c) noexcept { return char_type(c); }
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    static constexpr int_type to_int_type(char_type c) noexcept { return int_type(as_unsigned(c)); }
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    static constexpr bool eq_int_type(int_type c1, int_type c2) noexcept { return c1 == c2; }
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    static constexpr int_type eof() noexcept { return int_type(EOF); }
+    UTL_ATTRIBUTES(NODISCARD, CONST) static constexpr char_type to_char_type(int_type c) noexcept {
+        return char_type(c);
+    }
+    UTL_ATTRIBUTES(NODISCARD, CONST) static constexpr int_type to_int_type(char_type c) noexcept {
+        return int_type(as_unsigned(c));
+    }
+    UTL_ATTRIBUTES(NODISCARD, CONST) static constexpr bool eq_int_type(int_type c1, int_type c2) noexcept {
+        return c1 == c2;
+    }
+    UTL_ATTRIBUTES(NODISCARD, CONST) static constexpr int_type eof() noexcept { return int_type(EOF); }
+
+    UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) static inline constexpr bool eq(
+        char_type l, char_type r) noexcept {
+        return l == r;
+    }
+
+    UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) static inline constexpr bool lt(
+        char_type l, char_type r) noexcept {
+        return l < r;
+    }
 };
+
+template <>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) inline constexpr bool char_traits<char>::eq(
+    char_type l, char_type r) noexcept {
+    return static_cast<unsigned char>(l) == static_cast<unsigned char>(r);
+}
+
+template <>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) inline constexpr bool char_traits<char>::lt(
+    char_type l, char_type r) noexcept {
+    return static_cast<unsigned char>(l) < static_cast<unsigned char>(r);
+}
 
 template <typename T>
 struct char_traits<T const> {};

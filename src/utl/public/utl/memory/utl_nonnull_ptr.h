@@ -6,8 +6,13 @@
 
 #include "utl/compare/utl_pointer_comparable.h"
 #include "utl/concepts.h" // convertible_to
-#include "utl/exception/utl_program_exception.h"
 #include "utl/memory/utl_addressof.h"
+
+#if UTL_WITH_EXCEPTIONS
+#  include "utl/exception/utl_program_exception.h"
+#else
+#  include "utl/exception/utl_exception_base.h"
+#endif
 
 UTL_NAMESPACE_BEGIN
 

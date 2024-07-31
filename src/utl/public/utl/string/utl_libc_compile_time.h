@@ -83,7 +83,7 @@ constexpr T* strnchr(T const* str, T const ch, element_count_t len) noexcept {
     return len == 0    ? nullptr
         : (*str == ch) ? const_cast<T*>(str)
         : (!*str)      ? nullptr
-                       : strcmp(str + 1, ch, len - 1);
+                       : strnchr(str + 1, ch, len - 1);
 }
 
 template <typename T>
