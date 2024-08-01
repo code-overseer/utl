@@ -17,12 +17,12 @@ class initializer_list;
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-UTL_ATTRIBUTES(NODISCARD) constexpr T const& min(T const& l, T const& r) {
+UTL_ATTRIBUTES(NODISCARD) UTL_HIDE_FROM_ABI constexpr T const& min(T const& l, T const& r) {
     return l < r ? l : r;
 }
 
 template <typename T, typename F>
-UTL_ATTRIBUTES(NODISCARD) constexpr T const& min(T const& l, T const& r, F compare) {
+UTL_ATTRIBUTES(NODISCARD) UTL_HIDE_FROM_ABI constexpr T const& min(T const& l, T const& r, F compare) {
     return compare(l, r) ? l : r;
 }
 

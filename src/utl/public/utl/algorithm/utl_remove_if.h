@@ -32,7 +32,7 @@ using requirement = UTL_SCOPE conjunction<UTL_SCOPE is_legacy_forward_iterator<I
 
 template <UTL_CONCEPT_CXX20(forward_iterator) It,
     UTL_CONCEPT_CXX20(predicate<decltype(*UTL_SCOPE declval<It>())>) F>
-UTL_CONSTEXPR_CXX14 auto remove_if(It first, It last, F&& f)
+UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 auto remove_if(It first, It last, F&& f)
     -> UTL_ENABLE_IF_CXX11(It, details::remove_if::requirement<It, F>::value) {
     first = UTL_SCOPE find_if(first, last, f);
     if (first == last) {
