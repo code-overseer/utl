@@ -348,15 +348,15 @@ template <typename Traits, typename CharType>
 UTL_ATTRIBUTES(NODISCARD, PURE) UTL_HIDE_FROM_ABI constexpr CharType const* rsearch_substring(
     CharType const* l, size_t l_count, CharType const* r, size_t r_count) noexcept {
     return UTL_CONSTANT_P(l == r && l_count == r_count)
-        ? compile_time::rsearch_substring(l, l_count, r, r_count)
-        : runtime::rsearch_substring(l, l_count, r, r_count);
+        ? compile_time::rsearch_substring<Traits>(l, l_count, r, r_count)
+        : runtime::rsearch_substring<Traits>(l, l_count, r, r_count);
 }
 
 template <typename Traits, typename CharType>
 UTL_ATTRIBUTES(NODISCARD, PURE) UTL_HIDE_FROM_ABI constexpr CharType const* rfind_char(
     CharType const* str, size_t length, CharType const ch) noexcept {
-    return UTL_CONSTANT_P(*str == ch) ? compile_time::rfind_char(str, ch, length)
-                                      : runtime::rfind_char(str, ch, length);
+    return UTL_CONSTANT_P(*str == ch) ? compile_time::rfind_char<Traits>(str, ch, length)
+                                      : runtime::rfind_char<Traits>(str, ch, length);
 }
 
 template <typename Traits, typename CharType>

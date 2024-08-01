@@ -8,7 +8,7 @@
 
 #include "utl/string/utl_libc.h"
 
-#include <wchar.h>
+#include <cwchar>
 
 UTL_NAMESPACE_BEGIN
 template <typename T>
@@ -73,7 +73,28 @@ struct UTL_PUBLIC_TEMPLATE char_traits {
     UTL_ATTRIBUTES(NODISCARD, CONST) UTL_HIDE_FROM_ABI static constexpr int_type eof() noexcept {
         return int_type(EOF);
     }
+    UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) UTL_HIDE_FROM_ABI static inline constexpr bool eq(
+        char_type l, char_type r) noexcept {
+        return l == r;
+    }
+
+    UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) UTL_HIDE_FROM_ABI static inline constexpr bool lt(
+        char_type l, char_type r) noexcept {
+        return l < r;
+    }
 };
+
+template <>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) UTL_HIDE_FROM_ABI inline constexpr bool char_traits<char>::eq(
+    char_type l, char_type r) noexcept {
+    return static_cast<unsigned char>(l) == static_cast<unsigned char>(r);
+}
+
+template <>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) UTL_HIDE_FROM_ABI inline constexpr bool char_traits<char>::lt(
+    char_type l, char_type r) noexcept {
+    return static_cast<unsigned char>(l) < static_cast<unsigned char>(r);
+}
 
 template <typename T>
 struct char_traits<T const> {};

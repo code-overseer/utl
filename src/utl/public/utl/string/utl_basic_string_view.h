@@ -63,9 +63,6 @@ public:
     private:
         friend basic_string_view;
         UTL_HIDE_FROM_ABI constexpr const_iterator(pointer data) noexcept : base_type(data) {}
-        UTL_HIDE_FROM_ABI constexpr const_iterator(
-            contiguous_iterator_base<iterator, value_type> other) noexcept
-            : base_type(other) {}
     };
 
     basic_string_view(decltype(nullptr)) = delete;
@@ -168,6 +165,11 @@ public:
 
     UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(basic_string_view& other) noexcept {
         other = UTL_SCOPE exchange(*this, other);
+    }
+
+    UTL_HIDE_FROM_ABI friend UTL_CONSTEXPR_CXX14 void swap(
+        basic_string_view& l, basic_string_view& r) noexcept {
+        l.swap(r);
     }
 
     UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 size_t copy(
@@ -394,7 +396,7 @@ private:
         UTL_THROW(out_of_range(format, pos, size));
     }
 
-    pointer data_;
+    const_pointer data_;
     size_type size_;
 };
 
