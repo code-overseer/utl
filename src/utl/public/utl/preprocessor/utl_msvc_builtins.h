@@ -8,7 +8,10 @@
 
 #if UTL_COMPILER_MSVC
 
-#  define UTL_HAS_BUILTIN(BUILTIN) UTL_IS_EMPTY(UTL_CONCAT(UTL_MSVC_SUPPORTS, BUILTIN))
+#  ifdef __has_builtin
+#    error '__has_builtin' definition collision
+#  endif
+#  define __has_builtin(BUILTIN) UTL_IS_EMPTY(UTL_CONCAT(UTL_MSVC_SUPPORTS, BUILTIN))
 
 #  if UTL_COMPILER_MSVC_AT_LEAST(1915)
 #    define UTL_MSVC_SUPPORTS__is_aggregate
@@ -67,6 +70,9 @@
 #  define UTL_MSVC_SUPPORTS__is_base_of
 #  define UTL_MSVC_SUPPORTS__underlying_type
 
+#  ifdef __is_convertible
+#    error '__is_convertible' definition collision
+#  endif
 #  define __is_convertible __is_convertible_to
 
 #endif

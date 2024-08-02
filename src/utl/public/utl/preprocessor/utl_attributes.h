@@ -5,6 +5,7 @@
 #include "utl/preprocessor/utl_attribute_list.h"
 #include "utl/preprocessor/utl_builtins.h"
 #include "utl/preprocessor/utl_compiler.h"
+#include "utl/preprocessor/utl_declspec.h"
 
 #ifdef __has_cpp_attribute
 #  define UTL_HAS_CPP_ATTRIBUTE(...) __has_cpp_attribute(__VA_ARGS__)
@@ -17,10 +18,6 @@
 #else /* ifdef __has_attribute */
 #  define UTL_HAS_GNU_ATTRIBUTE(...) 0
 #endif /* ifdef __has_attribute */
-
-#if UTL_COMPILER_MSVC
-#  include "utl/preprocessor/utl_declspec.h"
-#endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(nodiscard)
 
