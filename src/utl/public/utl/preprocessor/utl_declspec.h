@@ -24,4 +24,14 @@
 
 #  define UTL_SAL_ANNOTATION_Check_return_
 
+#elif UTL_COMPILER_ARMCC /* NOT DEFINED */
+
+#  define UTL_HAS_DECLSPEC(NAME) UTL_IS_EMPTY(UTL_CONCAT(UTL_DECLSPEC_, NAME))
+
+#  define UTL_DECLSPEC_dllexport
+#  define UTL_DECLSPEC_dllimport
+#  define UTL_DECLSPEC_noinline
+#  define UTL_DECLSPEC_noreturn
+#  define UTL_DECLSPEC_notshared
+
 #endif
