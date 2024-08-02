@@ -6,8 +6,9 @@
 
 #include "utl/preprocessor/utl_assertion.h"
 
-#include "utl/exception/utl_exception_base.h"
 #include "utl/memory/utl_allocator_fwd.h"
+
+#include "utl/exception/utl_exception_base.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_is_complete.h"
 #include "utl/type_traits/utl_type_identity.h"
@@ -63,8 +64,6 @@ UTL_NAMESPACE_END
 #endif
 
 #if UTL_HAS_BUILTIN(__declspec) || UTL_IS_RESERVED_IDENTIFIER(__declspec) || UTL_COMPILER_MSVC
-#  define UTL_ALLOCATOR_ATTRIBUTE __declspec(allocator, restrict) UTL_ATTRIBUTE(MALLOC)
-#else
 #  define UTL_ALLOCATOR_ATTRIBUTE UTL_ATTRIBUTE(MALLOC)
 #endif
 
@@ -87,8 +86,8 @@ inline constexpr bool is_overaligned_for_new(size_t alignment) noexcept {
     return alignment > default_new_alignment;
 }
 
-UTL_ALLOCATOR_ATTRIBUTE
-inline UTL_HIDE_FROM_ABI void* allocate(size_t size, size_t alignment = default_new_alignment) {
+UTL_ALLOCATOR_ATTRIBUTE UTL_HIDE_FROM_ABI inline void* allocate(
+    size_t size, size_t alignment = default_new_alignment) {
     if (is_overaligned_for_new(alignment)) {
 #if UTL_SUPPORTS_ALIGNED_ALLOCATION
         align_val_t const align_val = static_cast<align_val_t>(alignment);
