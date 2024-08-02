@@ -18,6 +18,10 @@
 #  define UTL_HAS_GNU_ATTRIBUTE(...) 0
 #endif /* ifdef __has_attribute */
 
+#if UTL_COMPILER_MSVC
+#  include "utl/preprocessor/utl_declspec.h"
+#endif
+
 #if UTL_HAS_CPP_ATTRIBUTE(nodiscard)
 
 #  define UTL_NODISCARD [[nodiscard]]
@@ -38,12 +42,6 @@
 #  define UTL_ATTRIBUTE_NODISCARD
 #  define UTL_NODISCARD __attribute__((warn_unused_result))
 #  define UTL_NONSTD_ATTRIBUTE_NODISCARD __attribute__((warn_unused_result))
-#  define UTL_NONSTD_ATTRIBUTE_NODISCARD_DEFINED
-
-#elif UTL_COMPILER_MSVC_AT_LEAST(1700)
-
-#  define UTL_NODISCARD _Check_return_
-#  define UTL_NONSTD_ATTRIBUTE_NODISCARD _Check_return_
 #  define UTL_NONSTD_ATTRIBUTE_NODISCARD_DEFINED
 
 #endif /* UTL_HAS_CPP_ATTRIBUTE(nodiscard) */

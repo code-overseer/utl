@@ -3,65 +3,69 @@
 #pragma once
 
 #include "utl/preprocessor/utl_compiler.h"
+#include "utl/preprocessor/utl_concatenation.h"
+#include "utl/preprocessor/utl_is_empty.h"
 
 #if UTL_COMPILER_MSVC
 
+#  define UTL_HAS_BUILTIN(BUILTIN) UTL_IS_EMPTY(UTL_CONCAT(UTL_MSVC_SUPPORTS, BUILTIN))
+
 #  if UTL_COMPILER_MSVC_AT_LEAST(1915)
-#    define UTL_MSVC_SUPPORTS__is_aggregate 1
+#    define UTL_MSVC_SUPPORTS__is_aggregate
 #  endif
 
 #  if UTL_CXX17
-#    define UTL_MSVC_SUPPORTS__builtin_launder 1
+#    define UTL_MSVC_SUPPORTS__builtin_launder
 #  endif
 
 #  if UTL_COMPILER_MSVC_AT_LEAST(1925) /* UTL_HAS_BUILTIN(__builtin_is_constant_evaluated) */
-#    define UTL_MSVC_SUPPORTS__builtin_is_constant_evaluated 1
+#    define UTL_MSVC_SUPPORTS__builtin_is_constant_evaluated
 #  endif
 
 #  if UTL_COMPILER_MSVC_AT_LEAST(1927)
-#    define UTL_MSVC_SUPPORTS__builtin_FILE 1
-#    define UTL_MSVC_SUPPORTS__builtin_FUNCTION 1
-#    define UTL_MSVC_SUPPORTS__builtin_LINE 1
+#    define UTL_MSVC_SUPPORTS__builtin_FILE
+#    define UTL_MSVC_SUPPORTS__builtin_FUNCTION
+#    define UTL_MSVC_SUPPORTS__builtin_LINE
 #  endif
 
 #  if UTL_COMPILER_MSVC_AT_LEAST(1929)
-#    define UTL_MSVC_SUPPORTS__is_layout_compatible 1
+#    define UTL_MSVC_SUPPORTS__is_layout_compatible
 #    define UTL_MSVC_SUPPORTS__is_pointer_interconvertible_base_of
 #    define UTL_MSVC_SUPPORTS__is_corresponding_member
 #  endif
 
 #  if UTL_COMPILER_MSVC_AT_LEAST(1935)
-#    define UTL_MSVC_SUPPORTS__builtin_FUNCSIG 1
+#    define UTL_MSVC_SUPPORTS__builtin_FUNCSIG
 #  endif
 
-#  define UTL_MSVC_SUPPORTS__builtin_addressof 1
+#  define UTL_MSVC_SUPPORTS__builtin_addressof
 
-#  define UTL_MSVC_SUPPORTS__has_unique_object_representations 1
-#  define UTL_MSVC_SUPPORTS__is_constructible 1
-#  define UTL_MSVC_SUPPORTS__is_assignable 1
-#  define UTL_MSVC_SUPPORTS__is_union 1
-#  define UTL_MSVC_SUPPORTS__is_class 1
-#  define UTL_MSVC_SUPPORTS__is_convertible_to 1
-#  define UTL_MSVC_SUPPORTS__is_convertible 1
-#  define UTL_MSVC_SUPPORTS__is_enum 1
-#  define UTL_MSVC_SUPPORTS__is_member_function_pointer 1
-#  define UTL_MSVC_SUPPORTS__is_member_object_pointer 1
-#  define UTL_MSVC_SUPPORTS__is_empty 1
-#  define UTL_MSVC_SUPPORTS__is_final 1
-#  define UTL_MSVC_SUPPORTS__is_polymorphic 1
-#  define UTL_MSVC_SUPPORTS__is_abstract 1
-#  define UTL_MSVC_SUPPORTS__is_member_pointer 1
-#  define UTL_MSVC_SUPPORTS__is_standard_layout 1
-#  define UTL_MSVC_SUPPORTS__is_trivial 1
-#  define UTL_MSVC_SUPPORTS__is_trivially_copyable 1
-#  define UTL_MSVC_SUPPORTS__has_virtual_destructor 1
-#  define UTL_MSVC_SUPPORTS__is_destructible 1
-#  define UTL_MSVC_SUPPORTS__is_trivially_constructible 1
-#  define UTL_MSVC_SUPPORTS__is_trivially_assignable 1
-#  define UTL_MSVC_SUPPORTS__is_trivially_destructible 1
-#  define UTL_MSVC_SUPPORTS__is_nothrow_constructible 1
-#  define UTL_MSVC_SUPPORTS__is_base_of 1
-#  define UTL_MSVC_SUPPORTS__underlying_type 1
+#  define UTL_MSVC_SUPPORTS__has_unique_object_representations
+#  define UTL_MSVC_SUPPORTS__is_constructible
+#  define UTL_MSVC_SUPPORTS__is_assignable
+#  define UTL_MSVC_SUPPORTS__is_union
+#  define UTL_MSVC_SUPPORTS__is_class
+#  define UTL_MSVC_SUPPORTS__is_convertible_to
+#  define UTL_MSVC_SUPPORTS__is_convertible
+#  define UTL_MSVC_SUPPORTS__is_enum
+#  define UTL_MSVC_SUPPORTS__is_member_function_pointer
+#  define UTL_MSVC_SUPPORTS__is_member_object_pointer
+#  define UTL_MSVC_SUPPORTS__is_empty
+#  define UTL_MSVC_SUPPORTS__is_final
+#  define UTL_MSVC_SUPPORTS__is_polymorphic
+#  define UTL_MSVC_SUPPORTS__is_abstract
+#  define UTL_MSVC_SUPPORTS__is_member_pointer
+#  define UTL_MSVC_SUPPORTS__is_standard_layout
+#  define UTL_MSVC_SUPPORTS__is_trivial
+#  define UTL_MSVC_SUPPORTS__is_trivially_copyable
+#  define UTL_MSVC_SUPPORTS__has_virtual_destructor
+#  define UTL_MSVC_SUPPORTS__is_destructible
+#  define UTL_MSVC_SUPPORTS__is_trivially_constructible
+#  define UTL_MSVC_SUPPORTS__is_trivially_assignable
+#  define UTL_MSVC_SUPPORTS__is_trivially_destructible
+#  define UTL_MSVC_SUPPORTS__is_nothrow_constructible
+#  define UTL_MSVC_SUPPORTS__is_base_of
+#  define UTL_MSVC_SUPPORTS__underlying_type
 
 #  define __is_convertible __is_convertible_to
 

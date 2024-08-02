@@ -3,7 +3,6 @@
 #pragma once
 
 #include "utl/preprocessor/utl_compiler.h"
-#include "utl/preprocessor/utl_msvc_traits.h"
 #include "utl/preprocessor/utl_standard.h"
 
 #ifdef __is_identifier
@@ -13,7 +12,7 @@
 #endif
 
 #if UTL_COMPILER_MSVC
-#  define UTL_HAS_BUILTIN(BUILTIN) UTL_MSVC_SUPPORTS##BUILTIN
+#  include "utl/preprocessor/utl_msvc_traits.h"
 #elif defined(__has_builtin)
 #  define UTL_HAS_BUILTIN(BUILTIN) __has_builtin(BUILTIN)
 #else /* ifdef __has_builtin */
