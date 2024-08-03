@@ -52,6 +52,12 @@
 #  define UTL_BUILTIN_unreachable() __assume(0)
 #else /* UTL_HAS_BUILTIN(__builtin_unreachable) */
 
+#  if UTL_HAS_BUILTIN(__builtin_expect)
+#    define UTL_BUILTIN_expect(VALUE, EXP) __builtin_expect(VALUE, EXP)
+#  else
+#    define UTL_BUILTIN_expect(VALUE, _1) VALUE
+#  endif
+
 #  ifdef UTL_CXX
 extern "C" void abort(void);
 #  else

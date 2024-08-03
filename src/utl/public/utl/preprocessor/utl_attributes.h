@@ -21,29 +21,21 @@
 #endif /* ifdef __has_attribute */
 
 #if UTL_HAS_CPP_ATTRIBUTE(nodiscard)
-
 #  define UTL_NODISCARD [[nodiscard]]
 #  define __UTL_ATTRIBUTE_NODISCARD nodiscard
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODISCARD
-
 #elif UTL_HAS_CPP_ATTRIBUTE(gnu::warn_unused_result)
-
 #  define UTL_NODISCARD [[gnu::warn_unused_result]]
 #  define __UTL_ATTRIBUTE_NODISCARD gnu::warn_unused_result
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODISCARD
-
 #elif UTL_HAS_CPP_ATTRIBUTE(clang::warn_unused_result)
-
 #  define UTL_NODISCARD [[clang::warn_unused_result]]
 #  define __UTL_ATTRIBUTE_NODISCARD clang::warn_unused_result
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODISCARD
-
 #elif UTL_HAS_GNU_ATTRIBUTE(warn_unused_result)
-
 #  define UTL_NODISCARD __attribute__((warn_unused_result))
 #  define __UTL_ATTRIBUTE_NODISCARD warn_unused_result
 #  define __UTL_ATTRIBUTE_TYPE_GNU_NODISCARD
-
 #elif UTL_HAS_SAL_ANNOTATION(_Check_return_)
 #  define UTL_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_NODISCARD _Check_return_
@@ -199,10 +191,16 @@
 #if UTL_HAS_CPP_ATTRIBUTE(likely)
 #  define __UTL_ATTRIBUTE_LIKELY likely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_LIKELY
+#elif UTL_HAS_CPP_ATTRIBUTE(clang::likely)
+#  define __UTL_ATTRIBUTE_LIKELY clang::likely
+#  define __UTL_ATTRIBUTE_TYPE_CPP_LIKELY
 #endif /* UTL_HAS_CPP_ATTRIBUTE(likely) */
 
 #if UTL_HAS_CPP_ATTRIBUTE(unlikely)
 #  define __UTL_ATTRIBUTE_UNLIKELY unlikely
+#  define __UTL_ATTRIBUTE_TYPE_CPP_UNLIKELY
+#elif UTL_HAS_CPP_ATTRIBUTE(clang::unlikely)
+#  define __UTL_ATTRIBUTE_UNLIKELY clang::unlikely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_UNLIKELY
 #endif /* UTL_HAS_CPP_ATTRIBUTE(unlikely) */
 
