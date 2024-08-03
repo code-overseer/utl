@@ -22,5 +22,8 @@
 
 #  define UTL_MSVC_DECORATOR__forceline
 #  define UTL_SAL_ANNOTATION_Check_return_
-
+#else
+#  define UTL_HAS_MSVC_MODIFIER(NAME) 0
+#  define UTL_HAS_MSVC_DECORATOR(NAME) 0
+#  define UTL_HAS_SAL_ANNOTATION(NAME) 0
 #endif
