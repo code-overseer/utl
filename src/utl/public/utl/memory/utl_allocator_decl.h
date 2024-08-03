@@ -63,9 +63,7 @@ UTL_NAMESPACE_END
 #  define UTL_ALLOC_DELETE(...) ::operator delete(__VA_ARGS__)
 #endif
 
-#if UTL_HAS_BUILTIN(__declspec) || UTL_IS_RESERVED_IDENTIFIER(__declspec) || UTL_COMPILER_MSVC
-#  define UTL_ALLOCATOR_ATTRIBUTE UTL_ATTRIBUTE(MALLOC)
-#endif
+#define UTL_ALLOCATOR_ATTRIBUTE UTL_ATTRIBUTE(MALLOC)
 
 UTL_NAMESPACE_BEGIN
 using ::std::align_val_t;
