@@ -9,11 +9,6 @@
 #include "utl/preprocessor/utl_is_empty.h"
 #include "utl/preprocessor/utl_paste.h"
 
-/**
- * TODO: This is way too complicated and probably adds some preprocessing overhead, investigate if
- * there is a simpler way
- */
-
 #define __UTL_CPP_ATTRIBUTE_SCOPE_1()
 #define __UTL_CPP_ATTRIBUTE_SCOPE_0(...) [[__VA_ARGS__]]
 #define __UTL_CPP_ATTRIBUTE_SCOPE(...) \
