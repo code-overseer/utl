@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_declspec.h"
+
 #ifdef __has_cpp_attribute
 #  define UTL_HAS_CPP_ATTRIBUTE(NAME) __has_cpp_attribute(NAME)
 #else /* ifdef __has_cpp_attribute */
