@@ -2,42 +2,26 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_attribute_check.h"
 #include "utl/preprocessor/utl_attribute_list.h"
 #include "utl/preprocessor/utl_builtins.h"
 #include "utl/preprocessor/utl_compiler.h"
 #include "utl/preprocessor/utl_declspec.h"
 #include "utl/preprocessor/utl_msvc_extensions.h"
 
-#ifdef __has_cpp_attribute
-#  define UTL_HAS_CPP_ATTRIBUTE(...) __has_cpp_attribute(__VA_ARGS__)
-#else /* ifdef __has_cpp_attribute */
-#  define UTL_HAS_CPP_ATTRIBUTE(...) 0
-#endif /* ifdef __has_cpp_attribute */
-
-#ifdef __has_attribute
-#  define UTL_HAS_GNU_ATTRIBUTE(...) __has_attribute(__VA_ARGS__)
-#else /* ifdef __has_attribute */
-#  define UTL_HAS_GNU_ATTRIBUTE(...) 0
-#endif /* ifdef __has_attribute */
-
 #if UTL_HAS_CPP_ATTRIBUTE(nodiscard)
-#  define UTL_NODISCARD [[nodiscard]]
 #  define __UTL_ATTRIBUTE_NODISCARD nodiscard
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODISCARD
 #elif UTL_HAS_CPP_ATTRIBUTE(gnu::warn_unused_result)
-#  define UTL_NODISCARD [[gnu::warn_unused_result]]
 #  define __UTL_ATTRIBUTE_NODISCARD gnu::warn_unused_result
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODISCARD
 #elif UTL_HAS_CPP_ATTRIBUTE(clang::warn_unused_result)
-#  define UTL_NODISCARD [[clang::warn_unused_result]]
 #  define __UTL_ATTRIBUTE_NODISCARD clang::warn_unused_result
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODISCARD
-#elif UTL_HAS_GNU_ATTRIBUTE(warn_unused_result)
-#  define UTL_NODISCARD __attribute__((warn_unused_result))
-#  define __UTL_ATTRIBUTE_NODISCARD warn_unused_result
+#elif UTL_HAS_GNU_ATTRIBUTE(__warn_unused_result__)
+#  define __UTL_ATTRIBUTE_NODISCARD __warn_unused_result__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_NODISCARD
 #elif UTL_HAS_SAL_ANNOTATION(_Check_return_)
-#  define UTL_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_TYPE_MSVC_EXT_NODISCARD
 #endif /* UTL_HAS_CPP_ATTRIBUTE(nodiscard) */
@@ -48,24 +32,24 @@
 #elif UTL_HAS_CPP_ATTRIBUTE(clang::lifetimebound) /* UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound) */
 #  define __UTL_ATTRIBUTE_LIFETIMEBOUND clang::lifetimebound
 #  define __UTL_ATTRIBUTE_TYPE_CPP_LIFETIMEBOUND
-#elif UTL_HAS_GNU_ATTRIBUTE(lifetimebound) /* UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound) */
-#  define __UTL_ATTRIBUTE_LIFETIMEBOUND lifetimebound
+#elif UTL_HAS_GNU_ATTRIBUTE(__lifetimebound__) /* UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound) */
+#  define __UTL_ATTRIBUTE_LIFETIMEBOUND __lifetimebound__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_LIFETIMEBOUND
 #endif /* UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound) */
 
 #if UTL_HAS_CPP_ATTRIBUTE(gnu::pure)
 #  define __UTL_ATTRIBUTE_PURE gnu::pure
 #  define __UTL_ATTRIBUTE_TYPE_CPP_PURE
-#elif UTL_HAS_GNU_ATTRIBUTE(pure) /* UTL_HAS_CPP_ATTRIBUTE(gnu::pure) */
-#  define __UTL_ATTRIBUTE_PURE pure
+#elif UTL_HAS_GNU_ATTRIBUTE(__pure__) /* UTL_HAS_CPP_ATTRIBUTE(gnu::pure) */
+#  define __UTL_ATTRIBUTE_PURE __pure__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_PURE
 #endif /* UTL_HAS_CPP_ATTRIBUTE(gnu::pure) */
 
 #if UTL_HAS_CPP_ATTRIBUTE(gnu::const)
 #  define __UTL_ATTRIBUTE_CONST gnu::const
 #  define __UTL_ATTRIBUTE_TYPE_CPP_CONST
-#elif UTL_HAS_GNU_ATTRIBUTE(const)
-#  define __UTL_ATTRIBUTE_CONST const
+#elif UTL_HAS_GNU_ATTRIBUTE(__const__)
+#  define __UTL_ATTRIBUTE_CONST __const__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_CONST
 #elif UTL_HAS_DECLSPEC(noalias)
 #  define __UTL_ATTRIBUTE_CONST noalias
@@ -83,8 +67,8 @@
 #elif UTL_HAS_CPP_ATTRIBUTE(msvc::flatten)
 #  define __UTL_ATTRIBUTE_FLATTEN msvc::flatten
 #  define __UTL_ATTRIBUTE_TYPE_CPP_FLATTEN
-#elif UTL_HAS_GNU_ATTRIBUTE(flatten)
-#  define __UTL_ATTRIBUTE_FLATTEN flatten
+#elif UTL_HAS_GNU_ATTRIBUTE(__flatten__)
+#  define __UTL_ATTRIBUTE_FLATTEN __flatten__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_FLATTEN
 #endif /* UTL_HAS_CPP_ATTRIBUTE(gnu::const) */
 
@@ -94,8 +78,8 @@
 #elif UTL_HAS_CPP_ATTRIBUTE(no_unique_address)
 #  define __UTL_ATTRIBUTE_NO_UNIQUE_ADDRESS no_unique_address
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NO_UNIQUE_ADDRESS
-#elif UTL_HAS_GNU_ATTRIBUTE(no_unique_address)
-#  define __UTL_ATTRIBUTE_NO_UNIQUE_ADDRESS no_unique_address
+#elif UTL_HAS_GNU_ATTRIBUTE(__no_unique_address__)
+#  define __UTL_ATTRIBUTE_NO_UNIQUE_ADDRESS __no_unique_address__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_NO_UNIQUE_ADDRESS
 #endif /* UTL_HAS_CPP_ATTRIBUTE(msvc::no_unique_address) */
 
@@ -105,8 +89,8 @@
 #elif UTL_HAS_CPP_ATTRIBUTE(gnu::always_inline)
 #  define __UTL_ATTRIBUTE_ALWAYS_INLINE gnu::always_inline
 #  define __UTL_ATTRIBUTE_TYPE_CPP_ALWAYS_INLINE
-#elif UTL_HAS_GNU_ATTRIBUTE(always_inline)
-#  define __UTL_ATTRIBUTE_ALWAYS_INLINE always_inline
+#elif UTL_HAS_GNU_ATTRIBUTE(__always_inline__)
+#  define __UTL_ATTRIBUTE_ALWAYS_INLINE __always_inline__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_ALWAYS_INLINE
 #elif UTL_HAS_MSVC_KEYWORD(__forceinline)
 #  define __UTL_ATTRIBUTE_ALWAYS_INLINE __forceinline
@@ -119,8 +103,8 @@
 #elif UTL_HAS_CPP_ATTRIBUTE(gnu::malloc)
 #  define __UTL_ATTRIBUTE_MALLOC gnu::malloc
 #  define __UTL_ATTRIBUTE_TYPE_CPP_MALLOC
-#elif UTL_HAS_GNU_ATTRIBUTE(malloc)
-#  define __UTL_ATTRIBUTE_MALLOC malloc
+#elif UTL_HAS_GNU_ATTRIBUTE(__malloc__)
+#  define __UTL_ATTRIBUTE_MALLOC __malloc__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_MALLOC
 #elif UTL_HAS_DECLSPEC(allocator) | UTL_HAS_DECLSPEC(restrict)
 #  if UTL_HAS_DECLSPEC(allocator) & UTL_HAS_DECLSPEC(restrict)
@@ -136,8 +120,8 @@
 #  if UTL_HAS_CPP_ATTRIBUTE(gnu::malloc)
 #    define __UTL_ATTRIBUTE_DEALLOCATED_BY gnu::malloc
 #    define __UTL_ATTRIBUTE_TYPE_CPP_DEALLOCATED_BY(FUNC, ...)
-#  elif UTL_HAS_GNU_ATTRIBUTE(malloc)
-#    define __UTL_ATTRIBUTE_DEALLOCATED_BY malloc
+#  elif UTL_HAS_GNU_ATTRIBUTE(__malloc__)
+#    define __UTL_ATTRIBUTE_DEALLOCATED_BY __malloc__
 #    define __UTL_ATTRIBUTE_TYPE_GNU_DEALLOCATED_BY(FUNC, ...)
 #  endif /* UTL_HAS_CPP_ATTRIBUTE(clang::malloc) */
 #endif
@@ -148,8 +132,8 @@
 #elif UTL_HAS_CPP_ATTRIBUTE(gnu::visibility)
 #  define __UTL_ATTRIBUTE_VISIBILITY gnu::visibility
 #  define __UTL_ATTRIBUTE_TYPE_CPP_VISIBILITY(VISIBILITY)
-#elif UTL_HAS_GNU_ATTRIBUTE(visibility)
-#  define __UTL_ATTRIBUTE_VISIBILITY visibility
+#elif UTL_HAS_GNU_ATTRIBUTE(__visibility__)
+#  define __UTL_ATTRIBUTE_VISIBILITY __visibility__
 #  define __UTL_ATTRIBUTE_TYPE_CPP_VISIBILITY(VISIBILITY)
 #endif
 
@@ -162,16 +146,16 @@
 #elif UTL_HAS_CPP_ATTRIBUTE(gnu::type_visibility)
 #  define __UTL_ATTRIBUTE_TYPE_VISIBILITY gnu::type_visibility
 #  define __UTL_ATTRIBUTE_TYPE_CPP_TYPE_VISIBILITY(VISIBILITY)
-#elif UTL_HAS_GNU_ATTRIBUTE(type_visibility)
-#  define __UTL_ATTRIBUTE_TYPE_VISIBILITY type_visibility
+#elif UTL_HAS_GNU_ATTRIBUTE(__type_visibility__)
+#  define __UTL_ATTRIBUTE_TYPE_VISIBILITY __type_visibility__
 #  define __UTL_ATTRIBUTE_TYPE_CPP_TYPE_VISIBILITY(VISIBILITY)
 #endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(gnu::dllimport)
 #  define __UTL_ATTRIBUTE_DLLIMPORT gnu::dllimport
 #  define __UTL_ATTRIBUTE_TYPE_CPP_DLLIMPORT
-#elif UTL_HAS_GNU_ATTRIBUTE(dllimport)
-#  define __UTL_ATTRIBUTE_DLLIMPORT dllimport
+#elif UTL_HAS_GNU_ATTRIBUTE(__dllimport__)
+#  define __UTL_ATTRIBUTE_DLLIMPORT __dllimport__
 #  define __UTL_ATTRIBUTE_TYPE_CPP_DLLIMPORT
 #elif UTL_HAS_DECLSPEC(dllimport)
 #  define __UTL_ATTRIBUTE_DLLIMPORT dllimport
@@ -181,8 +165,8 @@
 #if UTL_HAS_CPP_ATTRIBUTE(gnu::dllexport)
 #  define __UTL_ATTRIBUTE_DLLEXPORT gnu::dllexport
 #  define __UTL_ATTRIBUTE_TYPE_CPP_DLLEXPORT
-#elif UTL_HAS_GNU_ATTRIBUTE(dllexport)
-#  define __UTL_ATTRIBUTE_DLLEXPORT dllexport
+#elif UTL_HAS_GNU_ATTRIBUTE(__dllexport__)
+#  define __UTL_ATTRIBUTE_DLLEXPORT __dllexport__
 #  define __UTL_ATTRIBUTE_TYPE_CPP_DLLEXPORT
 #elif UTL_HAS_DECLSPEC(dllexport)
 #  define __UTL_ATTRIBUTE_DLLIMPORT dllexport
@@ -195,8 +179,8 @@
 #elif UTL_HAS_CPP_ATTRIBUTE(gnu::reinitializes)
 #  define __UTL_ATTRIBUTE_REINITIALIZES gnu::reinitializes
 #  define __UTL_ATTRIBUTE_TYPE_CPP_REINITIALIZES
-#elif UTL_HAS_GNU_ATTRIBUTE(reinitializes)
-#  define __UTL_ATTRIBUTE_REINITIALIZES reinitializes
+#elif UTL_HAS_GNU_ATTRIBUTE(__reinitializes__)
+#  define __UTL_ATTRIBUTE_REINITIALIZES __reinitializes__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_REINITIALIZES
 #endif /* UTL_HAS_CPP_ATTRIBUTE(clang::reinitializes) */
 
@@ -206,8 +190,8 @@
 #elif UTL_HAS_CPP_ATTRIBUTE(gnu::unused)
 #  define __UTL_ATTRIBUTE_MAYBE_UNUSED gnu::unused
 #  define __UTL_ATTRIBUTE_TYPE_CPP_MAYBE_UNUSED
-#elif UTL_HAS_GNU_ATTRIBUTE(unused)
-#  define __UTL_ATTRIBUTE_MAYBE_UNUSED unused
+#elif UTL_HAS_GNU_ATTRIBUTE(__unused__)
+#  define __UTL_ATTRIBUTE_MAYBE_UNUSED __unused__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_MAYBE_UNUSED
 #endif /* UTL_HAS_CPP_ATTRIBUTE(maybe_unused) */
 
@@ -220,8 +204,8 @@
 #elif UTL_HAS_CPP_ATTRIBUTE(gnu::fallthrough)
 #  define __UTL_ATTRIBUTE_FALLTHROUGH gnu::fallthrough
 #  define __UTL_ATTRIBUTE_TYPE_CPP_FALLTHROUGH
-#elif UTL_HAS_GNU_ATTRIBUTE(fallthrough)
-#  define __UTL_ATTRIBUTE_FALLTHROUGH fallthrough
+#elif UTL_HAS_GNU_ATTRIBUTE(__fallthrough__)
+#  define __UTL_ATTRIBUTE_FALLTHROUGH __fallthrough__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_FALLTHROUGH
 #endif
 
