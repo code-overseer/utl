@@ -36,10 +36,15 @@
 #  define __UTL_ATTRIBUTE_TYPE_AGGREGATE_PUBLIC_TEMPLATE
 #endif
 
+#define __UTL_ODR_SIGNATURE_1(_0, _1, _2, _3, _4) _0##_1##_2##_3##_4
+#define __UTL_ODR_SIGNATURE_0(_0, _1, _2, _3, _4) __UTL_ODR_SIGNATURE_1(_0, _1, _2, _3, _4)
+#define __UTL_ODR_SIGNATURE              \
+    UTL_TO_STRING(__UTL_ODR_SIGNATURE_0( \
+        CXX, UTL_CXX, __UTL_HARDENING_MODE, __UTL_ABI_EXCEPTION_TAG, UTL_COMPILER_TAG))
+
 #define UTL_HIDE_FROM_ABI UTL_ATTRIBUTE(HIDE_FROM_ABI)
-#define __UTL_ATTRIBUTE_HIDE_FROM_ABI                            \
-    (VISIBILITY("hidden"))(EXCLUDE_FROM_EXPLICIT_INSTANTIATION)( \
-        ABI_TAG(UTL_TO_STRING(__UTL_ODR_SIGNATURE)))
+#define __UTL_ATTRIBUTE_HIDE_FROM_ABI \
+    (VISIBILITY("hidden"))(EXCLUDE_FROM_EXPLICIT_INSTANTIATION)(ABI_TAG(__UTL_ODR_SIGNATURE))
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_HIDE_FROM_ABI
 
 /* virtual functions must be linked to the same symbol */
@@ -49,25 +54,21 @@
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_HIDE_FROM_ABI_VIRTUAL
 
 #if UTL_WITH_EXCEPTIONS
-#  define UTL_ABI_EXCEPTION_TAG e
+#  define __UTL_ABI_EXCEPTION_TAG e
 #else
-#  define UTL_ABI_EXCEPTION_TAG n
+#  define __UTL_ABI_EXCEPTION_TAG n
 #endif
 
 #ifndef UTL_COMPILER_TAG
 #  error Undefined compiler tag
 #endif
 
-#ifndef UTL_ABI_EXCEPTION_TAG
+#ifndef __UTL_ABI_EXCEPTION_TAG
 #  error Undefined exception tag
 #endif
 
 /* TODO WTF? Do this properly! */
 #define __UTL_HARDENING_MODE n
-
-#define __UTL_ODR_SIGNATURE          \
-    UTL_CONCAT(__UTL_HARDENING_MODE, \
-        UTL_CONCAT(UTL_CONCAT(UTL_COMPILER_TAG, UTL_ABI_EXCEPTION_TAG), UTL_CXX))
 
 #define UTL_EXTERN_C extern "C"
 #define UTL_EXTERN_C_BEGIN UTL_EXTERN_C {

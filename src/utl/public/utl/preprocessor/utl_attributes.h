@@ -187,6 +187,17 @@
 #  define __UTL_ATTRIBUTE_TYPE_GNU_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
 #endif
 
+#if UTL_HAS_CPP_ATTRIBUTE(clang::abi_tag)
+#  define __UTL_ATTRIBUTE_ABI_TAG clang::abi_tag
+#  define __UTL_ATTRIBUTE_TYPE_CPP_ABI_TAG(STR)
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::abi_tag)
+#  define __UTL_ATTRIBUTE_ABI_TAG gnu::abi_tag
+#  define __UTL_ATTRIBUTE_TYPE_CPP_ABI_TAG(STR)
+#elif UTL_HAS_GNU_ATTRIBUTE(__abi_tag__)
+#  define __UTL_ATTRIBUTE_ABI_TAG __abi_tag__
+#  define __UTL_ATTRIBUTE_TYPE_GNU_ABI_TAG(STR)
+#endif
+
 #if UTL_HAS_CPP_ATTRIBUTE(clang::reinitializes)
 #  define __UTL_ATTRIBUTE_REINITIALIZES clang::reinitializes
 #  define __UTL_ATTRIBUTE_TYPE_CPP_REINITIALIZES
