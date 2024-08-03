@@ -22,7 +22,6 @@
 #  define __UTL_ATTRIBUTE_NODISCARD __warn_unused_result__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_NODISCARD
 #elif UTL_HAS_SAL_ANNOTATION(_Check_return_)
-#  define UTL_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_TYPE_MSVC_EXT_NODISCARD
 #endif /* UTL_HAS_CPP_ATTRIBUTE(nodiscard) */
