@@ -47,7 +47,7 @@
 #elif UTL_HAS_SAL_ANNOTATION(_Check_return_)
 #  define UTL_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_NODISCARD _Check_return_
-#  define __UTL_ATTRIBUTE_TYPE_MSVC_EXTENSION_NODISCARD
+#  define __UTL_ATTRIBUTE_TYPE_MSVC_EXT_NODISCARD
 #endif /* UTL_HAS_CPP_ATTRIBUTE(nodiscard) */
 
 #if UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound)
@@ -118,7 +118,7 @@
 #  define __UTL_ATTRIBUTE_TYPE_GNU_ALWAYS_INLINE
 #elif UTL_HAS_MSVC_DECORATOR(__forceinline)
 #  define __UTL_ATTRIBUTE_ALWAYS_INLINE __forceinline
-#  define __UTL_ATTRIBUTE_TYPE_MSVC_EXTENSION_ALWAYS_INLINE
+#  define __UTL_ATTRIBUTE_TYPE_MSVC_EXT_ALWAYS_INLINE
 #endif /* UTL_HAS_CPP_ATTRIBUTE(clang::always_inline) */
 
 #if UTL_HAS_CPP_ATTRIBUTE(clang::malloc)
