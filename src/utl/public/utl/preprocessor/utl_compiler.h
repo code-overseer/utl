@@ -29,6 +29,10 @@
 #elif defined(_MSC_VER)
 #  define UTL_COMPILER_MSVC 1
 #  define UTL_COMPILER_MSVC_AT_LEAST(VERSION) _MSC_VER >= VERSION
+#  if _MSVC_TRADITIONAL
+/* Using non-conformant MSVC preprocessor */
+#    define UTL_MSVC_PREPROCESSOR 1
+#  endif
 #elif
 #  error "Unknown compiler"
 #endif
