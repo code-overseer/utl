@@ -172,6 +172,20 @@
 #  define __UTL_ATTRIBUTE_TYPE_GNU_MAYBE_UNUSED
 #endif /* UTL_HAS_CPP_ATTRIBUTE(maybe_unused) */
 
+#if UTL_HAS_CPP_ATTRIBUTE(fallthrough)
+#  define __UTL_ATTRIBUTE_FALLTHROUGH fallthrough
+#  define __UTL_ATTRIBUTE_TYPE_CPP_FALLTHROUGH
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::fallthrough)
+#  define __UTL_ATTRIBUTE_FALLTHROUGH gnu::fallthrough
+#  define __UTL_ATTRIBUTE_TYPE_CPP_FALLTHROUGH
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::fallthrough)
+#  define __UTL_ATTRIBUTE_FALLTHROUGH gnu::fallthrough
+#  define __UTL_ATTRIBUTE_TYPE_CPP_FALLTHROUGH
+#elif UTL_HAS_GNU_ATTRIBUTE(fallthrough)
+#  define __UTL_ATTRIBUTE_FALLTHROUGH fallthrough
+#  define __UTL_ATTRIBUTE_TYPE_GNU_FALLTHROUGH
+#endif
+
 #if UTL_HAS_CPP_ATTRIBUTE(clang::noescape)
 #  define __UTL_ATTRIBUTE_NOESCAPE clang::noescape
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NOESCAPE
