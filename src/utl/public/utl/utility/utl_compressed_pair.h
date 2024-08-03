@@ -48,7 +48,7 @@ struct element {
 };
 
 template <typename T, size_t Idx>
-struct element<T, Idx, enable_if_t<optimizable<T>::value>> : private T {
+struct UTL_ATTRIBUTE(EMPTY_BASES) element<T, Idx, enable_if_t<optimizable<T>::value>> : private T {
     using reference = T&;
     using const_reference = T const&;
     using value_type = T;
@@ -71,7 +71,7 @@ struct element<T, Idx, enable_if_t<optimizable<T>::value>> : private T {
 } // namespace details
 
 template <typename T0, typename T1>
-class compressed_pair :
+class UTL_ATTRIBUTE(EMPTY_BASES) compressed_pair :
     details::compressed_pair::element<T0, 0>,
     details::compressed_pair::element<T1, 1> {
 

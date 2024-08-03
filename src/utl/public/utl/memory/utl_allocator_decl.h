@@ -6,8 +6,9 @@
 
 #include "utl/preprocessor/utl_assertion.h"
 
-#include "utl/exception/utl_exception_base.h"
 #include "utl/memory/utl_allocator_fwd.h"
+
+#include "utl/exception/utl_exception_base.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_is_complete.h"
 #include "utl/type_traits/utl_type_identity.h"
@@ -40,9 +41,11 @@ public:
         return *this;
     }
 
-    UTL_NODISCARD UTL_CONSTEXPR_CXX20 pointer allocate(size_type count) UTL_THROWS;
+    UTL_ATTRIBUTE(NODISCARD)
+    UTL_CONSTEXPR_CXX20 pointer allocate(size_type count) UTL_THROWS;
 
-    UTL_NODISCARD UTL_CONSTEXPR_CXX20 result_type allocate_at_least(size_type count) UTL_THROWS {
+    UTL_ATTRIBUTE(NODISCARD)
+    UTL_CONSTEXPR_CXX20 result_type allocate_at_least(size_type count) UTL_THROWS {
         return {allocate(count), count};
     }
 

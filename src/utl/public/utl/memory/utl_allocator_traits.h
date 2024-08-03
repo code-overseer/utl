@@ -309,11 +309,11 @@ struct allocator_traits {
             UTL_SCOPE is_nothrow_swappable<allocator_type>::value,
         "If propogation on swap is required, allocator must be nothrow swappable");
 
-    UTL_NODISCARD static UTL_CONSTEXPR_CXX20 pointer allocate(allocator_type& alloc, size_type size) {
+    UTL_ATTRIBUTE(NODISCARD) static UTL_CONSTEXPR_CXX20 pointer allocate(allocator_type& alloc, size_type size) {
         return alloc.allocate(size);
     }
 
-    UTL_NODISCARD static UTL_CONSTEXPR_CXX20 allocation_result allocate_at_least(
+    UTL_ATTRIBUTE(NODISCARD) static UTL_CONSTEXPR_CXX20 allocation_result allocate_at_least(
         allocator_type& alloc, size_type size) {
         return details::allocator::allocate_at_least(alloc, size);
     }
@@ -322,12 +322,12 @@ struct allocator_traits {
         alloc.deallocate(ptr, size);
     }
 
-    UTL_NODISCARD static UTL_CONSTEXPR_CXX20 pointer reallocate(
+    UTL_ATTRIBUTE(NODISCARD) static UTL_CONSTEXPR_CXX20 pointer reallocate(
         allocator_type& alloc, allocation_result arg, size_type new_size) {
         return details::allocator::reallocate(alloc, arg, new_size);
     }
 
-    UTL_NODISCARD static UTL_CONSTEXPR_CXX20 allocation_result reallocate_at_least(
+    UTL_ATTRIBUTE(NODISCARD) static UTL_CONSTEXPR_CXX20 allocation_result reallocate_at_least(
         allocator_type& alloc, allocation_result arg, size_type new_size) {
         return details::allocator::reallocate_at_least(alloc, arg, new_size);
     }
@@ -341,20 +341,20 @@ struct allocator_traits {
         return details::allocator::assign(dst, move(src), propagate_on_container_move_assignment{});
     }
 
-    UTL_NODISCARD static UTL_CONSTEXPR_CXX14 allocator_type select_on_container_copy_construction(
+    UTL_ATTRIBUTE(NODISCARD) static UTL_CONSTEXPR_CXX14 allocator_type select_on_container_copy_construction(
         allocator_type const& p) noexcept {
         return details::allocator::copy(p, selectable_copy_construction{});
     }
 
     template <typename T = allocator_type>
-    UTL_NODISCARD static constexpr enable_if_t<
+    UTL_ATTRIBUTE(NODISCARD) static constexpr enable_if_t<
         is_same<T, allocator_type>::value && is_always_equal::value, bool>
     equals(T const&, T const&) noexcept {
         return true;
     }
 
     template <typename T = allocator_type>
-    UTL_NODISCARD static constexpr enable_if_t<
+    UTL_ATTRIBUTE(NODISCARD) static constexpr enable_if_t<
         is_same<T, allocator_type>::value && !is_always_equal::value, bool>
     equals(T const& left, T const& right) noexcept {
         return left == right;
