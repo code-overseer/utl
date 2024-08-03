@@ -61,7 +61,7 @@
 #  define UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
 #endif
 
-#if UTL_HAS_ATTRIBUTE(__type_visibility__)
+#if UTL_HAS_GNU_ATTRIBUTE(__type_visibility__)
 #  define UTL_PUBLIC_TYPE __attribute__((__type_visibility__("default")))
 #  define UTL_PUBLIC_TEMPLATE
 #else
@@ -70,7 +70,7 @@
 #  define UTL_PUBLIC_TEMPLATE __attribute__((__visibility__("default")))
 #endif
 
-#if UTL_HAS_ATTRIBUTE(__abi_tag__)
+#if UTL_HAS_GNU_ATTRIBUTE(__abi_tag__)
 #  define UTL_HIDE_FROM_ABI                                   \
       UTL_ABI_PRIVATE UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION \
           __attribute__((__abi_tag__(UTL_TO_STRING(UTL_ODR_SIGNATURE))))
