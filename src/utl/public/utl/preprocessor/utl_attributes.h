@@ -137,9 +137,56 @@
 #    define __UTL_ATTRIBUTE_DEALLOCATED_BY gnu::malloc
 #    define __UTL_ATTRIBUTE_TYPE_CPP_DEALLOCATED_BY(FUNC, ...)
 #  elif UTL_HAS_GNU_ATTRIBUTE(malloc)
-#    define __UTL_ATTRIBUTE_MALLOC malloc
+#    define __UTL_ATTRIBUTE_DEALLOCATED_BY malloc
 #    define __UTL_ATTRIBUTE_TYPE_GNU_DEALLOCATED_BY(FUNC, ...)
 #  endif /* UTL_HAS_CPP_ATTRIBUTE(clang::malloc) */
+#endif
+
+#if UTL_HAS_CPP_ATTRIBUTE(visibility)
+#  define __UTL_ATTRIBUTE_VISIBILITY visibility
+#  define __UTL_ATTRIBUTE_TYPE_CPP_VISIBILITY(VISIBILITY)
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::visibility)
+#  define __UTL_ATTRIBUTE_VISIBILITY gnu::visibility
+#  define __UTL_ATTRIBUTE_TYPE_CPP_VISIBILITY(VISIBILITY)
+#elif UTL_HAS_GNU_ATTRIBUTE(visibility)
+#  define __UTL_ATTRIBUTE_VISIBILITY visibility
+#  define __UTL_ATTRIBUTE_TYPE_CPP_VISIBILITY(VISIBILITY)
+#endif
+
+#if UTL_HAS_CPP_ATTRIBUTE(type_visibility)
+#  define __UTL_ATTRIBUTE_TYPE_VISIBILITY type_visibility
+#  define __UTL_ATTRIBUTE_TYPE_CPP_TYPE_VISIBILITY(VISIBILITY)
+#elif UTL_HAS_CPP_ATTRIBUTE(clang::type_visibility)
+#  define __UTL_ATTRIBUTE_TYPE_VISIBILITY clang::type_visibility
+#  define __UTL_ATTRIBUTE_TYPE_CPP_TYPE_VISIBILITY(VISIBILITY)
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::type_visibility)
+#  define __UTL_ATTRIBUTE_TYPE_VISIBILITY gnu::type_visibility
+#  define __UTL_ATTRIBUTE_TYPE_CPP_TYPE_VISIBILITY(VISIBILITY)
+#elif UTL_HAS_GNU_ATTRIBUTE(type_visibility)
+#  define __UTL_ATTRIBUTE_TYPE_VISIBILITY type_visibility
+#  define __UTL_ATTRIBUTE_TYPE_CPP_TYPE_VISIBILITY(VISIBILITY)
+#endif
+
+#if UTL_HAS_CPP_ATTRIBUTE(gnu::dllimport)
+#  define __UTL_ATTRIBUTE_DLLIMPORT gnu::dllimport
+#  define __UTL_ATTRIBUTE_TYPE_CPP_DLLIMPORT
+#elif UTL_HAS_GNU_ATTRIBUTE(dllimport)
+#  define __UTL_ATTRIBUTE_DLLIMPORT dllimport
+#  define __UTL_ATTRIBUTE_TYPE_CPP_DLLIMPORT
+#elif UTL_HAS_DECLSPEC(dllimport)
+#  define __UTL_ATTRIBUTE_DLLIMPORT dllimport
+#  define __UTL_ATTRIBUTE_TYPE_DECLSPEC_DLLIMPORT
+#endif
+
+#if UTL_HAS_CPP_ATTRIBUTE(gnu::dllexport)
+#  define __UTL_ATTRIBUTE_DLLEXPORT gnu::dllexport
+#  define __UTL_ATTRIBUTE_TYPE_CPP_DLLEXPORT
+#elif UTL_HAS_GNU_ATTRIBUTE(dllexport)
+#  define __UTL_ATTRIBUTE_DLLEXPORT dllexport
+#  define __UTL_ATTRIBUTE_TYPE_CPP_DLLEXPORT
+#elif UTL_HAS_DECLSPEC(dllexport)
+#  define __UTL_ATTRIBUTE_DLLIMPORT dllexport
+#  define __UTL_ATTRIBUTE_TYPE_DECLSPEC_DLLIMPORT
 #endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(clang::reinitializes)
