@@ -53,7 +53,7 @@ public:
      *
      * @return The message string.
      */
-    UTL_ATTRIBUTE(NODISCARD) UTL_HIDE_FROM_ABI_VIRTUAL char const* what() const noexcept UTL_ATTRIBUTE(
+    UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI_VIRTUAL) char const* what() const noexcept UTL_ATTRIBUTE(
         LIFETIMEBOUND) final {
         return messages_.top().message();
     }
@@ -132,7 +132,7 @@ public:
      *
      * @return The constant reference to the data.
      */
-    UTL_ATTRIBUTES(NODISCARD, CONST) UTL_HIDE_FROM_ABI T const& data() const& noexcept UTL_ATTRIBUTE(
+    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) T const& data() const& noexcept UTL_ATTRIBUTE(
         LIFETIMEBOUND) {
         return data_;
     }
@@ -144,7 +144,7 @@ public:
      *
      * @return The constant rvalue reference to the data.
      */
-    UTL_ATTRIBUTES(NODISCARD, CONST) UTL_HIDE_FROM_ABI T const&& data() const&& noexcept UTL_ATTRIBUTE(
+    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) T const&& data() const&& noexcept UTL_ATTRIBUTE(
         LIFETIMEBOUND) {
         return data_;
     }
@@ -156,7 +156,7 @@ public:
      *
      * @return The reference to the data.
      */
-    UTL_ATTRIBUTES(NODISCARD, CONST) UTL_HIDE_FROM_ABI T& data() & noexcept UTL_ATTRIBUTE(
+    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) T& data() & noexcept UTL_ATTRIBUTE(
         LIFETIMEBOUND) {
         return data_;
     }
@@ -168,7 +168,7 @@ public:
      *
      * @return The rvalue reference to the data.
      */
-    UTL_ATTRIBUTES(NODISCARD, CONST) UTL_HIDE_FROM_ABI T&& data() && noexcept UTL_ATTRIBUTE(
+    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)T&& data() && noexcept UTL_ATTRIBUTE(
         LIFETIMEBOUND) {
         return data_;
     }

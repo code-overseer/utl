@@ -40,8 +40,10 @@
 #  define UTL_CONSTEXPR_WITH_TRY UTL_CONSTEXPR_CXX14
 #endif
 
-#define UTL_STRING_PURE UTL_ATTRIBUTES(NODISCARD, PURE)
-#define UTL_STRING_CONST UTL_ATTRIBUTES(NODISCARD, CONST)
+#define __UTL_ATTRIBUTE_STRING_PURE (PURE)(NODISCARD)
+#define __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_PURE
+#define __UTL_ATTRIBUTE_STRING_CONST (CONST)(NODISCARD)
+#define __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_CONST
 
 UTL_NAMESPACE_BEGIN
 template <typename CharType, size_t ShortSize, typename Traits, typename Alloc>
@@ -315,35 +317,35 @@ public:
 
     UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~basic_short_string() noexcept { destroy(); }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 pointer data() noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 pointer data() noexcept {
         return !is_heap_ ? get_short().data_ : get_heap().data_;
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_pointer data() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr const_pointer data() const noexcept {
         return !is_heap_ ? get_short().data_ : get_heap().data_;
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_pointer c_str() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr const_pointer c_str() const noexcept {
         return data();
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool empty() const noexcept { return !size_; }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type size() const noexcept { return size_; }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type length() const noexcept { return size_; }
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool empty() const noexcept { return !size_; }
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type size() const noexcept { return size_; }
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type length() const noexcept { return size_; }
 
-    UTL_STRING_CONST UTL_HIDE_FROM_ABI constexpr size_type max_size() const noexcept {
+    UTL_ATTRIBUTES(CONST, NODISCARD) UTL_HIDE_FROM_ABI constexpr size_type max_size() const noexcept {
         constexpr size_type max_bytes = ~(size_type(1) << (sizeof(size_type) * CHAR_BIT - 1));
         constexpr size_type max_characters = max_bytes / sizeof(value_type);
         return max_characters - 1;
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type capacity() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type capacity() const noexcept {
         constexpr size_type short_capacity = sizeof(short_type::data_) / sizeof(value_type);
         size_type const buffer_capacity = !is_heap_ ? short_capacity : get_heap().capacity_;
         return buffer_capacity - 1;
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr allocator_type get_allocator() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr allocator_type get_allocator() const noexcept {
         return allocator_ref();
     }
 
@@ -401,63 +403,63 @@ public:
         size_ = 0;
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator begin() noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator begin() noexcept {
         return iterator(data());
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_iterator cbegin() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr const_iterator cbegin() const noexcept {
         return const_iterator(data());
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_iterator begin() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr const_iterator begin() const noexcept {
         return const_iterator(data());
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator end() noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator end() noexcept {
         return iterator(data() + size());
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_iterator cend() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr const_iterator cend() const noexcept {
         return const_iterator(data() + size());
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_iterator end() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr const_iterator end() const noexcept {
         return const_iterator(data() + size());
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator rbegin() noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator rbegin() noexcept {
         return reverse_iterator(end());
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_iterator crbegin() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr const_iterator crbegin() const noexcept {
         return const_reverse_iterator(end());
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_iterator rbegin() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr const_iterator rbegin() const noexcept {
         return const_reverse_iterator(end());
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator rend() noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator rend() noexcept {
         return reverse_iterator(begin());
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_iterator crend() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr const_iterator crend() const noexcept {
         return const_reverse_iterator(begin());
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_iterator rend() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr const_iterator rend() const noexcept {
         return const_reverse_iterator(begin());
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_reference front() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr const_reference front() const noexcept {
         return *data();
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reference front() noexcept { return *data(); }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_reference back() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reference front() noexcept { return *data(); }
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr const_reference back() const noexcept {
         return data()[size() - 1];
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reference back() noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reference back() noexcept {
         return data()[size() - 1];
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_reference operator[](
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr const_reference operator[](
         size_type idx) const noexcept {
         return data()[idx];
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reference operator[](size_type idx) noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reference operator[](size_type idx) noexcept {
         return data()[idx];
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reference at(size_type idx) UTL_THROWS {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reference at(size_type idx) UTL_THROWS {
         return const_cast<reference>(as_const(*this).data()[idx]);
     }
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_reference at(size_type idx) const UTL_THROWS {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr const_reference at(size_type idx) const UTL_THROWS {
         UTL_THROW_IF(idx >= size(),
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] basic_short_string::at operation failed, "
                                             "Reason=[index out of range], idx=[%zu], size=[%zu]"),
@@ -997,29 +999,29 @@ public:
         l.swap(r);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find(
         basic_short_string const& str, size_type pos = 0) const noexcept {
         return find(str.data(), pos, str.size());
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find(
         const_pointer str, size_type pos, size_type str_len) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return details::string::find<traits_type>(data(), size(), str, str_len, pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find(
         const_pointer str, size_type pos = 0) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return find(str, pos, traits_type::length(str));
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find(
         value_type ch, size_type pos = 0) const noexcept {
         return details::string::find<traits_type>(data(), size(), ch, pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find(
         view_type view, size_type pos = 0) const noexcept {
         return find(view.data(), pos, view.size());
     }
@@ -1031,29 +1033,29 @@ public:
         return find(view_type(view), pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type rfind(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type rfind(
         basic_short_string const& str, size_type pos = npos) const noexcept {
         return rfind(str.data(), pos, str.size());
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type rfind(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type rfind(
         const_pointer str, size_type pos, size_type str_len) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return details::string::rfind<traits_type>(data(), size(), str, str_len, pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type rfind(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type rfind(
         const_pointer str, size_type pos = npos) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return rfind(str, pos, traits_type::length(str));
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type rfind(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type rfind(
         value_type ch, size_type pos = npos) const noexcept {
         return details::string::rfind<traits_type>(data(), size(), ch, pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type rfind(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type rfind(
         view_type view, size_type pos = npos) const noexcept {
         return rfind(view.data(), pos, view.size());
     }
@@ -1065,29 +1067,29 @@ public:
         return rfind(view_type(view), pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_first_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_first_of(
         basic_short_string const& chars, size_type pos = 0) const noexcept {
         return find_first_of(chars.data(), pos, chars.size());
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_first_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_first_of(
         const_pointer chars, size_type pos, size_type chars_count) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_first_of<traits_type>(data(), size(), chars, chars_count, pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_first_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_first_of(
         const_pointer chars, size_type pos = 0) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_first_of(chars, pos, traits_type::length(chars));
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_first_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_first_of(
         value_type ch, size_type pos = 0) const noexcept {
         return details::string::find_first_of<traits_type>(data(), size(), ch, pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_first_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_first_of(
         view_type view, size_type pos = 0) const noexcept {
         return find_first_of(view.data(), pos, view.size());
     }
@@ -1099,30 +1101,30 @@ public:
         return find_first_of(view_type(view), pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_first_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_first_not_of(
         basic_short_string const& chars, size_type pos = 0) const noexcept {
         return find_first_not_of(chars.data(), pos, chars.size());
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_first_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_first_not_of(
         const_pointer chars, size_type pos, size_type chars_count) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_first_not_of<traits_type>(
             data(), size(), chars, chars_count, pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_first_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_first_not_of(
         const_pointer chars, size_type pos = 0) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_first_not_of(chars, pos, traits_type::length(chars));
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_first_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_first_not_of(
         value_type ch, size_type pos = 0) const noexcept {
         return find_first_not_of(&ch, pos, 1);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_first_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_first_not_of(
         view_type view, size_type pos = 0) const noexcept {
         return find_first_not_of(view.data(), pos, view.size());
     }
@@ -1134,29 +1136,29 @@ public:
         return find_first_not_of(view_type(view), pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_last_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_last_of(
         basic_short_string const& chars, size_type pos = npos) const noexcept {
         return find_last_of(chars.data(), pos, chars.size());
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_last_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_last_of(
         const_pointer chars, size_type pos, size_type chars_count) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_last_of<traits_type>(data(), size(), chars, chars_count, pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_last_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_last_of(
         const_pointer chars, size_type pos = npos) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_last_of(chars, pos, traits_type::length(chars));
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_last_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_last_of(
         value_type ch, size_type pos = npos) const noexcept {
         return find_last_of(&ch, pos, 1);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_last_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_last_of(
         view_type view, size_type pos = npos) const noexcept {
         return find_last_of(view.data(), pos, view.size());
     }
@@ -1168,29 +1170,29 @@ public:
         return find_last_of(view_type(view), pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_last_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_last_not_of(
         basic_short_string const& chars, size_type pos = npos) const noexcept {
         return find_last_not_of(chars.data(), pos, chars.size());
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_last_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_last_not_of(
         const_pointer chars, size_type pos, size_type count) const UTL_THROWS {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_last_not_of<traits_type>(data(), size(), chars, count, pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_last_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_last_not_of(
         const_pointer chars, size_type pos = npos) const UTL_THROWS {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_last_not_of(chars, pos, traits_type::length(chars));
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_last_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_last_not_of(
         value_type ch, size_type pos = npos) const UTL_THROWS {
         return find_last_not_of(&ch, pos, 1);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr size_type find_last_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr size_type find_last_not_of(
         view_type view, size_type pos = npos) const UTL_THROWS {
         return find_last_not_of(view.data(), pos, view.size());
     }
@@ -1203,17 +1205,17 @@ public:
         return find_last_not_of(view_type(view), pos);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr int compare(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr int compare(
         basic_short_string const& other) const noexcept {
         return details::string::compare<traits_type>(data(), size(), other.data(), other.size());
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr int compare(const_pointer str) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr int compare(const_pointer str) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return details::string::compare<traits_type>(data(), size(), str, traits_type::length(str));
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr int compare(view_type view) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr int compare(view_type view) const noexcept {
         return details::string::compare<traits_type>(data(), size(), view.data(), view.size());
     }
 
@@ -1223,12 +1225,12 @@ public:
         return compare(view_type(view));
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 int compare(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 int compare(
         size_type pos, size_type count, basic_short_string const& other) const UTL_THROWS {
         return compare(pos, count, other.data(), other.size());
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 int compare(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 int compare(
         size_type pos, size_type count, const_pointer str, size_type str_len) const UTL_THROWS {
         UTL_ASSERT(str != nullptr);
         UTL_THROW_IF(pos > size(),
@@ -1239,12 +1241,12 @@ public:
             data() + pos, UTL_SCOPE numeric::min(count, size() - pos), str, str_len);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 int compare(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 int compare(
         size_type pos, size_type count, const_pointer str) const UTL_THROWS {
         return compare(pos, count, str, traits_type::length(str));
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 int compare(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 int compare(
         size_type pos, size_type count, view_type view) const UTL_THROWS {
         return compare(pos, count, view.data(), view.size());
     }
@@ -1258,7 +1260,7 @@ public:
         return compare(pos, count, view_type(view));
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
         basic_short_string const& other, size_type pos2, size_type count2 = npos) const UTL_THROWS {
         UTL_THROW_IF(pos2 > other.size(),
             out_of_range(
@@ -1268,7 +1270,7 @@ public:
         return compare(pos, count, view_type(other).substr(pos2, count2));
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
         view_type view, size_type pos2, size_type count2 = npos) const UTL_THROWS {
         UTL_THROW_IF(pos2 > view.size(),
             out_of_range(
@@ -1280,59 +1282,59 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
         View const& view, size_type pos2, size_type count2 = npos) const UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_convertible(View,
         view_type)) {
         return compare(pos, count, view_type(view), pos2, count2);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool starts_with(view_type view) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool starts_with(view_type view) const noexcept {
         return size() >= view.size() && traits_type::compare(data(), view.data(), view.size()) == 0;
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool starts_with(value_type ch) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool starts_with(value_type ch) const noexcept {
         return !empty() && front() == ch;
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool starts_with(const_pointer str) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool starts_with(const_pointer str) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return starts_with(view_type(str));
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool ends_with(view_type view) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool ends_with(view_type view) const noexcept {
         return size() >= view.size() &&
             traits_type::compare(view_type(*this).substr(size() - view.size()).data(), view.data(),
                 view.size()) == 0;
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool ends_with(value_type ch) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool ends_with(value_type ch) const noexcept {
         return !empty() && back() == ch;
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool ends_with(const_pointer str) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool ends_with(const_pointer str) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return ends_with(view_type(str));
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool contains(view_type view) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool contains(view_type view) const noexcept {
         return find(view) != npos;
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool contains(value_type ch) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool contains(value_type ch) const noexcept {
         return traits_type::find(data(), size(), ch) != nullptr;
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool contains(const_pointer str) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool contains(const_pointer str) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return contains(view_type(str));
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr basic_short_string substr(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr basic_short_string substr(
         size_type pos = 0, size_type count = npos) const& {
         return basic_short_string(*this, pos, count);
     }
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr basic_short_string substr(
+    UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr basic_short_string substr(
         size_type pos = 0, size_type count = npos) const&& {
         return basic_short_string(UTL_SCOPE move(*this), pos, count);
     }
@@ -1453,22 +1455,22 @@ private:
         UTL_SCOPE move(other).reset_to_short();
     }
 
-    UTL_STRING_CONST UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 short_type& get_short() noexcept {
+    UTL_ATTRIBUTE(STRING_CONST) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 short_type& get_short() noexcept {
         return storage_.first().short_;
     }
-    UTL_STRING_CONST UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 heap_type& get_heap() noexcept {
+    UTL_ATTRIBUTE(STRING_CONST) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 heap_type& get_heap() noexcept {
         return storage_.first().heap_;
     }
-    UTL_STRING_CONST UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 allocator_type& allocator_ref() noexcept {
+    UTL_ATTRIBUTE(STRING_CONST) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 allocator_type& allocator_ref() noexcept {
         return storage_.second();
     }
-    UTL_STRING_CONST UTL_HIDE_FROM_ABI constexpr short_type const& get_short() const noexcept {
+    UTL_ATTRIBUTE(STRING_CONST) UTL_HIDE_FROM_ABI constexpr short_type const& get_short() const noexcept {
         return storage_.first().short_;
     }
-    UTL_STRING_CONST UTL_HIDE_FROM_ABI constexpr heap_type const& get_heap() const noexcept {
+    UTL_ATTRIBUTE(STRING_CONST) UTL_HIDE_FROM_ABI constexpr heap_type const& get_heap() const noexcept {
         return storage_.first().heap_;
     }
-    UTL_STRING_CONST UTL_HIDE_FROM_ABI constexpr allocator_type const&
+    UTL_ATTRIBUTE(STRING_CONST) UTL_HIDE_FROM_ABI constexpr allocator_type const&
     allocator_ref() const noexcept {
         return storage_.second();
     }
@@ -1504,14 +1506,14 @@ erase_if(basic_short_string<CharT, N, Traits, Alloc>& c, Pred const& pred) {
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator==(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator==(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return lhs.size() == rhs.size() && lhs.compare(rhs) == 0;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator==(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator==(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return lhs.compare(rhs) == 0;
 }
@@ -1648,7 +1650,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr typename Traits::comparison_category operator<=>(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr typename Traits::comparison_category operator<=>(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     using result_type = typename Traits::comparison_category;
@@ -1656,7 +1658,7 @@ UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr typename Traits::comparison_category
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr typename Traits::comparison_category operator<=>(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr typename Traits::comparison_category operator<=>(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     using result_type = typename Traits::comparison_category;
     return static_cast<result_type>(lhs.compare(rhs) <=> 0);
@@ -1669,96 +1671,96 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator<(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator<(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return lhs.compare(rhs) < 0;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator<(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator<(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return lhs.compare(rhs) < 0;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator<(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator<(
     CharType const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return rhs.compare(lhs) > 0;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator>(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator>(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return rhs < lhs;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator>(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator>(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return rhs < lhs;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator>(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator>(
     CharType const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return rhs < lhs;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator>=(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator>=(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(lhs < rhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator>=(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator>=(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return !(lhs < rhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator>=(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator>=(
     CharType const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(lhs < rhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator<=(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator<=(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(rhs < lhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator<=(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator<=(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return !(rhs < lhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator<=(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator<=(
     CharT const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(rhs < lhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator!=(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator!=(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(lhs == rhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator!=(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator!=(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return !(lhs == rhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr bool operator!=(
+UTL_ATTRIBUTE(STRING_PURE) UTL_HIDE_FROM_ABI constexpr bool operator!=(
     CharType const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(lhs == rhs);
 }
@@ -1780,5 +1782,7 @@ UTL_NAMESPACE_END
 
 #endif
 
-#undef UTL_STRING_PURE
-#undef UTL_STRING_CONST
+#undef __UTL_ATTRIBUTE_STRING_PURE
+#undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_PURE
+#undef __UTL_ATTRIBUTE_STRING_CONST
+#undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_CONST

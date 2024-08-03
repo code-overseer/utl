@@ -173,6 +173,20 @@
 #  define __UTL_ATTRIBUTE_TYPE_DECLSPEC_DLLIMPORT
 #endif
 
+#if UTL_HAS_CPP_ATTRIBUTE(clang::exclude_from_explicit_instantiation)
+#  define __UTL_ATTRIBUTE_EXCLUDE_FROM_EXPLICIT_INSTANTIATION \
+      clang::exclude_from_explicit_instantiation
+#  define __UTL_ATTRIBUTE_TYPE_CPP_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::exclude_from_explicit_instantiation)
+#  define __UTL_ATTRIBUTE_EXCLUDE_FROM_EXPLICIT_INSTANTIATION \
+      gnu::exclude_from_explicit_instantiation
+#  define __UTL_ATTRIBUTE_TYPE_CPP_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
+#elif UTL_HAS_GNU_ATTRIBUTE(__exclude_from_explicit_instantiation__)
+#  define __UTL_ATTRIBUTE_EXCLUDE_FROM_EXPLICIT_INSTANTIATION \
+      __exclude_from_explicit_instantiation__
+#  define __UTL_ATTRIBUTE_TYPE_GNU_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
+#endif
+
 #if UTL_HAS_CPP_ATTRIBUTE(clang::reinitializes)
 #  define __UTL_ATTRIBUTE_REINITIALIZES clang::reinitializes
 #  define __UTL_ATTRIBUTE_TYPE_CPP_REINITIALIZES

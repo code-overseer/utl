@@ -26,9 +26,9 @@ UTL_STD_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-class UTL_ABI_PUBLIC strong_ordering;
-class UTL_ABI_PUBLIC partial_ordering;
-class UTL_ABI_PUBLIC weak_ordering;
+class strong_ordering;
+class partial_ordering;
+class weak_ordering;
 
 namespace details {
 namespace compare {

@@ -20,7 +20,7 @@
 /* extern C++ for MSVC */
 #define UTL_NAMESPACE_BEGIN \
     UTL_EXTERN_CXX_BEGIN    \
-    namespace UTL_PUBLIC_TYPE UTL_NS {
+    namespace UTL_ATTRIBUTE(TYPE_VISIBILITY("default")) UTL_NS {
 
 #ifndef UTL_NAMESPACE_END
 #  define UTL_NAMESPACE_END \
@@ -44,8 +44,8 @@
 #endif
 
 /* extern C++ for MSVC > C++20, no effect anywhere else */
-#define UTL_STD_NAMESPACE_BEGIN                          \
-    UTL_EXTERN_CXX_BEGIN namespace UTL_PUBLIC_TYPE std { \
+#define UTL_STD_NAMESPACE_BEGIN                                                    \
+    UTL_EXTERN_CXX_BEGIN namespace UTL_ATTRIBUTE(TYPE_VISIBILITY("default")) std { \
         UTL_STD_ABI_NAMESPACE_BEGIN
 
 #define UTL_STD_NAMESPACE_END \

@@ -9,6 +9,8 @@
 
 UTL_NAMESPACE_BEGIN
 
+#define __UTL_COMPARISON_ATTRIBUTES UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI)
+
 /**
  * CRTP (Curiously Recurring Template Pattern) base class providing comparison operators for
  * pointer-like types.
@@ -24,21 +26,22 @@ template <typename T>
 class pointer_comparable {
     using null_type = decltype(nullptr);
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator==(T const& lhs, T const& rhs) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator==(
+        T const& lhs, T const& rhs) noexcept {
         return lhs.get() == rhs.get();
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator==(T const& lhs, null_type) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator==(T const& lhs, null_type) noexcept {
         return lhs.get() == nullptr;
     }
 
 #if UTL_CXX20
-    UTL_HIDE_FROM_ABI friend constexpr strong_ordering operator<=>(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr strong_ordering operator<=>(
         T const& lhs, T const& rhs) noexcept {
         return lhs.get() <=> rhs.get();
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr strong_ordering operator<=>(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr strong_ordering operator<=>(
         T const& lhs, null_type) noexcept {
         return lhs.get() <=> nullptr;
     }
@@ -47,71 +50,78 @@ class pointer_comparable {
      * Comparison operators for pre-C++20 compilers
      */
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator<(T const& lhs, T const& rhs) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator<(
+        T const& lhs, T const& rhs) noexcept {
         return lhs.get() < rhs.get();
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator!=(T const& lhs, T const& rhs) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator!=(
+        T const& lhs, T const& rhs) noexcept {
         return !(lhs == rhs);
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator>(T const& lhs, T const& rhs) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator>(
+        T const& lhs, T const& rhs) noexcept {
         return rhs < lhs;
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator>=(T const& lhs, T const& rhs) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator>=(
+        T const& lhs, T const& rhs) noexcept {
         return !(lhs < rhs);
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator<=(T const& lhs, T const& rhs) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator<=(
+        T const& lhs, T const& rhs) noexcept {
         return !(rhs < lhs);
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator==(null_type, T const& rhs) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator==(null_type, T const& rhs) noexcept {
         return nullptr == rhs.get();
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator<(T const& lhs, null_type) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator<(T const& lhs, null_type) noexcept {
         return lhs.get() < nullptr;
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator<(null_type, T const& rhs) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator<(null_type, T const& rhs) noexcept {
         return nullptr < rhs.get();
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator!=(T const& lhs, null_type) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator!=(T const& lhs, null_type) noexcept {
         return lhs.get() != nullptr;
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator!=(null_type, T const& rhs) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator!=(null_type, T const& rhs) noexcept {
         return nullptr != rhs.get();
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator>(T const& lhs, null_type) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator>(T const& lhs, null_type) noexcept {
         return nullptr < lhs;
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator>(null_type, T const& rhs) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator>(null_type, T const& rhs) noexcept {
         return rhs < nullptr;
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator>=(T const& lhs, null_type) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator>=(T const& lhs, null_type) noexcept {
         return !(lhs < nullptr);
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator>=(null_type, T const& rhs) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator>=(null_type, T const& rhs) noexcept {
         return !(nullptr < rhs);
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator<=(T const& lhs, null_type) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator<=(T const& lhs, null_type) noexcept {
         return !(lhs > nullptr);
     }
 
-    UTL_HIDE_FROM_ABI friend constexpr bool operator<=(null_type, T const& rhs) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator<=(null_type, T const& rhs) noexcept {
         return !(nullptr > rhs);
     }
 
 #endif
 };
+
+#undef __UTL_COMPARISON_ATTRIBUTES
 
 UTL_NAMESPACE_END

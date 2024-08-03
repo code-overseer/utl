@@ -10,6 +10,8 @@
 
 UTL_NAMESPACE_BEGIN
 
+#define __UTL_COMPARISON_ATTRIBUTES UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)
+
 class strong_ordering :
     details::compare::less_value<strong_ordering>,
     details::compare::equivalent_value<strong_ordering>,
@@ -29,42 +31,49 @@ public:
     using details::compare::greater_value<strong_ordering>::greater;
     using details::compare::equal_value<strong_ordering>::equal;
 
-    constexpr operator partial_ordering() const { return partial_ordering(order_t(value)); }
-    constexpr operator weak_ordering() const { return weak_ordering(order_t(value)); }
+    UTL_HIDE_FROM_ABI constexpr operator partial_ordering() const {
+        return partial_ordering(order_t(value));
+    }
+    UTL_HIDE_FROM_ABI constexpr operator weak_ordering() const {
+        return weak_ordering(order_t(value));
+    }
 #if UTL_CXX20
     template <same_as<std::strong_ordering> T>
-    constexpr strong_ordering(T p) noexcept
+    UTL_HIDE_FROM_ABI constexpr strong_ordering(T p) noexcept
         : value(p == T::less           ? less
                   : p == T::equivalent ? equivalent
                   : p == T::equal      ? equal
                                        : greater) {}
 
     template <same_as<std::strong_ordering> T>
-    constexpr operator T() noexcept {
+    UTL_HIDE_FROM_ABI constexpr operator T() noexcept {
         return *this == less      ? T::less
             : *this == equivalent ? T::equivalent
             : *this == equal      ? T::equal
                                   : T::greater;
     }
 #endif
-    constexpr strong_ordering(strong_ordering const&) noexcept = default;
-    constexpr strong_ordering(strong_ordering&&) noexcept = default;
-    constexpr strong_ordering& operator=(strong_ordering const&) noexcept = default;
-    constexpr strong_ordering& operator=(strong_ordering&&) noexcept = default;
+    UTL_HIDE_FROM_ABI constexpr strong_ordering(strong_ordering const&) noexcept = default;
+    UTL_HIDE_FROM_ABI constexpr strong_ordering(strong_ordering&&) noexcept = default;
+    UTL_HIDE_FROM_ABI constexpr strong_ordering& operator=(
+        strong_ordering const&) noexcept = default;
+    UTL_HIDE_FROM_ABI constexpr strong_ordering& operator=(strong_ordering&&) noexcept = default;
 
-    UTL_ATTRIBUTES(NODISCARD, CONST) friend constexpr bool operator==(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator==(
         strong_ordering l, strong_ordering r) noexcept {
         return l.value == r.value;
     }
-    UTL_ATTRIBUTES(NODISCARD, CONST) friend constexpr bool operator==(strong_ordering l, zero_t) noexcept {
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator==(
+        strong_ordering l, zero_t) noexcept {
         return l.value == 0;
     }
 
 #define UTL_ORDERING_COMPARISONS(SYMBOL)                                        \
-    UTL_ATTRIBUTES(NODISCARD, CONST)                                            \
+    __UTL_COMPARISON_ATTRIBUTES                                                 \
     friend constexpr bool operator SYMBOL(zero_t, strong_ordering r) noexcept { \
         return 0 SYMBOL r.value;                                                \
     }                                                                           \
+    __UTL_COMPARISON_ATTRIBUTES                                                 \
     friend constexpr bool operator SYMBOL(strong_ordering l, zero_t) noexcept { \
         return l.value SYMBOL 0;                                                \
     }
@@ -77,12 +86,12 @@ public:
 #undef UTL_ORDERING_COMPARISONS
 
 #if UTL_CXX20
-    UTL_ATTRIBUTES(NODISCARD, CONST) friend constexpr strong_ordering operator<=>(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr strong_ordering operator<=>(
         strong_ordering l, zero_t) noexcept {
         return l;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, CONST) friend constexpr strong_ordering operator<=>(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr strong_ordering operator<=>(
         zero_t, strong_ordering r) noexcept {
         return strong_ordering(order_t(-r.value));
     }
@@ -94,5 +103,7 @@ private:
 
     value_t value;
 };
+
+#undef __UTL_COMPARISON_ATTRIBUTES
 
 UTL_NAMESPACE_END

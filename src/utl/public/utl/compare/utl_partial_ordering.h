@@ -10,7 +10,7 @@
 
 UTL_NAMESPACE_BEGIN
 
-#define UTL_PARTIAL_ORDERING_ATTRIBUTES UTL_ATTRIBUTES(NODISCARD, CONST)
+#define __UTL_COMPARISON_ATTRIBUTES UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)
 
 class partial_ordering :
     details::compare::less_value<partial_ordering>,
@@ -59,58 +59,58 @@ public:
         partial_ordering const&) noexcept = default;
     UTL_HIDE_FROM_ABI constexpr partial_ordering& operator=(partial_ordering&&) noexcept = default;
 
-    UTL_PARTIAL_ORDERING_ATTRIBUTES UTL_HIDE_FROM_ABI friend constexpr bool operator==(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator==(
         partial_ordering l, partial_ordering r) noexcept {
         return l.value_ == r.value_;
     }
-    UTL_PARTIAL_ORDERING_ATTRIBUTES UTL_HIDE_FROM_ABI friend constexpr bool operator==(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator==(
         partial_ordering l, zero_t) noexcept {
         return l.value_ == 0;
     }
 
-    UTL_PARTIAL_ORDERING_ATTRIBUTES UTL_HIDE_FROM_ABI friend constexpr bool operator<(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator<(
         zero_t, partial_ordering r) noexcept {
         return r.value_ == greater.value_;
     }
-    UTL_PARTIAL_ORDERING_ATTRIBUTES UTL_HIDE_FROM_ABI friend constexpr bool operator<(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator<(
         partial_ordering l, zero_t) noexcept {
         return l.value_ == less.value_;
     }
 
-    UTL_PARTIAL_ORDERING_ATTRIBUTES UTL_HIDE_FROM_ABI friend constexpr bool operator>(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator>(
         zero_t, partial_ordering r) noexcept {
         return r.value_ == less.value_;
     }
-    UTL_PARTIAL_ORDERING_ATTRIBUTES UTL_HIDE_FROM_ABI friend constexpr bool operator>(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator>(
         partial_ordering l, zero_t) noexcept {
         return l.value_ == greater.value_;
     }
 
-    UTL_PARTIAL_ORDERING_ATTRIBUTES UTL_HIDE_FROM_ABI friend constexpr bool operator<=(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator<=(
         zero_t, partial_ordering r) noexcept {
         return r.value_ == greater.value_ || r.value_ == equivalent.value_;
     }
-    UTL_PARTIAL_ORDERING_ATTRIBUTES UTL_HIDE_FROM_ABI friend constexpr bool operator<=(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator<=(
         partial_ordering l, zero_t) noexcept {
         return l.value_ == less.value_ || l.value_ == equivalent.value_;
     }
 
-    UTL_PARTIAL_ORDERING_ATTRIBUTES UTL_HIDE_FROM_ABI friend constexpr bool operator>=(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator>=(
         zero_t, partial_ordering r) noexcept {
         return r.value_ == less.value_ || r.value_ == equivalent.value_;
     }
-    UTL_PARTIAL_ORDERING_ATTRIBUTES UTL_HIDE_FROM_ABI friend constexpr bool operator>=(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr bool operator>=(
         partial_ordering l, zero_t) noexcept {
         return l.value_ == greater.value_ || l.value_ == equivalent.value_;
     }
 
 #if UTL_CXX20
-    UTL_PARTIAL_ORDERING_ATTRIBUTES UTL_HIDE_FROM_ABI friend constexpr partial_ordering operator<=>(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr partial_ordering operator<=>(
         partial_ordering l, zero_t) noexcept {
         return l;
     }
 
-    UTL_PARTIAL_ORDERING_ATTRIBUTES UTL_HIDE_FROM_ABI friend constexpr partial_ordering operator<=>(
+    __UTL_COMPARISON_ATTRIBUTES friend constexpr partial_ordering operator<=>(
         zero_t, partial_ordering r) noexcept {
         switch (r.value_) {
         case value_t(order_t::less):
@@ -132,6 +132,6 @@ private:
     value_t value_;
 };
 
-UTL_NAMESPACE_END
+#undef __UTL_COMPARISON_ATTRIBUTES
 
-#undef UTL_PARTIAL_ORDERING_ATTRIBUTES
+UTL_NAMESPACE_END

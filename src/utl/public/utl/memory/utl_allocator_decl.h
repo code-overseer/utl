@@ -41,11 +41,11 @@ public:
         return *this;
     }
 
-    UTL_ATTRIBUTE(NODISCARD) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 pointer allocate(size_type count)
-        UTL_THROWS;
+    UTL_ATTRIBUTES(MALLOC, NODISCARD, HIDE_FROM_ABI)
+    UTL_CONSTEXPR_CXX20 pointer allocate(size_type count) UTL_THROWS;
 
-    UTL_ATTRIBUTE(NODISCARD) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 result_type allocate_at_least(
-        size_type count) UTL_THROWS {
+    UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI)
+    UTL_CONSTEXPR_CXX20 result_type allocate_at_least(size_type count) UTL_THROWS {
         return {allocate(count), count};
     }
 
@@ -84,22 +84,7 @@ inline constexpr bool is_overaligned_for_new(size_t alignment) noexcept {
     return alignment > default_new_alignment;
 }
 
-UTL_ALLOCATOR_ATTRIBUTE UTL_HIDE_FROM_ABI inline void* allocate(
-    size_t size, size_t alignment = default_new_alignment) {
-    if (is_overaligned_for_new(alignment)) {
-#if UTL_SUPPORTS_ALIGNED_ALLOCATION
-        align_val_t const align_val = static_cast<align_val_t>(alignment);
-        return UTL_ALLOC_NEW(size, align_val);
-#else
-        UTL_ASSERT(false, "Allocation alignment is too strict");
-        UTL_BUILTIN_unreachable();
-#endif
-    }
-    (void)alignment;
-    return UTL_ALLOC_NEW(size);
-}
-
-inline UTL_HIDE_FROM_ABI void deallocate(
+UTL_HIDE_FROM_ABI inline void deallocate(
     void* pointer, size_t size, size_t alignment = default_new_alignment) noexcept {
     if (is_overaligned_for_new(alignment)) {
 #if UTL_SUPPORTS_ALIGNED_ALLOCATION
@@ -123,11 +108,26 @@ inline UTL_HIDE_FROM_ABI void deallocate(
 #endif
     }
 }
+
+UTL_ATTRIBUTES(MALLOC, HIDE_FROM_ABI) inline void* allocate(
+    size_t size, size_t alignment = default_new_alignment) {
+    if (is_overaligned_for_new(alignment)) {
+#if UTL_SUPPORTS_ALIGNED_ALLOCATION
+        align_val_t const align_val = static_cast<align_val_t>(alignment);
+        return UTL_ALLOC_NEW(size, align_val);
+#else
+        UTL_ASSERT(false, "Allocation alignment is too strict");
+        UTL_BUILTIN_unreachable();
+#endif
+    }
+    (void)alignment;
+    return UTL_ALLOC_NEW(size);
+}
 } // namespace details
 
 namespace runtime {
 template <typename T>
-UTL_HIDE_FROM_ABI T* allocate(size_t count) {
+UTL_ATTRIBUTES(MALLOC, HIDE_FROM_ABI) T* allocate(size_t count) {
     return static_cast<T*>(details::allocate(count * sizeof(T), alignof(T)));
 }
 
@@ -143,7 +143,7 @@ template <typename T>
 inline constinit ::std::allocator<T> allocator_v = {};
 
 template <typename T>
-UTL_HIDE_FROM_ABI constexpr T* allocate(size_t count) {
+UTL_ATTRIBUTES(MALLOC, HIDE_FROM_ABI) constexpr T* allocate(size_t count) {
     if (UTL_BUILTIN_is_constant_evaluated()) {
         if constexpr (UTL_TRAIT_is_complete(::std::allocator<T>)) {
             return allocator_v<T>.allocate(count);
@@ -182,7 +182,8 @@ UTL_HIDE_FROM_ABI constexpr void deallocate(
 } // namespace compile_time
 
 template <typename T>
-UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 T* allocate(size_t count) {
+UTL_ATTRIBUTES(MALLOC, HIDE_FROM_ABI)
+UTL_CONSTEXPR_CXX20 T* allocate(size_t count) {
     static_assert(sizeof(T) > 0, "Incomplete type cannot be allocated");
 #if UTL_CXX20
     return compile_time::allocate<T>(count);

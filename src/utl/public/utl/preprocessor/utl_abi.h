@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attribute_check.h"
+#include "utl/preprocessor/utl_attributes.h"
 #include "utl/preprocessor/utl_compiler.h"
 #include "utl/preprocessor/utl_concatenation.h"
 #include "utl/preprocessor/utl_exceptions.h"
@@ -12,25 +12,41 @@
 
 #if UTL_TARGET_MICROSOFT
 #  ifdef UTL_BUILDING_LIBRARY
-#    if UTL_COMPILER_GNU_COMPATIBLE
-#      define UTL_ABI_PUBLIC __attribute__((dllexport))
-#    else
-#      define UTL_ABI_PUBLIC \
-          __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
-#    endif
+#    define UTL_ABI_PUBLIC UTL_ATTRIBUTE(DLLEXPORT)
+#    define __UTL_ATTRIBUTE_ABI_PUBLIC (DLLEXPORT)
+#    define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PUBLIC
 #  else
-#    if UTL_COMPILER_GNU_COMPATIBLE
-#      define UTL_ABI_PUBLIC __attribute__((dllimport))
-#    else
-#      define UTL_ABI_PUBLIC \
-          __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
-#    endif
+#    define UTL_ABI_PUBLIC UTL_ATTRIBUTE(DLLIMPORT)
+#    define __UTL_ATTRIBUTE_ABI_PUBLIC (DLLIMPORT)
+#    define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PUBLIC
 #  endif
-#  define UTL_ABI_PRIVATE
 #else
-#  define UTL_ABI_PUBLIC __attribute__((visibility("default")))
-#  define UTL_ABI_PRIVATE __attribute__((visibility("hidden")))
+#  define UTL_ABI_PUBLIC UTL_ATTRIBUTE(VISIBILITY("default"))
+#  define UTL_ABI_PRIVATE UTL_ATTRIBUTE(VISIBILITY("hidden"))
+#  define __UTL_ATTRIBUTE_ABI_PUBLIC (VISIBILITY("default"))
+#  define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PUBLIC
+#  define __UTL_ATTRIBUTE_ABI_PRIVATE (VISIBILITY("hidden"))
+#  define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PRIVATE
 #endif
+
+#if !UTL_HAS_ATTRIBUTE(TYPE_VISIBILITY)
+/* For GNU compilers that don't have type visibility we must keep the templates visible */
+#  define UTL_PUBLIC_TEMPLATE UTL_ATTRIBUTE(VISIBILITY("default"))
+#  define __UTL_ATTRIBUTE_PUBLIC_TEMPLATE (VISIBILITY("default"))
+#  define __UTL_ATTRIBUTE_TYPE_AGGREGATE_PUBLIC_TEMPLATE
+#endif
+
+#define UTL_HIDE_FROM_ABI UTL_ATTRIBUTE(HIDE_FROM_ABI)
+#define __UTL_ATTRIBUTE_HIDE_FROM_ABI                            \
+    (VISIBILITY("hidden"))(EXCLUDE_FROM_EXPLICIT_INSTANTIATION)( \
+        ABI_TAG(UTL_TO_STRING(__UTL_ODR_SIGNATURE)))
+#define __UTL_ATTRIBUTE_TYPE_AGGREGATE_HIDE_FROM_ABI
+
+/* virtual functions must be linked to the same symbol */
+#define UTL_HIDE_FROM_ABI_VIRTUAL UTL_ATTRIBUTE(HIDE_FROM_ABI_VIRTUAL)
+#define __UTL_ATTRIBUTE_HIDE_FROM_ABI_VIRTUAL \
+    (VISIBILITY("hidden"))(EXCLUDE_FROM_EXPLICIT_INSTANTIATION)
+#define __UTL_ATTRIBUTE_TYPE_AGGREGATE_HIDE_FROM_ABI_VIRTUAL
 
 #if UTL_WITH_EXCEPTIONS
 #  define UTL_ABI_EXCEPTION_TAG e
@@ -47,40 +63,12 @@
 #endif
 
 /* TODO WTF? Do this properly! */
-#define UTL_HARDENING_MODE n
+#define __UTL_HARDENING_MODE n
 
-#define UTL_ODR_SIGNATURE          \
-    UTL_CONCAT(UTL_HARDENING_MODE, \
+#define __UTL_ODR_SIGNATURE          \
+    UTL_CONCAT(__UTL_HARDENING_MODE, \
         UTL_CONCAT(UTL_CONCAT(UTL_COMPILER_TAG, UTL_ABI_EXCEPTION_TAG), UTL_CXX))
 
-#if __has_attribute(exclude_from_explicit_instantiation)
-#  define UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION \
-      __attribute__((__exclude_from_explicit_instantiation__))
-
-#else
-#  define UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
-#endif
-
-#if UTL_HAS_GNU_ATTRIBUTE(__type_visibility__)
-#  define UTL_PUBLIC_TYPE __attribute__((__type_visibility__("default")))
-#  define UTL_PUBLIC_TEMPLATE
-#else
-#  define UTL_PUBLIC_TYPE
-/* For GNU compilers that don't have type visibility we must keep the templates visible */
-#  define UTL_PUBLIC_TEMPLATE __attribute__((__visibility__("default")))
-#endif
-
-#if UTL_HAS_GNU_ATTRIBUTE(__abi_tag__)
-#  define UTL_HIDE_FROM_ABI                                   \
-      UTL_ABI_PRIVATE UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION \
-          __attribute__((__abi_tag__(UTL_TO_STRING(UTL_ODR_SIGNATURE))))
-#else
-/* What about Windows? */
-#  define UTL_HIDE_FROM_ABI UTL_ABI_PRIVATE UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
-#endif
-
-/* virtual functions must be linked to the same symbol */
-#define UTL_HIDE_FROM_ABI_VIRTUAL UTL_ABI_PRIVATE UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
 #define UTL_EXTERN_C extern "C"
 #define UTL_EXTERN_C_BEGIN UTL_EXTERN_C {
 #define UTL_EXTERN_C_END }
