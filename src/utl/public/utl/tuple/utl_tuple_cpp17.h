@@ -12,10 +12,11 @@
 
 #include "utl/preprocessor/utl_config.h"
 
+#include "utl/tuple/utl_tuple_fwd.h"
+
 #include "utl/memory/utl_uses_allocator.h"
 #include "utl/ranges/utl_swap.h"
 #include "utl/tuple/utl_tuple_compare_traits.h"
-#include "utl/tuple/utl_tuple_fwd.h"
 #include "utl/tuple/utl_tuple_traits.h"
 #include "utl/type_traits/utl_common_reference.h"
 #include "utl/type_traits/utl_decay.h"
@@ -233,15 +234,14 @@ public:
     }
 
     template <size_t I>
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr auto get() const&& noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
-        -> enable_if_t<!I, T const&&> {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const&& noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
+    -> enable_if_t<!I, T const&&> {
         return move(head);
     }
 
     template <size_t I>
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr auto get() const& noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) -> enable_if_t<!I, T const&> {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const& noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
+    -> enable_if_t<!I, T const&> {
         return head;
     }
 
@@ -373,8 +373,8 @@ struct storage<T, Tail...> : variadic_traits<T, Tail...> {
     }
 
     template <typename UHead, typename... UTail>
-    UTL_ATTRIBUTE(ALWAYS_INLINE)
-    constexpr storage const& assign(UHead&& other_head, UTail&&... other_tail) const
+    UTL_ATTRIBUTE(ALWAYS_INLINE) constexpr storage const& assign(
+        UHead&& other_head, UTail&&... other_tail) const
         noexcept(traits::template is_nothrow_const_assignable<UHead, UTail...>::value) {
         head = forward<UHead>(other_head);
         tail.assign(forward<UTail>(other_tail)...);
@@ -394,15 +394,14 @@ struct storage<T, Tail...> : variadic_traits<T, Tail...> {
     }
 
     template <size_t I>
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr auto get() const&& noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
-        -> enable_if_t<!I, T const&&> {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const&& noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
+    -> enable_if_t<!I, T const&&> {
         return move(head);
     }
 
     template <size_t I>
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    constexpr auto get() const& noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) -> enable_if_t<!I, T const&> {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const& noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
+    -> enable_if_t<!I, T const&> {
         return head;
     }
 
@@ -411,25 +410,27 @@ struct storage<T, Tail...> : variadic_traits<T, Tail...> {
 
     template <size_t I>
     UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN)
-    UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) -> result_type_t<I>&& {
+    UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
+    -> result_type_t<I>&& {
         return move(tail).template get<I - 1>();
     }
 
     template <size_t I>
     UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN)
-    UTL_CONSTEXPR_CXX14 auto get() & noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) -> result_type_t<I>& {
+    UTL_CONSTEXPR_CXX14 auto get() & noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
+    -> result_type_t<I>& {
         return tail.template get<I - 1>();
     }
 
     template <size_t I>
-    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN)
-    constexpr auto get() const&& noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) -> result_type_t<I> const&& {
+    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() const&& noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
+    -> result_type_t<I> const&& {
         return move(tail).template get<I - 1>();
     }
 
     template <size_t I>
-    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN)
-    constexpr auto get() const& noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) -> result_type_t<I> const& {
+    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() const& noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
+    -> result_type_t<I> const& {
         return tail.template get<I - 1>();
     }
 
@@ -1330,8 +1331,8 @@ struct tuple_element_offset<I, tuple<Ts...>> :
 namespace details {
 namespace tuple {
 template <size_t I, typename T, typename U>
-UTL_ATTRIBUTE(CONST)
-constexpr enable_if_t<(I == tuple_size<T>::value), bool> less(T const& l, U const& r) noexcept {
+UTL_ATTRIBUTE(CONST) constexpr enable_if_t<(I == tuple_size<T>::value), bool> less(
+    T const& l, U const& r) noexcept {
     return false;
 }
 
@@ -1344,8 +1345,7 @@ constexpr enable_if_t<(I < tuple_size<T>::value), bool> less(T const& l, U const
 }
 
 template <typename T, typename U>
-UTL_ATTRIBUTE(FLATTEN)
-constexpr bool less(T const& l, U const& r) noexcept(
+UTL_ATTRIBUTE(FLATTEN) constexpr bool less(T const& l, U const& r) noexcept(
     conjunction<compare_ops::all_have_nothrow_eq<T, U>,
         compare_ops::all_have_nothrow_lt<T, U>>::value) {
     static_assert(compare_ops::all_have_eq<T, U>::value, "All elements must be comparable");
@@ -1354,8 +1354,8 @@ constexpr bool less(T const& l, U const& r) noexcept(
 }
 
 template <size_t I, typename T, typename U>
-UTL_ATTRIBUTE(CONST)
-constexpr enable_if_t<(I == tuple_size<T>::value), bool> equals(T const& l, U const& r) noexcept {
+UTL_ATTRIBUTE(CONST) constexpr enable_if_t<(I == tuple_size<T>::value), bool> equals(
+    T const& l, U const& r) noexcept {
     return true;
 }
 
@@ -1366,8 +1366,7 @@ constexpr enable_if_t<(I < tuple_size<T>::value), bool> equals(T const& l, U con
 }
 
 template <typename T, typename U>
-UTL_ATTRIBUTES(NODISCARD, FLATTEN)
-constexpr bool equals(T const& l, U const& r) noexcept(
+UTL_ATTRIBUTES(NODISCARD, FLATTEN) constexpr bool equals(T const& l, U const& r) noexcept(
     compare_ops::all_have_nothrow_eq<T, U>::value) {
     static_assert(compare_ops::all_have_eq<T, U>::value, "All elements must be comparable");
     return equals<0>(l, r);
@@ -1377,14 +1376,14 @@ constexpr bool equals(T const& l, U const& r) noexcept(
 } // namespace details
 
 template <typename... Ts, typename... Us>
-UTL_NODISCARD constexpr enable_if_t<
+UTL_ATTRIBUTE(NODISCARD) constexpr enable_if_t<
     conjunction<compare_ops::all_have_eq<tuple<Ts...>, tuple<Us...>>>::value, bool>
 operator==(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(details::tuple::equals(l, r)) {
     return details::tuple::equals(l, r);
 }
 
 template <typename... Ts, typename... Us>
-UTL_NODISCARD constexpr enable_if_t<
+UTL_ATTRIBUTE(NODISCARD) constexpr enable_if_t<
     conjunction<compare_ops::all_have_eq<tuple<Ts...>, tuple<Us...>>,
         compare_ops::all_have_lt<tuple<Ts...>, tuple<Us...>>>::value,
     bool>
@@ -1392,32 +1391,30 @@ operator<(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(details::tuple:
     return details::tuple::less(l, r);
 }
 
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr bool operator==(tuple<> const& l, tuple<> const& r) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr bool operator==(tuple<> const& l, tuple<> const& r) noexcept {
     return true;
 }
 
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr bool operator<(tuple<> const& l, tuple<> const& r) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr bool operator<(tuple<> const& l, tuple<> const& r) noexcept {
     return false;
 }
 
 template <typename... Ts, typename... Us>
-UTL_NODISCARD constexpr enable_if_t<
+UTL_ATTRIBUTE(NODISCARD) constexpr enable_if_t<
     UTL_TRAIT_is_equality_comparable_with(tuple<Ts...>, tuple<Us...>), bool>
 operator!=(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(noexcept(!(l == r))) {
     return !(l == r);
 }
 
 template <typename... Ts, typename... Us>
-UTL_NODISCARD constexpr enable_if_t<
+UTL_ATTRIBUTE(NODISCARD) constexpr enable_if_t<
     UTL_TRAIT_is_strict_subordinate_comparable_with(tuple<Us...>, tuple<Ts...>), bool>
 operator<=(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(noexcept(!(r < l))) {
     return !(r < l);
 }
 
 template <typename... Ts, typename... Us>
-UTL_NODISCARD constexpr enable_if_t<
+UTL_ATTRIBUTE(NODISCARD) constexpr enable_if_t<
     UTL_TRAIT_is_strict_subordinate_comparable_with(tuple<Us...>, tuple<Ts...>), bool>
 operator>(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
     noexcept(static_cast<bool>(r < l))) {
@@ -1425,7 +1422,7 @@ operator>(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
 }
 
 template <typename... Ts, typename... Us>
-UTL_NODISCARD constexpr enable_if_t<
+UTL_ATTRIBUTE(NODISCARD) constexpr enable_if_t<
     UTL_TRAIT_is_strict_subordinate_comparable_with(tuple<Ts...>, tuple<Us...>), bool>
 operator>=(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(noexcept(!(l < r))) {
     return !(l < r);
@@ -1438,12 +1435,12 @@ constexpr tuple<unwrap_reference_t<decay_t<Ts>>...> make_tuple(Ts&&... ts) noexc
 }
 
 template <typename... Args>
-UTL_NODISCARD constexpr tuple<Args&...> tie(Args&... args UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTE(NODISCARD) constexpr tuple<Args&...> tie(Args&... args UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
     return {args...};
 }
 
 template <typename... Args>
-UTL_NODISCARD constexpr tuple<Args&&...> forward_as_tuple(
+UTL_ATTRIBUTE(NODISCARD) constexpr tuple<Args&&...> forward_as_tuple(
     Args&&... args UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
     return {forward<Args>(args)...};
 }

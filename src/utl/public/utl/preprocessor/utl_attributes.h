@@ -108,7 +108,7 @@
 #elif UTL_HAS_GNU_ATTRIBUTE(always_inline)
 #  define __UTL_ATTRIBUTE_ALWAYS_INLINE always_inline
 #  define __UTL_ATTRIBUTE_TYPE_GNU_ALWAYS_INLINE
-#elif UTL_HAS_MSVC_DECORATOR(__forceinline)
+#elif UTL_HAS_MSVC_KEYWORD(__forceinline)
 #  define __UTL_ATTRIBUTE_ALWAYS_INLINE __forceinline
 #  define __UTL_ATTRIBUTE_TYPE_MSVC_EXT_ALWAYS_INLINE
 #endif /* UTL_HAS_CPP_ATTRIBUTE(clang::always_inline) */
@@ -203,7 +203,3 @@
 #  define __UTL_ATTRIBUTE_UNLIKELY clang::unlikely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_UNLIKELY
 #endif /* UTL_HAS_CPP_ATTRIBUTE(unlikely) */
-
-#ifndef UTL_NODISCARD
-#  define UTL_NODISCARD
-#endif /* ifndef UTL_NODISCARD */
