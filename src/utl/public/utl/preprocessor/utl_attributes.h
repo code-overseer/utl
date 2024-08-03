@@ -130,7 +130,25 @@
 #elif UTL_HAS_GNU_ATTRIBUTE(malloc)
 #  define __UTL_ATTRIBUTE_MALLOC malloc
 #  define __UTL_ATTRIBUTE_TYPE_GNU_MALLOC
+#elif UTL_HAS_DECLSPEC(allocator) | UTL_HAS_DECLSPEC(restrict)
+#  if UTL_HAS_DECLSPEC(allocator) & UTL_HAS_DECLSPEC(restrict)
+#    define __UTL_ATTRIBUTE_MALLOC allocator, restrict
+#    define __UTL_ATTRIBUTE_TYPE_DECLSPEC_MALLOC
+#  elif UTL_HAS_DECLSPEC(allocator)
+#    define __UTL_ATTRIBUTE_MALLOC allocator
+#    define __UTL_ATTRIBUTE_TYPE_DECLSPEC_MALLOC
+#  endif
 #endif /* UTL_HAS_CPP_ATTRIBUTE(clang::malloc) */
+
+#if UTL_COMPILER_GCC
+#  if UTL_HAS_CPP_ATTRIBUTE(gnu::malloc)
+#    define __UTL_ATTRIBUTE_DEALLOCATED_BY gnu::malloc
+#    define __UTL_ATTRIBUTE_TYPE_CPP_DEALLOCATED_BY(FUNC, ...)
+#  elif UTL_HAS_GNU_ATTRIBUTE(malloc)
+#    define __UTL_ATTRIBUTE_MALLOC malloc
+#    define __UTL_ATTRIBUTE_TYPE_GNU_DEALLOCATED_BY(FUNC, ...)
+#  endif /* UTL_HAS_CPP_ATTRIBUTE(clang::malloc) */
+#endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(clang::reinitializes)
 #  define __UTL_ATTRIBUTE_REINITIALIZES clang::reinitializes
@@ -153,6 +171,16 @@
 #  define __UTL_ATTRIBUTE_MAYBE_UNUSED unused
 #  define __UTL_ATTRIBUTE_TYPE_GNU_MAYBE_UNUSED
 #endif /* UTL_HAS_CPP_ATTRIBUTE(maybe_unused) */
+
+#if UTL_HAS_CPP_ATTRIBUTE(clang::noescape)
+#  define __UTL_ATTRIBUTE_NOESCAPE clang::noescape
+#  define __UTL_ATTRIBUTE_TYPE_CPP_NOESCAPE
+#endif
+
+#if UTL_HAS_CPP_ATTRIBUTE(clang::nodebug)
+#  define __UTL_ATTRIBUTE_NODEBUG clang::nodebug
+#  define __UTL_ATTRIBUTE_TYPE_CPP_NODEBUG
+#endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(likely)
 #  define __UTL_ATTRIBUTE_LIKELY likely
