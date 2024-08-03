@@ -28,6 +28,7 @@
                   (__GNUC_MINOR__ == MINOR && __GNUC_PATCHLEVEL__ > PATCH)))
 #elif defined(_MSC_VER)
 #  define UTL_COMPILER_MSVC 1
+#  define UTL_COMPILER_SUPPORTS_DECLSPEC 1
 #  define UTL_COMPILER_MSVC_AT_LEAST(VERSION) _MSC_VER >= VERSION
 #  if _MSVC_TRADITIONAL
 /* Using non-conformant MSVC preprocessor */

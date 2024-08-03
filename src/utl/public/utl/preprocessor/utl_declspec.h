@@ -30,4 +30,6 @@
 #  define UTL_DECLSPEC_noreturn
 #  define UTL_DECLSPEC_notshared
 
+#else
+#  define UTL_HAS_DECLSPEC(NAME) 0
 #endif
