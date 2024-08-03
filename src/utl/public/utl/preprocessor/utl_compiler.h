@@ -45,8 +45,13 @@
       UTL_CONCAT(GCC, UTL_COMPILER_VERSION_CONCAT(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__))
 #elif defined(_MSC_VER)
 #  define UTL_COMPILER_MSVC 1
+#  define UTL_COMPILER_SUPPORTS_DECLSPEC 1
 #  define UTL_COMPILER_MSVC_AT_LEAST(VERSION) _MSC_VER >= VERSION
-#  define UTL_COMPILER_TAG UTL_CONCAT(ICC, _MSC_VER)
+#  define UTL_COMPILER_TAG UTL_CONCAT(MSVC, _MSC_VER)
+#  if _MSVC_TRADITIONAL
+/* Using non-conformant MSVC preprocessor */
+#    define UTL_MSVC_PREPROCESSOR 1
+#  endif
 #elif
 #  error "Unknown compiler"
 #endif

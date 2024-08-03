@@ -41,10 +41,10 @@ public:
         return *this;
     }
 
-    UTL_NODISCARD UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 pointer allocate(size_type count)
+    UTL_ATTRIBUTE(NODISCARD) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 pointer allocate(size_type count)
         UTL_THROWS;
 
-    UTL_NODISCARD UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 result_type allocate_at_least(
+    UTL_ATTRIBUTE(NODISCARD) UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 result_type allocate_at_least(
         size_type count) UTL_THROWS {
         return {allocate(count), count};
     }

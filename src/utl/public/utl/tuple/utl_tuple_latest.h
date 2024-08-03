@@ -400,15 +400,13 @@ public:
 
     template <size_t I>
     requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() && noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
-        -> T&& {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() && noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) -> T&& {
         return UTL_SCOPE move(head);
     }
 
     template <size_t I>
     requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() & noexcept UTL_ATTRIBUTE(LIFETIMEBOUND)
-        -> T& {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() & noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) -> T& {
         return head;
     }
 
@@ -428,29 +426,33 @@ public:
 
     template <size_t I>
     requires (I > 0) && (I < element_count)
-    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() && noexcept
-        UTL_ATTRIBUTE(LIFETIMEBOUND) -> template_element_t<I, storage>&& {
+    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() && noexcept UTL_ATTRIBUTE(
+        LIFETIMEBOUND)
+    -> template_element_t<I, storage>&& {
         return UTL_SCOPE move(tail).template get<I - 1>();
     }
 
     template <size_t I>
     requires (I > 0) && (I < element_count)
-    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() & noexcept
-        UTL_ATTRIBUTE(LIFETIMEBOUND) -> template_element_t<I, storage>& {
+    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() & noexcept UTL_ATTRIBUTE(
+        LIFETIMEBOUND)
+    -> template_element_t<I, storage>& {
         return tail.template get<I - 1>();
     }
 
     template <size_t I>
     requires (I > 0) && (I < element_count)
-    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() const&& noexcept
-        UTL_ATTRIBUTE(LIFETIMEBOUND) -> template_element_t<I, storage> const&& {
+    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() const&& noexcept UTL_ATTRIBUTE(
+        LIFETIMEBOUND)
+    -> template_element_t<I, storage> const&& {
         return UTL_SCOPE move(tail).template get<I - 1>();
     }
 
     template <size_t I>
     requires (I > 0) && (I < element_count)
-    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() const& noexcept
-        UTL_ATTRIBUTE(LIFETIMEBOUND) -> template_element_t<I, storage> const& {
+    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() const& noexcept UTL_ATTRIBUTE(
+        LIFETIMEBOUND)
+    -> template_element_t<I, storage> const& {
         return tail.template get<I - 1>();
     }
 
@@ -992,7 +994,7 @@ struct tuple_element_offset<I, tuple<Ts...>> :
         details::tuple::offset_impl<I, details::tuple::storage<Ts...>>> {};
 
 template <typename... Ts>
-UTL_NODISCARD constexpr tuple<unwrap_reference_t<decay_t<Ts>>...> make_tuple(Ts&&... ts) noexcept(
+UTL_ATTRIBUTE(NODISCARD) constexpr tuple<unwrap_reference_t<decay_t<Ts>>...> make_tuple(Ts&&... ts) noexcept(
     is_nothrow_constructible<tuple<unwrap_reference_t<decay_t<Ts>>...>, Ts...>::value) {
     return tuple<unwrap_reference_t<decay_t<Ts>>...>{forward<Ts>(ts)...};
 }
@@ -1050,8 +1052,7 @@ constexpr bool equals(T const& l, U const& r) noexcept(is_nothrow_accessible_v<T
 }
 
 template <tuple_like T, tuple_like U>
-UTL_ATTRIBUTE(FLATTEN)
-constexpr bool equals(T const& l, U const& r) noexcept(noexcept(equals<0>(l, r))) {
+UTL_ATTRIBUTE(FLATTEN) constexpr bool equals(T const& l, U const& r) noexcept(noexcept(equals<0>(l, r))) {
     static_assert(compare_ops::all_have_eq<T, U>::value, "All elements must be comparable");
     return equals<0>(l, r);
 }
@@ -1060,33 +1061,33 @@ constexpr bool equals(T const& l, U const& r) noexcept(noexcept(equals<0>(l, r))
 } // namespace details
 
 template <typename... Ts, equality_comparable_with<Ts>... Us>
-UTL_NODISCARD constexpr bool operator==(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
+UTL_ATTRIBUTE(NODISCARD) constexpr bool operator==(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
     noexcept(details::tuple::equals(l, r))) {
     return details::tuple::equals(l, r);
 }
 
-UTL_NODISCARD constexpr bool operator==(tuple<> const&, tuple<> const&) noexcept {
+UTL_ATTRIBUTE(NODISCARD) constexpr bool operator==(tuple<> const&, tuple<> const&) noexcept {
     return true;
 }
 
 template <typename... Ts, three_way_comparable_with<Ts>... Us>
-UTL_NODISCARD constexpr auto operator<=>(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
+UTL_ATTRIBUTE(NODISCARD) constexpr auto operator<=>(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
     noexcept(details::tuple::three_way(l, r))) {
     return details::tuple::three_way(l, r);
 }
 
-UTL_NODISCARD constexpr UTL_SCOPE strong_ordering operator<=>(
+UTL_ATTRIBUTE(NODISCARD) constexpr UTL_SCOPE strong_ordering operator<=>(
     tuple<> const&, tuple<> const&) noexcept {
     return UTL_SCOPE strong_ordering::equal;
 }
 
 template <typename... Args>
-UTL_NODISCARD constexpr tuple<Args&...> tie(Args&... args UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTE(NODISCARD) constexpr tuple<Args&...> tie(Args&... args UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
     return {args...};
 }
 
 template <typename... Args>
-UTL_NODISCARD constexpr tuple<Args&&...> forward_as_tuple(
+UTL_ATTRIBUTE(NODISCARD) constexpr tuple<Args&&...> forward_as_tuple(
     Args&&... args UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
     return {UTL_SCOPE forward<Args>(args)...};
 }

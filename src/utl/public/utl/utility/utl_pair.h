@@ -24,9 +24,10 @@ UTL_NAMESPACE_END
 
 #else // UTL_USE_STDPAIR
 
+#  include "utl/preprocessor/utl_config.h"
+
 #  include "utl/compare/utl_compare_traits.h"
 #  include "utl/concepts/utl_common_with.h"
-#  include "utl/preprocessor/utl_config.h"
 #  include "utl/tuple/utl_tuple_traits.h"
 #  include "utl/type_traits/utl_common_reference.h"
 #  include "utl/type_traits/utl_common_type.h"
@@ -76,16 +77,14 @@ UTL_BEGIN_REGION(pair_get)
 namespace details {
 namespace pair {
 template <size_t I, typename P>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr auto get(P&& p UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get(P&& p UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept
     -> enable_if_t<!I && is_pair<P>::value,
         copy_cvref_t<decltype(declval<P>()), decltype(p.first)>> {
     return forward<P>(p).first;
 }
 
 template <size_t I, typename P>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr auto get(P&& p UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get(P&& p UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept
     -> enable_if_t<(I == 1) && is_pair<P>::value,
         copy_cvref_t<decltype(declval<P>()), decltype(p.second)>> {
     return forward<P>(p).second;
@@ -94,78 +93,68 @@ constexpr auto get(P&& p UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept
 } // namespace details
 
 template <size_t I, typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr auto get(pair<T0, T1>&& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get(pair<T0, T1>&& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept
     -> decltype(details::pair::get<I>(move(pair))) {
     return details::pair::get<I>(move(pair));
 }
 
 template <size_t I, typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr auto get(pair<T0, T1> const&& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get(pair<T0, T1> const&& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept
     -> decltype(details::pair::get<I>(move(pair))) {
     return details::pair::get<I>(move(pair));
 }
 
 template <size_t I, typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr auto get(pair<T0, T1> const& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get(pair<T0, T1> const& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept
     -> decltype(details::pair::get<I>(pair)) {
     return details::pair::get<I>(move(pair));
 }
 
 template <size_t I, typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr auto get(pair<T0, T1>& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get(pair<T0, T1>& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept
     -> decltype(details::pair::get<I>(pair)) {
     return details::pair::get<I>(move(pair));
 }
 
 template <typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr T0&& get(pair<T0, T1>&& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr T0&& get(pair<T0, T1>&& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
     return move(pair).first;
 }
 
 template <typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr T0 const&& get(pair<T0, T1> const&& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr T0 const&& get(
+    pair<T0, T1> const&& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
     return move(pair).first;
 }
 
 template <typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr T0 const& get(pair<T0, T1> const& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr T0 const& get(pair<T0, T1> const& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
     return pair.first;
 }
 
 template <typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr T0& get(pair<T0, T1>& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr T0& get(pair<T0, T1>& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
     return pair.first;
 }
 
 template <typename T1, typename T0>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr T1&& get(pair<T0, T1>&& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr T1&& get(pair<T0, T1>&& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
     return move(pair).second;
 }
 
 template <typename T1, typename T0>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr T1 const&& get(pair<T0, T1> const&& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr T1 const&& get(
+    pair<T0, T1> const&& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
     return move(pair).second;
 }
 
 template <typename T1, typename T0>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr T1 const& get(pair<T0, T1> const& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr T1 const& get(pair<T0, T1> const& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
     return pair.second;
 }
 
 template <typename T1, typename T0>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr T1& get(pair<T0, T1>& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr T1& get(pair<T0, T1>& pair UTL_ATTRIBUTES(LIFETIMEBOUND)) noexcept {
     return pair.second;
 }
 
@@ -295,12 +284,12 @@ public:
 public:
 #  if !UTL_CXX20
     template <typename U0 = T0, typename U1 = T1 UTL_REQUIRES_CXX11(
-        defer<bool_constant<traits::is_implicit_default_constructible>, U0, U1>::value)>
+            defer<bool_constant<traits::is_implicit_default_constructible>, U0, U1>::value)>
     constexpr pair() noexcept(traits::is_nothrow_default_constructible) : first()
                                                                         , second() {}
 
     template <typename U0 = T0, typename U1 = T1 UTL_REQUIRES_CXX11(
-        defer<bool_constant<traits::is_explicit_default_constructible>, U0, U1>::value)>
+            defer<bool_constant<traits::is_explicit_default_constructible>, U0, U1>::value)>
     explicit constexpr pair() noexcept(traits::is_nothrow_default_constructible)
         : first()
         , second() {}
@@ -610,7 +599,7 @@ public:
           : pair(l0, l1, index_sequence_for<Args0...>{}, index_sequence_for<Args1...>{}) {}
 
 template <typename T0, typename T1, typename U0, typename U1>
-UTL_NODISCARD constexpr enable_if_t<
+UTL_ATTRIBUTE(NODISCARD) constexpr enable_if_t<
     conjunction<is_equality_comparable_with<T0, U0>, is_equality_comparable_with<T1, U1>>::value,
     bool>
 operator==(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
@@ -620,7 +609,7 @@ operator==(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
 }
 
 template <typename T0, typename T1, typename U0, typename U1>
-UTL_NODISCARD constexpr enable_if_t<
+UTL_ATTRIBUTE(NODISCARD) constexpr enable_if_t<
     conjunction<is_equality_comparable_with<T0, U0>, is_strict_subordinate_comparable_with<T0, U0>,
         is_strict_subordinate_comparable_with<T1, U1>>::value,
     bool>
@@ -633,7 +622,7 @@ operator<(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
 }
 
 template <typename T0, typename T1, typename U0, typename U1>
-UTL_NODISCARD constexpr enable_if_t<is_equality_comparable_with<pair<T0, T1>, pair<U0, U1>>::value,
+UTL_ATTRIBUTE(NODISCARD) constexpr enable_if_t<is_equality_comparable_with<pair<T0, T1>, pair<U0, U1>>::value,
     bool>
 operator!=(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
     is_nothrow_equality_comparable_with<pair<T0, T1>, pair<U0, U1>>::value) {
@@ -641,7 +630,7 @@ operator!=(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
 }
 
 template <typename T0, typename T1, typename U0, typename U1>
-UTL_NODISCARD constexpr enable_if_t<
+UTL_ATTRIBUTE(NODISCARD) constexpr enable_if_t<
     is_strict_subordinate_comparable_with<pair<U0, U1>, pair<T0, T1>>::value, bool>
 operator<=(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
     is_nothrow_strict_subordinate_comparable_with<pair<U0, U1>, pair<T0, T1>>::value) {
@@ -649,7 +638,7 @@ operator<=(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
 }
 
 template <typename T0, typename T1, typename U0, typename U1>
-UTL_NODISCARD constexpr enable_if_t<
+UTL_ATTRIBUTE(NODISCARD) constexpr enable_if_t<
     is_strict_subordinate_comparable_with<pair<U0, U1>, pair<T0, T1>>::value, bool>
 operator>(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
     is_nothrow_strict_subordinate_comparable_with<pair<U0, U1>, pair<T0, T1>>::value) {
@@ -657,7 +646,7 @@ operator>(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
 }
 
 template <typename T0, typename T1, typename U0, typename U1>
-UTL_NODISCARD constexpr enable_if_t<
+UTL_ATTRIBUTE(NODISCARD) constexpr enable_if_t<
     is_strict_subordinate_comparable_with<pair<T0, T1>, pair<U0, U1>>::value, bool>
 operator>=(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
     is_nothrow_strict_subordinate_comparable_with<pair<T0, T1>, pair<U0, U1>>::value) {
