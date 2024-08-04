@@ -190,9 +190,10 @@
 #define __UTL_TO_ITERABLE_1(_0) (_0)
 
 /**
- * Note: these macros slows down preprocessing by quite a bit
- * utl_string preprocesses in ~60 milliseconds with these disabled
- * utl_string preprocesses in ~300 milliseconds with these enabled
+ * Note: UTL_APPLY_MACRO slows down preprocessing by quite a bit
+ * utl_string preprocesses in ~60 milliseconds with UTL_ATTRIBUTES disabled
+ * utl_string preprocesses in ~190 milliseconds with __UTL_TO_ITERABLE
+ * utl_string preprocesses in ~300 milliseconds with UTL_APPLY_MACRO
  */
 #define UTL_ATTRIBUTES(...) __UTL_ATTRIBUTES(__UTL_TO_ITERABLE(__VA_ARGS__))
 #define UTL_ATTRIBUTE(ATTR) __UTL_ATTRIBUTES((ATTR))
