@@ -10,28 +10,40 @@
 #include "utl/preprocessor/utl_target.h"
 #include "utl/preprocessor/utl_to_string.h"
 
-#if UTL_TARGET_MICROSOFT
+#if UTL_COMPILER_MSVC
+
+#  if !UTL_HAS_DECLSPEC(dllexport) || !UTL_HAS_DECLSPEC(dllimport)
+#    error "Unrecognized compiler"
+#  endif
+
 #  ifdef UTL_BUILDING_LIBRARY
-#    define UTL_ABI_PUBLIC UTL_ATTRIBUTE(DLLEXPORT)
+#    define UTL_ABI_PUBLIC __declspec(dllexport)
 #    define __UTL_ATTRIBUTE_ABI_PUBLIC (DLLEXPORT)
 #    define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PUBLIC
 #  else
-#    define UTL_ABI_PUBLIC UTL_ATTRIBUTE(DLLIMPORT)
+#    define UTL_ABI_PUBLIC __declspec(dllimport)
 #    define __UTL_ATTRIBUTE_ABI_PUBLIC (DLLIMPORT)
 #    define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PUBLIC
 #  endif
+
 #else
-#  define UTL_ABI_PUBLIC UTL_ATTRIBUTE(VISIBILITY("default"))
-#  define UTL_ABI_PRIVATE UTL_ATTRIBUTE(VISIBILITY("hidden"))
+
+#  if !UTL_HAS_GNU_ATTRIBUTE(__visibility__) || !UTL_HAS_GNU_ATTRIBUTE(__visibility__)
+#    error "Unrecognized compiler"
+#  endif
+
+#  define UTL_ABI_PUBLIC __attribute__((__visibility__("default")))
+#  define UTL_ABI_PRIVATE __attribute__((__visibility__("hidden")))
 #  define __UTL_ATTRIBUTE_ABI_PUBLIC (VISIBILITY("default"))
 #  define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PUBLIC
 #  define __UTL_ATTRIBUTE_ABI_PRIVATE (VISIBILITY("hidden"))
 #  define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PRIVATE
+
 #endif
 
 #if !UTL_HAS_ATTRIBUTE(TYPE_VISIBILITY)
 /* For GNU compilers that don't have type visibility we must keep the templates visible */
-#  define UTL_PUBLIC_TEMPLATE UTL_ATTRIBUTE(VISIBILITY("default"))
+#  define UTL_PUBLIC_TEMPLATE __attribute__((__visibility__("default")))
 #  define __UTL_ATTRIBUTE_PUBLIC_TEMPLATE (VISIBILITY("default"))
 #  define __UTL_ATTRIBUTE_TYPE_AGGREGATE_PUBLIC_TEMPLATE
 #endif
@@ -42,13 +54,27 @@
     UTL_TO_STRING(__UTL_ODR_SIGNATURE_0( \
         CXX, UTL_CXX, __UTL_HARDENING_MODE, __UTL_ABI_EXCEPTION_TAG, UTL_COMPILER_TAG))
 
-#define UTL_HIDE_FROM_ABI UTL_ATTRIBUTE(HIDE_FROM_ABI)
+#if UTL_HAS_GNU_ATTRIBUTE(__exclude_from_explicit_instantiation__)
+#  define __UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION \
+      __attribute__((__exclude_from_explicit_instantiation__))
+#else
+#  define __UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
+#endif
+
+#if UTL_HAS_GNU_ATTRIBUTE(__abi_tag__)
+#  define __UTL_ABI_TAG(TAG) __attribute__((__abi_tag__(TAG)))
+#else
+#  define __UTL_ABI_TAG(TAG)
+#endif
+
+#define UTL_HIDE_FROM_ABI \
+    UTL_ABI_PRIVATE __UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION __UTL_ABI_TAG(__UTL_ODR_SIGNATURE)
 #define __UTL_ATTRIBUTE_HIDE_FROM_ABI \
     (VISIBILITY("hidden"))(EXCLUDE_FROM_EXPLICIT_INSTANTIATION)(ABI_TAG(__UTL_ODR_SIGNATURE))
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_HIDE_FROM_ABI
 
 /* virtual functions must be linked to the same symbol */
-#define UTL_HIDE_FROM_ABI_VIRTUAL UTL_ATTRIBUTE(HIDE_FROM_ABI_VIRTUAL)
+#define UTL_HIDE_FROM_ABI_VIRTUAL UTL_ABI_PRIVATE __UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
 #define __UTL_ATTRIBUTE_HIDE_FROM_ABI_VIRTUAL \
     (VISIBILITY("hidden"))(EXCLUDE_FROM_EXPLICIT_INSTANTIATION)
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_HIDE_FROM_ABI_VIRTUAL
