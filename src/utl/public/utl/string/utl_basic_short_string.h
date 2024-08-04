@@ -52,20 +52,20 @@ class basic_short_string {
 public:
     using allocator_type = Alloc;
     using value_type = CharType;
-    using size_type = size_t;
-    using difference_type = decltype((CharType*)0 - (CharType*)0);
+    using size_type = typename allocator_traits<allocator_type>::size_type;
+    using difference_type = typename allocator_traits<allocator_type>::difference_type;
     using traits_type = Traits;
-    using pointer = CharType*;
-    using const_pointer = CharType const*;
+    using pointer = typename allocator_traits<allocator_type>::pointer;
+    using const_pointer = typename allocator_traits<allocator_type>::const_pointer;
     using reference = CharType&;
     using const_reference = CharType const&;
-    using alloc_traits = allocator_traits<allocator_type>;
     using view_type = basic_string_view<value_type, traits_type>;
     static constexpr size_type npos = details::string::npos;
     class iterator;
     class const_iterator;
 
 private:
+    using alloc_traits = allocator_traits<allocator_type>;
     static constexpr size_type inline_size = ShortSize + 1;
 
     struct alignas(16) short_type {
