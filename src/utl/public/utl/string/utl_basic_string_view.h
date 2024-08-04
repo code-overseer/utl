@@ -19,6 +19,9 @@
 #include "utl/numeric/utl_min.h"
 #include "utl/string/utl_string_details.h"
 
+#define __UTL_ATTRIBUTE_STRING_INLINE_PURE \
+    (ALWAYS_INLINE)(PURE)(NODISCARD)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_INLINE_PURE
 #define __UTL_ATTRIBUTE_STRING_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE_HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_PURE
 
@@ -89,12 +92,12 @@ public:
     UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_string_view& operator=(
         basic_string_view const&) noexcept = default;
 
-    UTL_ATTRIBUTES(ALWAYS_INLINE,STRING_PURE) constexpr const_pointer data() const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr const_pointer data() const noexcept UTL_LIFETIMEBOUND {
         return data_;
     }
-    UTL_ATTRIBUTES(ALWAYS_INLINE,STRING_PURE) constexpr bool empty() const noexcept { return !size(); }
-    UTL_ATTRIBUTES(ALWAYS_INLINE,STRING_PURE) constexpr size_type size() const noexcept { return size_; }
-    UTL_ATTRIBUTES(ALWAYS_INLINE,STRING_PURE) constexpr size_type length() const noexcept { return size_; }
+    UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr bool empty() const noexcept { return !size(); }
+    UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr size_type size() const noexcept { return size_; }
+    UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr size_type length() const noexcept { return size_; }
 
     UTL_ATTRIBUTES(CONST, NODISCARD, HIDE_FROM_ABI) constexpr size_type max_size() const noexcept {
         return npos;
@@ -124,15 +127,13 @@ public:
     UTL_ATTRIBUTE(STRING_PURE) constexpr const_iterator rend() const noexcept UTL_LIFETIMEBOUND {
         return const_reverse_iterator(begin());
     }
-    UTL_ATTRIBUTES(ALWAYS_INLINE,STRING_PURE) constexpr const_reference
-    front() const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr const_reference front() const noexcept UTL_LIFETIMEBOUND {
         return *data_;
     }
-    UTL_ATTRIBUTES(ALWAYS_INLINE,STRING_PURE) constexpr const_reference
-    back() const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr const_reference back() const noexcept UTL_LIFETIMEBOUND {
         return data_[size_ - 1];
     }
-    UTL_ATTRIBUTES(ALWAYS_INLINE,STRING_PURE) constexpr const_reference operator[](
+    UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr const_reference operator[](
         size_type idx) const noexcept UTL_LIFETIMEBOUND {
         return data_[idx];
     }
@@ -195,7 +196,7 @@ public:
         size_type other_pos, size_type other_count) const UTL_THROWS {
         return substr(pos, count).compare(other.substr(other_pos, other_count));
     }
-    UTL_ATTRIBUTE(STRING_PURE) constexpr int compare(const_pointer other) const {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr int compare(const_pointer other) const noexcept {
         return compare(basic_string_view(other));
     }
     UTL_ATTRIBUTE(STRING_PURE) constexpr int compare(
@@ -238,7 +239,7 @@ public:
         return find(ch) != npos;
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) constexpr bool contains(const_pointer other) const UTL_THROWS {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr bool contains(const_pointer other) const noexcept {
         return find(other) != npos;
     }
 
@@ -351,24 +352,24 @@ public:
     }
 
     UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_last_not_of(
-        basic_string_view other, size_type pos = npos) const UTL_THROWS {
+        basic_string_view other, size_type pos = npos) const noexcept {
         return find_last_not_of(other.data(), pos, other.size());
     }
 
     UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_last_not_of(
-        const_pointer chars, size_type pos, size_type count) const UTL_THROWS {
+        const_pointer chars, size_type pos, size_type count) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_last_not_of<traits_type>(data(), size(), chars, count, pos);
     }
 
     UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_last_not_of(
-        const_pointer chars, size_type pos = npos) const UTL_THROWS {
+        const_pointer chars, size_type pos = npos) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_last_not_of(chars, pos, traits_type::length(chars));
     }
 
     UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_last_not_of(
-        value_type ch, size_type pos = npos) const UTL_THROWS {
+        value_type ch, size_type pos = npos) const noexcept {
         return find_last_not_of(&ch, pos, 1);
     }
 

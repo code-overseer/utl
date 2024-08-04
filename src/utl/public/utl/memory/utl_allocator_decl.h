@@ -180,6 +180,16 @@ UTL_HIDE_FROM_ABI constexpr void deallocate(
 }
 #endif
 } // namespace compile_time
+template <typename T>
+UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void deallocate(
+    typename type_identity<T>::type* ptr, size_t count) noexcept {
+    static_assert(sizeof(T) > 0, "Incomplete type cannot be deallocated");
+#if UTL_CXX20
+    compile_time::deallocate<T>(ptr, count);
+#else
+    runtime::deallocate<T>(ptr, count);
+#endif
+}
 
 template <typename T>
 UTL_ATTRIBUTES(MALLOC, HIDE_FROM_ABI)
@@ -189,17 +199,6 @@ UTL_CONSTEXPR_CXX20 T* allocate(size_t count) {
     return compile_time::allocate<T>(count);
 #else
     return runtime::allocate<T>(count);
-#endif
-}
-
-template <typename T>
-UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void deallocate(
-    typename type_identity<T>::type* ptr, size_t count) noexcept {
-    static_assert(sizeof(T) > 0, "Incomplete type cannot be deallocated");
-#if UTL_CXX20
-    compile_time::deallocate<T>(ptr, count);
-#else
-    runtime::deallocate<T>(ptr, count);
 #endif
 }
 } // namespace memory
