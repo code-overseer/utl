@@ -8,6 +8,7 @@
 
 #include "utl/algorithm/utl_remove.h"
 #include "utl/algorithm/utl_remove_if.h"
+#include "utl/bit/utl_bit_ceil.h"
 #include "utl/concepts/utl_convertible_to.h"
 #include "utl/concepts/utl_integral.h"
 #include "utl/exception.h"
@@ -44,10 +45,31 @@
 #define UTL_STRING_CONST UTL_ATTRIBUTES(NODISCARD, CONST)
 
 UTL_NAMESPACE_BEGIN
+
+namespace details {
+namespace string {
+template <typename C, typename Alloc>
+struct verify_allocator {
+    static constexpr bool value = true;
+};
+template <typename C>
+struct verify_allocator<C, UTL_SCOPE allocator<C>> {
+    struct test_allocator : UTL_SCOPE allocator<C> {};
+
+    static constexpr bool value = default_size_traits<test_allocator>::heap_type() ==
+            default_size_traits<test_allocator>::heap_type() &&
+        default_size_traits<test_allocator>::size_type() ==
+            default_size_traits<test_allocator>::size_type();
+};
+} // namespace string
+} // namespace details
+
 template <typename CharType, size_t ShortSize, typename Traits, typename Alloc>
 class basic_short_string {
-    static_assert(ShortSize >= details::string::default_inline_size<CharType>::value,
+    static_assert(ShortSize >= details::string::default_inline_size<CharType, Alloc>::value,
         "Inline size must be longer than the default value");
+    static_assert(details::string::verify_allocator<CharType, Alloc>::value,
+        "Unexpected allocator specialization");
 
 public:
     using allocator_type = Alloc;
@@ -68,7 +90,7 @@ private:
     using alloc_traits = allocator_traits<allocator_type>;
     static constexpr size_type inline_size = ShortSize + 1;
 
-    struct alignas(16) short_type {
+    struct short_type {
         value_type data_[inline_size];
     };
 

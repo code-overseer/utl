@@ -4,6 +4,8 @@
 
 #include "utl/preprocessor/utl_config.h"
 
+#include "utl/memory/utl_allocator_fwd.h"
+
 #include <limits.h>
 
 UTL_NAMESPACE_BEGIN
@@ -11,10 +13,6 @@ using size_t = decltype(sizeof(0));
 
 template <typename>
 struct char_traits;
-template <typename>
-class allocator;
-template <typename, typename>
-struct allocation_result;
 
 template <typename CharType, typename Traits = char_traits<CharType>>
 class basic_string_view;
@@ -28,36 +26,45 @@ class basic_short_string;
 namespace details {
 namespace string {
 
+template <typename Alloc>
+struct default_size_traits {
+private:
+    using alloc_traits = allocator_traits<Alloc>;
+
+public:
+    static constexpr size_t size_type() noexcept {
+        return sizeof(typename alloc_traits::size_type);
+    }
+    static constexpr size_t heap_type() noexcept {
+        return size_type() + sizeof(typename alloc_traits::pointer);
+    }
+};
 template <typename CharType>
+struct default_size_traits<UTL_SCOPE allocator<CharType>> {
+public:
+    static constexpr size_t size_type() noexcept { return sizeof(size_t); }
+    static constexpr size_t heap_type() noexcept { return size_type() + sizeof(void*); }
+};
+template <typename CharType, typename Alloc>
 struct default_inline_size {
 private:
-    static constexpr size_t bytes = 32;
+    using value_type = CharType;
+    static constexpr size_t bytes = default_size_traits<Alloc>::heap_type();
 
 public:
-    static constexpr size_t value = bytes / sizeof(CharType) - 1;
+    static constexpr size_t value = bytes / sizeof(value_type) - 1 > 2
+        ? bytes / sizeof(value_type) - 1
+        : 2;
 };
-
-template <>
-struct default_inline_size<char> {
-private:
-    static constexpr size_t bytes = 24;
-
-public:
-    static constexpr size_t value = bytes - 1;
-};
-
-#ifdef UTL_SUPPORTS_CHAR8_T
-template <>
-struct default_inline_size<char8_t> : default_inline_size<char> {};
-#endif
-
+template <typename CharType, typename Traits, typename Alloc>
+using default_type =
+    basic_short_string<CharType, default_inline_size<CharType, Alloc>::value, Traits, Alloc>;
 } // namespace string
 } // namespace details
 
 template <typename CharType, typename Traits = char_traits<CharType>,
     typename Alloc = allocator<CharType>>
-using basic_string = basic_short_string<CharType,
-    details::string::default_inline_size<CharType>::value, Traits, Alloc>;
+using basic_string = details::string::default_type<CharType, Traits, Alloc>;
 
 using string = basic_string<char>;
 using wstring = basic_string<wchar_t>;
