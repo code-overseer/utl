@@ -13,8 +13,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 auto allocator<T>::allocate(size_type count)
-    UTL_THROWS -> pointer {
+inline UTL_CONSTEXPR_CXX20 auto allocator<T>::allocate(size_type count) UTL_THROWS -> pointer {
     UTL_THROW_IF(count > memory::max_size<T>::value,
         bad_array_new_length(
             UTL_MESSAGE_FORMAT("[UTL] allocation operation failed, Reason=[element count "
@@ -25,8 +24,7 @@ UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 auto allocator<T>::allocate(size_type coun
 }
 
 template <typename T>
-UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void allocator<T>::deallocate(
-    pointer pointer, size_type count) noexcept {
+inline UTL_CONSTEXPR_CXX20 void allocator<T>::deallocate(pointer pointer, size_type count) noexcept {
     memory::deallocate<value_type>(pointer, count);
 }
 UTL_NAMESPACE_END
