@@ -41,11 +41,10 @@ public:
         return *this;
     }
 
-    UTL_ATTRIBUTES(MALLOC, NODISCARD, HIDE_FROM_ABI)
-    UTL_CONSTEXPR_CXX20 pointer allocate(size_type count) UTL_THROWS;
+    UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX20 pointer allocate(size_type count) UTL_THROWS;
 
-    UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI)
-    UTL_CONSTEXPR_CXX20 result_type allocate_at_least(size_type count) UTL_THROWS {
+    UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX20 result_type allocate_at_least(
+        size_type count) UTL_THROWS {
         return {allocate(count), count};
     }
 
@@ -56,14 +55,12 @@ public:
 UTL_NAMESPACE_END
 
 #if UTL_HAS_BUILTIN(__builtin_operator_new) && UTL_HAS_BUILTIN(__builtin_operator_delete)
-#  define UTL_ALLOC_NEW(...) __builtin_operator_new(__VA_ARGS__)
-#  define UTL_ALLOC_DELETE(...) __builtin_operator_delete(__VA_ARGS__)
+#  define __UTL_ALLOC_NEW(...) __builtin_operator_new(__VA_ARGS__)
+#  define __UTL_ALLOC_DELETE(...) __builtin_operator_delete(__VA_ARGS__)
 #else
-#  define UTL_ALLOC_NEW(...) ::operator new(__VA_ARGS__)
-#  define UTL_ALLOC_DELETE(...) ::operator delete(__VA_ARGS__)
+#  define __UTL_ALLOC_NEW(...) ::operator new(__VA_ARGS__)
+#  define __UTL_ALLOC_DELETE(...) ::operator delete(__VA_ARGS__)
 #endif
-
-#define UTL_ALLOCATOR_ATTRIBUTE UTL_ATTRIBUTE(MALLOC)
 
 UTL_NAMESPACE_BEGIN
 using ::std::align_val_t;
@@ -90,9 +87,9 @@ UTL_HIDE_FROM_ABI inline void deallocate(
 #if UTL_SUPPORTS_ALIGNED_ALLOCATION
         align_val_t const align_val = static_cast<align_val_t>(alignment);
 #  if UTL_SUPPORTS_SIZED_DEALLOCATION
-        UTL_ALLOC_DELETE(pointer, size, align_val);
+        __UTL_ALLOC_DELETE(pointer, size, align_val);
 #  else
-        UTL_ALLOC_DELETE(pointer, align_val);
+        __UTL_ALLOC_DELETE(pointer, align_val);
 #  endif
 #else
         UTL_ASSERT(false, "Allocation alignment is too strict");
@@ -101,33 +98,32 @@ UTL_HIDE_FROM_ABI inline void deallocate(
     } else {
         (void)alignment;
 #if UTL_SUPPORTS_SIZED_DEALLOCATION
-        UTL_ALLOC_DELETE(pointer, size);
+        __UTL_ALLOC_DELETE(pointer, size);
 #else
         (void)size;
-        UTL_ALLOC_DELETE(pointer);
+        __UTL_ALLOC_DELETE(pointer);
 #endif
     }
 }
 
-UTL_ATTRIBUTES(MALLOC, HIDE_FROM_ABI) inline void* allocate(
-    size_t size, size_t alignment = default_new_alignment) {
+UTL_HIDE_FROM_ABI inline void* allocate(size_t size, size_t alignment = default_new_alignment) {
     if (is_overaligned_for_new(alignment)) {
 #if UTL_SUPPORTS_ALIGNED_ALLOCATION
         align_val_t const align_val = static_cast<align_val_t>(alignment);
-        return UTL_ALLOC_NEW(size, align_val);
+        return __UTL_ALLOC_NEW(size, align_val);
 #else
         UTL_ASSERT(false, "Allocation alignment is too strict");
         UTL_BUILTIN_unreachable();
 #endif
     }
     (void)alignment;
-    return UTL_ALLOC_NEW(size);
+    return __UTL_ALLOC_NEW(size);
 }
 } // namespace details
 
 namespace runtime {
 template <typename T>
-UTL_ATTRIBUTES(MALLOC, HIDE_FROM_ABI) T* allocate(size_t count) {
+UTL_HIDE_FROM_ABI T* allocate(size_t count) {
     return static_cast<T*>(details::allocate(count * sizeof(T), alignof(T)));
 }
 
@@ -143,7 +139,7 @@ template <typename T>
 inline constinit ::std::allocator<T> allocator_v = {};
 
 template <typename T>
-UTL_ATTRIBUTES(MALLOC, HIDE_FROM_ABI) constexpr T* allocate(size_t count) {
+UTL_HIDE_FROM_ABI constexpr T* allocate(size_t count) {
     if (UTL_BUILTIN_is_constant_evaluated()) {
         if constexpr (UTL_TRAIT_is_complete(::std::allocator<T>)) {
             return allocator_v<T>.allocate(count);
@@ -192,7 +188,7 @@ UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void deallocate(
 }
 
 template <typename T>
-UTL_ATTRIBUTES(MALLOC, HIDE_FROM_ABI)
+UTL_ATTRIBUTES(MALLOC, NODISCARD, HIDE_FROM_ABI)
 UTL_CONSTEXPR_CXX20 T* allocate(size_t count) {
     static_assert(sizeof(T) > 0, "Incomplete type cannot be allocated");
 #if UTL_CXX20
@@ -205,6 +201,5 @@ UTL_CONSTEXPR_CXX20 T* allocate(size_t count) {
 
 UTL_NAMESPACE_END
 
-#undef UTL_ALLOC_DELETE
-#undef UTL_ALLOC_NEW
-#undef UTL_ALLOCATOR_ATTRIBUTE
+#undef __UTL_ALLOC_DELETE
+#undef __UTL_ALLOC_NEW

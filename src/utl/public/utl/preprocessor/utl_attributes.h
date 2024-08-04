@@ -281,8 +281,11 @@
 #endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(clang::nodebug)
+#  define UTL_NODEBUG [[clang::nodebug]]
 #  define __UTL_ATTRIBUTE_NODEBUG clang::nodebug
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODEBUG
+#else
+#  define UTL_NODEBUG
 #endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(likely)

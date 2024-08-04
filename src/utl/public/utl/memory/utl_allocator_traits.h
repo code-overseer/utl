@@ -60,35 +60,35 @@ struct selectable_copy_construction<Alloc,
 
 template <typename Alloc, typename = void>
 struct pointer {
-    using type = typename Alloc::value_type*;
+    using type UTL_NODEBUG = typename Alloc::value_type*;
 };
 template <typename Alloc>
 struct pointer<Alloc, void_t<typename Alloc::pointer>> {
-    using type = typename Alloc::pointer;
+    using type UTL_NODEBUG = typename Alloc::pointer;
 };
 template <typename Alloc>
 using pointer_t = typename pointer<Alloc>::type;
 
 template <typename Alloc, typename = void>
 struct difference_type {
-    using type = typename UTL_SCOPE pointer_traits<pointer_t<Alloc>>::difference_type;
+    using type UTL_NODEBUG = typename UTL_SCOPE pointer_traits<pointer_t<Alloc>>::difference_type;
 };
 
 template <typename Alloc>
 struct difference_type<Alloc, void_t<typename Alloc::difference_type>> {
-    using type = typename Alloc::difference_type;
+    using type UTL_NODEBUG = typename Alloc::difference_type;
 };
 template <typename Alloc>
 using difference_type_t = typename difference_type<Alloc>::type;
 
 template <typename Alloc, typename = void>
 struct size_type {
-    using type = make_unsigned_t<difference_type_t<Alloc>>;
+    using type UTL_NODEBUG = make_unsigned_t<difference_type_t<Alloc>>;
 };
 
 template <typename Alloc>
 struct size_type<Alloc, void_t<typename Alloc::size_type>> {
-    using type = typename Alloc::size_type;
+    using type UTL_NODEBUG = typename Alloc::size_type;
 };
 template <typename Alloc>
 using size_type_t = typename size_type<Alloc>::type;
@@ -107,13 +107,13 @@ struct rebind;
 
 template <typename Alloc, typename T>
 struct rebind<Alloc, T, true> {
-    using type = typename Alloc::template rebind<T>::other;
+    using type UTL_NODEBUG = typename Alloc::template rebind<T>::other;
 };
 
 template <typename To, template <typename, typename...> class Alloc, typename From,
     typename... Args>
 struct rebind<Alloc<From, Args...>, To, false> {
-    using type = Alloc<To, Args...>;
+    using type UTL_NODEBUG = Alloc<To, Args...>;
 };
 
 template <typename T, typename U>
@@ -313,12 +313,12 @@ struct UTL_PUBLIC_TEMPLATE allocator_traits {
             UTL_SCOPE is_nothrow_swappable<allocator_type>::value,
         "If propogation on swap is required, allocator must be nothrow swappable");
 
-    UTL_ATTRIBUTE(NODISCARD) UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX20 pointer allocate(
+    UTL_NODISCARD UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX20 pointer allocate(
         allocator_type& alloc, size_type size) {
         return alloc.allocate(size);
     }
 
-    UTL_ATTRIBUTE(NODISCARD) UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX20 allocation_result allocate_at_least(
+    UTL_NODISCARD UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX20 allocation_result allocate_at_least(
         allocator_type& alloc, size_type size) {
         return details::allocator::allocate_at_least(alloc, size);
     }
@@ -328,12 +328,12 @@ struct UTL_PUBLIC_TEMPLATE allocator_traits {
         alloc.deallocate(ptr, size);
     }
 
-    UTL_ATTRIBUTE(NODISCARD) UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX20 pointer reallocate(
+    UTL_NODISCARD UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX20 pointer reallocate(
         allocator_type& alloc, allocation_result arg, size_type new_size) {
         return details::allocator::reallocate(alloc, arg, new_size);
     }
 
-    UTL_ATTRIBUTE(NODISCARD) UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX20 allocation_result reallocate_at_least(
+    UTL_NODISCARD UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX20 allocation_result reallocate_at_least(
         allocator_type& alloc, allocation_result arg, size_type new_size) {
         return details::allocator::reallocate_at_least(alloc, arg, new_size);
     }
@@ -348,20 +348,20 @@ struct UTL_PUBLIC_TEMPLATE allocator_traits {
         return details::allocator::assign(dst, move(src), propagate_on_container_move_assignment{});
     }
 
-    UTL_ATTRIBUTE(NODISCARD) UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX14 allocator_type
+    UTL_NODISCARD UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX14 allocator_type
     select_on_container_copy_construction(allocator_type const& p) noexcept {
         return details::allocator::copy(p, selectable_copy_construction{});
     }
 
     template <typename T = allocator_type>
-    UTL_ATTRIBUTE(NODISCARD) UTL_HIDE_FROM_ABI static constexpr enable_if_t<
+    UTL_NODISCARD UTL_HIDE_FROM_ABI static constexpr enable_if_t<
         is_same<T, allocator_type>::value && is_always_equal::value, bool>
     equals(T const&, T const&) noexcept {
         return true;
     }
 
     template <typename T = allocator_type>
-    UTL_ATTRIBUTE(NODISCARD) UTL_HIDE_FROM_ABI static constexpr enable_if_t<
+    UTL_NODISCARD UTL_HIDE_FROM_ABI static constexpr enable_if_t<
         is_same<T, allocator_type>::value && !is_always_equal::value, bool>
     equals(T const& left, T const& right) noexcept {
         return left == right;
