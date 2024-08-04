@@ -39,12 +39,7 @@ public:
         return size_type() + sizeof(typename alloc_traits::pointer);
     }
 };
-template <typename CharType>
-struct default_size_traits<UTL_SCOPE allocator<CharType>> {
-public:
-    static constexpr size_t size_type() noexcept { return sizeof(size_t); }
-    static constexpr size_t heap_type() noexcept { return size_type() + sizeof(void*); }
-};
+
 template <typename CharType, typename Alloc>
 struct default_inline_size {
 private:
@@ -56,6 +51,31 @@ public:
         ? bytes / sizeof(value_type) - 1
         : 2;
 };
+
+template <>
+struct default_inline_size<char, UTL_SCOPE allocator<char>> {
+private:
+    static constexpr size_t bytes = 24;
+
+public:
+    static constexpr size_t value = bytes - 1;
+};
+
+template <typename CharType>
+struct default_inline_size<CharType, UTL_SCOPE allocator<CharType>> {
+private:
+    static constexpr size_t bytes = 32;
+
+public:
+    static constexpr size_t value = bytes / sizeof(CharType) - 1;
+};
+
+#ifdef UTL_SUPPORTS_CHAR8_T
+template <>
+struct default_inline_size<char8_t, UTL_SCOPE allocator<char8_t>> :
+    default_inline_size<char, UTL_SCOPE allocator<char>> {};
+#endif
+
 template <typename CharType, typename Traits, typename Alloc>
 using default_type =
     basic_short_string<CharType, default_inline_size<CharType, Alloc>::value, Traits, Alloc>;

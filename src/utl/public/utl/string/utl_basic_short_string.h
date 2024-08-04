@@ -21,6 +21,7 @@
 #include "utl/memory/utl_allocator_traits.h"
 #include "utl/memory/utl_construct_at.h"
 #include "utl/memory/utl_to_address.h"
+#include "utl/numeric/utl_limits.h"
 #include "utl/numeric/utl_max.h"
 #include "utl/numeric/utl_min.h"
 #include "utl/string/utl_basic_string_view.h"
@@ -46,30 +47,10 @@
 
 UTL_NAMESPACE_BEGIN
 
-namespace details {
-namespace string {
-template <typename C, typename Alloc>
-struct verify_allocator {
-    static constexpr bool value = true;
-};
-template <typename C>
-struct verify_allocator<C, UTL_SCOPE allocator<C>> {
-    struct test_allocator : UTL_SCOPE allocator<C> {};
-
-    static constexpr bool value = default_size_traits<test_allocator>::heap_type() ==
-            default_size_traits<test_allocator>::heap_type() &&
-        default_size_traits<test_allocator>::size_type() ==
-            default_size_traits<test_allocator>::size_type();
-};
-} // namespace string
-} // namespace details
-
 template <typename CharType, size_t ShortSize, typename Traits, typename Alloc>
 class basic_short_string {
     static_assert(ShortSize >= details::string::default_inline_size<CharType, Alloc>::value,
         "Inline size must be longer than the default value");
-    static_assert(details::string::verify_allocator<CharType, Alloc>::value,
-        "Unexpected allocator specialization");
 
 public:
     using allocator_type = Alloc;
@@ -82,11 +63,13 @@ public:
     using reference = CharType&;
     using const_reference = CharType const&;
     using view_type = basic_string_view<value_type, traits_type>;
-    static constexpr size_type npos = details::string::npos;
+    static constexpr size_type npos = numeric::maximum<size_type>::value;
     class iterator;
     class const_iterator;
 
 private:
+    using char_pointer = CharType*;
+    using const_char_pointer = CharType const*;
     using alloc_traits = allocator_traits<allocator_type>;
     static constexpr size_type inline_size = ShortSize + 1;
 
@@ -109,9 +92,8 @@ private:
             : data_(data)
             , capacity_(capacity) {}
 
-        UTL_CONSTEXPR_CXX14 heap_type& operator=(
-            allocation_result<pointer, size_type> const& other) noexcept {
-            data_ = other.ptr;
+        UTL_CONSTEXPR_CXX14 heap_type& operator=(allocation_result<pointer, size_type>&& other) noexcept {
+            data_ = UTL_SCOPE move(other.ptr);
             capacity_ = other.size;
             return *this;
         }
@@ -148,7 +130,7 @@ public:
 
     private:
         friend basic_short_string;
-        constexpr iterator(pointer data) noexcept : base_type(data) {}
+        constexpr iterator(char_pointer data) noexcept : base_type(data) {}
         template <typename It>
         constexpr iterator(It other) noexcept
             : iterator(const_cast<pointer>(UTL_SCOPE to_address(other))) {}
@@ -174,7 +156,7 @@ public:
 
     private:
         friend basic_short_string;
-        constexpr const_iterator(pointer data) noexcept : base_type(data) {}
+        constexpr const_iterator(char_pointer data) noexcept : base_type(data) {}
         constexpr const_iterator(iterator other) noexcept
             : base_type(UTL_SCOPE to_address(other)) {}
     };
@@ -192,7 +174,7 @@ public:
         , is_heap_() {}
 
     UTL_CONSTEXPR_CXX14 basic_short_string(
-        const_pointer str, size_type len, allocator_type const& a = allocator_type()) UTL_THROWS
+        const_char_pointer str, size_type len, allocator_type const& a = allocator_type()) UTL_THROWS
         : basic_short_string(a) {
         assign(str, len);
     }
@@ -206,7 +188,7 @@ public:
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string(
-        const_pointer str, allocator_type const& a = allocator_type()) UTL_THROWS
+        const_char_pointer str, allocator_type const& a = allocator_type()) UTL_THROWS
         : basic_short_string(str, traits_type::length(str), a) {}
 
     UTL_CONSTEXPR_CXX14 basic_short_string(::std::initializer_list<value_type> ilist,
@@ -330,12 +312,12 @@ public:
 
     UTL_CONSTEXPR_CXX20 ~basic_short_string() noexcept { destroy(); }
 
-    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 pointer data() noexcept {
-        return !is_heap_ ? get_short().data_ : get_heap().data_;
+    UTL_STRING_PURE UTL_CONSTEXPR_CXX14 char_pointer data() noexcept {
+        return !is_heap_ ? get_short().data_ : UTL_SCOPE to_address(get_heap().data_);
     }
 
-    UTL_STRING_PURE constexpr const_pointer data() const noexcept {
-        return !is_heap_ ? get_short().data_ : get_heap().data_;
+    UTL_STRING_PURE constexpr const_char_pointer data() const noexcept {
+        return !is_heap_ ? get_short().data_ : UTL_SCOPE to_address(get_heap().data_);
     }
 
     UTL_STRING_PURE constexpr const_pointer c_str() const noexcept { return data(); }
@@ -382,8 +364,8 @@ public:
     }
 
     template <typename Op UTL_REQUIRES_CXX11(
-        is_integral<decltype(UTL_SCOPE declval<Op>()(pointer{}, size_type{}))>::value)>
-    UTL_REQUIRES_CXX20(requires(Op op, pointer p, size_type s) {
+        is_integral<decltype(UTL_SCOPE declval<Op>()(char_pointer{}, size_type{}))>::value)>
+    UTL_REQUIRES_CXX20(requires(Op op, char_pointer p, size_type s) {
         { op(p, s) } -> integral;
     })
     UTL_CONSTEXPR_WITH_TRY void resize_and_overwrite(size_type new_size, Op operation) UTL_THROWS {
@@ -505,7 +487,8 @@ public:
         return *this = move(other);
     }
 
-    UTL_CONSTEXPR_CXX14 basic_short_string& assign(const_pointer str, size_type count) UTL_THROWS {
+    UTL_CONSTEXPR_CXX14 basic_short_string& assign(const_char_pointer str, size_type count)
+        UTL_THROWS {
         UTL_ASSERT(str != nullptr);
         reserve(count);
         traits_type::copy(data(), str, count)[count] = value_type();
@@ -513,7 +496,7 @@ public:
         return *this;
     }
 
-    UTL_CONSTEXPR_CXX14 basic_short_string& assign(const_pointer str) UTL_THROWS {
+    UTL_CONSTEXPR_CXX14 basic_short_string& assign(const_char_pointer str) UTL_THROWS {
         UTL_ASSERT(str != nullptr);
         assign(str, traits_type::length(str));
     }
@@ -588,7 +571,7 @@ public:
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& insert(
-        size_type pos, const_pointer str, size_type length) UTL_THROWS {
+        size_type pos, const_char_pointer str, size_type length) UTL_THROWS {
         UTL_THROW_IF(pos > size(),
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::insert` operation failed, "
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
@@ -602,7 +585,8 @@ public:
         return *this;
     }
 
-    UTL_CONSTEXPR_CXX14 basic_short_string& insert(size_type pos, const_pointer str) UTL_THROWS {
+    UTL_CONSTEXPR_CXX14 basic_short_string& insert(size_type pos, const_char_pointer str)
+        UTL_THROWS {
         return insert(pos, str, traits_type::length(str));
     }
 
@@ -731,9 +715,12 @@ public:
         return insert(size(), str, idx, count);
     }
 
-    UTL_CONSTEXPR_CXX14 basic_short_string& append(const_pointer str) UTL_THROWS { return insert(size(), str); }
+    UTL_CONSTEXPR_CXX14 basic_short_string& append(const_char_pointer str) UTL_THROWS {
+        return insert(size(), str);
+    }
 
-    UTL_CONSTEXPR_CXX14 basic_short_string& append(const_pointer str, size_type count) UTL_THROWS {
+    UTL_CONSTEXPR_CXX14 basic_short_string& append(const_char_pointer str, size_type count)
+        UTL_THROWS {
         return insert(size(), str, count);
     }
 
@@ -774,7 +761,9 @@ public:
 
     UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(value_type ch) UTL_THROWS { return append(1, ch); }
 
-    UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(const_pointer str) UTL_THROWS { return append(str); }
+    UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(const_char_pointer str) UTL_THROWS {
+        return append(str);
+    }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(::std::initializer_list<value_type> list)
         UTL_THROWS {
@@ -810,7 +799,7 @@ public:
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& replace(
-        size_type pos, size_type count, const_pointer str, size_type length) UTL_THROWS {
+        size_type pos, size_type count, const_char_pointer str, size_type length) UTL_THROWS {
         UTL_THROW_IF(pos > size(),
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::replace` operation failed, "
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
@@ -819,8 +808,8 @@ public:
         return replace(first, first + count, str, length);
     }
 
-    UTL_CONSTEXPR_CXX14 basic_short_string& replace(
-        const_iterator first, const_iterator last, const_pointer str, size_type length) UTL_THROWS {
+    UTL_CONSTEXPR_CXX14 basic_short_string& replace(const_iterator first, const_iterator last,
+        const_char_pointer str, size_type length) UTL_THROWS {
         auto const replaced_count = last - first;
         auto copy_str = [p = const_cast<pointer>(first.operator->()), str](
                             size_type count) { return traits_type::move(p, str, count); };
@@ -837,13 +826,13 @@ public:
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& replace(
-        size_type pos, size_type count, const_pointer str) UTL_THROWS {
+        size_type pos, size_type count, const_char_pointer str) UTL_THROWS {
         UTL_ASSERT(str != nullptr);
         return replace(pos, count, str, traits_type::length(str));
     }
 
     UTL_CONSTEXPR_CXX14 basic_short_string& replace(
-        const_iterator first, const_iterator last, const_pointer str) UTL_THROWS {
+        const_iterator first, const_iterator last, const_char_pointer str) UTL_THROWS {
         UTL_ASSERT(str != nullptr);
         return replace(first, last, str, traits_type::length(str));
     }
@@ -968,12 +957,13 @@ public:
     }
 
     UTL_STRING_PURE constexpr size_type find(
-        const_pointer str, size_type pos, size_type str_len) const noexcept {
+        const_char_pointer str, size_type pos, size_type str_len) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return details::string::find<traits_type>(data(), size(), str, str_len, pos);
     }
 
-    UTL_STRING_PURE constexpr size_type find(const_pointer str, size_type pos = 0) const noexcept {
+    UTL_STRING_PURE constexpr size_type find(
+        const_char_pointer str, size_type pos = 0) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return find(str, pos, traits_type::length(str));
     }
@@ -999,13 +989,13 @@ public:
     }
 
     UTL_STRING_PURE constexpr size_type rfind(
-        const_pointer str, size_type pos, size_type str_len) const noexcept {
+        const_char_pointer str, size_type pos, size_type str_len) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return details::string::rfind<traits_type>(data(), size(), str, str_len, pos);
     }
 
     UTL_STRING_PURE constexpr size_type rfind(
-        const_pointer str, size_type pos = npos) const noexcept {
+        const_char_pointer str, size_type pos = npos) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return rfind(str, pos, traits_type::length(str));
     }
@@ -1031,13 +1021,13 @@ public:
     }
 
     UTL_STRING_PURE constexpr size_type find_first_of(
-        const_pointer chars, size_type pos, size_type chars_count) const noexcept {
+        const_char_pointer chars, size_type pos, size_type chars_count) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_first_of<traits_type>(data(), size(), chars, chars_count, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find_first_of(
-        const_pointer chars, size_type pos = 0) const noexcept {
+        const_char_pointer chars, size_type pos = 0) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_first_of(chars, pos, traits_type::length(chars));
     }
@@ -1065,14 +1055,14 @@ public:
     }
 
     UTL_STRING_PURE constexpr size_type find_first_not_of(
-        const_pointer chars, size_type pos, size_type chars_count) const noexcept {
+        const_char_pointer chars, size_type pos, size_type chars_count) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_first_not_of<traits_type>(
             data(), size(), chars, chars_count, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find_first_not_of(
-        const_pointer chars, size_type pos = 0) const noexcept {
+        const_char_pointer chars, size_type pos = 0) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_first_not_of(chars, pos, traits_type::length(chars));
     }
@@ -1100,13 +1090,13 @@ public:
     }
 
     UTL_STRING_PURE constexpr size_type find_last_of(
-        const_pointer chars, size_type pos, size_type chars_count) const noexcept {
+        const_char_pointer chars, size_type pos, size_type chars_count) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_last_of<traits_type>(data(), size(), chars, chars_count, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find_last_of(
-        const_pointer chars, size_type pos = npos) const noexcept {
+        const_char_pointer chars, size_type pos = npos) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_last_of(chars, pos, traits_type::length(chars));
     }
@@ -1134,13 +1124,13 @@ public:
     }
 
     UTL_STRING_PURE constexpr size_type find_last_not_of(
-        const_pointer chars, size_type pos, size_type count) const UTL_THROWS {
+        const_char_pointer chars, size_type pos, size_type count) const UTL_THROWS {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_last_not_of<traits_type>(data(), size(), chars, count, pos);
     }
 
     UTL_STRING_PURE constexpr size_type find_last_not_of(
-        const_pointer chars, size_type pos = npos) const UTL_THROWS {
+        const_char_pointer chars, size_type pos = npos) const UTL_THROWS {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_last_not_of(chars, pos, traits_type::length(chars));
     }
@@ -1166,7 +1156,7 @@ public:
         return details::string::compare<traits_type>(data(), size(), other.data(), other.size());
     }
 
-    UTL_STRING_PURE constexpr int compare(const_pointer str) const noexcept {
+    UTL_STRING_PURE constexpr int compare(const_char_pointer str) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return details::string::compare<traits_type>(data(), size(), str, traits_type::length(str));
     }
@@ -1187,7 +1177,7 @@ public:
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
-        size_type pos, size_type count, const_pointer str, size_type str_len) const UTL_THROWS {
+        size_type pos, size_type count, const_char_pointer str, size_type str_len) const UTL_THROWS {
         UTL_ASSERT(str != nullptr);
         UTL_THROW_IF(pos > size(),
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::replace` operation failed, "
@@ -1198,7 +1188,7 @@ public:
     }
 
     UTL_STRING_PURE UTL_CONSTEXPR_CXX14 int compare(
-        size_type pos, size_type count, const_pointer str) const UTL_THROWS {
+        size_type pos, size_type count, const_char_pointer str) const UTL_THROWS {
         return compare(pos, count, str, traits_type::length(str));
     }
 
@@ -1249,7 +1239,7 @@ public:
 
     constexpr bool starts_with(value_type ch) const noexcept { return !empty() && front() == ch; }
 
-    constexpr bool starts_with(const_pointer str) const noexcept {
+    constexpr bool starts_with(const_char_pointer str) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return starts_with(view_type(str));
     }
@@ -1262,7 +1252,7 @@ public:
 
     constexpr bool ends_with(value_type ch) const noexcept { return !empty() && back() == ch; }
 
-    constexpr bool ends_with(const_pointer str) const noexcept {
+    constexpr bool ends_with(const_char_pointer str) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return ends_with(view_type(str));
     }
@@ -1273,7 +1263,7 @@ public:
         return traits_type::find(data(), size(), ch) != nullptr;
     }
 
-    constexpr bool contains(const_pointer str) const noexcept {
+    constexpr bool contains(const_char_pointer str) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return contains(view_type(str));
     }
@@ -1305,8 +1295,8 @@ private:
     UTL_CONSTEXPR_CONSTRUCTS_AT void transfer_to_heap(size_t new_capacity) UTL_THROWS {
         UTL_ASSERT(!is_heap_);
         auto const result = alloc_traits::allocate_at_least(allocator_ref(), new_capacity + 1);
-        heap_type new_heap{result.ptr, result.size};
-        traits_type::copy(new_heap.data_, data(), size());
+        heap_type new_heap{UTL_SCOPE move(result.ptr), result.size};
+        traits_type::copy(UTL_SCOPE to_address(new_heap.data_), data(), size());
         UTL_SCOPE construct_at(UTL_SCOPE addressof(get_heap()), new_heap);
         is_heap_ = true;
     }
