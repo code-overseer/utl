@@ -6,9 +6,18 @@
 
 UTL_NAMESPACE_BEGIN
 
+namespace details {
+namespace bit {
+template <typename T>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) inline constexpr T bit_log2(T x) noexcept {
+    return CHAR_BIT * sizeof(T) - 1 - UTL_SCOPE countl_zero(x);
+}
+} // namespace bit
+} // namespace details
+
 template <UTL_CONCEPT_CXX20(bit_readable) T>
-UTL_ATTRIBUTES(NODISCARD, CONST) constexpr UTL_ENABLE_IF_CXX11(bool, UTL_TRAIT_VALUE(is_bit_readable, T)) bit_width(T x) noexcept {
-    return CHAR_BIT * sizeof(T) - countl_zero(x);
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) inline constexpr UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_bit_readable(T)) bit_width(T x) noexcept {
+    return x == 0 ? 0 : details::bit::bit_log2(x) + 1;
 }
 
 UTL_NAMESPACE_END

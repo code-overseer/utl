@@ -6,8 +6,8 @@
 
 UTL_NAMESPACE_BEGIN
 
-namespace bit {
 namespace details {
+namespace bit {
 
 #if UTL_HAS_BUILTIN(__builtin_ctz)
 
@@ -87,12 +87,12 @@ UTL_ATTRIBUTES(NODISCARD, CONST) constexpr int builtin_ctz(T x) noexcept {
 
 #endif
 
-} // namespace details
 } // namespace bit
+} // namespace details
 
 template <UTL_CONCEPT_CXX20(bit_readable) T>
-UTL_ATTRIBUTES(NODISCARD, CONST) constexpr UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_VALUE(is_bit_readable, T)) countr_zero(T x) noexcept {
-    return bit::details::builtin_ctz(x);
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_bit_readable(T)) countr_zero(T x) noexcept {
+    return details::bit::builtin_ctz(x);
 }
 
 UTL_NAMESPACE_END
