@@ -77,7 +77,8 @@ struct function_t {
     }
 
     template <exchangable T>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void operator()(T& l, T& r) const noexcept(
+    UTL_ATTRIBUTES(ALWAYS_INLINE, HIDE_FROM_ABI)
+    UTL_CONSTEXPR_CXX14 void operator()(T& l, T& r) const noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_move_assignable(T)) {
         r = UTL_SCOPE exchange(l, UTL_SCOPE move(r));
     }
