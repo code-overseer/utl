@@ -42,7 +42,7 @@ preprocess: $(PREPROCESSED)
 $(PREPROCESSED):%.cpp.i: $(MODULE_ROOT)/%.cpp
 	@mkdir -p '$(INTERMEDIATE_DIR)/$(@D)'
 	@echo "Running preprocessor" $@
-	@time $(CXX) $(CXX_FLAGS) -MMD -MP -MF '$(INTERMEDIATE_DIR)/$(@:.i=.d)' -MT '$(INTERMEDIATE_DIR)/$@' -E $< -o '$(INTERMEDIATE_DIR)/$@'
+	@$(CXX) $(CXX_FLAGS) -MMD -MP -MF '$(INTERMEDIATE_DIR)/$(@:.i=.d)' -MT '$(INTERMEDIATE_DIR)/$@' -E $< -o '$(INTERMEDIATE_DIR)/$@'
 
 clean:
 	@echo "Cleaning up..."

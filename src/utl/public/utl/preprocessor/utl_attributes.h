@@ -10,31 +10,55 @@
 #include "utl/preprocessor/utl_msvc_extensions.h"
 
 #if UTL_HAS_CPP_ATTRIBUTE(nodiscard)
+#  define UTL_NODISCARD [[nodiscard]]
 #  define __UTL_ATTRIBUTE_NODISCARD nodiscard
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODISCARD
 #elif UTL_HAS_CPP_ATTRIBUTE(gnu::warn_unused_result)
+#  define UTL_NODISCARD [[gnu::warn_unused_result]]
 #  define __UTL_ATTRIBUTE_NODISCARD gnu::warn_unused_result
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODISCARD
 #elif UTL_HAS_CPP_ATTRIBUTE(clang::warn_unused_result)
+#  define UTL_NODISCARD [[clang::warn_unused_result]]
 #  define __UTL_ATTRIBUTE_NODISCARD clang::warn_unused_result
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODISCARD
 #elif UTL_HAS_GNU_ATTRIBUTE(__warn_unused_result__)
+#  define UTL_NODISCARD __attribute__((__warn_unused_result__))
 #  define __UTL_ATTRIBUTE_NODISCARD __warn_unused_result__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_NODISCARD
 #elif UTL_HAS_SAL_ANNOTATION(_Check_return_)
+#  define UTL_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_TYPE_MSVC_EXT_NODISCARD
+#else
+#  define UTL_NODISCARD
 #endif /* UTL_HAS_CPP_ATTRIBUTE(nodiscard) */
 
+#if UTL_HAS_CPP_ATTRIBUTE(noreturn)
+#  define UTL_NORETURN [[noreturn]]
+#  define __UTL_ATTRIBUTE_NORETURN noreturn
+#  define __UTL_ATTRIBUTE_TYPE_CPP_NORETURN
+#else
+#  define UTL_NORETURN
+#endif
+
 #if UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound)
+#  define UTL_LIFETIMEBOUND [[msvc::lifetimebound]]
 #  define __UTL_ATTRIBUTE_LIFETIMEBOUND msvc::lifetimebound
 #  define __UTL_ATTRIBUTE_TYPE_CPP_LIFETIMEBOUND
 #elif UTL_HAS_CPP_ATTRIBUTE(clang::lifetimebound) /* UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound) */
+#  define UTL_LIFETIMEBOUND [[clang::lifetimebound]]
 #  define __UTL_ATTRIBUTE_LIFETIMEBOUND clang::lifetimebound
 #  define __UTL_ATTRIBUTE_TYPE_CPP_LIFETIMEBOUND
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::lifetimebound) /* UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound) */
+#  define UTL_LIFETIMEBOUND [[gnu::lifetimebound]]
+#  define __UTL_ATTRIBUTE_LIFETIMEBOUND gnu::lifetimebound
+#  define __UTL_ATTRIBUTE_TYPE_CPP_LIFETIMEBOUND
 #elif UTL_HAS_GNU_ATTRIBUTE(__lifetimebound__) /* UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound) */
+#  define UTL_LIFETIMEBOUND __attribute__((__lifetimebound__))
 #  define __UTL_ATTRIBUTE_LIFETIMEBOUND __lifetimebound__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_LIFETIMEBOUND
+#else
+#  define UTL_LIFETIMEBOUND
 #endif /* UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound) */
 
 #if UTL_HAS_CPP_ATTRIBUTE(gnu::pure)
@@ -96,6 +120,23 @@
 #  define __UTL_ATTRIBUTE_ALWAYS_INLINE __forceinline
 #  define __UTL_ATTRIBUTE_TYPE_MSVC_EXT_ALWAYS_INLINE
 #endif /* UTL_HAS_CPP_ATTRIBUTE(clang::always_inline) */
+
+#if UTL_HAS_CPP_ATTRIBUTE(msvc::noinline)
+#  define __UTL_ATTRIBUTE_NOINLINE msvc::noinline
+#  define __UTL_ATTRIBUTE_TYPE_CPP_NOINLINE
+#elif UTL_HAS_CPP_ATTRIBUTE(clang::noinline)
+#  define __UTL_ATTRIBUTE_NOINLINE clang::noinline
+#  define __UTL_ATTRIBUTE_TYPE_CPP_NOINLINE
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::noinline)
+#  define __UTL_ATTRIBUTE_NOINLINE gnu::noinline
+#  define __UTL_ATTRIBUTE_TYPE_CPP_NOINLINE
+#elif UTL_HAS_GNU_ATTRIBUTE(__noinline__)
+#  define __UTL_ATTRIBUTE_NOINLINE __noinline__
+#  define __UTL_ATTRIBUTE_TYPE_GNU_NOINLINE
+#elif UTL_HAS_DECLSPEC(noinline)
+#  define __UTL_ATTRIBUTE_NOINLINE noinline
+#  define __UTL_ATTRIBUTE_TYPE_DECLSPEC_NOINLINE
+#endif /* UTL_HAS_CPP_ATTRIBUTE(clang::noinline) */
 
 #if UTL_HAS_CPP_ATTRIBUTE(clang::malloc)
 #  define __UTL_ATTRIBUTE_MALLOC clang::malloc
@@ -245,17 +286,25 @@
 #endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(likely)
+#  define UTL_LIKELY [[likely]]
 #  define __UTL_ATTRIBUTE_LIKELY likely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_LIKELY
 #elif UTL_HAS_CPP_ATTRIBUTE(clang::likely)
+#  define UTL_LIKELY [[clang::likely]]
 #  define __UTL_ATTRIBUTE_LIKELY clang::likely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_LIKELY
+#else
+#  define UTL_LIKELY
 #endif /* UTL_HAS_CPP_ATTRIBUTE(likely) */
 
 #if UTL_HAS_CPP_ATTRIBUTE(unlikely)
+#  define UTL_UNLIKELY [[unlikely]]
 #  define __UTL_ATTRIBUTE_UNLIKELY unlikely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_UNLIKELY
 #elif UTL_HAS_CPP_ATTRIBUTE(clang::unlikely)
+#  define UTL_UNLIKELY [[clang::unlikely]]
 #  define __UTL_ATTRIBUTE_UNLIKELY clang::unlikely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_UNLIKELY
+#else
+#  define UTL_UNLIKELY
 #endif /* UTL_HAS_CPP_ATTRIBUTE(unlikely) */

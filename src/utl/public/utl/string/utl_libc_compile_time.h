@@ -141,7 +141,7 @@ UTL_HIDE_FROM_ABI constexpr int memcmp(
 #endif
 }
 
-UTL_ATTRIBUTE(ALWAYS_INLINE) constexpr char* memchr(char const* str, char value, size_t bytes) noexcept {
+UTL_HIDE_FROM_ABI constexpr char* memchr(char const* str, char value, size_t bytes) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_char_memchr)
     return __builtin_char_memchr(str, (int)value, bytes);
 #else
@@ -155,7 +155,7 @@ UTL_HIDE_FROM_ABI constexpr T* memchr(T const* str, U value, size_t bytes) noexc
     return recursive::memchr(str, as_byte(value), bytes);
 }
 
-UTL_ATTRIBUTE(ALWAYS_INLINE) constexpr size_t strlen(char const* str) noexcept {
+UTL_HIDE_FROM_ABI constexpr size_t strlen(char const* str) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_strlen)
     return __builtin_strlen(str);
 #else
@@ -163,7 +163,7 @@ UTL_ATTRIBUTE(ALWAYS_INLINE) constexpr size_t strlen(char const* str) noexcept {
 #endif
 }
 
-UTL_ATTRIBUTE(ALWAYS_INLINE) constexpr size_t strlen(wchar_t const* str) noexcept {
+UTL_HIDE_FROM_ABI constexpr size_t strlen(wchar_t const* str) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_wcslen)
     return __builtin_wcslen(str);
 #else
@@ -176,7 +176,7 @@ UTL_HIDE_FROM_ABI constexpr size_t strlen(T const* str) noexcept {
     return recursive::strlen(str);
 }
 
-UTL_ATTRIBUTE(ALWAYS_INLINE) constexpr char* strchr(char const* str, char const ch) noexcept {
+UTL_HIDE_FROM_ABI constexpr char* strchr(char const* str, char const ch) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_strchr)
     return __builtin_strchr(str, (int)ch);
 #else
@@ -184,7 +184,7 @@ UTL_ATTRIBUTE(ALWAYS_INLINE) constexpr char* strchr(char const* str, char const 
 #endif
 }
 
-UTL_ATTRIBUTE(ALWAYS_INLINE) constexpr wchar_t* strchr(wchar_t const* str, wchar_t const ch) noexcept {
+UTL_HIDE_FROM_ABI constexpr wchar_t* strchr(wchar_t const* str, wchar_t const ch) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_wcschr)
     return __builtin_wcschr(str, ch);
 #else
@@ -197,7 +197,7 @@ UTL_HIDE_FROM_ABI constexpr T* strchr(T const* str, T const ch) noexcept {
     return recursive::strchr(str, ch);
 }
 
-UTL_ATTRIBUTE(ALWAYS_INLINE) constexpr int strcmp(char const* left, char const* right) noexcept {
+UTL_HIDE_FROM_ABI constexpr int strcmp(char const* left, char const* right) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_strcmp)
     return __builtin_strcmp(left, right);
 #else
@@ -205,7 +205,7 @@ UTL_ATTRIBUTE(ALWAYS_INLINE) constexpr int strcmp(char const* left, char const* 
 #endif
 }
 
-UTL_ATTRIBUTE(ALWAYS_INLINE) constexpr int strcmp(wchar_t const* left, wchar_t const* right) noexcept {
+UTL_HIDE_FROM_ABI constexpr int strcmp(wchar_t const* left, wchar_t const* right) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_wcscmp)
     return __builtin_wcscmp(left, right);
 #else
@@ -218,7 +218,7 @@ UTL_HIDE_FROM_ABI constexpr int strcmp(T const* left, T const* right) noexcept {
     return recursive::strcmp(left, right);
 }
 
-UTL_ATTRIBUTE(ALWAYS_INLINE) constexpr int strncmp(
+UTL_HIDE_FROM_ABI constexpr int strncmp(
     char const* left, char const* right, element_count_t len) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_strncmp)
     return __builtin_strncmp(left, right, (size_t)len);
@@ -227,7 +227,7 @@ UTL_ATTRIBUTE(ALWAYS_INLINE) constexpr int strncmp(
 #endif
 }
 
-UTL_ATTRIBUTE(ALWAYS_INLINE) constexpr int strncmp(
+UTL_HIDE_FROM_ABI constexpr int strncmp(
     wchar_t const* left, wchar_t const* right, element_count_t len) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_wcsncmp)
     return __builtin_wcsncmp(left, right, (size_t)len);

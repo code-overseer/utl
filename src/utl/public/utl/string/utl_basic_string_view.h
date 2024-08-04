@@ -19,10 +19,8 @@
 #include "utl/numeric/utl_min.h"
 #include "utl/string/utl_string_details.h"
 
-#define __UTL_ATTRIBUTE_STRING_PURE (PURE)(NODISCARD)
+#define __UTL_ATTRIBUTE_STRING_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE_HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_PURE
-#define __UTL_ATTRIBUTE_STRING_GETTER (PURE)(NODISCARD)(ALWAYS_INLINE)
-#define __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_GETTER
 
 UTL_NAMESPACE_BEGIN
 template <typename CharType, typename Traits>
@@ -91,51 +89,55 @@ public:
     UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_string_view& operator=(
         basic_string_view const&) noexcept = default;
 
-    UTL_ATTRIBUTES(STRING_GETTER, HIDE_FROM_ABI) constexpr const_pointer data() const noexcept { return data_; }
-    UTL_ATTRIBUTES(STRING_GETTER, HIDE_FROM_ABI) constexpr bool empty() const noexcept { return !size(); }
-    UTL_ATTRIBUTES(STRING_GETTER, HIDE_FROM_ABI) constexpr size_type size() const noexcept { return size_; }
-    UTL_ATTRIBUTES(STRING_GETTER, HIDE_FROM_ABI) constexpr size_type length() const noexcept { return size_; }
+    UTL_ATTRIBUTES(ALWAYS_INLINE,STRING_PURE) constexpr const_pointer data() const noexcept UTL_LIFETIMEBOUND {
+        return data_;
+    }
+    UTL_ATTRIBUTES(ALWAYS_INLINE,STRING_PURE) constexpr bool empty() const noexcept { return !size(); }
+    UTL_ATTRIBUTES(ALWAYS_INLINE,STRING_PURE) constexpr size_type size() const noexcept { return size_; }
+    UTL_ATTRIBUTES(ALWAYS_INLINE,STRING_PURE) constexpr size_type length() const noexcept { return size_; }
 
     UTL_ATTRIBUTES(CONST, NODISCARD, HIDE_FROM_ABI) constexpr size_type max_size() const noexcept {
         return npos;
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr const_iterator cbegin() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr const_iterator cbegin() const noexcept UTL_LIFETIMEBOUND {
         return const_iterator(data());
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr const_iterator begin() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr const_iterator begin() const noexcept UTL_LIFETIMEBOUND {
         return const_iterator(data());
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr const_iterator cend() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr const_iterator cend() const noexcept UTL_LIFETIMEBOUND {
         return const_iterator(data() + size());
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr const_iterator end() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr const_iterator end() const noexcept UTL_LIFETIMEBOUND {
         return const_iterator(data() + size());
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr const_iterator crbegin() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr const_iterator crbegin() const noexcept UTL_LIFETIMEBOUND {
         return const_reverse_iterator(end());
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr const_iterator rbegin() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr const_iterator rbegin() const noexcept UTL_LIFETIMEBOUND {
         return const_reverse_iterator(end());
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr const_iterator crend() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr const_iterator crend() const noexcept UTL_LIFETIMEBOUND {
         return const_reverse_iterator(begin());
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr const_iterator rend() const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr const_iterator rend() const noexcept UTL_LIFETIMEBOUND {
         return const_reverse_iterator(begin());
     }
-    UTL_ATTRIBUTES(STRING_GETTER, HIDE_FROM_ABI) constexpr const_reference front() const noexcept {
+    UTL_ATTRIBUTES(ALWAYS_INLINE,STRING_PURE) constexpr const_reference
+    front() const noexcept UTL_LIFETIMEBOUND {
         return *data_;
     }
-    UTL_ATTRIBUTES(STRING_GETTER, HIDE_FROM_ABI) constexpr const_reference back() const noexcept {
+    UTL_ATTRIBUTES(ALWAYS_INLINE,STRING_PURE) constexpr const_reference
+    back() const noexcept UTL_LIFETIMEBOUND {
         return data_[size_ - 1];
     }
-    UTL_ATTRIBUTES(STRING_GETTER, HIDE_FROM_ABI) constexpr const_reference operator[](
-        size_type idx) const noexcept {
+    UTL_ATTRIBUTES(ALWAYS_INLINE,STRING_PURE) constexpr const_reference operator[](
+        size_type idx) const noexcept UTL_LIFETIMEBOUND {
         return data_[idx];
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr const_reference at(size_type idx) const UTL_THROWS {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr const_reference at(size_type idx) const UTL_THROWS UTL_LIFETIMEBOUND {
         UTL_THROW_IF(idx > size(),
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_string_view::at` operation failed, "
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
@@ -175,208 +177,203 @@ public:
         return copied;
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr basic_string_view substr(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr basic_string_view substr(
         size_type pos = 0, size_type count = npos) const UTL_THROWS {
         return pos >= size()
             ? substr_throw(UTL_SOURCE_LOCATION(), pos, size())
             : basic_string_view(data() + pos, UTL_SCOPE numeric::min(count, size() - pos));
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr int compare(basic_string_view other) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr int compare(basic_string_view other) const noexcept {
         return details::string::compare<traits_type>(data(), size(), other.data(), other.size());
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr int compare(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr int compare(
         size_type pos, size_type count, basic_string_view other) const UTL_THROWS {
         return substr(pos, count).compare(other);
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr int compare(size_type pos, size_type count,
-        basic_string_view other, size_type other_pos, size_type other_count) const UTL_THROWS {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr int compare(size_type pos, size_type count, basic_string_view other,
+        size_type other_pos, size_type other_count) const UTL_THROWS {
         return substr(pos, count).compare(other.substr(other_pos, other_count));
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr int compare(const_pointer other) const {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr int compare(const_pointer other) const {
         return compare(basic_string_view(other));
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr int compare(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr int compare(
         size_type pos, size_type count, const_pointer other) const UTL_THROWS {
         return substr(pos, count).compare(basic_string_view(other));
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr int compare(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr int compare(
         size_type pos, size_type count, const_pointer other, size_type other_count) const UTL_THROWS {
         return substr(pos, count).compare(basic_string_view(other, other_count));
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool starts_with(
-        basic_string_view other) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr bool starts_with(basic_string_view other) const noexcept {
         return size() >= other.size() &&
             traits_type::compare(data(), other.data(), other.size()) == 0;
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool starts_with(value_type ch) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr bool starts_with(value_type ch) const noexcept {
         return !empty() && front() == ch;
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool starts_with(const_pointer other) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr bool starts_with(const_pointer other) const noexcept {
         // CONSTEXPR_ASSERT(other != nullptr);
         return starts_with(basic_string_view(other));
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool ends_with(
-        basic_string_view other) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr bool ends_with(basic_string_view other) const noexcept {
         return size() >= other.size() &&
             traits_type::compare(data() + size() - other.size(), other.data(), other.size()) == 0;
     }
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool ends_with(value_type ch) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr bool ends_with(value_type ch) const noexcept {
         return !empty() && back() == ch;
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool ends_with(const_pointer other) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr bool ends_with(const_pointer other) const noexcept {
         // CONSTEXPR_ASSERT(other != nullptr);
         return ends_with(basic_string_view(other));
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool contains(basic_string_view other) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr bool contains(basic_string_view other) const noexcept {
         return find(other) != npos;
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool contains(value_type ch) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr bool contains(value_type ch) const noexcept {
         return find(ch) != npos;
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool contains(const_pointer other) const UTL_THROWS {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr bool contains(const_pointer other) const UTL_THROWS {
         return find(other) != npos;
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find(
         basic_string_view other, size_type pos = 0) const noexcept {
         return find(other.data(), pos, other.size());
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find(
-        value_type ch, size_type pos = 0) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find(value_type ch, size_type pos = 0) const noexcept {
         return details::string::find<traits_type>(data(), size(), ch, pos);
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find(
         const_pointer str, size_type pos, size_type str_len) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return details::string::find<traits_type>(data(), size(), str, str_len, pos);
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find(
-        const_pointer str, size_type pos = 0) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find(const_pointer str, size_type pos = 0) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return find(str, pos, traits_type::length(str));
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type rfind(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type rfind(
         basic_string_view other, size_type pos = npos) const noexcept {
         return rfind(other.data(), pos, other.size());
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type rfind(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type rfind(
         const_pointer str, size_type pos, size_type str_len) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return details::string::rfind<traits_type>(data(), size(), str, str_len, pos);
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type rfind(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type rfind(
         const_pointer str, size_type pos = npos) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return rfind(str, pos, traits_type::length(str));
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type rfind(
-        value_type ch, size_type pos = npos) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type rfind(value_type ch, size_type pos = npos) const noexcept {
         return details::string::rfind<traits_type>(data(), size(), ch, pos);
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_first_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_first_of(
         basic_string_view other, size_type pos = 0) const noexcept {
         return find_first_of(other.data(), pos, other.size());
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_first_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_first_of(
         const_pointer chars, size_type pos, size_type chars_count) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_first_of<traits_type>(data(), size(), chars, chars_count, pos);
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_first_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_first_of(
         const_pointer chars, size_type pos = 0) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_first_of(chars, pos, traits_type::length(chars));
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_first_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_first_of(
         value_type ch, size_type pos = 0) const noexcept {
         return details::string::find_first_of<traits_type>(data(), size(), ch, pos);
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_first_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_first_not_of(
         basic_string_view other, size_type pos = 0) const noexcept {
         return find_first_not_of(other.data(), pos, other.size());
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_first_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_first_not_of(
         const_pointer chars, size_type pos, size_type chars_count) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_first_not_of<traits_type>(
             data(), size(), chars, chars_count, pos);
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_first_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_first_not_of(
         const_pointer chars, size_type pos = 0) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_first_not_of(chars, pos, traits_type::length(chars));
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_first_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_first_not_of(
         value_type ch, size_type pos = 0) const noexcept {
         return find_first_not_of(&ch, pos, 1);
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_last_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_last_of(
         basic_string_view other, size_type pos = npos) const noexcept {
         return find_last_of(other.data(), pos, other.size());
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_last_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_last_of(
         const_pointer chars, size_type pos, size_type chars_count) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_last_of<traits_type>(data(), size(), chars, chars_count, pos);
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_last_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_last_of(
         const_pointer chars, size_type pos = npos) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_last_of(chars, pos, traits_type::length(chars));
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_last_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_last_of(
         value_type ch, size_type pos = npos) const noexcept {
         return find_last_of(&ch, pos, 1);
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_last_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_last_not_of(
         basic_string_view other, size_type pos = npos) const UTL_THROWS {
         return find_last_not_of(other.data(), pos, other.size());
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_last_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_last_not_of(
         const_pointer chars, size_type pos, size_type count) const UTL_THROWS {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_last_not_of<traits_type>(data(), size(), chars, count, pos);
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_last_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_last_not_of(
         const_pointer chars, size_type pos = npos) const UTL_THROWS {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_last_not_of(chars, pos, traits_type::length(chars));
     }
 
-    UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr size_type find_last_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) constexpr size_type find_last_not_of(
         value_type ch, size_type pos = npos) const UTL_THROWS {
         return find_last_not_of(&ch, pos, 1);
     }
 
 private:
-    [[noreturn]] UTL_HIDE_FROM_ABI static basic_string_view substr_throw(
+    UTL_ATTRIBUTES(NORETURN, NOINLINE, HIDE_FROM_ABI) static basic_string_view substr_throw(
         UTL_SCOPE source_location src, size_t pos, size_t size) UTL_THROWS {
         exceptions::message_format format = {"[UTL] `basic_string_view::substr` operation failed, "
                                              "Reason=[index out of range], pos=[%zu], size=[%zu]",
@@ -389,7 +386,7 @@ private:
 };
 
 template <typename CharType, typename Traits>
-UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool operator==(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator==(
     basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
     return lhs.size() == rhs.size() && (lhs.data() == rhs.data() || lhs.compare(rhs) == 0);
 }
@@ -403,7 +400,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename CharType, typename Traits>
-UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr typename Traits::comparison_category operator<=>(
+UTL_ATTRIBUTE(STRING_PURE) constexpr typename Traits::comparison_category operator<=>(
     basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
     using result_type = typename Traits::comparison_category;
     return static_cast<result_type>(lhs.compare(rhs) <=> 0);
@@ -416,31 +413,31 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename CharType, typename Traits>
-UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool operator<(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator<(
     basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
     return lhs.compare(rhs) < 0;
 }
 
 template <typename CharType, typename Traits>
-UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool operator>(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator>(
     basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
     return rhs < lhs;
 }
 
 template <typename CharType, typename Traits>
-UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool operator>=(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator>=(
     basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
     return !(lhs < rhs);
 }
 
 template <typename CharType, typename Traits>
-UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool operator<=(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator<=(
     basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
     return !(rhs < lhs);
 }
 
 template <typename CharType, typename Traits>
-UTL_ATTRIBUTES(STRING_PURE, HIDE_FROM_ABI) constexpr bool operator!=(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator!=(
     basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
     return !(lhs == rhs);
 }
@@ -449,7 +446,5 @@ UTL_NAMESPACE_END
 
 #endif
 
-#undef __UTL_ATTRIBUTE_STRING_GETTER
-#undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_GETTER
 #undef __UTL_ATTRIBUTE_STRING_PURE
 #undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_PURE

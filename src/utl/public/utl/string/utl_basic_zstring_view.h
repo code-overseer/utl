@@ -19,8 +19,8 @@
 #include "utl/numeric/utl_min.h"
 #include "utl/string/utl_string_details.h"
 
-#define UTL_STRING_PURE UTL_ATTRIBUTES(NODISCARD, PURE)
-#define UTL_STRING_CONST UTL_ATTRIBUTES(NODISCARD, CONST)
+#define __UTL_ATTRIBUTE_STRING_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_PURE
 
 UTL_NAMESPACE_BEGIN
 template <typename CharType, typename Traits>
@@ -90,7 +90,7 @@ public:
     using base_type::operator[];
     using base_type::remove_prefix;
 
-    UTL_STRING_PURE UTL_HIDE_FROM_ABI constexpr const_reference at(size_type idx) const UTL_THROWS {
+    UTL_ATTRIBUTE(STRING_PURE)constexpr const_reference at(size_type idx) const UTL_THROWS UTL_LIFETIMEBOUND {
         UTL_THROW_IF(idx > size(),
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_zstring_view::at` operation failed, "
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
@@ -136,7 +136,7 @@ public:
     using base_type::starts_with;
 
 private:
-    [[noreturn]] UTL_HIDE_FROM_ABI static basic_zstring_view substr_throw(
+    UTL_ATTRIBUTES(NORETURN, NOINLINE, HIDE_FROM_ABI) static basic_zstring_view substr_throw(
         UTL_SCOPE source_location src, size_t pos, size_t size) UTL_THROWS {
         exceptions::message_format format = {"[UTL] `basic_zstring_view::substr` operation failed, "
                                              "Reason=[index out of range], pos=[%zu], size=[%zu]",
@@ -146,7 +146,7 @@ private:
 };
 
 template <typename CharType, typename Traits>
-UTL_STRING_CONST UTL_HIDE_FROM_ABI constexpr bool operator==(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator==(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
     return lhs.size() == rhs.size() && (lhs.data() == rhs.data() || lhs.compare(rhs) == 0);
 }
@@ -160,7 +160,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename CharType, typename Traits>
-UTL_STRING_CONST UTL_HIDE_FROM_ABI constexpr typename Traits::comparison_category operator<=>(
+UTL_ATTRIBUTE(STRING_PURE) constexpr typename Traits::comparison_category operator<=>(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
     using result_type = typename Traits::comparison_category;
     return static_cast<result_type>(lhs.compare(rhs) <=> 0);
@@ -173,31 +173,31 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename CharType, typename Traits>
-UTL_STRING_CONST UTL_HIDE_FROM_ABI constexpr bool operator<(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator<(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
     return lhs.compare(rhs) < 0;
 }
 
 template <typename CharType, typename Traits>
-UTL_STRING_CONST UTL_HIDE_FROM_ABI constexpr bool operator>(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator>(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
     return rhs < lhs;
 }
 
 template <typename CharType, typename Traits>
-UTL_STRING_CONST UTL_HIDE_FROM_ABI constexpr bool operator>=(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator>=(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
     return !(lhs < rhs);
 }
 
 template <typename CharType, typename Traits>
-UTL_STRING_CONST UTL_HIDE_FROM_ABI constexpr bool operator<=(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator<=(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
     return !(rhs < lhs);
 }
 
 template <typename CharType, typename Traits>
-UTL_STRING_CONST UTL_HIDE_FROM_ABI constexpr bool operator!=(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator!=(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
     return !(lhs == rhs);
 }
@@ -206,5 +206,5 @@ UTL_NAMESPACE_END
 
 #endif
 
-#undef UTL_STRING_PURE
-#undef UTL_STRING_CONST
+#undef __UTL_ATTRIBUTE_STRING_PURE
+#undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_PURE
