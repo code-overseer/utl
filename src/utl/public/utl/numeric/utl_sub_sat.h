@@ -114,7 +114,7 @@ T impl(T left, T right) noexcept {
 } // namespace runtime
 
 template <UTL_CONCEPT_CXX20(signed_integral) T UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_signed(T) && UTL_TRAIT_is_integral(T) && !has_overload<T>::value)>
+    UTL_TRAIT_is_signed(T) && UTL_TRAIT_is_integral(T) && !runtime::has_overload<T>::value)>
 constexpr T impl(T left, T right) noexcept {
     return UTL_CONSTANT_P(left == right)
         ? UTL_SCOPE details::sub_sat::compile_time::impl(left, right)
@@ -135,8 +135,7 @@ constexpr T impl(T left, T right) noexcept {
 } // namespace details
 
 template <UTL_CONCEPT_CXX20(saturatable) T UTL_REQUIRES_CXX11(UTL_TRAIT_is_saturatable(T))>
-UTL_ATTRIBUTES(NODISCARD, CONST)
-constexpr T sub_sat(T left, T right) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr T sub_sat(T left, T right) noexcept {
     return UTL_SCOPE details::sub_sat::impl(left, right);
 }
 

@@ -223,7 +223,7 @@ concept implements_allocate_at_least = requires(T& alloc, size_type_t<T> size) {
 
 template <typename T UTL_REQUIRES_CXX11(!implements_allocate_at_least<T>::value)>
 UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 result_type_t<T> allocate_at_least(T& allocator, size_type_t<T> size) {
-    return {allocate(allocator, size), size};
+    return {allocator.allocate(size), size};
 }
 
 template <UTL_CONCEPT_CXX20(implements_allocate_at_least) T UTL_REQUIRES_CXX11(

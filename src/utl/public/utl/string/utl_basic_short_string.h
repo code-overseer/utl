@@ -1708,7 +1708,7 @@ UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator<(
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator<(
-    CharType const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
+    CharT const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return rhs.compare(lhs) > 0;
 }
 
@@ -1726,7 +1726,7 @@ UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator>(
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator>(
-    CharType const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
+    CharT const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return rhs < lhs;
 }
 
@@ -1744,7 +1744,7 @@ UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator>=(
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator>=(
-    CharType const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
+    CharT const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(lhs < rhs);
 }
 
@@ -1780,7 +1780,7 @@ UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator!=(
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator!=(
-    CharType const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
+    CharT const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(lhs == rhs);
 }
 

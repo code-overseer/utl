@@ -124,8 +124,12 @@ struct pointer_to_arg<void> {
 };
 
 template <typename P>
-using diff_type_t = UTL_SCOPE conditional_t<UTL_TRAIT_has_member_difference_type(P),
-    typename P::difference_type, decltype((char*)(0) - (char*)(0))>;
+UTL_HIDE_FROM_ABI auto diff_type_impl(int) -> typename P::difference_type;
+template <typename P>
+UTL_HIDE_FROM_ABI auto diff_type_impl(short) -> decltype((char*)(0) - (char*)(0));
+
+template <typename P>
+using diff_type_t = decltype(diff_type_impl<P>(0));
 
 template <typename T, typename U>
 auto has_rebind_impl(float) noexcept -> UTL_SCOPE false_type;

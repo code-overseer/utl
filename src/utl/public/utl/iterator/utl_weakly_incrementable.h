@@ -41,6 +41,7 @@ UTL_NAMESPACE_END
 
 #else // UTL_CXX20
 
+#  include "utl/type_traits/utl_declval.h"
 #  include "utl/type_traits/utl_enable_if.h"
 #  include "utl/type_traits/utl_is_integral.h"
 #  include "utl/type_traits/utl_is_same.h"
@@ -66,7 +67,7 @@ template <typename T>
 auto trait_impl(int) noexcept
     -> UTL_SCOPE conjunction<UTL_SCOPE is_signed<UTL_SCOPE iter_difference_t<T>>,
         UTL_SCOPE is_integral<UTL_SCOPE iter_difference_t<T>>, pre_incrementable<T>,
-        UTL_SCOPE always_true<decltype(UTL_SCOPE declval<T&>()++)>>;
+        UTL_SCOPE always_true_type<decltype(UTL_SCOPE declval<T&>()++)>>;
 
 template <typename T>
 auto trait_impl(float) noexcept -> UTL_SCOPE false_type;

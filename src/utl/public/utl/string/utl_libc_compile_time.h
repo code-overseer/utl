@@ -43,16 +43,18 @@ UTL_HIDE_FROM_ABI constexpr int memcmp(
         "Types must be lexicographically comparable");
     return count == 0      ? 0
         : (*left < *right) ? -1
-        : (*right < *left) ? 1
-                           : memcmp(left + 1, right + 1, count - 1);
+        : (*right < *left)
+        ? 1
+        : UTL_SCOPE libc::compile_time::recursive::memcmp(left + 1, right + 1, count - 1);
 }
 
 template <UTL_CONCEPT_CXX20(exact_size<1>) T, UTL_CONCEPT_CXX20(exact_size<1>) U UTL_REQUIRES_CXX11(
     exact_size<T, 1>::value && exact_size<U, 1>::value)>
 UTL_HIDE_FROM_ABI constexpr T* memchr(T const* str, U value, size_t bytes) noexcept {
-    return bytes == 0   ? nullptr
-        : *str == value ? const_cast<T*>(str)
-                        : memchr(str + 1, value, bytes - 1);
+    return bytes == 0 ? nullptr
+        : *str == value
+        ? const_cast<T*>(str)
+        : UTL_SCOPE libc::compile_time::recursive::memchr(str + 1, value, bytes - 1);
 }
 
 template <typename T>
@@ -62,7 +64,9 @@ UTL_HIDE_FROM_ABI constexpr size_t strlen(T const* str, size_t r = 0) noexcept {
 
 template <typename T>
 UTL_HIDE_FROM_ABI constexpr T* strchr(T const* str, T const ch) noexcept {
-    return *str == ch ? const_cast<T*>(str) : !*str ? nullptr : strchr(str + 1, ch);
+    return *str == ch ? const_cast<T*>(str)
+        : !*str       ? nullptr
+                      : UTL_SCOPE libc::compile_time::recursive::strchr(str + 1, ch);
 }
 
 template <typename T>
@@ -70,7 +74,7 @@ UTL_HIDE_FROM_ABI constexpr int strcmp(T const* left, T const* right) noexcept {
     return !*left && !*right ? 0
         : (*left < *right)   ? -1
         : (*right < *left)   ? 1
-                             : strcmp(left + 1, right + 1);
+                             : UTL_SCOPE libc::compile_time::recursive::strcmp(left + 1, right + 1);
 }
 
 template <typename T>
@@ -78,8 +82,9 @@ UTL_HIDE_FROM_ABI constexpr int strncmp(
     T const* left, T const* right, element_count_t len) noexcept {
     return len == 0 || (!*left && !*right) ? 0
         : (*left < *right)                 ? -1
-        : (*right < *left)                 ? 1
-                                           : strcmp(left + 1, right + 1, len - 1);
+        : (*right < *left)
+        ? 1
+        : UTL_SCOPE libc::compile_time::recursive::strncmp(left + 1, right + 1, len - 1);
 }
 
 template <typename T>
@@ -87,13 +92,16 @@ UTL_HIDE_FROM_ABI constexpr T* strnchr(T const* str, T const ch, element_count_t
     return len == 0    ? nullptr
         : (*str == ch) ? const_cast<T*>(str)
         : (!*str)      ? nullptr
-                       : strnchr(str + 1, ch, len - 1);
+                       : UTL_SCOPE libc::compile_time::recursive::strnchr(str + 1, ch, len - 1);
 }
 
 template <typename T>
 UTL_HIDE_FROM_ABI constexpr T* strnset(
     T* dst, T const val, element_count_t count, T* org) noexcept {
-    return count == 0 ? org : ((*dst = val), strnset(dst + 1, val, count - 1, org));
+    return count == 0
+        ? org
+        : ((*dst = val),
+              UTL_SCOPE libc::compile_time::recursive::strnset(dst + 1, val, count - 1, org));
 }
 
 } // namespace recursive
