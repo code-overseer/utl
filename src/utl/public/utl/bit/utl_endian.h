@@ -7,7 +7,7 @@
 UTL_NAMESPACE_BEGIN
 
 enum class endian {
-#ifdef UTL_COMPILER_MSVC
+#if UTL_COMPILER_MSVC
     little = 0,
     big = 1,
     native = little
