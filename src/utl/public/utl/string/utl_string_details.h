@@ -5,6 +5,7 @@
 #include "utl/preprocessor/utl_config.h"
 
 #include "utl/numeric/utl_add_sat.h"
+#include "utl/numeric/utl_limits.h"
 #include "utl/numeric/utl_min.h"
 #include "utl/numeric/utl_sub_sat.h"
 #include "utl/string/utl_char_traits.h"
@@ -26,7 +27,7 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace string {
 
-UTL_INLINE_CXX17 constexpr size_t npos = (size_t)-1;
+UTL_INLINE_CXX17 constexpr size_t npos = numeric::maximum<size_t>::value;
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
 UTL_ATTRIBUTE(CONST_FUNCTION) constexpr size_t to_index(T const* base, T const* ptr) noexcept {
