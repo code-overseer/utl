@@ -37,6 +37,30 @@ UTL_NODISCARD constexpr int builtin_popcount(unsigned char x) noexcept {
     return __builtin_popcount(x);
 }
 
+#  if UTL_SUPPORTS_INT128
+struct builtin_popcount128 {
+    constexpr builtin_popcount128(__uint128_t x) : result(compute(x)) {}
+    constexpr operator int() const noexcept { return result; }
+
+private:
+    static constexpr __uint128_t mask() noexcept { return (__uint128_t(1) << 64) - 1; }
+
+    static constexpr int compute(__uint128_t x) noexcept {
+        return compute((unsigned long long)(x & mask()), (unsigned long long)(x >> 64));
+    }
+
+    static constexpr int compute(unsigned long long hi, unsigned long long low) noexcept {
+        return builtin_popcount(hi) + builtin_popcount(low);
+    }
+
+    int result;
+};
+
+UTL_NODISCARD inline constexpr int builtin_popcount(__uint128_t x) noexcept {
+    return builtin_popcount128(x);
+}
+#  endif
+
 #elif UTL_COMPILER_MSVC
 
 namespace compile_time {

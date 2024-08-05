@@ -3,7 +3,6 @@
 #pragma once
 
 #include "utl/bit/utl_bit_width.h"
-#include "utl/concepts/utl_same_as.h"
 
 UTL_NAMESPACE_BEGIN
 

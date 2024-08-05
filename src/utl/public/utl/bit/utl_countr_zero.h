@@ -39,10 +39,34 @@ UTL_NODISCARD constexpr int builtin_ctz(unsigned char x) noexcept {
     return x ? __builtin_ctz(x) - unsigned_width_diff<unsigned char>() : CHAR_BIT * sizeof(x);
 }
 
+#  if UTL_SUPPORTS_INT128
+struct builtin_ctz128 {
+    constexpr builtin_ctz128(__uint128_t x) : result(compute(x)) {}
+    constexpr operator int() const noexcept { return result; }
+
+private:
+    static constexpr __uint128_t mask() noexcept { return (__uint128_t(1) << 64) - 1; }
+
+    static constexpr int compute(__uint128_t x) noexcept {
+        return compute((unsigned long long)(x & mask()), (unsigned long long)(x >> 64));
+    }
+
+    static constexpr int compute(unsigned long long hi, unsigned long long low) noexcept {
+        return low == 0 ? 64 + builtin_clz(hi) : builtin_clz(low);
+    }
+
+    int result;
+};
+
+UTL_NODISCARD inline constexpr int builtin_ctz(__uint128_t x) noexcept {
+    return builtin_ctz128(x);
+}
+#  endif
+
 #elif UTL_COMPILER_MSVC
 
 namespace compile_time {
-template <typename T, unsigned int N = sizeof(T) * CHAR_BIT>
+template <typename T>
 UTL_NODISCARD constexpr int builtin_ctz(T x, unsigned int i = 1) noexcept {
     return x ? (x &= -(int64_t)x),
            ((!(x & 0xFFFFFFFFULL) << 5 | !(x & 0xFFFF0000FFFFULL) << 4 |
