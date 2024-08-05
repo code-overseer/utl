@@ -27,3 +27,42 @@ utl::string concatenatable(utl::string s) {
 
 // Ensure char_traits specialization is implemented
 static_assert(!utl::char_traits<char>::lt(-1, 1), "Invalid");
+
+template <typename T>
+class small_ptr {
+public:
+    using value_type = T;
+    using difference_type = int16_t;
+    using pointer = small_ptr;
+    using reference = T&;
+    using iterator_category = utl::random_access_iterator_tag;
+
+private:
+    uint16_t offset;
+};
+
+template <typename T>
+class small_iter_allocator {
+public:
+    using value_type = T;
+    using pointer = small_ptr<T>;
+    using size_type = int16_t;
+    using difference_type = int16_t;
+
+    small_iter_allocator() noexcept {}
+
+    template <class U>
+    small_iter_allocator(small_iter_allocator<U>) noexcept {}
+
+    T* allocate(size_t n);
+    void deallocate(T* p, size_t);
+
+    friend bool operator==(small_iter_allocator, small_iter_allocator) { return true; }
+    friend bool operator!=(small_iter_allocator, small_iter_allocator) { return false; }
+};
+
+template <typename CharT>
+using small_string = utl::basic_string<CharT, utl::char_traits<CharT>, small_iter_allocator<CharT>>;
+
+static_assert(sizeof(small_string<char>) == 6, "");
+static_assert(sizeof(utl::string) == 32, "");

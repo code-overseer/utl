@@ -29,6 +29,8 @@
 #  define UTL_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_TYPE_MSVC_EXT_NODISCARD
+#else
+#  define UTL_NODISCARD
 #endif /* UTL_HAS_CPP_ATTRIBUTE(nodiscard) */
 
 #if UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound)
