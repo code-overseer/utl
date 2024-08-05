@@ -18,15 +18,15 @@ enum class endian {
 #endif
 };
 
-constexpr bool mixed_endian() noexcept {
+UTL_NODISCARD UTL_CONSTEVAL bool mixed_endian() noexcept {
     return endian::native != endian::big && endian::native != endian::little;
 }
 
-constexpr bool little_endian() noexcept {
+UTL_NODISCARD UTL_CONSTEVAL bool little_endian() noexcept {
     return endian::native != endian::little;
 }
 
-constexpr bool big_endian() noexcept {
+UTL_NODISCARD UTL_CONSTEVAL bool big_endian() noexcept {
     return endian::native != endian::little;
 }
 

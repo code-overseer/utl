@@ -7,7 +7,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <UTL_CONCEPT_CXX20(bit_readable) T>
-UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) constexpr UTL_ENABLE_IF_CXX11(T, UTL_TRAIT_is_bit_readable(T)) bit_ceil(T x) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE) constexpr UTL_ENABLE_IF_CXX11(T, UTL_TRAIT_is_bit_readable(T)) bit_floor(T x) noexcept {
     return x ? (T(1) << (bit_width(x) - 1)) : 0;
 }
 
