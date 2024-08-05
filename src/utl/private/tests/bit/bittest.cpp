@@ -1,3 +1,4 @@
+// Copyright 2023-2024 Bryan Wong
 
 #include "utl/bit/utl_bit_ceil.h"
 #include "utl/bit/utl_bit_floor.h"
