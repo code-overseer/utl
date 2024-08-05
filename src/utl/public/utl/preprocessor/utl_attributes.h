@@ -10,18 +10,23 @@
 #include "utl/preprocessor/utl_msvc_extensions.h"
 
 #if UTL_HAS_CPP_ATTRIBUTE(nodiscard)
+#  define UTL_NODISCARD [[nodiscard]]
 #  define __UTL_ATTRIBUTE_NODISCARD nodiscard
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODISCARD
 #elif UTL_HAS_CPP_ATTRIBUTE(gnu::warn_unused_result)
+#  define UTL_NODISCARD [[gnu::warn_unused_result]]
 #  define __UTL_ATTRIBUTE_NODISCARD gnu::warn_unused_result
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODISCARD
 #elif UTL_HAS_CPP_ATTRIBUTE(clang::warn_unused_result)
+#  define UTL_NODISCARD [[clang::warn_unused_result]]
 #  define __UTL_ATTRIBUTE_NODISCARD clang::warn_unused_result
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODISCARD
 #elif UTL_HAS_GNU_ATTRIBUTE(__warn_unused_result__)
+#  define UTL_NODISCARD __attribute__((__warn_unused_result__))
 #  define __UTL_ATTRIBUTE_NODISCARD __warn_unused_result__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_NODISCARD
 #elif UTL_HAS_SAL_ANNOTATION(_Check_return_)
+#  define UTL_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_TYPE_MSVC_EXT_NODISCARD
 #endif /* UTL_HAS_CPP_ATTRIBUTE(nodiscard) */
