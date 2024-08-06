@@ -33,15 +33,32 @@
 #  define UTL_NODISCARD
 #endif /* UTL_HAS_CPP_ATTRIBUTE(nodiscard) */
 
+#if UTL_HAS_CPP_ATTRIBUTE(noreturn)
+#  define UTL_NORETURN [[noreturn]]
+#  define __UTL_ATTRIBUTE_NORETURN noreturn
+#  define __UTL_ATTRIBUTE_TYPE_CPP_NORETURN
+#else
+#  define UTL_NORETURN
+#endif
+
 #if UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound)
+#  define UTL_LIFETIMEBOUND [[msvc::lifetimebound]]
 #  define __UTL_ATTRIBUTE_LIFETIMEBOUND msvc::lifetimebound
 #  define __UTL_ATTRIBUTE_TYPE_CPP_LIFETIMEBOUND
 #elif UTL_HAS_CPP_ATTRIBUTE(clang::lifetimebound) /* UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound) */
+#  define UTL_LIFETIMEBOUND [[clang::lifetimebound]]
 #  define __UTL_ATTRIBUTE_LIFETIMEBOUND clang::lifetimebound
 #  define __UTL_ATTRIBUTE_TYPE_CPP_LIFETIMEBOUND
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::lifetimebound) /* UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound) */
+#  define UTL_LIFETIMEBOUND [[gnu::lifetimebound]]
+#  define __UTL_ATTRIBUTE_LIFETIMEBOUND gnu::lifetimebound
+#  define __UTL_ATTRIBUTE_TYPE_CPP_LIFETIMEBOUND
 #elif UTL_HAS_GNU_ATTRIBUTE(__lifetimebound__) /* UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound) */
+#  define UTL_LIFETIMEBOUND __attribute__((__lifetimebound__))
 #  define __UTL_ATTRIBUTE_LIFETIMEBOUND __lifetimebound__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_LIFETIMEBOUND
+#else
+#  define UTL_LIFETIMEBOUND
 #endif /* UTL_HAS_CPP_ATTRIBUTE(msvc::lifetimebound) */
 
 #if UTL_HAS_CPP_ATTRIBUTE(gnu::pure)
@@ -104,6 +121,23 @@
 #  define __UTL_ATTRIBUTE_TYPE_MSVC_EXT_ALWAYS_INLINE
 #endif /* UTL_HAS_CPP_ATTRIBUTE(clang::always_inline) */
 
+#if UTL_HAS_CPP_ATTRIBUTE(msvc::noinline)
+#  define __UTL_ATTRIBUTE_NOINLINE msvc::noinline
+#  define __UTL_ATTRIBUTE_TYPE_CPP_NOINLINE
+#elif UTL_HAS_CPP_ATTRIBUTE(clang::noinline)
+#  define __UTL_ATTRIBUTE_NOINLINE clang::noinline
+#  define __UTL_ATTRIBUTE_TYPE_CPP_NOINLINE
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::noinline)
+#  define __UTL_ATTRIBUTE_NOINLINE gnu::noinline
+#  define __UTL_ATTRIBUTE_TYPE_CPP_NOINLINE
+#elif UTL_HAS_GNU_ATTRIBUTE(__noinline__)
+#  define __UTL_ATTRIBUTE_NOINLINE __noinline__
+#  define __UTL_ATTRIBUTE_TYPE_GNU_NOINLINE
+#elif UTL_HAS_DECLSPEC(noinline)
+#  define __UTL_ATTRIBUTE_NOINLINE noinline
+#  define __UTL_ATTRIBUTE_TYPE_DECLSPEC_NOINLINE
+#endif /* UTL_HAS_CPP_ATTRIBUTE(clang::noinline) */
+
 #if UTL_HAS_CPP_ATTRIBUTE(clang::malloc)
 #  define __UTL_ATTRIBUTE_MALLOC clang::malloc
 #  define __UTL_ATTRIBUTE_TYPE_CPP_MALLOC
@@ -119,6 +153,9 @@
 #    define __UTL_ATTRIBUTE_TYPE_DECLSPEC_MALLOC
 #  elif UTL_HAS_DECLSPEC(allocator)
 #    define __UTL_ATTRIBUTE_MALLOC allocator
+#    define __UTL_ATTRIBUTE_TYPE_DECLSPEC_MALLOC
+#  elif UTL_HAS_DECLSPEC(restrict)
+#    define __UTL_ATTRIBUTE_MALLOC restrict
 #    define __UTL_ATTRIBUTE_TYPE_DECLSPEC_MALLOC
 #  endif
 #endif /* UTL_HAS_CPP_ATTRIBUTE(clang::malloc) */
@@ -180,6 +217,31 @@
 #  define __UTL_ATTRIBUTE_TYPE_DECLSPEC_DLLIMPORT
 #endif
 
+#if UTL_HAS_CPP_ATTRIBUTE(clang::exclude_from_explicit_instantiation)
+#  define __UTL_ATTRIBUTE_EXCLUDE_FROM_EXPLICIT_INSTANTIATION \
+      clang::exclude_from_explicit_instantiation
+#  define __UTL_ATTRIBUTE_TYPE_CPP_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::exclude_from_explicit_instantiation)
+#  define __UTL_ATTRIBUTE_EXCLUDE_FROM_EXPLICIT_INSTANTIATION \
+      gnu::exclude_from_explicit_instantiation
+#  define __UTL_ATTRIBUTE_TYPE_CPP_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
+#elif UTL_HAS_GNU_ATTRIBUTE(__exclude_from_explicit_instantiation__)
+#  define __UTL_ATTRIBUTE_EXCLUDE_FROM_EXPLICIT_INSTANTIATION \
+      __exclude_from_explicit_instantiation__
+#  define __UTL_ATTRIBUTE_TYPE_GNU_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
+#endif
+
+#if UTL_HAS_CPP_ATTRIBUTE(clang::abi_tag)
+#  define __UTL_ATTRIBUTE_ABI_TAG clang::abi_tag
+#  define __UTL_ATTRIBUTE_TYPE_CPP_ABI_TAG(STR)
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::abi_tag)
+#  define __UTL_ATTRIBUTE_ABI_TAG gnu::abi_tag
+#  define __UTL_ATTRIBUTE_TYPE_CPP_ABI_TAG(STR)
+#elif UTL_HAS_GNU_ATTRIBUTE(__abi_tag__)
+#  define __UTL_ATTRIBUTE_ABI_TAG __abi_tag__
+#  define __UTL_ATTRIBUTE_TYPE_GNU_ABI_TAG(STR)
+#endif
+
 #if UTL_HAS_CPP_ATTRIBUTE(clang::reinitializes)
 #  define __UTL_ATTRIBUTE_REINITIALIZES clang::reinitializes
 #  define __UTL_ATTRIBUTE_TYPE_CPP_REINITIALIZES
@@ -203,17 +265,19 @@
 #endif /* UTL_HAS_CPP_ATTRIBUTE(maybe_unused) */
 
 #if UTL_HAS_CPP_ATTRIBUTE(fallthrough)
+#  define UTL_FALLTHROUGH [[fallthrough]]
 #  define __UTL_ATTRIBUTE_FALLTHROUGH fallthrough
 #  define __UTL_ATTRIBUTE_TYPE_CPP_FALLTHROUGH
 #elif UTL_HAS_CPP_ATTRIBUTE(gnu::fallthrough)
-#  define __UTL_ATTRIBUTE_FALLTHROUGH gnu::fallthrough
-#  define __UTL_ATTRIBUTE_TYPE_CPP_FALLTHROUGH
-#elif UTL_HAS_CPP_ATTRIBUTE(gnu::fallthrough)
+#  define UTL_FALLTHROUGH [[gnu::fallthrough]]
 #  define __UTL_ATTRIBUTE_FALLTHROUGH gnu::fallthrough
 #  define __UTL_ATTRIBUTE_TYPE_CPP_FALLTHROUGH
 #elif UTL_HAS_GNU_ATTRIBUTE(__fallthrough__)
+#  define UTL_FALLTHROUGH __attribute__((__fallthrough__))
 #  define __UTL_ATTRIBUTE_FALLTHROUGH __fallthrough__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_FALLTHROUGH
+#else
+#  define UTL_FALLTHROUGH
 #endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(clang::noescape)
@@ -222,22 +286,33 @@
 #endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(clang::nodebug)
+#  define UTL_NODEBUG [[clang::nodebug]]
 #  define __UTL_ATTRIBUTE_NODEBUG clang::nodebug
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODEBUG
+#else
+#  define UTL_NODEBUG
 #endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(likely)
+#  define UTL_LIKELY [[likely]]
 #  define __UTL_ATTRIBUTE_LIKELY likely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_LIKELY
 #elif UTL_HAS_CPP_ATTRIBUTE(clang::likely)
+#  define UTL_LIKELY [[clang::likely]]
 #  define __UTL_ATTRIBUTE_LIKELY clang::likely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_LIKELY
+#else
+#  define UTL_LIKELY
 #endif /* UTL_HAS_CPP_ATTRIBUTE(likely) */
 
 #if UTL_HAS_CPP_ATTRIBUTE(unlikely)
+#  define UTL_UNLIKELY [[unlikely]]
 #  define __UTL_ATTRIBUTE_UNLIKELY unlikely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_UNLIKELY
 #elif UTL_HAS_CPP_ATTRIBUTE(clang::unlikely)
+#  define UTL_UNLIKELY [[clang::unlikely]]
 #  define __UTL_ATTRIBUTE_UNLIKELY clang::unlikely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_UNLIKELY
+#else
+#  define UTL_UNLIKELY
 #endif /* UTL_HAS_CPP_ATTRIBUTE(unlikely) */
