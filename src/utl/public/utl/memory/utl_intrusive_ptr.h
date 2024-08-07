@@ -142,21 +142,21 @@ public:
     /**
      * Dereference operator to access the object pointed to by the intrusive_ptr.
      */
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD) constexpr T* operator->() const noexcept {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, PURE) constexpr T* operator->() const noexcept {
         return resource_;
     }
 
     /**
      * Dereference operator to access the object pointed to by the intrusive_ptr.
      */
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD) constexpr T& operator*() const noexcept {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, PURE) constexpr T& operator*() const noexcept {
         return *resource_;
     }
 
     /**
      * Returns the underlying raw pointer.
      */
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD) constexpr T* get() const noexcept {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, PURE) constexpr T* get() const noexcept {
         return resource_;
     }
 
@@ -171,7 +171,7 @@ public:
     /**
      * Conversion operator to implicitly convert intrusive_ptr to boolean indicating non-nullness.
      */
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD) constexpr explicit operator bool() const noexcept {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, PURE) constexpr explicit operator bool() const noexcept {
         return resource_ != nullptr;
     }
 
@@ -267,21 +267,21 @@ public:
     /**
      * Dereference operator to access the const-qualified object pointed to by the intrusive_ptr.
      */
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD) constexpr T const* operator->() const noexcept {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, PURE) constexpr T const* operator->() const noexcept {
         return this->get();
     }
 
     /**
      * Dereference operator to access the const-qualified object pointed to by the intrusive_ptr.
      */
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD) constexpr T const& operator*() const noexcept {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, PURE) constexpr T const& operator*() const noexcept {
         return *(this->get());
     }
 
     /**
      * Returns the underlying raw pointer to the const-qualified object.
      */
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD) constexpr T const* get() const noexcept {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, PURE) constexpr T const* get() const noexcept {
         return base_type::get();
     }
 
