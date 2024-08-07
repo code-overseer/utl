@@ -47,8 +47,6 @@ protected:
     atomic_reference_count& operator=(atomic_reference_count&&) noexcept = delete;
 
 private:
-    using this_type = atomic_reference_count<T>;
-
     /**
      * ADL function to increment the reference count for objects of type T.
      *

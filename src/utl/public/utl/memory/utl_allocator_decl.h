@@ -26,8 +26,8 @@ public:
     using propagate_on_container_move_assignment = true_type;
 
 private:
-    using pointer = value_type*;
-    using result_type = allocation_result<pointer, size_t>;
+    using pointer UTL_NODEBUG = value_type*;
+    using result_type UTL_NODEBUG = allocation_result<pointer, size_t>;
 
 public:
     UTL_HIDE_FROM_ABI constexpr allocator() noexcept = default;
