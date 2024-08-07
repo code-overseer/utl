@@ -37,9 +37,8 @@ private:
     };
 
 public:
-    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_t size_type =
-        sizeof(typename alloc_traits::size_type);
-    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_t heap_type = sizeof(heap_type_emulator);
+    static constexpr size_t size_type = sizeof(typename alloc_traits::size_type);
+    static constexpr size_t heap_type = sizeof(heap_type_emulator);
 };
 
 template <typename CharType, typename Alloc>
@@ -49,7 +48,7 @@ private:
     static constexpr size_t bytes = default_size_traits<Alloc>::heap_type;
 
 public:
-    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_t value = bytes / sizeof(value_type) - 1 > 2
+    static constexpr size_t value = bytes / sizeof(value_type) - 1 > 2
         ? bytes / sizeof(value_type) - 1
         : 2;
 };
@@ -57,19 +56,19 @@ public:
 template <>
 struct default_inline_size<char, UTL_SCOPE allocator<char>> {
 private:
-    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_t bytes = 24;
+    static constexpr size_t bytes = 24;
 
 public:
-    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_t value = bytes - 1;
+    static constexpr size_t value = bytes - 1;
 };
 
 template <typename CharType>
 struct default_inline_size<CharType, UTL_SCOPE allocator<CharType>> {
 private:
-    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_t bytes = 32;
+    static constexpr size_t bytes = 32;
 
 public:
-    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_t value = bytes / sizeof(CharType) - 1;
+    static constexpr size_t value = bytes / sizeof(CharType) - 1;
 };
 
 #ifdef UTL_SUPPORTS_CHAR8_T
