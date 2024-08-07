@@ -66,12 +66,10 @@ public:
     }
 
     /**
-     * Default copy and move operations.
+     * Default copy operation
      */
     constexpr nonnull_ptr(nonnull_ptr const&) noexcept = default;
-    constexpr nonnull_ptr(nonnull_ptr&&) noexcept = default;
     UTL_CONSTEXPR_CXX14 nonnull_ptr& operator=(nonnull_ptr const&) noexcept = default;
-    UTL_CONSTEXPR_CXX14 nonnull_ptr& operator=(nonnull_ptr&&) noexcept = default;
 
     /**
      * Dereference operators to access the object pointed to by the nonnull_ptr.
