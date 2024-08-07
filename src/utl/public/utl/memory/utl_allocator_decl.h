@@ -30,43 +30,36 @@ private:
     using result_type = allocation_result<pointer, size_t>;
 
 public:
-    constexpr allocator() noexcept = default;
-    constexpr allocator(allocator const&) noexcept = default;
-    UTL_CONSTEXPR_CXX14 allocator& operator=(allocator const&) noexcept = default;
+    UTL_HIDE_FROM_ABI constexpr allocator() noexcept = default;
+    UTL_HIDE_FROM_ABI constexpr allocator(allocator const&) noexcept = default;
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 allocator& operator=(allocator const&) noexcept = default;
 
     template <typename U>
-    constexpr allocator(allocator<U> const&) noexcept {}
+    UTL_HIDE_FROM_ABI constexpr allocator(allocator<U> const&) noexcept {}
     template <typename U>
-    UTL_CONSTEXPR_CXX14 allocator& operator=(allocator<U> const&) noexcept {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 allocator& operator=(allocator<U> const&) noexcept {
         return *this;
     }
 
-    UTL_ATTRIBUTE(NODISCARD)
-    UTL_CONSTEXPR_CXX20 pointer allocate(size_type count) UTL_THROWS;
+    UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX20 pointer allocate(size_type count) UTL_THROWS;
 
-    UTL_ATTRIBUTE(NODISCARD)
-    UTL_CONSTEXPR_CXX20 result_type allocate_at_least(size_type count) UTL_THROWS {
+    UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX20 result_type allocate_at_least(
+        size_type count) UTL_THROWS {
         return {allocate(count), count};
     }
 
-    UTL_CONSTEXPR_CXX20 void deallocate(pointer pointer, size_type count) noexcept;
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void deallocate(pointer pointer, size_type count) noexcept;
 
-    UTL_CONSTEXPR_CXX20 ~allocator() noexcept = default;
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~allocator() noexcept = default;
 };
 UTL_NAMESPACE_END
 
 #if UTL_HAS_BUILTIN(__builtin_operator_new) && UTL_HAS_BUILTIN(__builtin_operator_delete)
-#  define UTL_ALLOC_NEW(...) __builtin_operator_new(__VA_ARGS__)
-#  define UTL_ALLOC_DELETE(...) __builtin_operator_delete(__VA_ARGS__)
+#  define __UTL_ALLOC_NEW(...) __builtin_operator_new(__VA_ARGS__)
+#  define __UTL_ALLOC_DELETE(...) __builtin_operator_delete(__VA_ARGS__)
 #else
-#  define UTL_ALLOC_NEW(...) ::operator new(__VA_ARGS__)
-#  define UTL_ALLOC_DELETE(...) ::operator delete(__VA_ARGS__)
-#endif
-
-#if UTL_HAS_BUILTIN(__declspec) || UTL_IS_RESERVED_IDENTIFIER(__declspec) || UTL_COMPILER_MSVC
-#  define UTL_ALLOCATOR_ATTRIBUTE __declspec(allocator, restrict) UTL_ATTRIBUTE(MALLOC)
-#else
-#  define UTL_ALLOCATOR_ATTRIBUTE UTL_ATTRIBUTE(MALLOC)
+#  define __UTL_ALLOC_NEW(...) ::operator new(__VA_ARGS__)
+#  define __UTL_ALLOC_DELETE(...) ::operator delete(__VA_ARGS__)
 #endif
 
 UTL_NAMESPACE_BEGIN
@@ -84,34 +77,20 @@ UTL_INLINE_CXX17 constexpr size_t default_new_alignment = UTL_DEFAULT_NEW_ALIGNM
 UTL_INLINE_CXX17 constexpr size_t default_new_alignment = alignof(max_align_t);
 #endif
 
-inline constexpr bool is_overaligned_for_new(size_t alignment) noexcept {
+UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE, CONST) inline constexpr bool is_overaligned_for_new(
+    size_t alignment) noexcept {
     return alignment > default_new_alignment;
 }
 
-UTL_ALLOCATOR_ATTRIBUTE
-inline void* allocate(size_t size, size_t alignment = default_new_alignment) {
-    if (is_overaligned_for_new(alignment)) {
-#if UTL_SUPPORTS_ALIGNED_ALLOCATION
-        align_val_t const align_val = static_cast<align_val_t>(alignment);
-        return UTL_ALLOC_NEW(size, align_val);
-#else
-        UTL_ASSERT(false, "Allocation alignment is too strict");
-        UTL_BUILTIN_unreachable();
-#endif
-    }
-    (void)alignment;
-    return UTL_ALLOC_NEW(size);
-}
-
-inline void deallocate(
+UTL_HIDE_FROM_ABI inline void deallocate(
     void* pointer, size_t size, size_t alignment = default_new_alignment) noexcept {
     if (is_overaligned_for_new(alignment)) {
 #if UTL_SUPPORTS_ALIGNED_ALLOCATION
         align_val_t const align_val = static_cast<align_val_t>(alignment);
 #  if UTL_SUPPORTS_SIZED_DEALLOCATION
-        UTL_ALLOC_DELETE(pointer, size, align_val);
+        __UTL_ALLOC_DELETE(pointer, size, align_val);
 #  else
-        UTL_ALLOC_DELETE(pointer, align_val);
+        __UTL_ALLOC_DELETE(pointer, align_val);
 #  endif
 #else
         UTL_ASSERT(false, "Allocation alignment is too strict");
@@ -120,23 +99,37 @@ inline void deallocate(
     } else {
         (void)alignment;
 #if UTL_SUPPORTS_SIZED_DEALLOCATION
-        UTL_ALLOC_DELETE(pointer, size);
+        __UTL_ALLOC_DELETE(pointer, size);
 #else
         (void)size;
-        UTL_ALLOC_DELETE(pointer);
+        __UTL_ALLOC_DELETE(pointer);
 #endif
     }
+}
+
+UTL_HIDE_FROM_ABI inline void* allocate(size_t size, size_t alignment = default_new_alignment) {
+    if (is_overaligned_for_new(alignment)) {
+#if UTL_SUPPORTS_ALIGNED_ALLOCATION
+        align_val_t const align_val = static_cast<align_val_t>(alignment);
+        return __UTL_ALLOC_NEW(size, align_val);
+#else
+        UTL_ASSERT(false, "Allocation alignment is too strict");
+        UTL_BUILTIN_unreachable();
+#endif
+    }
+    (void)alignment;
+    return __UTL_ALLOC_NEW(size);
 }
 } // namespace details
 
 namespace runtime {
 template <typename T>
-T* allocate(size_t count) {
+UTL_HIDE_FROM_ABI T* allocate(size_t count) {
     return static_cast<T*>(details::allocate(count * sizeof(T), alignof(T)));
 }
 
 template <typename T>
-void deallocate(typename type_identity<T>::type* ptr, size_t count) noexcept {
+UTL_HIDE_FROM_ABI void deallocate(typename type_identity<T>::type* ptr, size_t count) noexcept {
     details::deallocate(ptr, count * sizeof(T), alignof(T));
 }
 } // namespace runtime
@@ -147,7 +140,7 @@ template <typename T>
 inline constinit ::std::allocator<T> allocator_v = {};
 
 template <typename T>
-constexpr T* allocate(size_t count) {
+UTL_HIDE_FROM_ABI constexpr T* allocate(size_t count) {
     if (UTL_BUILTIN_is_constant_evaluated()) {
         if constexpr (UTL_TRAIT_is_complete(::std::allocator<T>)) {
             return allocator_v<T>.allocate(count);
@@ -165,7 +158,8 @@ constexpr T* allocate(size_t count) {
 }
 
 template <typename T>
-constexpr void deallocate(typename type_identity<T>::type* ptr, size_t count) noexcept {
+UTL_HIDE_FROM_ABI constexpr void deallocate(
+    typename type_identity<T>::type* ptr, size_t count) noexcept {
     if (UTL_BUILTIN_is_constant_evaluated()) {
         if constexpr (UTL_TRAIT_is_complete(::std::allocator<T>)) {
             allocator_v<T>.deallocate(ptr, count);
@@ -183,8 +177,19 @@ constexpr void deallocate(typename type_identity<T>::type* ptr, size_t count) no
 }
 #endif
 } // namespace compile_time
+template <typename T>
+UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void deallocate(
+    typename type_identity<T>::type* ptr, size_t count) noexcept {
+    static_assert(sizeof(T) > 0, "Incomplete type cannot be deallocated");
+#if UTL_CXX20
+    compile_time::deallocate<T>(ptr, count);
+#else
+    runtime::deallocate<T>(ptr, count);
+#endif
+}
 
 template <typename T>
+UTL_ATTRIBUTES(MALLOC, NODISCARD, HIDE_FROM_ABI)
 UTL_CONSTEXPR_CXX20 T* allocate(size_t count) {
     static_assert(sizeof(T) > 0, "Incomplete type cannot be allocated");
 #if UTL_CXX20
@@ -193,20 +198,9 @@ UTL_CONSTEXPR_CXX20 T* allocate(size_t count) {
     return runtime::allocate<T>(count);
 #endif
 }
-
-template <typename T>
-UTL_CONSTEXPR_CXX20 void deallocate(typename type_identity<T>::type* ptr, size_t count) noexcept {
-    static_assert(sizeof(T) > 0, "Incomplete type cannot be deallocated");
-#if UTL_CXX20
-    compile_time::deallocate<T>(ptr, count);
-#else
-    runtime::deallocate<T>(ptr, count);
-#endif
-}
 } // namespace memory
 
 UTL_NAMESPACE_END
 
-#undef UTL_ALLOC_DELETE
-#undef UTL_ALLOC_NEW
-#undef UTL_ALLOCATOR_ATTRIBUTE
+#undef __UTL_ALLOC_DELETE
+#undef __UTL_ALLOC_NEW

@@ -40,28 +40,29 @@ namespace details {
 template <typename T>
 void destroy(T*) noexcept = delete;
 
-struct destroy_cpo_t {
+struct UTL_ABI_PUBLIC destroy_cpo_t {
 private:
     template <typename T>
-    static auto has_custom_destroy_impl(int) noexcept -> always_true_type<decltype(destroy((T*)0))>;
+    UTL_HIDE_FROM_ABI static auto has_custom_destroy_impl(int) noexcept
+        -> always_true_type<decltype(destroy((T*)0))>;
     template <typename T>
-    static auto has_custom_destroy_impl(float) noexcept -> false_type;
+    UTL_HIDE_FROM_ABI static auto has_custom_destroy_impl(float) noexcept -> false_type;
 
     template <typename T>
-    using has_custom_destroy = decltype(has_custom_destroy_impl<T>(0));
+    using has_custom_destroy UTL_NODEBUG = decltype(has_custom_destroy_impl<T>(0));
 
 public:
     template <UTL_CONCEPT_CXX20(reference_countable) T UTL_REQUIRES_CXX11(
         is_reference_countable<T>::value && has_custom_destroy<T>::value)>
     UTL_REQUIRES_CXX20(requires(T* p) {
         destroy(p); })
-    UTL_CONSTEXPR_CXX20 void operator()(T* ptr) const noexcept {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void operator()(T* ptr) const noexcept {
         destroy(ptr);
     }
 
     template <UTL_CONCEPT_CXX20(reference_countable) T UTL_REQUIRES_CXX11(
         is_reference_countable<T>::value && !has_custom_destroy<T>::value)>
-    UTL_CONSTEXPR_CXX20 void operator()(T* ptr) const noexcept {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void operator()(T* ptr) const noexcept {
         delete ptr;
     }
 };
