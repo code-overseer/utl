@@ -73,8 +73,8 @@ using has_overload UTL_NODEBUG = UTL_SCOPE disjunction<decltype(not_addressible<
 } // namespace details
 
 template <typename T>
-UTL_ATTRIBUTES(ADDRESSOF, INTRINSIC) inline enable_if_t<details::addressof::has_overload<T>::value, T*>
-addressof(T& arg UTL_LIFETIMEBOUND) noexcept {
+UTL_ATTRIBUTE(ADDRESSOF) inline enable_if_t<details::addressof::has_overload<T>::value, T*> addressof(
+    T& arg UTL_LIFETIMEBOUND) noexcept {
     return reinterpret_cast<T*>(&reinterpret_cast<copy_cvref_t<T&, char>>(arg));
 }
 
