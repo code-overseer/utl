@@ -179,7 +179,7 @@ public:
      * Resets the intrusive_ptr to hold a null pointer, decrementing the reference count of the
      * current object if it's not null.
      */
-    UTL_ATTRIBUTES(HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 void reset() noexcept {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, REINITIALIZES) UTL_CONSTEXPR_CXX14 void reset() noexcept {
         if (resource_ != nullptr) {
             decrement(*resource_);
             resource_ = nullptr;
@@ -195,7 +195,7 @@ public:
      *
      * @throws utl::invalid_argument - if ptr is null and exceptions are enabled
      */
-    UTL_ATTRIBUTES(HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 void reset(retain_object_t, T* ptr)
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, REINITIALIZES) UTL_CONSTEXPR_CXX14 void reset(retain_object_t, T* ptr)
         UTL_THROWS {
         reset();
         iff_notnull(ptr, [this](T* ptr) {
@@ -212,7 +212,7 @@ public:
      *
      * @throws utl::invalid_argument - if ptr is null and exceptions are enabled
      */
-    UTL_ATTRIBUTES(HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 void reset(adopt_object_t, T* ptr)
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, REINITIALIZES) UTL_CONSTEXPR_CXX14 void reset(adopt_object_t, T* ptr)
         UTL_THROWS {
         reset();
         iff_notnull(ptr, [this](T* ptr) { resource_ = ptr; });
@@ -223,7 +223,7 @@ public:
      *
      * @param other The intrusive_ptr to swap with.
      */
-    UTL_ATTRIBUTES(HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 void swap(intrusive_ptr& other) noexcept {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, REINITIALIZES) UTL_CONSTEXPR_CXX14 void swap(intrusive_ptr& other) noexcept {
         T* tmp = other.resource_;
         other.resource_ = resource_;
         resource_ = tmp;
@@ -327,7 +327,7 @@ public:
      *
      * @param other The intrusive_ptr to swap with.
      */
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(intrusive_ptr& other) noexcept {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, REINITIALIZES) UTL_CONSTEXPR_CXX14 void swap(intrusive_ptr& other) noexcept {
         base_type::swap(static_cast<base_type&>(other));
     }
 };
