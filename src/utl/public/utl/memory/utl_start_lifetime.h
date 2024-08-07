@@ -31,7 +31,6 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace lifetime {
 #if UTL_COMPILER_MSVC
-#  pragma intrinsic(memcpy)
 #  pragma optimize("s", on)
 #  pragma optimize("t", on)
 #  pragma optimize("g", on)
@@ -43,6 +42,9 @@ namespace lifetime {
 #  define __UTL_ENTANGLE_PLACEMENT_IMPL 1
 #else
 #  define __UTL_ENTANGLE_MEMCPY_IMPL 1
+#  if UTL_COMPILER_MSVC
+#    pragma intrinsic(memcpy)
+#  endif
 #endif
 /**
  * Generates a superposition of all posible implicit lifetime types of size n with alignment
