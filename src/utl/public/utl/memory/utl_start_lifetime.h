@@ -11,16 +11,16 @@
 #include <new>
 
 #if UTL_HAS_BUILTIN(__builtin_memmove)
-#  define UTL_MEMMOVE(...) __builtin_memmove(__VA_ARGS__)
+#  define __UTL_MEMMOVE(...) __builtin_memmove(__VA_ARGS__)
 #else
 #  include <string.h>
-#  define UTL_MEMMOVE(...) ::memmove(__VA_ARGS__)
+#  define __UTL_MEMMOVE(...) ::memmove(__VA_ARGS__)
 #endif
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
-#  define UTL_MEMCPY(...) __builtin_memcpy(__VA_ARGS__)
+#  define __UTL_MEMCPY(...) __builtin_memcpy(__VA_ARGS__)
 #else
 #  include <string.h>
-#  define UTL_MEMCPY(...) ::memcpy(__VA_ARGS__)
+#  define __UTL_MEMCPY(...) ::memcpy(__VA_ARGS__)
 #endif
 
 UTL_NAMESPACE_BEGIN
@@ -38,11 +38,11 @@ namespace lifetime {
 #endif
 
 #if UTL_COMPILER_GCC | ((UTL_COMPILER_CLANG | UTL_COMPILER_ICX) & UTL_OPTIMIZATIONS_ENABLED)
-#  define UTL_ENTANGLE_MEMMOVE_IMPL 1
+#  define __UTL_ENTANGLE_MEMMOVE_IMPL 1
 #elif ((UTL_COMPILER_CLANG | UTL_COMPILER_ICX) & !UTL_OPTIMIZATIONS_ENABLED) | UTL_COMPILER_ICC
-#  define UTL_ENTANGLE_PLACEMENT_IMPL 1
+#  define __UTL_ENTANGLE_PLACEMENT_IMPL 1
 #else
-#  define UTL_ENTANGLE_MEMCPY_IMPL 1
+#  define __UTL_ENTANGLE_MEMCPY_IMPL 1
 #endif
 /**
  * Generates a superposition of all posible implicit lifetime types of size n with alignment
@@ -52,14 +52,14 @@ namespace lifetime {
  * @param n - size of implicit lifetime object
  */
 UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline void* entangle_storage(void* p, size_t n) noexcept {
-#if UTL_ENTANGLE_MEMMOVE_IMPL
+#if __UTL_ENTANGLE_MEMMOVE_IMPL
     /* UTL_UNDEFINED_BEHAVIOUR */
     // May be undefined behaviour if p points to a const object with automatic, static or
     // thread-local storage
     // This is "more" defined than placement new byte array due to indeterminate value access in
     // the alternative
-    return UTL_MEMMOVE(p, p, n);
-#elif (UTL_ENTANGLE_PLACEMENT_IMPL | UTL_ENTANGLE_MEMCPY_IMPL)
+    return __UTL_MEMMOVE(p, p, n);
+#elif (__UTL_ENTANGLE_PLACEMENT_IMPL | __UTL_ENTANGLE_MEMCPY_IMPL)
     using byte_type = unsigned char;
     /* UTL_UNDEFINED_BEHAVIOUR */
     // technically results in undefined behaviour since bytes have indeterminate value
@@ -79,35 +79,35 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline void* entangle_storage(void* 
 template <size_t N>
 UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline void* entangle_storage(void* p) noexcept {
     using byte_type = unsigned char;
-#if UTL_ENTANGLE_MEMMOVE_IMPL
+#if __UTL_ENTANGLE_MEMMOVE_IMPL
     /* UTL_UNDEFINED_BEHAVIOUR */
     // May be undefined behaviour if p points to a const object with automatic, static or
     // thread-local storage
     // This is "more" defined than placement new byte array due to indeterminate value access in
     // the alternative
-    return UTL_MEMMOVE(p, p, N);
-#elif UTL_ENTANGLE_PLACEMENT_IMPL
+    return __UTL_MEMMOVE(p, p, N);
+#elif __UTL_ENTANGLE_PLACEMENT_IMPL
     /* UTL_UNDEFINED_BEHAVIOUR */
     // technically results in undefined behaviour since bytes have indeterminate value
     return ::new (p) byte_type[N];
-#elif UTL_ENTANGLE_MEMCPY_IMPL
+#elif __UTL_ENTANGLE_MEMCPY_IMPL
     /* UTL_UNDEFINED_BEHAVIOUR */
     // same reasoning as memmove
     byte_type buf[N];
-    UTL_MEMCPY(buf, p, N);
-    return UTL_MEMCPY(p, buf, N);
+    __UTL_MEMCPY(buf, p, N);
+    return __UTL_MEMCPY(p, buf, N);
 #else
 #  error Undefined implementation
 #endif
 }
-#undef UTL_MEMMOVE
-#undef UTL_MEMCPY
-#if defined(UTL_ENTANGLE_MEMCPY_IMPL)
-#  undef UTL_ENTANGLE_MEMCPY_IMPL
-#elif defined(UTL_ENTANGLE_MEMMOVE_IMPL)
-#  undef UTL_ENTANGLE_MEMMOVE_IMPL
-#elif defined(UTL_ENTANGLE_PLACEMENT_IMPL)
-#  undef UTL_ENTANGLE_PLACEMENT_IMPL
+#undef __UTL_MEMMOVE
+#undef __UTL_MEMCPY
+#if defined(__UTL_ENTANGLE_MEMCPY_IMPL)
+#  undef __UTL_ENTANGLE_MEMCPY_IMPL
+#elif defined(__UTL_ENTANGLE_MEMMOVE_IMPL)
+#  undef __UTL_ENTANGLE_MEMMOVE_IMPL
+#elif defined(__UTL_ENTANGLE_PLACEMENT_IMPL)
+#  undef __UTL_ENTANGLE_PLACEMENT_IMPL
 #endif
 
 /**
