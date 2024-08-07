@@ -18,6 +18,9 @@ UTL_NAMESPACE_BEGIN
 namespace libc {
 namespace runtime {
 namespace standard {
+#if UTL_COMPILER_MSVC
+#  pragma intrinsic(memcpy)
+#endif
 
 template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
 UTL_ATTRIBUTES(ALWAYS_INLINE,HIDE_FROM_ABI) inline T* memcpy(
@@ -38,6 +41,10 @@ UTL_ATTRIBUTES(ALWAYS_INLINE,HIDE_FROM_ABI) inline T* memmove(
     return (T*)::memmove(dst, src, byte_count<T>(count));
 #endif
 }
+
+#if UTL_COMPILER_MSVC
+#  pragma intrinsic(memset)
+#endif
 
 template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
     is_trivially_copyable<T>::value && exact_size<T, 1>::value)>
@@ -61,6 +68,10 @@ UTL_ATTRIBUTES(LIBC_INLINE_PURE) inline T* memchr(T const* ptr, U value, size_t 
 #endif
 }
 
+#if UTL_COMPILER_MSVC
+#  pragma intrinsic(memcmp)
+#endif
+
 template <typename T, typename U>
 UTL_ATTRIBUTES(LIBC_INLINE_PURE) inline int memcmp(T const* lhs, U const* rhs, element_count_t count) noexcept {
     static_assert(is_trivially_lexicographically_comparable<T, U>::value,
@@ -71,6 +82,10 @@ UTL_ATTRIBUTES(LIBC_INLINE_PURE) inline int memcmp(T const* lhs, U const* rhs, e
     return ::memcmp(lhs, rhs, byte_count<T>(count));
 #endif
 }
+
+#if UTL_COMPILER_MSVC
+#  pragma intrinsic(strlen)
+#endif
 
 UTL_ATTRIBUTES(LIBC_INLINE_PURE) inline size_t strlen(char const* str) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_strlen)
@@ -145,6 +160,10 @@ UTL_ATTRIBUTES(LIBC_PURE) inline T* strchr(T const* str, T const ch) noexcept {
     return (T*)str;
 }
 
+#if UTL_COMPILER_MSVC
+#  pragma intrinsic(strcmp)
+#endif
+
 UTL_ATTRIBUTES(LIBC_INLINE_PURE) inline int strcmp(char const* left, char const* right) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_strcmp)
     return __builtin_strcmp(left, right);
@@ -209,6 +228,10 @@ UTL_ATTRIBUTES(LIBC_PURE) inline int strncmp(T const* left, T const* right, elem
     return (len == 0) ? 0 : (*left < *right) ? -1 : 1;
 }
 
+#if UTL_COMPILER_MSVC
+#  pragma intrinsic(memcpy)
+#endif
+
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
 UTL_ATTRIBUTES(LIBC_PURE) inline T* strnset(T* dst, T const val, element_count_t elements) noexcept {
     size_t len = (size_t)elements;
@@ -225,7 +248,7 @@ UTL_ATTRIBUTES(LIBC_PURE) inline T* strnset(T* dst, T const val, element_count_t
     T* ptr = dst;
     do {
         size_t const copy_size = len < buffer_count ? len : buffer_count;
-        memcpy(ptr, buffer, byte_count<T>(copy_size));
+        ::memcpy(ptr, buffer, byte_count<T>(copy_size));
         len -= copy_size;
         ptr += copy_size;
     } while (len);
