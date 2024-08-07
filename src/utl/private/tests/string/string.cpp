@@ -46,7 +46,7 @@ class small_iter_allocator {
 public:
     using value_type = T;
     using pointer = small_ptr<T>;
-    using size_type = int16_t;
+    using size_type = uint16_t;
     using difference_type = int16_t;
 
     small_iter_allocator() noexcept {}

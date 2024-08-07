@@ -27,12 +27,12 @@ using diff_type_t = typename diff_type<P>::type;
 template <typename P>
 requires requires { typename P::difference_type; }
 struct diff_type<P> {
-    using type = typename P::difference_type;
+    using type UTL_NODEBUG = typename P::difference_type;
 };
 
 template <typename P>
 struct diff_type {
-    using type = decltype((char*)(0) - (char*)(0));
+    using type UTL_NODEBUG = decltype((char*)(0) - (char*)(0));
 };
 
 template <typename Ptr, typename T>
@@ -40,23 +40,23 @@ struct rebind_impl;
 template <typename Ptr, typename T>
 requires requires { typename Ptr::template rebind<T>; }
 struct rebind_impl<Ptr, T> {
-    using type = typename Ptr::template rebind<T>;
+    using type UTL_NODEBUG = typename Ptr::template rebind<T>;
 };
 
 template <template <typename...> class Template, typename T, typename... Args, typename U>
 requires requires { typename Template<T, Args...>::template rebind<U>; }
 struct rebind_impl<Template<T, Args...>, U> {
-    using type = typename Template<T, Args...>::template rebind<U>;
+    using type UTL_NODEBUG = typename Template<T, Args...>::template rebind<U>;
 };
 
 template <template <typename...> class Template, typename T, typename... Args, typename U>
 struct rebind_impl<Template<T, Args...>, U> {
-    using type = Template<U, Args...>;
+    using type UTL_NODEBUG = Template<U, Args...>;
 };
 
 template <typename From, typename To>
 struct rebind_impl<From*, To> {
-    using type = To*;
+    using type UTL_NODEBUG = To*;
 };
 
 template <typename Ptr>
@@ -69,7 +69,7 @@ struct impl<Ptr> {
     using element_type = typename pointer::element_type;
     using difference_type = diff_type_t<pointer>;
 
-    static constexpr pointer pointer_to(element_type& ref)
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN) static constexpr pointer pointer_to(element_type& ref)
     requires UTL_SCOPE
     referenceable<element_type> {
         return pointer::pointer_to(ref);
@@ -85,7 +85,7 @@ struct impl<Template<T, Args...>> {
     using element_type = T;
     using difference_type = diff_type_t<pointer>;
 
-    static constexpr pointer pointer_to(element_type& ref)
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN) static constexpr pointer pointer_to(element_type& ref)
     requires UTL_SCOPE
     referenceable<element_type> {
         return pointer::pointer_to(ref);
@@ -116,47 +116,52 @@ struct invalid_t {};
 
 template <typename Element>
 struct pointer_to_arg {
-    using type = Element&;
+    using type UTL_NODEBUG = Element&;
 };
 template <>
 struct pointer_to_arg<void> {
-    using type = invalid_t;
+    using type UTL_NODEBUG = invalid_t;
 };
 
 template <typename P>
-using diff_type_t = UTL_SCOPE conditional_t<UTL_TRAIT_has_member_difference_type(P),
-    typename P::difference_type, decltype((char*)(0) - (char*)(0))>;
+UTL_HIDE_FROM_ABI auto diff_type_impl(int) -> typename P::difference_type;
+template <typename P>
+UTL_HIDE_FROM_ABI auto diff_type_impl(short) -> decltype((char*)(0) - (char*)(0));
+
+template <typename P>
+using diff_type_t UTL_NODEBUG = decltype(diff_type_impl<P>(0));
 
 template <typename T, typename U>
-auto has_rebind_impl(float) noexcept -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto has_rebind_impl(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T, typename U>
-auto has_rebind_impl(int) noexcept -> UTL_SCOPE always_true_type<typename T::template rebind<U>>;
+UTL_HIDE_FROM_ABI auto has_rebind_impl(int) noexcept
+    -> UTL_SCOPE always_true_type<typename T::template rebind<U>>;
 
 template <typename T, typename U>
-using has_rebind = decltype(has_rebind_impl<T, U>(0));
+using has_rebind UTL_NODEBUG = decltype(has_rebind_impl<T, U>(0));
 
 template <typename Ptr, typename T, bool = has_rebind<Ptr, T>::value>
 struct rebind_impl;
 
 template <typename Ptr, typename T>
 struct rebind_impl<Ptr, T, true> {
-    using type = typename Ptr::template rebind<T>;
+    using type UTL_NODEBUG = typename Ptr::template rebind<T>;
 };
 
 template <template <typename...> class Template, typename T, typename... Args, typename U>
 struct rebind_impl<Template<T, Args...>, U, true> {
-    using type = typename Template<T, Args...>::template rebind<U>;
+    using type UTL_NODEBUG = typename Template<T, Args...>::template rebind<U>;
 };
 
 template <template <typename...> class Template, typename T, typename... Args, typename U>
 struct rebind_impl<Template<T, Args...>, U, false> {
-    using type = Template<U, Args...>;
+    using type UTL_NODEBUG = Template<U, Args...>;
 };
 
 template <typename From, typename To>
 struct rebind_impl<From*, To, false> {
-    using type = To*;
+    using type UTL_NODEBUG = To*;
 };
 
 template <typename Ptr, bool = UTL_TRAIT_has_member_element_type(Ptr)>
@@ -168,7 +173,8 @@ struct impl<Ptr, true> {
     using element_type = typename pointer::element_type;
     using difference_type = diff_type_t<pointer>;
 
-    static constexpr pointer pointer_to(typename pointer_to_arg<element_type>::type ref) {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN) static constexpr pointer pointer_to(
+        typename pointer_to_arg<element_type>::type ref) {
         return pointer::pointer_to(ref);
     }
 
@@ -182,7 +188,8 @@ struct impl<Template<T, Args...>, false> {
     using element_type = T;
     using difference_type = diff_type_t<pointer>;
 
-    static constexpr pointer pointer_to(typename pointer_to_arg<element_type>::type ref) {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN) static constexpr pointer pointer_to(
+        typename pointer_to_arg<element_type>::type ref) {
         return pointer::pointer_to(ref);
     }
 
@@ -200,17 +207,17 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct pointer_traits : details::pointer_traits::impl<T> {};
+struct UTL_PUBLIC_TEMPLATE pointer_traits : details::pointer_traits::impl<T> {};
 
 template <typename T>
-struct pointer_traits<T*> {
+struct UTL_PUBLIC_TEMPLATE pointer_traits<T*> {
     using pointer = T*;
     using element_type = T;
     using difference_type = details::pointer_traits::diff_type_t<T*>;
     template <typename U>
     using rebind = U*;
 
-    static constexpr pointer pointer_to(element_type& ref) noexcept {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN) static constexpr pointer pointer_to(element_type& ref) noexcept {
         return UTL_SCOPE addressof(ref);
     }
 };

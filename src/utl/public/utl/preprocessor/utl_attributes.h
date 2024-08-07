@@ -113,6 +113,9 @@
 #elif UTL_HAS_CPP_ATTRIBUTE(gnu::always_inline)
 #  define __UTL_ATTRIBUTE_ALWAYS_INLINE gnu::always_inline
 #  define __UTL_ATTRIBUTE_TYPE_CPP_ALWAYS_INLINE
+#elif UTL_HAS_CPP_ATTRIBUTE(msvc::forceinline)
+#  define __UTL_ATTRIBUTE_ALWAYS_INLINE msvc::forceinline
+#  define __UTL_ATTRIBUTE_TYPE_CPP_ALWAYS_INLINE
 #elif UTL_HAS_GNU_ATTRIBUTE(__always_inline__)
 #  define __UTL_ATTRIBUTE_ALWAYS_INLINE __always_inline__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_ALWAYS_INLINE
@@ -283,6 +286,11 @@
 #if UTL_HAS_CPP_ATTRIBUTE(clang::noescape)
 #  define __UTL_ATTRIBUTE_NOESCAPE clang::noescape
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NOESCAPE
+#endif
+
+#if UTL_HAS_GNU_ATTRIBUTE(__optimize__)
+#  define __UTL_ATTRIBUTE_OPTIMIZE __optimize__
+#  define __UTL_ATTRIBUTE_TYPE_GNU_OPTIMIZE(STR)
 #endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(clang::nodebug)
