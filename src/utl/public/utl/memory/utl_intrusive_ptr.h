@@ -15,9 +15,9 @@
 
 UTL_NAMESPACE_BEGIN
 
-UTL_ABI_PUBLIC_VARIABLE constexpr class retain_object_t {
+UTL_ABI_PUBLIC_VARIABLE constexpr class UTL_ABI_PUBLIC retain_object_t {
 } retain_object = {};
-UTL_ABI_PUBLIC_VARIABLE constexpr class adopt_object_t {
+UTL_ABI_PUBLIC_VARIABLE constexpr class UTL_ABI_PUBLIC adopt_object_t {
 } adopt_object = {};
 
 /**

@@ -65,7 +65,7 @@ public:
     using reference = CharType&;
     using const_reference = CharType const&;
     using view_type = basic_string_view<value_type, traits_type>;
-    UTL_ABI_PUBLIC static constexpr size_type npos = -1;
+    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_type npos = -1;
 
     class iterator;
     class const_iterator;
@@ -115,8 +115,7 @@ private:
     using storage_type = compressed_pair<storage_union, allocator_type>;
 
 public:
-    class UTL_ABI_PUBLIC iterator :
-        UTL_SCOPE contiguous_iterator_base<iterator, value_type> {
+    class UTL_ABI_PUBLIC iterator : UTL_SCOPE contiguous_iterator_base<iterator, value_type> {
         using base_type = contiguous_iterator_base<iterator, value_type>;
 
     public:
@@ -222,8 +221,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string(View const& view,
-        size_type pos, size_type n,
+    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string(View const& view, size_type pos, size_type n,
         allocator_type const& a = allocator_type()) noexcept(!utl::with_exceptions &&
         is_nothrow_convertible<View, view_type>::value)
         : basic_short_string(a) {
@@ -724,9 +722,8 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& insert(size_type pos,
-        View const& view, size_type subidx, size_type subcount = npos)
-        UTL_THROWS UTL_LIFETIMEBOUND {
+    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& insert(size_type pos, View const& view,
+        size_type subidx, size_type subcount = npos) UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
         UTL_THROW_IF(subidx > v.size(),
             out_of_range(
@@ -947,8 +944,8 @@ public:
 
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_input_iterator(It))>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(const_iterator first,
-        const_iterator last, It in_first, It in_last) UTL_THROWS UTL_LIFETIMEBOUND {
+    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(const_iterator first, const_iterator last,
+        It in_first, It in_last) UTL_THROWS UTL_LIFETIMEBOUND {
         while (first != last && in_first != in_last) {
             const_cast<reference>(*first) = *in_first;
             ++first;
@@ -976,9 +973,9 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(const_iterator first,
-        const_iterator last, View const& view, size_type subidx,
-        size_type subcount = npos) UTL_THROWS UTL_LIFETIMEBOUND {
+    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(const_iterator first, const_iterator last,
+        View const& view, size_type subidx, size_type subcount = npos)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
         UTL_THROW_IF(subidx > v.size(),
             out_of_range(
@@ -999,9 +996,9 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(size_type idx,
-        size_type count, View const& view, size_type subidx,
-        size_type subcount = npos) UTL_THROWS UTL_LIFETIMEBOUND {
+    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(size_type idx, size_type count,
+        View const& view, size_type subidx, size_type subcount = npos)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
         UTL_THROW_IF(subidx > v.size(),
             out_of_range(
@@ -1808,9 +1805,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ABI_PUBLIC constexpr
-    typename basic_short_string<CharT, N, Traits, Alloc>::size_type
-        basic_short_string<CharT, N, Traits, Alloc>::npos;
+UTL_ABI_PUBLIC constexpr typename basic_short_string<CharT, N, Traits, Alloc>::size_type
+    basic_short_string<CharT, N, Traits, Alloc>::npos;
 
 UTL_NAMESPACE_END
 

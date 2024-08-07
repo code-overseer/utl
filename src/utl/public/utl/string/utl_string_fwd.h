@@ -29,25 +29,27 @@ namespace string {
 template <typename Alloc>
 struct default_size_traits {
 private:
-    using alloc_traits = allocator_traits<Alloc>;
+    using alloc_traits UTL_NODEBUG = allocator_traits<Alloc>;
+    static constexpr size_t pointer_size = sizeof(typename alloc_traits::pointer);
+    struct heap_type_emulator {
+        typename alloc_traits::pointer p;
+        typename alloc_traits::size_type s;
+    };
 
 public:
-    static constexpr size_t size_type() noexcept {
-        return sizeof(typename alloc_traits::size_type);
-    }
-    static constexpr size_t heap_type() noexcept {
-        return size_type() + sizeof(typename alloc_traits::pointer);
-    }
+    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_t size_type =
+        sizeof(typename alloc_traits::size_type);
+    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_t heap_type = sizeof(heap_type_emulator);
 };
 
 template <typename CharType, typename Alloc>
 struct default_inline_size {
 private:
-    using value_type = CharType;
-    static constexpr size_t bytes = default_size_traits<Alloc>::heap_type();
+    using value_type UTL_NODEBUG = CharType;
+    static constexpr size_t bytes = default_size_traits<Alloc>::heap_type;
 
 public:
-    static constexpr size_t value = bytes / sizeof(value_type) - 1 > 2
+    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_t value = bytes / sizeof(value_type) - 1 > 2
         ? bytes / sizeof(value_type) - 1
         : 2;
 };
@@ -55,19 +57,19 @@ public:
 template <>
 struct default_inline_size<char, UTL_SCOPE allocator<char>> {
 private:
-    static constexpr size_t bytes = 24;
+    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_t bytes = 24;
 
 public:
-    static constexpr size_t value = bytes - 1;
+    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_t value = bytes - 1;
 };
 
 template <typename CharType>
 struct default_inline_size<CharType, UTL_SCOPE allocator<CharType>> {
 private:
-    static constexpr size_t bytes = 32;
+    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_t bytes = 32;
 
 public:
-    static constexpr size_t value = bytes / sizeof(CharType) - 1;
+    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_t value = bytes / sizeof(CharType) - 1;
 };
 
 #ifdef UTL_SUPPORTS_CHAR8_T

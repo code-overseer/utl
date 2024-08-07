@@ -38,12 +38,13 @@ public:
     using reference = CharType&;
     using const_reference = CharType const&;
     static constexpr size_type npos = details::string::npos;
-    class UTL_ABI_PUBLIC const_iterator;
+    class const_iterator;
     using iterator = const_iterator;
     using const_reverse_iterator = UTL_SCOPE reverse_iterator<const_iterator>;
     using reverse_iterator = const_reverse_iterator;
 
-    class const_iterator : UTL_SCOPE contiguous_iterator_base<const_iterator, value_type const> {
+    class UTL_ABI_PUBLIC const_iterator :
+        UTL_SCOPE contiguous_iterator_base<const_iterator, value_type const> {
         using base_type = contiguous_iterator_base<const_iterator, value_type const>;
 
     public:
