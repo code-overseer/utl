@@ -30,7 +30,6 @@ template <typename Alloc>
 struct default_size_traits {
 private:
     using alloc_traits UTL_NODEBUG = allocator_traits<Alloc>;
-    static constexpr size_t pointer_size = sizeof(typename alloc_traits::pointer);
     struct heap_type_emulator {
         typename alloc_traits::pointer p;
         typename alloc_traits::size_type s;
