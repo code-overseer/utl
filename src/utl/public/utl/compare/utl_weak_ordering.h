@@ -12,17 +12,23 @@ UTL_NAMESPACE_BEGIN
 #define __UTL_ATTRIBUTE_COMPARE_API (NODISCARD)(CONST)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_COMPARE_API
 
-class UTL_ABI_PUBLIC weak_ordering {
+class UTL_ABI_PUBLIC weak_ordering :
+    details::compare::less_value<weak_ordering>,
+    details::compare::equivalent_value<weak_ordering>,
+    details::compare::greater_value<weak_ordering> {
     using value_t = details::compare::value_t;
     using order_t = details::compare::order_t;
     using zero_t = details::compare::zero_t;
     friend class strong_ordering;
     friend class partial_ordering;
+    friend details::compare::less_value<weak_ordering>;
+    friend details::compare::equivalent_value<weak_ordering>;
+    friend details::compare::greater_value<weak_ordering>;
 
 public:
-    static weak_ordering const less;
-    static weak_ordering const equivalent;
-    static weak_ordering const greater;
+    using details::compare::less_value<weak_ordering>::less;
+    using details::compare::equivalent_value<weak_ordering>::equivalent;
+    using details::compare::greater_value<weak_ordering>::greater;
 
     UTL_HIDE_FROM_ABI constexpr operator partial_ordering() const {
         return partial_ordering(order_t(value));
@@ -92,14 +98,9 @@ public:
 private:
     UTL_HIDE_FROM_ABI constexpr explicit weak_ordering(order_t value) noexcept
         : value(value_t(value)) {}
+
     value_t value;
 };
-
-UTL_ABI_PUBLIC_DATA constexpr weak_ordering weak_ordering::less{details::compare::order_t::less};
-UTL_ABI_PUBLIC_DATA constexpr weak_ordering weak_ordering::equivalent{
-    details::compare::order_t::equal};
-UTL_ABI_PUBLIC_DATA constexpr weak_ordering weak_ordering::greater{
-    details::compare::order_t::greater};
 
 #undef __UTL_ATTRIBUTE_COMPARE_API
 #undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_COMPARE_API

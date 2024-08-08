@@ -13,19 +13,28 @@ UTL_NAMESPACE_BEGIN
 #define __UTL_ATTRIBUTE_COMPARE_API (NODISCARD)(CONST)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_COMPARE_API
 
-class UTL_ABI_PUBLIC partial_ordering {
+class UTL_ABI_PUBLIC partial_ordering :
+    details::compare::less_value<partial_ordering>,
+    details::compare::equivalent_value<partial_ordering>,
+    details::compare::greater_value<partial_ordering>,
+    details::compare::unordered_value<partial_ordering> {
     using value_t = details::compare::value_t;
     using order_t = details::compare::order_t;
     using unorder_t = details::compare::unorder_t;
     using zero_t = details::compare::zero_t;
     friend class strong_ordering;
     friend class weak_ordering;
+    friend details::compare::less_value<partial_ordering>;
+    friend details::compare::equivalent_value<partial_ordering>;
+    friend details::compare::greater_value<partial_ordering>;
+    friend details::compare::unordered_value<partial_ordering>;
 
 public:
-    static partial_ordering const less;
-    static partial_ordering const equivalent;
-    static partial_ordering const greater;
-    static partial_ordering const unordered;
+    // TODO test for ODR issues
+    using details::compare::less_value<partial_ordering>::less;
+    using details::compare::equivalent_value<partial_ordering>::equivalent;
+    using details::compare::greater_value<partial_ordering>::greater;
+    using details::compare::unordered_value<partial_ordering>::unordered;
 
 #if UTL_CXX20
     template <same_as<std::partial_ordering> T>
@@ -110,17 +119,9 @@ private:
         : value(value_t(value)) {}
     UTL_HIDE_FROM_ABI constexpr explicit partial_ordering(unorder_t value) noexcept
         : value(value_t(unorder_t::unordered)) {}
+
     value_t value;
 };
-
-UTL_ABI_PUBLIC_DATA constexpr partial_ordering partial_ordering::less{
-    details::compare::order_t::less};
-UTL_ABI_PUBLIC_DATA constexpr partial_ordering partial_ordering::equivalent{
-    details::compare::order_t::equal};
-UTL_ABI_PUBLIC_DATA constexpr partial_ordering partial_ordering::greater{
-    details::compare::order_t::greater};
-UTL_ABI_PUBLIC_DATA constexpr partial_ordering partial_ordering::unordered{
-    details::compare::unorder_t::unordered};
 
 #undef __UTL_ATTRIBUTE_COMPARE_API
 #undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_COMPARE_API
