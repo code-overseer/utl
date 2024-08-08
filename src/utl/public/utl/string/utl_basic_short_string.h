@@ -50,7 +50,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename CharType, size_t ShortSize, typename Traits, typename Alloc>
-class basic_short_string {
+class UTL_PUBLIC_TEMPLATE basic_short_string {
     static_assert(ShortSize >= details::string::default_inline_size<CharType, Alloc>::value,
         "Inline size must be longer than the default value");
 
