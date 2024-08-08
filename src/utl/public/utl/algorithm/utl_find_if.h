@@ -20,7 +20,7 @@ namespace details {
 namespace find_if {
 
 template <typename It, typename F>
-using requirement = UTL_SCOPE conjunction<UTL_SCOPE is_legacy_forward_iterator<It>,
+using requirement UTL_NODEBUG = UTL_SCOPE conjunction<UTL_SCOPE is_legacy_forward_iterator<It>,
     UTL_SCOPE is_predicate<F, decltype(*UTL_SCOPE declval<It>())>>;
 
 } // namespace find_if
@@ -32,7 +32,7 @@ UTL_NAMESPACE_BEGIN
 
 template <UTL_CONCEPT_CXX20(forward_iterator) It,
     UTL_CONCEPT_CXX20(predicate<decltype(*UTL_SCOPE declval<It>())>) F>
-UTL_CONSTEXPR_CXX14 auto find_if(It first, It last, F&& f)
+UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 auto find_if(It first, It last, F&& f)
     -> UTL_ENABLE_IF_CXX11(It, details::find_if::requirement<It, F>::value) {
     for (; first != last; ++first) {
         if (f(*first)) {

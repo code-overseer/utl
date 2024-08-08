@@ -41,7 +41,8 @@ concept concept_impl =
 } // namespace details
 
 template <typename T>
-concept indirectly_readable = details::indirectly_readable::concept_impl<UTL_SCOPE remove_cvref<T>>;
+concept indirectly_readable =
+    details::indirectly_readable::concept_impl<UTL_SCOPE remove_cvref_t<T>>;
 
 template <typename T>
 struct is_indirectly_readable : UTL_SCOPE bool_constant<indirectly_readable<T>> {};

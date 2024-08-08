@@ -22,7 +22,7 @@ namespace details {
 namespace remove_if {
 
 template <typename It, typename F>
-using requirement = UTL_SCOPE conjunction<UTL_SCOPE is_legacy_forward_iterator<It>,
+using requirement UTL_NODEBUG = UTL_SCOPE conjunction<UTL_SCOPE is_legacy_forward_iterator<It>,
     UTL_SCOPE is_predicate<F, decltype(*UTL_SCOPE declval<It>())>,
     UTL_SCOPE is_move_assignable<UTL_SCOPE remove_cvref_t<decltype(*UTL_SCOPE declval<It>())>>>;
 
@@ -32,6 +32,7 @@ using requirement = UTL_SCOPE conjunction<UTL_SCOPE is_legacy_forward_iterator<I
 
 template <UTL_CONCEPT_CXX20(forward_iterator) It,
     UTL_CONCEPT_CXX20(predicate<decltype(*UTL_SCOPE declval<It>())>) F>
+UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD)
 UTL_CONSTEXPR_CXX14 auto remove_if(It first, It last, F&& f)
     -> UTL_ENABLE_IF_CXX11(It, details::remove_if::requirement<It, F>::value) {
     first = UTL_SCOPE find_if(first, last, f);

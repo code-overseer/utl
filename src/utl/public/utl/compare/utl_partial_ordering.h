@@ -5,13 +5,15 @@
 #include "utl/preprocessor/utl_attributes.h"
 
 #include "utl/compare/utl_compare_fwd.h"
+
 #include "utl/concepts/utl_same_as.h"
 
 UTL_NAMESPACE_BEGIN
 
-#define UTL_PARTIAL_ORDERING_ATTRIBUTES UTL_ATTRIBUTES(NODISCARD, CONST)
+#define __UTL_ATTRIBUTE_COMPARE_API (NODISCARD)(CONST)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_TYPE_AGGREGATE_COMPARE_API
 
-class partial_ordering {
+class UTL_ABI_PUBLIC partial_ordering {
     using value_t = details::compare::value_t;
     using order_t = details::compare::order_t;
     using unorder_t = details::compare::unorder_t;
@@ -27,14 +29,14 @@ public:
 
 #if UTL_CXX20
     template <same_as<std::partial_ordering> T>
-    constexpr partial_ordering(T p) noexcept
+    UTL_HIDE_FROM_ABI constexpr partial_ordering(T p) noexcept
         : value(p == T::less           ? less
                   : p == T::equivalent ? equivalent
                   : p == T::greater    ? greater
                                        : unordered) {}
 
     template <same_as<std::partial_ordering> T>
-    constexpr operator T() noexcept {
+    UTL_HIDE_FROM_ABI constexpr operator T() noexcept {
         return *this == less      ? T::less
             : *this == equivalent ? T::equivalent
             : *this == greater    ? T::greater
@@ -42,60 +44,56 @@ public:
     }
 #endif
 
-    constexpr partial_ordering(partial_ordering const&) noexcept = default;
-    constexpr partial_ordering(partial_ordering&&) noexcept = default;
-    constexpr partial_ordering& operator=(partial_ordering const&) noexcept = default;
-    constexpr partial_ordering& operator=(partial_ordering&&) noexcept = default;
+    UTL_HIDE_FROM_ABI constexpr partial_ordering(partial_ordering const&) noexcept = default;
+    UTL_HIDE_FROM_ABI constexpr partial_ordering(partial_ordering&&) noexcept = default;
+    UTL_HIDE_FROM_ABI constexpr partial_ordering& operator=(
+        partial_ordering const&) noexcept = default;
+    UTL_HIDE_FROM_ABI constexpr partial_ordering& operator=(partial_ordering&&) noexcept = default;
 
-    UTL_PARTIAL_ORDERING_ATTRIBUTES
-    friend constexpr bool operator==(partial_ordering l, partial_ordering r) noexcept {
+    UTL_ATTRIBUTE(COMPARE_API) friend constexpr bool operator==(
+        partial_ordering l, partial_ordering r) noexcept {
         return l.value == r.value;
     }
-    UTL_PARTIAL_ORDERING_ATTRIBUTES
-    friend constexpr bool operator==(partial_ordering l, zero_t) noexcept { return l.value == 0; }
+    UTL_ATTRIBUTE(COMPARE_API) friend constexpr bool operator==(partial_ordering l, zero_t) noexcept {
+        return l.value == 0;
+    }
 
-    UTL_PARTIAL_ORDERING_ATTRIBUTES
-    friend constexpr bool operator<(zero_t, partial_ordering r) noexcept {
+    UTL_ATTRIBUTE(COMPARE_API) friend constexpr bool operator<(zero_t, partial_ordering r) noexcept {
         return r.value == greater.value;
     }
-    UTL_PARTIAL_ORDERING_ATTRIBUTES
-    friend constexpr bool operator<(partial_ordering l, zero_t) noexcept {
+    UTL_ATTRIBUTE(COMPARE_API) friend constexpr bool operator<(partial_ordering l, zero_t) noexcept {
         return l.value == less.value;
     }
 
-    UTL_PARTIAL_ORDERING_ATTRIBUTES
-    friend constexpr bool operator>(zero_t, partial_ordering r) noexcept {
+    UTL_ATTRIBUTE(COMPARE_API) friend constexpr bool operator>(zero_t, partial_ordering r) noexcept {
         return r.value == less.value;
     }
-    UTL_PARTIAL_ORDERING_ATTRIBUTES
-    friend constexpr bool operator>(partial_ordering l, zero_t) noexcept {
+    UTL_ATTRIBUTE(COMPARE_API) friend constexpr bool operator>(partial_ordering l, zero_t) noexcept {
         return l.value == greater.value;
     }
 
-    UTL_PARTIAL_ORDERING_ATTRIBUTES
-    friend constexpr bool operator<=(zero_t, partial_ordering r) noexcept {
+    UTL_ATTRIBUTE(COMPARE_API) friend constexpr bool operator<=(zero_t, partial_ordering r) noexcept {
         return r.value == greater.value || r.value == equivalent.value;
     }
-    UTL_PARTIAL_ORDERING_ATTRIBUTES
-    friend constexpr bool operator<=(partial_ordering l, zero_t) noexcept {
+    UTL_ATTRIBUTE(COMPARE_API) friend constexpr bool operator<=(partial_ordering l, zero_t) noexcept {
         return l.value == less.value || l.value == equivalent.value;
     }
 
-    UTL_PARTIAL_ORDERING_ATTRIBUTES
-    friend constexpr bool operator>=(zero_t, partial_ordering r) noexcept {
+    UTL_ATTRIBUTE(COMPARE_API) friend constexpr bool operator>=(zero_t, partial_ordering r) noexcept {
         return r.value == less.value || r.value == equivalent.value;
     }
-    UTL_PARTIAL_ORDERING_ATTRIBUTES
-    friend constexpr bool operator>=(partial_ordering l, zero_t) noexcept {
+    UTL_ATTRIBUTE(COMPARE_API) friend constexpr bool operator>=(partial_ordering l, zero_t) noexcept {
         return l.value == greater.value || l.value == equivalent.value;
     }
 
 #if UTL_CXX20
-    UTL_PARTIAL_ORDERING_ATTRIBUTES
-    friend constexpr partial_ordering operator<=>(partial_ordering l, zero_t) noexcept { return l; }
+    UTL_ATTRIBUTE(COMPARE_API) friend constexpr partial_ordering operator<=>(
+        partial_ordering l, zero_t) noexcept {
+        return l;
+    }
 
-    UTL_PARTIAL_ORDERING_ATTRIBUTES
-    friend constexpr partial_ordering operator<=>(zero_t, partial_ordering r) noexcept {
+    UTL_ATTRIBUTE(COMPARE_API) friend constexpr partial_ordering operator<=>(
+        zero_t, partial_ordering r) noexcept {
         switch (r.value) {
         case value_t(order_t::less):
             return greater;
@@ -108,18 +106,23 @@ public:
 #endif
 
 private:
-    constexpr explicit partial_ordering(order_t value) noexcept : value(value_t(value)) {}
-    constexpr explicit partial_ordering(unorder_t value) noexcept
+    UTL_HIDE_FROM_ABI constexpr explicit partial_ordering(order_t value) noexcept
+        : value(value_t(value)) {}
+    UTL_HIDE_FROM_ABI constexpr explicit partial_ordering(unorder_t value) noexcept
         : value(value_t(unorder_t::unordered)) {}
     value_t value;
 };
 
-UTL_INLINE_CXX17 constexpr partial_ordering partial_ordering::less{details::compare::order_t::less};
-UTL_INLINE_CXX17 constexpr partial_ordering partial_ordering::equivalent{details::compare::order_t::equal};
-UTL_INLINE_CXX17 constexpr partial_ordering partial_ordering::greater{details::compare::order_t::greater};
-UTL_INLINE_CXX17 constexpr partial_ordering partial_ordering::unordered{
+UTL_ABI_PUBLIC_DATA constexpr partial_ordering partial_ordering::less{
+    details::compare::order_t::less};
+UTL_ABI_PUBLIC_DATA constexpr partial_ordering partial_ordering::equivalent{
+    details::compare::order_t::equal};
+UTL_ABI_PUBLIC_DATA constexpr partial_ordering partial_ordering::greater{
+    details::compare::order_t::greater};
+UTL_ABI_PUBLIC_DATA constexpr partial_ordering partial_ordering::unordered{
     details::compare::unorder_t::unordered};
 
-UTL_NAMESPACE_END
+#undef __UTL_ATTRIBUTE_COMPARE_API
+#undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_COMPARE_API
 
-#undef UTL_PARTIAL_ORDERING_ATTRIBUTES
+UTL_NAMESPACE_END

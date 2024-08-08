@@ -25,6 +25,12 @@ utl::string concatenatable(utl::string s) {
     return s.c_str() + s + s.c_str();
 }
 
+utl::string erasable(utl::string s) {
+    erase(s, 'u');
+    erase_if(s, [](auto c) { return c == 'y'; });
+    return s;
+}
+
 // Ensure char_traits specialization is implemented
 static_assert(!utl::char_traits<char>::lt(-1, 1), "Invalid");
 

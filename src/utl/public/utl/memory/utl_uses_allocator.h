@@ -54,7 +54,7 @@ struct UTL_ABI_PUBLIC allocator_arg_t {
     }
 };
 
-UTL_ABI_PUBLIC_VARIABLE constexpr allocator_arg_t allocator_arg = allocator_arg_t{};
+UTL_ABI_PUBLIC_DATA constexpr allocator_arg_t allocator_arg = allocator_arg_t{};
 
 /**
  * Specializing std will work on both utl and std, specializing utl will only work on utl
@@ -88,18 +88,18 @@ struct UTL_PUBLIC_TEMPLATE is_implicit_constructible_with_allocator :
 
 #if UTL_CXX14
 template <typename T, typename Alloc>
-UTL_ABI_PUBLIC_VARIABLE constexpr bool uses_allocator_v = uses_allocator<T, Alloc>::value;
+UTL_ABI_PUBLIC_DATA constexpr bool uses_allocator_v = uses_allocator<T, Alloc>::value;
 template <typename T, typename Alloc, typename... Args>
-UTL_ABI_PUBLIC_VARIABLE constexpr bool is_constructible_with_allocator_v =
+UTL_ABI_PUBLIC_DATA constexpr bool is_constructible_with_allocator_v =
     is_constructible_with_allocator<T, Alloc, Args...>::value;
 template <typename T, typename Alloc, typename... Args>
-UTL_ABI_PUBLIC_VARIABLE constexpr bool is_nothrow_constructible_with_allocator_v =
+UTL_ABI_PUBLIC_DATA constexpr bool is_nothrow_constructible_with_allocator_v =
     is_nothrow_constructible_with_allocator<T, Alloc, Args...>::value;
 template <typename T, typename Alloc, typename... Args>
-UTL_ABI_PUBLIC_VARIABLE constexpr bool is_explicit_constructible_with_allocator_v =
+UTL_ABI_PUBLIC_DATA constexpr bool is_explicit_constructible_with_allocator_v =
     is_explicit_constructible_with_allocator<T, Alloc, Args...>::value;
 template <typename T, typename Alloc, typename... Args>
-UTL_ABI_PUBLIC_VARIABLE constexpr bool is_implicit_constructible_with_allocator_v =
+UTL_ABI_PUBLIC_DATA constexpr bool is_implicit_constructible_with_allocator_v =
     is_implicit_constructible_with_allocator<T, Alloc, Args...>::value;
 
 #  define UTL_TRAIT_uses_allocator(...) UTL_SCOPE uses_allocator_v<__VA_ARGS__>
