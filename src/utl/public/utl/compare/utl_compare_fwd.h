@@ -32,7 +32,7 @@ class weak_ordering;
 
 namespace details {
 namespace compare {
-using value_t = signed char;
+using value_t UTL_NODEBUG = signed char;
 enum class order_t : value_t {
     equal = 0,
     less = -1,
@@ -41,8 +41,8 @@ enum class order_t : value_t {
 enum class unorder_t : value_t {
     unordered = 2
 };
-struct zero_t {
-    UTL_CONSTEVAL zero_t(zero_t*) noexcept {}
+struct UTL_ABI_PUBLIC zero_t {
+    UTL_HIDE_FROM_ABI UTL_CONSTEVAL zero_t(zero_t*) noexcept {}
 };
 template <typename T>
 struct less_value {
