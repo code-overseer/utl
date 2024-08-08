@@ -108,9 +108,15 @@
 /* TODO: Use debug/opt level */
 #define __UTL_HARDENING_MODE n
 
-#define UTL_EXTERN_C extern "C"
-#define UTL_EXTERN_C_BEGIN UTL_EXTERN_C {
-#define UTL_EXTERN_C_END }
+#if UTL_CXX
+#  define UTL_EXTERN_C extern "C"
+#  define UTL_EXTERN_C_BEGIN UTL_EXTERN_C {
+#  define UTL_EXTERN_C_END }
+#else
+#  define UTL_EXTERN_C
+#  define UTL_EXTERN_C_BEGIN
+#  define UTL_EXTERN_C_END
+#endif
 
 #if UTL_COMPILER_MSVC && UTL_CXX20
 #  define UTL_EXTERN_CXX extern "C++"
