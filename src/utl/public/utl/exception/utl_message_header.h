@@ -27,8 +27,7 @@ namespace exceptions {
  * on the stack. New elements are pushed onto the head. The class also provides methods
  * to manage memory allocation, access message details, and handle linked list operations.
  */
-class UTL_ABI_PUBLIC message_header final :
-    reference_count<message_header> {
+class UTL_ABI_PUBLIC message_header final : reference_count<message_header> {
 public:
     // Deleted new and delete operators to prevent direct allocation
     static void* operator new(size_t) = delete;
@@ -94,7 +93,7 @@ public:
      * @return A pointer to the header of the newly created message.
      * @throws std::bad_alloc on memory allocation failure.
      */
-    static message_header* create(message_format fmt, ...) UTL_THROWS {
+    UTL_NODISCARD static message_header* create(message_format fmt, ...) UTL_THROWS {
         static constexpr auto header_size = sizeof(message_header);
         va_list args1;
         va_list args2;

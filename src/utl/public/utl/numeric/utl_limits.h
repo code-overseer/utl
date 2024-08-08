@@ -231,11 +231,11 @@ struct UTL_PUBLIC_TEMPLATE lowest<bfloat16> : details::fp_lowest<bfloat16> {};
 #endif
 #if UTL_CXX14
 template <typename T>
-UTL_INLINE_CXX17 constexpr auto maximum_v = maximum<T>::value;
+UTL_ABI_PUBLIC_DATA constexpr auto maximum_v = maximum<T>::value;
 template <typename T>
-UTL_INLINE_CXX17 constexpr auto minimum_v = minimum<T>::value;
+UTL_ABI_PUBLIC_DATA constexpr auto minimum_v = minimum<T>::value;
 template <typename T>
-UTL_INLINE_CXX17 constexpr auto lowest_v = lowest<T>::value;
+UTL_ABI_PUBLIC_DATA constexpr auto lowest_v = lowest<T>::value;
 #  define UTL_NUMERIC_maximum(TYPE) UTL_SCOPE numeric::maximum_v<TYPE>
 #  define UTL_NUMERIC_minimum(TYPE) UTL_SCOPE numeric::minimum_v<TYPE>
 #  define UTL_NUMERIC_lowest(TYPE) UTL_SCOPE numeric::lowest_v<TYPE>

@@ -72,7 +72,7 @@ public:
         return *this;
     }
 
-    class const_iterator {
+    class UTL_ABI_PUBLIC const_iterator {
     public:
         using value_type = message_header const;
         using pointer = message_header const*;
@@ -111,31 +111,27 @@ public:
         message_header const* current_ = nullptr;
     };
 
-    UTL_ATTRIBUTES(NODISCARD, PURE) UTL_HIDE_FROM_ABI constexpr message_header const& top() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) {
+    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr message_header const& top() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) {
         return *head_;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE) UTL_HIDE_FROM_ABI constexpr bool empty() const noexcept {
-        return size() == 0;
-    }
+    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr bool empty() const noexcept { return size() == 0; }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE) UTL_HIDE_FROM_ABI constexpr size_type size() const noexcept {
-        return size_;
-    }
+    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr size_type size() const noexcept { return size_; }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE) UTL_HIDE_FROM_ABI constexpr const_iterator begin() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) {
+    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator begin() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) {
         return const_iterator(head_);
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE) UTL_HIDE_FROM_ABI constexpr const_iterator end() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) {
+    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator end() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) {
         return const_iterator();
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE) UTL_HIDE_FROM_ABI constexpr const_iterator cbegin() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND){
+    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator cbegin() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND){
         return const_iterator(head_);
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE) UTL_HIDE_FROM_ABI constexpr const_iterator cend() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND){
+    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator cend() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND){
         return const_iterator();
     }
 

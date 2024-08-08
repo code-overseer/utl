@@ -21,11 +21,12 @@ template <typename T, size_t N>
 concept sized_signed_integral = signed_integral<T> && sized_integral<T, N>;
 
 template <size_t N, typename T>
-struct is_sized_integral : bool_constant<sized_integral<T, N>> {};
+struct UTL_PUBLIC_TEMPLATE is_sized_integral : bool_constant<sized_integral<T, N>> {};
 template <size_t N, typename T>
-struct is_sized_unsigned_integral : bool_constant<sized_unsigned_integral<T, N>> {};
+struct UTL_PUBLIC_TEMPLATE is_sized_unsigned_integral :
+    bool_constant<sized_unsigned_integral<T, N>> {};
 template <size_t N, typename T>
-struct is_sized_signed_integral : bool_constant<sized_signed_integral<T, N>> {};
+struct UTL_PUBLIC_TEMPLATE is_sized_signed_integral : bool_constant<sized_signed_integral<T, N>> {};
 template <size_t N, typename T>
 inline constexpr bool is_sized_integral_v = sized_integral<T, N>;
 template <size_t N, typename T>
@@ -46,23 +47,23 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <size_t N, typename T>
-struct is_sized_integral : bool_constant<UTL_TRAIT_is_integral(T) && sizeof(T) == N> {};
+struct UTL_PUBLIC_TEMPLATE is_sized_integral :
+    bool_constant<UTL_TRAIT_is_integral(T) && sizeof(T) == N> {};
 template <size_t N, typename T>
-struct is_sized_unsigned_integral :
+struct UTL_PUBLIC_TEMPLATE is_sized_unsigned_integral :
     bool_constant<UTL_TRAIT_is_integral(T) && UTL_TRAIT_is_unsigned(T) && sizeof(T) == N> {};
 template <size_t N, typename T>
-struct is_sized_signed_integral :
+struct UTL_PUBLIC_TEMPLATE is_sized_signed_integral :
     bool_constant<UTL_TRAIT_is_integral(T) && UTL_TRAIT_is_signed(T) && sizeof(T) == N> {};
 
 #  if UTL_CXX14
 template <size_t N, typename T>
-UTL_ABI_PUBLIC_VARIABLE constexpr bool is_sized_integral_v =
-    UTL_TRAIT_is_integral(T) && sizeof(T) == N;
+UTL_ABI_PUBLIC_DATA constexpr bool is_sized_integral_v = UTL_TRAIT_is_integral(T) && sizeof(T) == N;
 template <size_t N, typename T>
-UTL_ABI_PUBLIC_VARIABLE constexpr bool is_sized_unsigned_integral_v =
+UTL_ABI_PUBLIC_DATA constexpr bool is_sized_unsigned_integral_v =
     UTL_TRAIT_is_integral(T) && UTL_TRAIT_is_unsigned(T) && sizeof(T) == N;
 template <size_t N, typename T>
-UTL_ABI_PUBLIC_VARIABLE constexpr bool is_sized_signed_integral_v =
+UTL_ABI_PUBLIC_DATA constexpr bool is_sized_signed_integral_v =
     UTL_TRAIT_is_integral(T) && UTL_TRAIT_is_signed(T) && sizeof(T) == N;
 #  endif
 
