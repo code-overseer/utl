@@ -12,7 +12,7 @@ UTL_NAMESPACE_BEGIN
 
 namespace numeric {
 template <UTL_CONCEPT_CXX20(arithmetic_type) T>
-UTL_ATTRIBUTES(NODISCARD, CONST) constexpr UTL_ENABLE_IF_CXX11(T, is_arithmetic<T>::value) min(T l, T r) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr UTL_ENABLE_IF_CXX11(T, is_arithmetic<T>::value) min(T l, T r) noexcept {
     return l < r ? l : r;
 }
 } // namespace numeric

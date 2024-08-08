@@ -14,7 +14,7 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace customization_point {
 template <typename T>
-constexpr T constant = {};
+UTL_ABI_PUBLIC constexpr T constant = {};
 } // namespace customization_point
 } // namespace details
 
@@ -32,7 +32,7 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace customization_point {
 template <typename T>
-struct constant {
+struct UTL_PUBLIC_TEMPLATE constant {
     static constexpr T value = {};
 };
 
