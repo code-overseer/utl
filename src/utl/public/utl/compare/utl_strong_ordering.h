@@ -13,16 +13,24 @@ UTL_NAMESPACE_BEGIN
 #define __UTL_ATTRIBUTE_COMPARE_API (NODISCARD)(CONST)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_COMPARE_API
 
-class UTL_ABI_PUBLIC strong_ordering {
+class UTL_ABI_PUBLIC strong_ordering :
+    details::compare::less_value<strong_ordering>,
+    details::compare::equivalent_value<strong_ordering>,
+    details::compare::greater_value<strong_ordering>,
+    details::compare::equal_value<strong_ordering> {
     using value_t = details::compare::value_t;
     using order_t = details::compare::order_t;
     using zero_t = details::compare::zero_t;
+    friend details::compare::less_value<strong_ordering>;
+    friend details::compare::equivalent_value<strong_ordering>;
+    friend details::compare::greater_value<strong_ordering>;
+    friend details::compare::equal_value<strong_ordering>;
 
 public:
-    static strong_ordering const less;
-    static strong_ordering const equivalent;
-    static strong_ordering const equal;
-    static strong_ordering const greater;
+    using details::compare::less_value<strong_ordering>::less;
+    using details::compare::equivalent_value<strong_ordering>::equivalent;
+    using details::compare::greater_value<strong_ordering>::greater;
+    using details::compare::equal_value<strong_ordering>::equal;
 
     UTL_HIDE_FROM_ABI constexpr operator partial_ordering() const {
         return partial_ordering(order_t(value));
@@ -92,17 +100,9 @@ public:
 private:
     UTL_HIDE_FROM_ABI constexpr explicit strong_ordering(order_t value) noexcept
         : value(value_t(value)) {}
+
     value_t value;
 };
-
-UTL_ABI_PUBLIC_DATA constexpr strong_ordering strong_ordering::less{
-    details::compare::order_t::less};
-UTL_ABI_PUBLIC_DATA constexpr strong_ordering strong_ordering::equivalent{
-    details::compare::order_t::equal};
-UTL_ABI_PUBLIC_DATA constexpr strong_ordering strong_ordering::equal{
-    details::compare::order_t::equal};
-UTL_ABI_PUBLIC_DATA constexpr strong_ordering strong_ordering::greater{
-    details::compare::order_t::greater};
 
 #undef __UTL_ATTRIBUTE_COMPARE_API
 #undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_COMPARE_API
