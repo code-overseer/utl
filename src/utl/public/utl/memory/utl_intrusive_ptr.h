@@ -22,8 +22,8 @@ struct UTL_ABI_PUBLIC adopt_object_t {
     explicit constexpr adopt_object_t() noexcept = default;
 };
 
-UTL_ABI_PUBLIC_VARIABLE constexpr retain_object_t retain_object = retain_object_t{};
-UTL_ABI_PUBLIC_VARIABLE constexpr adopt_object_t adopt_object = adopt_object_t{};
+UTL_ABI_PUBLIC_DATA constexpr retain_object_t retain_object = retain_object_t{};
+UTL_ABI_PUBLIC_DATA constexpr adopt_object_t adopt_object = adopt_object_t{};
 
 /**
  * Smart pointer class for managing intrusive reference-counted objects.

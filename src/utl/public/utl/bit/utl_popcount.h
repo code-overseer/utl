@@ -96,7 +96,7 @@ UTL_NODISCARD constexpr int builtin_popcount(unsigned char x) noexcept {
 } // namespace bit
 
 template <UTL_CONCEPT_CXX20(bit_readable) T>
-UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_bit_readable(T)) popcount(T x) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto popcount(T x) noexcept -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_bit_readable(T)) {
     return bit::details::builtin_popcount(x);
 }
 
