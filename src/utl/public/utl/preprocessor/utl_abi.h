@@ -30,6 +30,7 @@
 #  ifdef __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PRIVATE
 #    error '__UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PRIVATE' cannot be defined
 #  endif
+#  define UTL_PUBLIC_TEMPLATE_DATA
 #else
 
 #  if !UTL_HAS_GNU_ATTRIBUTE(__visibility__) || !UTL_HAS_GNU_ATTRIBUTE(__visibility__)
@@ -42,6 +43,7 @@
 #  define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PUBLIC
 #  define __UTL_ATTRIBUTE_ABI_PRIVATE (VISIBILITY("hidden"))
 #  define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PRIVATE
+#  define UTL_PUBLIC_TEMPLATE_DATA __attribute__((__visibility__("default")))
 
 #endif
 

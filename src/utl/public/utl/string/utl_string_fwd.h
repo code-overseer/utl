@@ -12,16 +12,16 @@ UTL_NAMESPACE_BEGIN
 using size_t = decltype(sizeof(0));
 
 template <typename>
-struct char_traits;
+struct UTL_PUBLIC_TEMPLATE char_traits;
 
 template <typename CharType, typename Traits = char_traits<CharType>>
-class basic_string_view;
+class UTL_PUBLIC_TEMPLATE basic_string_view;
 template <typename CharType, typename Traits = char_traits<CharType>>
-class basic_zstring_view;
+class UTL_PUBLIC_TEMPLATE basic_zstring_view;
 
 template <typename CharType, size_t ShortSize, typename Traits = char_traits<CharType>,
     typename Alloc = allocator<CharType>>
-class basic_short_string;
+class UTL_PUBLIC_TEMPLATE basic_short_string;
 
 namespace details {
 namespace string {
@@ -29,22 +29,22 @@ namespace string {
 template <typename Alloc>
 struct default_size_traits {
 private:
-    using alloc_traits = allocator_traits<Alloc>;
+    using alloc_traits UTL_NODEBUG = allocator_traits<Alloc>;
+    struct heap_type_emulator {
+        typename alloc_traits::pointer p;
+        typename alloc_traits::size_type s;
+    };
 
 public:
-    static constexpr size_t size_type() noexcept {
-        return sizeof(typename alloc_traits::size_type);
-    }
-    static constexpr size_t heap_type() noexcept {
-        return size_type() + sizeof(typename alloc_traits::pointer);
-    }
+    static constexpr size_t size_type = sizeof(typename alloc_traits::size_type);
+    static constexpr size_t heap_type = sizeof(heap_type_emulator);
 };
 
 template <typename CharType, typename Alloc>
 struct default_inline_size {
 private:
-    using value_type = CharType;
-    static constexpr size_t bytes = default_size_traits<Alloc>::heap_type();
+    using value_type UTL_NODEBUG = CharType;
+    static constexpr size_t bytes = default_size_traits<Alloc>::heap_type;
 
 public:
     static constexpr size_t value = bytes / sizeof(value_type) - 1 > 2

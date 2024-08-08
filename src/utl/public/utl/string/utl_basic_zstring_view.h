@@ -19,12 +19,12 @@
 #include "utl/numeric/utl_min.h"
 #include "utl/string/utl_string_details.h"
 
-#define UTL_STRING_PURE UTL_ATTRIBUTES(NODISCARD, PURE)
-#define UTL_STRING_CONST UTL_ATTRIBUTES(NODISCARD, CONST)
+#define __UTL_ATTRIBUTE_STRING_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_PURE
 
 UTL_NAMESPACE_BEGIN
 template <typename CharType, typename Traits>
-class basic_zstring_view : private basic_string_view<CharType, Traits> {
+class UTL_PUBLIC_TEMPLATE basic_zstring_view : private basic_string_view<CharType, Traits> {
     using base_type = basic_string_view<CharType, Traits>;
 
 public:
@@ -43,33 +43,34 @@ public:
     using typename base_type::value_type;
 
     basic_zstring_view(decltype(nullptr)) = delete;
-    constexpr basic_zstring_view() noexcept = default;
-    constexpr basic_zstring_view(basic_zstring_view const&) noexcept = default;
-    UTL_CONSTEXPR_CXX14 basic_zstring_view(const_pointer data, size_type size) UTL_THROWS
+    UTL_HIDE_FROM_ABI constexpr basic_zstring_view() noexcept = default;
+    UTL_HIDE_FROM_ABI constexpr basic_zstring_view(basic_zstring_view const&) noexcept = default;
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_zstring_view(const_pointer data, size_type size) UTL_THROWS
         : base_type(data, size) {
         UTL_THROW_IF(data()[size] != 0,
             invalid_argument(UTL_MESSAGE_FORMAT(
                 "zstring_view construction failed, Reason=[argument string not null-terminated]")));
     }
-    constexpr basic_zstring_view(const_pointer data)
+    UTL_HIDE_FROM_ABI constexpr basic_zstring_view(const_pointer data)
         UTL_NOEXCEPT(noexcept(traits_type::length(data)))
         : base_type(data, traits_type::length(data)) {}
 
     template <UTL_CONCEPT_CXX20(contiguous_iterator) It,
         UTL_CONCEPT_CXX20(sized_sentinel_for<It>) E UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_contiguous_iterator(It) && UTL_TRAIT_is_sized_sentinel_for(E, It))>
-    UTL_CONSTEXPR_CXX14 basic_zstring_view(It begin, E end)
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_zstring_view(It begin, E end)
         UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_dereferenceable(It)&& noexcept(end - begin))
         : basic_zstring_view(UTL_SCOPE to_address(begin), end - begin) {}
 
-    explicit UTL_CONSTEXPR_CXX14 basic_zstring_view(base_type other) UTL_THROWS
+    UTL_HIDE_FROM_ABI explicit UTL_CONSTEXPR_CXX14 basic_zstring_view(base_type other) UTL_THROWS
         : basic_zstring_view(other.data(), other.size()) {}
 
-    constexpr operator base_type() const { return *this; }
+    UTL_HIDE_FROM_ABI constexpr operator base_type() const { return *this; }
 
     // TODO: ranges ctor
 
-    UTL_CONSTEXPR_CXX14 basic_zstring_view& operator=(basic_zstring_view const&) noexcept = default;
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_zstring_view& operator=(
+        basic_zstring_view const&) noexcept = default;
 
     using base_type::back;
     using base_type::begin;
@@ -89,7 +90,7 @@ public:
     using base_type::operator[];
     using base_type::remove_prefix;
 
-    UTL_STRING_PURE constexpr const_reference at(size_type idx) const UTL_THROWS {
+    UTL_ATTRIBUTE(STRING_PURE)constexpr const_reference at(size_type idx) const UTL_THROWS UTL_LIFETIMEBOUND {
         UTL_THROW_IF(idx > size(),
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_zstring_view::at` operation failed, "
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
@@ -97,11 +98,17 @@ public:
         return *this[idx];
     }
 
-    UTL_CONSTEXPR_CXX14 void swap(basic_zstring_view& other) noexcept { base_type::swap(other); }
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(basic_zstring_view& other) noexcept {
+        base_type::swap(other);
+    }
 
-    friend UTL_CONSTEXPR_CXX14 void swap(basic_zstring_view& l, basic_zstring_view& r) noexcept { l.swap(r); }
+    UTL_HIDE_FROM_ABI friend UTL_CONSTEXPR_CXX14 void swap(
+        basic_zstring_view& l, basic_zstring_view& r) noexcept {
+        l.swap(r);
+    }
 
-    UTL_CONSTEXPR_CXX14 size_type copy(pointer dest, size_type count, size_type pos = 0) const UTL_THROWS {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 size_type copy(
+        pointer dest, size_type count, size_type pos = 0) const UTL_THROWS {
         UTL_THROW_IF(pos > size(),
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_zstring_view::copy` operation failed, "
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
@@ -111,7 +118,8 @@ public:
         return copied;
     }
 
-    constexpr base_type substr(size_type pos = 0, size_type count = npos) const UTL_THROWS {
+    UTL_HIDE_FROM_ABI constexpr base_type substr(
+        size_type pos = 0, size_type count = npos) const UTL_THROWS {
         return pos >= size() ? substr_throw(UTL_SOURCE_LOCATION(), pos, size())
                              : base_type(data() + pos, UTL_SCOPE numeric::min(count, size() - pos));
     }
@@ -128,7 +136,7 @@ public:
     using base_type::starts_with;
 
 private:
-    [[noreturn]] static basic_zstring_view substr_throw(
+    UTL_ATTRIBUTES(NORETURN, NOINLINE, HIDE_FROM_ABI) static basic_zstring_view substr_throw(
         UTL_SCOPE source_location src, size_t pos, size_t size) UTL_THROWS {
         exceptions::message_format format = {"[UTL] `basic_zstring_view::substr` operation failed, "
                                              "Reason=[index out of range], pos=[%zu], size=[%zu]",
@@ -138,7 +146,7 @@ private:
 };
 
 template <typename CharType, typename Traits>
-UTL_STRING_CONST constexpr bool operator==(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator==(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
     return lhs.size() == rhs.size() && (lhs.data() == rhs.data() || lhs.compare(rhs) == 0);
 }
@@ -152,7 +160,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename CharType, typename Traits>
-UTL_STRING_CONST constexpr typename Traits::comparison_category operator<=>(
+UTL_ATTRIBUTE(STRING_PURE) constexpr typename Traits::comparison_category operator<=>(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
     using result_type = typename Traits::comparison_category;
     return static_cast<result_type>(lhs.compare(rhs) <=> 0);
@@ -165,31 +173,31 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename CharType, typename Traits>
-UTL_STRING_CONST constexpr bool operator<(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator<(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
     return lhs.compare(rhs) < 0;
 }
 
 template <typename CharType, typename Traits>
-UTL_STRING_CONST constexpr bool operator>(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator>(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
     return rhs < lhs;
 }
 
 template <typename CharType, typename Traits>
-UTL_STRING_CONST constexpr bool operator>=(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator>=(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
     return !(lhs < rhs);
 }
 
 template <typename CharType, typename Traits>
-UTL_STRING_CONST constexpr bool operator<=(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator<=(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
     return !(rhs < lhs);
 }
 
 template <typename CharType, typename Traits>
-UTL_STRING_CONST constexpr bool operator!=(
+UTL_ATTRIBUTE(STRING_PURE) constexpr bool operator!=(
     basic_zstring_view<CharType, Traits> lhs, basic_zstring_view<CharType, Traits> rhs) noexcept {
     return !(lhs == rhs);
 }
@@ -198,5 +206,5 @@ UTL_NAMESPACE_END
 
 #endif
 
-#undef UTL_STRING_PURE
-#undef UTL_STRING_CONST
+#undef __UTL_ATTRIBUTE_STRING_PURE
+#undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_PURE

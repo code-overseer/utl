@@ -43,7 +43,7 @@ using impl UTL_NODEBUG = R;
 } // namespace details
 
 struct UTL_ABI_PUBLIC allocator_arg_t {
-    UTL_HIDE_FROM_ABI explicit constexpr allocator_arg_t() noexcept = default;
+    explicit constexpr allocator_arg_t() noexcept = default;
     template <UTL_CONCEPT_CXX20(same_as<::std::allocator_arg_t>) T UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_same(T, ::std::allocator_arg_t))>
     UTL_HIDE_FROM_ABI constexpr allocator_arg_t(T) noexcept {}
