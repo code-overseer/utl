@@ -30,7 +30,7 @@ UTL_ATTRIBUTE(LIBC_API) constexpr size_t byte_count(element_count_t c) noexcept 
 template <typename T>
 UTL_ATTRIBUTE(LIBC_API) constexpr bool is_pointer_in_range(
     T const* begin, T const* end, T const* ptr) noexcept {
-    return UTL_CONSTANT_P(begin <= end && ptr < end) || !(ptr < begin) && ptr < end;
+    return UTL_CONSTANT_P(begin <= end && ptr < end) || (!(ptr < begin) && ptr < end);
 }
 
 UTL_ATTRIBUTE(LIBC_API) constexpr element_count_t operator-(element_count_t val, size_t op) noexcept {

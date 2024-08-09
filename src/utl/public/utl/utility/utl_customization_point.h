@@ -6,7 +6,8 @@
 
 #if UTL_CXX17
 
-#  define UTL_DEFINE_CUSTOMIZATION_POINT(TYPE, NAME) inline constexpr TYPE NAME = {}
+#  define UTL_DEFINE_CUSTOMIZATION_POINT(TYPE, NAME) \
+      inline constexpr TYPE NAME {}
 
 #elif UTL_CXX14
 

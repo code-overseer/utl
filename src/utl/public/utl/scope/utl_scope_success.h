@@ -2,24 +2,34 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_config.h"
+
+#include "utl/concepts/utl_constructible_as.h"
 #include "utl/exception.h"
 #include "utl/scope/utl_scope_impl.h"
+#include "utl/type_traits/utl_is_constructible.h"
+#include "utl/type_traits/utl_is_nothrow_constructible.h"
+#include "utl/type_traits/utl_logical_traits.h"
+#include "utl/utility/utl_customization_point.h"
 
 UTL_NAMESPACE_BEGIN
 
 #if UTL_CXX17
 template <typename F>
-class scope_success : private details::scope::impl<scope_success<F>, F> {
+class UTL_ATTRIBUTES(PUBLIC_TEMPLATE, NODISCARD) scope_success :
+    private details::scope::impl<scope_success<F>, F> {
     using base_type = details::scope::impl<scope_success<F>, F>;
     using is_movable = typename base_type::is_movable;
     using move_t = conditional_t<is_movable::value, scope_success, details::scope::invalid_t>;
     friend base_type;
 
 public:
-    template <typename Fn, typename = enable_if_t<UTL_TRAIT_is_constructible(F, Fn&&)>>
+    template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn
+            UTL_REQUIRES_CXX11(UTL_TRAIT_is_constructible(F, Fn&&))>
     explicit scope_success(Fn&& func) noexcept(UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
         : base_type(UTL_SCOPE forward<Fn>(func))
         , exceptions_(uncaught_exceptions()) {}
+    scope_success(scope_success const&) = delete;
     scope_success(move_t&& other) noexcept(UTL_TRAIT_is_nothrow_move_constructible(F))
         : base_type(UTL_SCOPE move(other))
         , exceptions_(other.exceptions_) {}
@@ -41,7 +51,7 @@ template <typename Fn>
 explicit scope_success(Fn&& f) -> scope_success<decay_t<Fn>>;
 
 template <typename Fn>
-auto make_scope_success(Fn&& f) noexcept(
+UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) auto make_scope_success(Fn&& f) noexcept(
     UTL_TRAIT_is_nothrow_constructible(scope_success<decay_t<Fn>>, Fn))
     -> enable_if_t<UTL_TRAIT_is_constructible(scope_success<decay_t<Fn>>, Fn),
         scope_success<decay_t<Fn>>> {
@@ -50,15 +60,18 @@ auto make_scope_success(Fn&& f) noexcept(
 
 namespace details {
 namespace scope {
-UTL_INLINE_CXX17 constexpr struct success_proxy_t {
+struct success_proxy_t {
+    UTL_HIDE_FROM_ABI constexpr explicit success_proxy_t() noexcept = default;
     template <typename Fn>
-    auto operator->*(Fn&& f) const
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) auto operator->*(Fn&& f) const
         noexcept(UTL_TRAIT_is_nothrow_constructible(scope_success<decay_t<Fn>>, Fn))
             -> enable_if_t<UTL_TRAIT_is_constructible(scope_success<decay_t<Fn>>, Fn),
                 scope_success<decay_t<Fn>>> {
         return scope_success<decay_t<Fn>>{UTL_SCOPE forward<Fn>(f)};
     }
-} success_proxy = {};
+};
+
+inline constexpr success_proxy_t success_proxy{};
 } // namespace scope
 } // namespace details
 

@@ -3,6 +3,9 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
+#include "utl/concepts/utl_same_as.h"
+#include "utl/type_traits/utl_add_rvalue_reference.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_move_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_move_constructible.h"
@@ -14,7 +17,6 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace scope {
 class invalid_t {
-private:
     constexpr invalid_t() noexcept = default;
     ~invalid_t() noexcept = default;
 };
@@ -31,31 +33,38 @@ private:
     using not_move_t = conditional_t<is_movable::value, details::scope::invalid_t, impl>;
 
 protected:
-    template <typename Fn, typename = enable_if_t<UTL_TRAIT_is_constructible(F, Fn&&)>>
-    impl(Fn&& func) noexcept(UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
+    template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn UTL_REQUIRES_CXX11(
+        UTL_TRAIT_is_constructible(F, Fn&&))>
+    UTL_HIDE_FROM_ABI constexpr impl(Fn&& func) noexcept(
+        UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
         : callable(UTL_SCOPE forward<Fn>(func))
         , released_(false) {}
     impl(impl const& other) = delete;
     impl& operator=(impl const& other) = delete;
     impl(not_move_t&& other) = delete;
     impl& operator=(impl&& other) = delete;
-    constexpr impl(move_t&& other) noexcept(UTL_TRAIT_is_nothrow_move_constructible(F))
+    UTL_HIDE_FROM_ABI constexpr impl(move_t&& other) noexcept(
+        UTL_TRAIT_is_nothrow_move_constructible(F))
         : impl(is_movable{}, UTL_SCOPE move(other)) {}
 
-    void release() noexcept { released_ = true; }
+    UTL_HIDE_FROM_ABI void release() noexcept { released_ = true; }
 
-    ~impl() noexcept(noexcept(callable())) {
+    UTL_HIDE_FROM_ABI ~impl() noexcept(noexcept(callable())) {
         if (!released_) {
             callable();
         }
     }
 
 private:
-    // TODO ignore warning
-    constexpr impl(false_type, details::scope::invalid_t&&) noexcept;
-    template <typename T = impl,
-        typename = enable_if_t<is_movable::value && UTL_TRAIT_is_same(T, impl)>>
-    constexpr impl(true_type, T&& other) noexcept
+    template <UTL_CONCEPT_CXX20(same_as<details::scope::invalid_t>) T UTL_REQUIRES_CXX11(
+        is_movable::value && UTL_TRAIT_is_same(T, impl))>
+    UTL_REQUIRES_CXX20(is_movable::value)
+    impl(false_type, T&& other) noexcept = delete;
+
+    template <UTL_CONCEPT_CXX20(same_as<impl>) T = impl UTL_REQUIRES_CXX11(
+        is_movable::value && UTL_TRAIT_is_same(T, impl))>
+    UTL_REQUIRES_CXX20(is_movable::value)
+    UTL_HIDE_FROM_ABI constexpr impl(true_type, T&& other) noexcept
         : callable(UTL_SCOPE move(other.callable))
         , released_(other.released_) {
         other.release();
