@@ -18,10 +18,10 @@ UTL_NAMESPACE_BEGIN
 template <typename F>
 class UTL_ATTRIBUTES(PUBLIC_TEMPLATE, NODISCARD) scope_success :
     private details::scope::impl<scope_success<F>, F> {
-    using base_type = details::scope::impl<scope_success<F>, F>;
+    using base_type UTL_NODEBUG = details::scope::impl<scope_success<F>, F>;
     using typename base_type::invalid_t;
     using typename base_type::is_movable;
-    using move_t = conditional_t<is_movable::value, scope_success, invalid_t>;
+    using move_t UTL_NODEBUG = conditional_t<is_movable::value, scope_success, invalid_t>;
     friend base_type;
 
 public:

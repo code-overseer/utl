@@ -17,10 +17,10 @@ UTL_NAMESPACE_BEGIN
 template <typename F>
 class UTL_ATTRIBUTES(
     PUBLIC_TEMPLATE, NODISCARD) scope_exit : private details::scope::impl<scope_exit<F>, F> {
-    using base_type = details::scope::impl<scope_exit<F>, F>;
+    using base_type UTL_NODEBUG = details::scope::impl<scope_exit<F>, F>;
     using typename base_type::invalid_t;
     using typename base_type::is_movable;
-    using move_t = conditional_t<is_movable::value, scope_exit, invalid_t>;
+    using move_t UTL_NODEBUG = conditional_t<is_movable::value, scope_exit, invalid_t>;
 
 public:
     template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn UTL_REQUIRES_CXX11(

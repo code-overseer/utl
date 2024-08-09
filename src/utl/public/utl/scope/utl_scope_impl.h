@@ -17,19 +17,19 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace scope {
 template <typename Impl, typename F>
-class impl {
+class UTL_PUBLIC_TEMPLATE impl {
     static_assert(UTL_TRAIT_is_invocable(F), "Callable F must be invocable");
 
 protected:
-    using is_movable = is_move_constructible<F>;
+    using is_movable UTL_NODEBUG = is_move_constructible<F>;
     class invalid_t {
         constexpr invalid_t() noexcept = default;
         ~invalid_t() noexcept = default;
     };
 
 private:
-    using move_t = conditional_t<is_movable::value, impl, invalid_t>;
-    using not_move_t = conditional_t<is_movable::value, invalid_t, impl>;
+    using move_t UTL_NODEBUG = conditional_t<is_movable::value, impl, invalid_t>;
+    using not_move_t UTL_NODEBUG = conditional_t<is_movable::value, invalid_t, impl>;
 
 protected:
     template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn UTL_REQUIRES_CXX11(
