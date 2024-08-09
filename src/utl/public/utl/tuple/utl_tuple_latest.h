@@ -400,27 +400,25 @@ public:
 
     template <size_t I>
     requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() && noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) -> T&& {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() && noexcept UTL_LIFETIMEBOUND->T&& {
         return UTL_SCOPE move(head);
     }
 
     template <size_t I>
     requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() & noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) -> T& {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() & noexcept UTL_LIFETIMEBOUND->T& {
         return head;
     }
 
     template <size_t I>
     requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const&& noexcept
-        UTL_ATTRIBUTE(LIFETIMEBOUND) -> T const&& {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const&& noexcept UTL_LIFETIMEBOUND->T const&& {
         return UTL_SCOPE move(head);
     }
 
     template <size_t I>
     requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const& noexcept
-        UTL_ATTRIBUTE(LIFETIMEBOUND) -> T const& {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const& noexcept UTL_LIFETIMEBOUND->T const& {
         return head;
     }
 
@@ -1082,13 +1080,13 @@ UTL_ATTRIBUTE(NODISCARD) constexpr UTL_SCOPE strong_ordering operator<=>(
 }
 
 template <typename... Args>
-UTL_ATTRIBUTE(NODISCARD) constexpr tuple<Args&...> tie(Args&... args UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTE(NODISCARD) constexpr tuple<Args&...> tie(Args&... args UTL_LIFETIMEBOUND) noexcept {
     return {args...};
 }
 
 template <typename... Args>
 UTL_ATTRIBUTE(NODISCARD) constexpr tuple<Args&&...> forward_as_tuple(
-    Args&&... args UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
+    Args&&... args UTL_LIFETIMEBOUND) noexcept {
     return {UTL_SCOPE forward<Args>(args)...};
 }
 

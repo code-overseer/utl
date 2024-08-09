@@ -26,7 +26,7 @@ struct UTL_ABI_PUBLIC message_format {
      * Internal use only to prevent assignment
      */
     UTL_HIDE_FROM_ABI static constexpr message_format&& forward(
-        message_format&& src UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
+        message_format&& src UTL_LIFETIMEBOUND) noexcept {
         return static_cast<message_format&&>(src);
     }
 #if UTL_COMPILER_SUPPORTS_SOURCE_LOCATION
@@ -41,7 +41,7 @@ struct UTL_ABI_PUBLIC message_format {
      * @param src - The source location information, defaulting to the current location.
      */
     template <size_t N>
-    UTL_HIDE_FROM_ABI message_format(char const (&fmt)[N] UTL_ATTRIBUTE(LIFETIMEBOUND),
+    UTL_HIDE_FROM_ABI message_format(char const (&fmt)[N] UTL_LIFETIMEBOUND,
         UTL_SCOPE source_location src = UTL_SOURCE_LOCATION()) noexcept
         : format(fmt)
         , location(src) {}
@@ -58,7 +58,7 @@ struct UTL_ABI_PUBLIC message_format {
      */
     template <size_t N>
     UTL_HIDE_FROM_ABI message_format(
-        char const (&fmt)[N] UTL_ATTRIBUTE(LIFETIMEBOUND), UTL_SCOPE source_location src) noexcept
+        char const (&fmt)[N] UTL_LIFETIMEBOUND, UTL_SCOPE source_location src) noexcept
         : format(fmt)
         , location(src) {}
 #endif

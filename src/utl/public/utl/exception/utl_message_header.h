@@ -55,7 +55,7 @@ public:
      * @return The constant reference to the source location.
      */
     UTL_ATTRIBUTES(NODISCARD, CONST) UTL_HIDE_FROM_ABI constexpr UTL_SCOPE source_location const&
-    location() const noexcept UTL_ATTRIBUTE(LIFETIMEBOUND) {
+    location() const noexcept UTL_LIFETIMEBOUND {
         return location_;
     }
 

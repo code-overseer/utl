@@ -27,14 +27,14 @@ UTL_PRAGMA_WARN(
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC)
-constexpr T&& forward(remove_reference_t<T>& t UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC) constexpr T&& forward(
+    remove_reference_t<T>& t UTL_LIFETIMEBOUND) noexcept {
     return static_cast<T&&>(t);
 }
 
 template <typename T>
-UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC)
-constexpr T&& forward(remove_reference_t<T>&& t UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC) constexpr T&& forward(
+    remove_reference_t<T>&& t UTL_LIFETIMEBOUND) noexcept {
     static_assert(!is_lvalue_reference<T>::value, "cannot forward an rvalue as an lvalue");
     return static_cast<T&&>(t);
 }
@@ -67,8 +67,7 @@ UTL_PRAGMA_WARN(
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC)
-constexpr auto forward_like(U&& u UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept
+UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC) constexpr auto forward_like(U&& u UTL_LIFETIMEBOUND) noexcept
     -> add_rvalue_reference_t<copy_cvref_t<T, remove_reference_t<U>>> {
     return static_cast<add_rvalue_reference_t<copy_cvref_t<T, remove_reference_t<U>>>>(u);
 }
