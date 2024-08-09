@@ -20,8 +20,9 @@ template <typename F>
 class
     UTL_ATTRIBUTES(PUBLIC_TEMPLATE, NODISCARD) scope_fail : private details::scope::impl<scope_fail<F>, F> {
     using base_type = details::scope::impl<scope_fail<F>, F>;
-    using is_movable = typename base_type::is_movable;
-    using move_t = conditional_t<is_movable::value, scope_fail, details::scope::invalid_t>;
+    using typename base_type::invalid_t;
+    using typename base_type::is_movable;
+    using move_t = conditional_t<is_movable::value, scope_fail, invalid_t>;
     friend base_type;
 
 public:

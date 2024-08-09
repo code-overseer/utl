@@ -19,31 +19,36 @@ template <typename F>
 class UTL_ATTRIBUTES(PUBLIC_TEMPLATE, NODISCARD) scope_success :
     private details::scope::impl<scope_success<F>, F> {
     using base_type = details::scope::impl<scope_success<F>, F>;
-    using is_movable = typename base_type::is_movable;
-    using move_t = conditional_t<is_movable::value, scope_success, details::scope::invalid_t>;
+    using typename base_type::invalid_t;
+    using typename base_type::is_movable;
+    using move_t = conditional_t<is_movable::value, scope_success, invalid_t>;
     friend base_type;
 
 public:
     template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn
             UTL_REQUIRES_CXX11(UTL_TRAIT_is_constructible(F, Fn&&))>
-    explicit scope_success(Fn&& func) noexcept(UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
+    UTL_HIDE_FROM_ABI explicit scope_success(Fn&& func) noexcept(
+        UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
         : base_type(UTL_SCOPE forward<Fn>(func))
         , exceptions_(uncaught_exceptions()) {}
     scope_success(scope_success const&) = delete;
-    scope_success(move_t&& other) noexcept(UTL_TRAIT_is_nothrow_move_constructible(F))
+    UTL_HIDE_FROM_ABI scope_success(move_t&& other) noexcept(
+        UTL_TRAIT_is_nothrow_move_constructible(F))
         : base_type(UTL_SCOPE move(other))
         , exceptions_(other.exceptions_) {}
 
     using base_type::release;
 
-    ~scope_success() noexcept {
+    UTL_HIDE_FROM_ABI ~scope_success() noexcept {
         if (!should_invoke()) {
             release();
         }
     }
 
 private:
-    bool should_invoke() const noexcept { return exceptions_ >= uncaught_exceptions(); }
+    UTL_HIDE_FROM_ABI bool should_invoke() const noexcept {
+        return exceptions_ >= uncaught_exceptions();
+    }
     int exceptions_;
 };
 
