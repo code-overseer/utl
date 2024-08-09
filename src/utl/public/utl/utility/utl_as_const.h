@@ -33,7 +33,8 @@ UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC) constexpr T const& as_const(
 }
 
 template <typename T>
-UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC) constexpr T const& as_const(T& value UTL_LIFETIMEBOUND) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC) constexpr T const& as_const(
+    T& value UTL_LIFETIMEBOUND) noexcept {
     return value;
 }
 

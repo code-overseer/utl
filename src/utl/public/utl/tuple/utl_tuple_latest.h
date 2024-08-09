@@ -400,25 +400,26 @@ public:
 
     template <size_t I>
     requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() && noexcept UTL_LIFETIMEBOUND->T&& {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() && noexcept UTL_LIFETIMEBOUND-> T&& {
         return UTL_SCOPE move(head);
     }
 
     template <size_t I>
     requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() & noexcept UTL_LIFETIMEBOUND->T& {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() & noexcept UTL_LIFETIMEBOUND-> T& {
         return head;
     }
 
     template <size_t I>
     requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const&& noexcept UTL_LIFETIMEBOUND->T const&& {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const&& noexcept UTL_LIFETIMEBOUND
+    -> T const&& {
         return UTL_SCOPE move(head);
     }
 
     template <size_t I>
     requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const& noexcept UTL_LIFETIMEBOUND->T const& {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const& noexcept UTL_LIFETIMEBOUND-> T const& {
         return head;
     }
 

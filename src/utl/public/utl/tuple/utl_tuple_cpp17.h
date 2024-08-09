@@ -223,25 +223,27 @@ public:
 
     template <size_t I>
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_LIFETIMEBOUND->enable_if_t<!I, T&&> {
+    UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_LIFETIMEBOUND
+    -> enable_if_t<!I, T&&> {
         return move(head);
     }
 
     template <size_t I>
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    UTL_CONSTEXPR_CXX14 auto get() & noexcept UTL_LIFETIMEBOUND->enable_if_t<!I, T&> {
+    UTL_CONSTEXPR_CXX14 auto get() & noexcept UTL_LIFETIMEBOUND
+    -> enable_if_t<!I, T&> {
         return head;
     }
 
     template <size_t I>
-    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto
-    get() const&& noexcept UTL_LIFETIMEBOUND->enable_if_t<!I, T const&&> {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const&& noexcept UTL_LIFETIMEBOUND
+    -> enable_if_t<!I, T const&&> {
         return move(head);
     }
 
     template <size_t I>
-    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto
-    get() const& noexcept UTL_LIFETIMEBOUND->enable_if_t<!I, T const&> {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const& noexcept UTL_LIFETIMEBOUND
+    -> enable_if_t<!I, T const&> {
         return head;
     }
 
@@ -383,25 +385,27 @@ struct storage<T, Tail...> : variadic_traits<T, Tail...> {
 
     template <size_t I>
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_LIFETIMEBOUND->enable_if_t<!I, T&&> {
+    UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_LIFETIMEBOUND
+    -> enable_if_t<!I, T&&> {
         return move(head);
     }
 
     template <size_t I>
     UTL_ATTRIBUTES(NODISCARD, CONST)
-    UTL_CONSTEXPR_CXX14 auto get() & noexcept UTL_LIFETIMEBOUND->enable_if_t<!I, T&> {
+    UTL_CONSTEXPR_CXX14 auto get() & noexcept UTL_LIFETIMEBOUND
+    -> enable_if_t<!I, T&> {
         return head;
     }
 
     template <size_t I>
-    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto
-    get() const&& noexcept UTL_LIFETIMEBOUND->enable_if_t<!I, T const&&> {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const&& noexcept UTL_LIFETIMEBOUND
+    -> enable_if_t<!I, T const&&> {
         return move(head);
     }
 
     template <size_t I>
-    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto
-    get() const& noexcept UTL_LIFETIMEBOUND->enable_if_t<!I, T const&> {
+    UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get() const& noexcept UTL_LIFETIMEBOUND
+    -> enable_if_t<!I, T const&> {
         return head;
     }
 
@@ -410,27 +414,27 @@ struct storage<T, Tail...> : variadic_traits<T, Tail...> {
 
     template <size_t I>
     UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN)
-    UTL_CONSTEXPR_CXX14 auto
-    get() && noexcept UTL_LIFETIMEBOUND->result_type_t<I>&& {
+    UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_LIFETIMEBOUND
+    -> result_type_t<I>&& {
         return move(tail).template get<I - 1>();
     }
 
     template <size_t I>
     UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN)
-    UTL_CONSTEXPR_CXX14 auto
-    get() & noexcept UTL_LIFETIMEBOUND->result_type_t<I>& {
+    UTL_CONSTEXPR_CXX14 auto get() & noexcept UTL_LIFETIMEBOUND
+    -> result_type_t<I>& {
         return tail.template get<I - 1>();
     }
 
     template <size_t I>
-    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto
-    get() const&& noexcept UTL_LIFETIMEBOUND->result_type_t<I> const&& {
+    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() const&& noexcept UTL_LIFETIMEBOUND
+    -> result_type_t<I> const&& {
         return move(tail).template get<I - 1>();
     }
 
     template <size_t I>
-    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto
-    get() const& noexcept UTL_LIFETIMEBOUND->result_type_t<I> const& {
+    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN) constexpr auto get() const& noexcept UTL_LIFETIMEBOUND
+    -> result_type_t<I> const& {
         return tail.template get<I - 1>();
     }
 

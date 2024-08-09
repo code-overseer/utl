@@ -29,8 +29,7 @@ UTL_CONSTEXPR_CXX14 auto get(tuple<U...>& target UTL_LIFETIMEBOUND) noexcept
 }
 
 template <size_t I, typename... U, typename = enable_if_t<(I < sizeof...(U))>>
-UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get(tuple<U...> const&& target UTL_LIFETIMEBOUND) noexcept
-    -> decltype(TT_SCOPE decl_element<I, decltype(target)>()) {
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get(tuple<U...> const&& target UTL_LIFETIMEBOUND) noexcept -> decltype(TT_SCOPE decl_element<I, decltype(target)>()) {
     static_assert(is_base_of<details::tuple::storage<U...>, tuple<U...>>::value, "Invalid tuple");
     return ((details::tuple::storage<U...> const&&)move(target)).template get<I>();
 }
@@ -66,9 +65,8 @@ UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get(tuple<U...> const& target UT
 }
 
 template <typename T, typename... U>
-UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get(tuple<U...> const&& target UTL_LIFETIMEBOUND) noexcept
-    -> enable_if_t<template_count<T, tuple<U...>>::value == 1,
-        decltype(get<template_index<T, tuple<U...>>::value>(move(target)))> {
+UTL_ATTRIBUTES(NODISCARD, CONST) constexpr auto get(tuple<U...> const&& target UTL_LIFETIMEBOUND) noexcept -> enable_if_t<template_count<T, tuple<U...>>::value == 1,
+    decltype(get<template_index<T, tuple<U...>>::value>(move(target)))> {
     return get<template_index<T, tuple<U...>>::value>(move(target));
 }
 
