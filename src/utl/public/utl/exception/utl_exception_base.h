@@ -58,7 +58,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 using std::exception;
-UTL_ABI_PUBLIC_DATA constexpr bool with_exceptions = false;
+UTL_INLINE_CXX17 constexpr bool with_exceptions = false;
 
 namespace details {
 namespace exception {

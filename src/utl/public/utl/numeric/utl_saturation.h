@@ -50,7 +50,7 @@ template <typename T>
 struct UTL_PUBLIC_TEMPLATE is_saturatable : details::saturation::trait<T> {};
 
 template <typename T>
-UTL_ABI_PUBLIC_DATA constexpr bool is_saturatable_v = details::saturation::trait<T>::value;
+UTL_INLINE_CXX17 constexpr bool is_saturatable_v = details::saturation::trait<T>::value;
 
 UTL_NAMESPACE_END
 

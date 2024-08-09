@@ -35,8 +35,8 @@ using is_bit_readable = bool_constant<UTL_TRAIT_is_unsigned(T) && !UTL_TRAIT_is_
 
 #if UTL_CXX14
 template <typename T>
-UTL_ABI_PUBLIC_DATA constexpr bool is_bit_readable_v = UTL_TRAIT_is_unsigned(T) &&
-    !UTL_TRAIT_is_same(bool, T) && !UTL_TRAIT_is_same(char, T) && !UTL_TRAIT_is_same(char16_t, T) &&
+UTL_INLINE_CXX17 constexpr bool is_bit_readable_v = UTL_TRAIT_is_unsigned(T) && !UTL_TRAIT_is_same(bool, T) &&
+    !UTL_TRAIT_is_same(char, T) && !UTL_TRAIT_is_same(char16_t, T) &&
     !UTL_TRAIT_is_same(char32_t, T) && !UTL_TRAIT_is_same(wchar_t, T) && !__UTL_IS_TYPE_CHAR8(T);
 #  define UTL_TRAIT_is_bit_readable(...) UTL_SCOPE is_bit_readable_v<__VA_ARGS__>
 #else

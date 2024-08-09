@@ -66,15 +66,15 @@ struct unordered_value {
 };
 
 template <typename T>
-UTL_ABI_PUBLIC_DATA constexpr T less_value<T>::less{order_t::less};
+UTL_INLINE_CXX17 constexpr T less_value<T>::less{order_t::less};
 template <typename T>
-UTL_ABI_PUBLIC_DATA constexpr T greater_value<T>::greater{order_t::greater};
+UTL_INLINE_CXX17 constexpr T greater_value<T>::greater{order_t::greater};
 template <typename T>
-UTL_ABI_PUBLIC_DATA constexpr T equal_value<T>::equal{order_t::equal};
+UTL_INLINE_CXX17 constexpr T equal_value<T>::equal{order_t::equal};
 template <typename T>
-UTL_ABI_PUBLIC_DATA constexpr T equivalent_value<T>::equivalent{order_t::equal};
+UTL_INLINE_CXX17 constexpr T equivalent_value<T>::equivalent{order_t::equal};
 template <typename T>
-UTL_ABI_PUBLIC_DATA constexpr T unordered_value<T>::unordered{unorder_t::unordered};
+UTL_INLINE_CXX17 constexpr T unordered_value<T>::unordered{unorder_t::unordered};
 } // namespace compare
 } // namespace details
 

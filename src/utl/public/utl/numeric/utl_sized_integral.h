@@ -58,12 +58,12 @@ struct UTL_PUBLIC_TEMPLATE is_sized_signed_integral :
 
 #  if UTL_CXX14
 template <size_t N, typename T>
-UTL_ABI_PUBLIC_DATA constexpr bool is_sized_integral_v = UTL_TRAIT_is_integral(T) && sizeof(T) == N;
+UTL_INLINE_CXX17 constexpr bool is_sized_integral_v = UTL_TRAIT_is_integral(T) && sizeof(T) == N;
 template <size_t N, typename T>
-UTL_ABI_PUBLIC_DATA constexpr bool is_sized_unsigned_integral_v =
+UTL_INLINE_CXX17 constexpr bool is_sized_unsigned_integral_v =
     UTL_TRAIT_is_integral(T) && UTL_TRAIT_is_unsigned(T) && sizeof(T) == N;
 template <size_t N, typename T>
-UTL_ABI_PUBLIC_DATA constexpr bool is_sized_signed_integral_v =
+UTL_INLINE_CXX17 constexpr bool is_sized_signed_integral_v =
     UTL_TRAIT_is_integral(T) && UTL_TRAIT_is_signed(T) && sizeof(T) == N;
 #  endif
 
