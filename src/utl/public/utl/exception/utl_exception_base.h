@@ -63,7 +63,7 @@ UTL_INLINE_CXX17 constexpr bool with_exceptions = false;
 namespace details {
 namespace exception {
 template <typename F>
-UTL_ATTRIBUTES(NODISCARD) constexpr bool catch_statement(F&&) noexcept {
+UTL_NODISCARD constexpr bool catch_statement(F&&) noexcept {
     return false;
 }
 } // namespace exception
