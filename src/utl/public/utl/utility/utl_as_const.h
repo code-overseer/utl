@@ -27,14 +27,14 @@ template <typename T>
 void as_const(T&&) noexcept = delete;
 
 template <typename T>
-UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC)
-constexpr T const& as_const(T const& value UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC) constexpr T const& as_const(
+    T const& value UTL_LIFETIMEBOUND) noexcept {
     return value;
 }
 
 template <typename T>
-UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC)
-constexpr T const& as_const(T& value UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC) constexpr T const& as_const(
+    T& value UTL_LIFETIMEBOUND) noexcept {
     return value;
 }
 

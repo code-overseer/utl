@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/type_traits/utl_is_copy_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_move_constructible.h"
 #include "utl/type_traits/utl_logical_traits.h"
@@ -28,8 +29,8 @@ UTL_PRAGMA_WARN(
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC)
-constexpr remove_reference_t<T>&& move(T&& t UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC) constexpr remove_reference_t<T>&& move(
+    T&& t UTL_LIFETIMEBOUND) noexcept {
     return static_cast<remove_reference_t<T>&&>(t);
 }
 
@@ -44,9 +45,8 @@ using move_if_noexcept_result_t =
 } // namespace details
 
 template <typename T>
-UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC)
-constexpr details::utility::move_if_noexcept_result_t<T> move_if_noexcept(
-    T& t UTL_ATTRIBUTE(LIFETIMEBOUND)) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC) constexpr details::utility::move_if_noexcept_result_t<T>
+move_if_noexcept(T& t UTL_LIFETIMEBOUND) noexcept {
     return move(t);
 }
 

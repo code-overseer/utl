@@ -16,7 +16,7 @@ template <typename T>
 concept saturatable = integral<T> && !string_char<T> && !is_boolean_v<T>;
 
 template <typename T>
-struct is_saturatable : bool_constant<saturatable<T>> {};
+struct UTL_PUBLIC_TEMPLATE is_saturatable : bool_constant<saturatable<T>> {};
 
 template <typename T>
 inline constexpr bool is_saturatable_v = saturatable<T>;
@@ -33,25 +33,24 @@ namespace details {
 namespace saturation {
 
 template <typename T>
-auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-auto trait_impl(int) noexcept -> UTL_SCOPE bool_constant<UTL_TRAIT_is_integral(T) &&
-    !UTL_SCOPE disjunction<UTL_SCOPE is_string_char<T>, UTL_SCOPE is_boolean<T>>::value>;
+UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
+    -> UTL_SCOPE bool_constant<UTL_TRAIT_is_integral(T) &&
+        !UTL_SCOPE disjunction<UTL_SCOPE is_string_char<T>, UTL_SCOPE is_boolean<T>>::value>;
 
 template <typename T>
-using trait = decltype(UTL_SCOPE details::saturation::trait_impl<T>(0));
+using trait UTL_NODEBUG = decltype(UTL_SCOPE details::saturation::trait_impl<T>(0));
 
 } // namespace saturation
 } // namespace details
 
 template <typename T>
-struct is_saturatable : details::saturation::trait<T> {};
+struct UTL_PUBLIC_TEMPLATE is_saturatable : details::saturation::trait<T> {};
 
-#  if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_saturatable_v = details::saturation::trait<T>::value;
-#  endif
 
 UTL_NAMESPACE_END
 
