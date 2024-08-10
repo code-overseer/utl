@@ -91,7 +91,7 @@ using is_nothrow UTL_NODEBUG = decltype(UTL_SCOPE details::advance::nothrow_chec
 
 template <UTL_CONCEPT_CXX20(UTL_SCOPE input_iterator) It,
     UTL_CONCEPT_CXX20(UTL_SCOPE integral) Distance>
-UTL_ATTRIBUTES(HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX14 auto advance(It& it, Distance n) noexcept(
+UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 auto advance(It& it, Distance n) noexcept(
     UTL_SCOPE details::advance::is_nothrow<It>::value) -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_legacy_input_iterator(It) && UTL_TRAIT_is_integral(Distance)) {
     UTL_SCOPE details::advance::impl(it, UTL_SCOPE details::advance::difference_t<It>(n),
         UTL_SCOPE details::advance::category_t<It>());
