@@ -301,7 +301,7 @@
 #  define UTL_NODEBUG
 #endif
 
-#if UTL_HAS_CPP_ATTRIBUTE(likely)
+#if UTL_CXX20 & UTL_HAS_CPP_ATTRIBUTE(likely)
 #  define UTL_LIKELY [[likely]]
 #  define __UTL_ATTRIBUTE_LIKELY likely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_LIKELY
@@ -313,7 +313,7 @@
 #  define UTL_LIKELY
 #endif /* UTL_HAS_CPP_ATTRIBUTE(likely) */
 
-#if UTL_HAS_CPP_ATTRIBUTE(unlikely)
+#if UTL_CXX20 & UTL_HAS_CPP_ATTRIBUTE(unlikely)
 #  define UTL_UNLIKELY [[unlikely]]
 #  define __UTL_ATTRIBUTE_UNLIKELY unlikely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_UNLIKELY

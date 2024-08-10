@@ -26,7 +26,7 @@ UTL_REQUIRES_CXX20(requires(T&& it) {
     { *it } -> lvalue_reference;
     UTL_SCOPE move(*it);
 })
-constexpr auto iter_move(T&& it) noexcept(UTL_TRAIT_is_nothrow_dereferenceable(T))
+UTL_HIDE_FROM_ABI constexpr auto iter_move(T&& it) noexcept(UTL_TRAIT_is_nothrow_dereferenceable(T))
     -> decltype(UTL_SCOPE move(*it)) {
     return UTL_SCOPE move(*it);
 }
@@ -36,7 +36,7 @@ template <typename T UTL_REQUIRES_CXX11(
 UTL_REQUIRES_CXX20(requires(T&& it) {
     { *it } -> rvalue_reference;
 })
-constexpr auto iter_move(T&& it) noexcept(UTL_TRAIT_is_nothrow_dereferenceable(T))
+UTL_HIDE_FROM_ABI constexpr auto iter_move(T&& it) noexcept(UTL_TRAIT_is_nothrow_dereferenceable(T))
     -> decltype(*it) {
     return *it;
 }
@@ -45,8 +45,9 @@ struct function_t {
     template <typename T UTL_REQUIRES_CXX11(
         UTL_SCOPE always_true_type<decltype(iter_move(UTL_SCOPE declval<T>()))>::value)>
     UTL_REQUIRES_CXX20(requires(T&& it) { iter_move(UTL_SCOPE forward<T>(it)); })
-    constexpr auto operator()(T&& it) const noexcept(UTL_TRAIT_is_nothrow_dereferenceable(T))
-        -> decltype(iter_move(UTL_SCOPE declval<T>())) {
+    UTL_HIDE_FROM_ABI constexpr auto operator()(T&& it) const
+        noexcept(UTL_TRAIT_is_nothrow_dereferenceable(T))
+            -> decltype(iter_move(UTL_SCOPE declval<T>())) {
         return iter_move(UTL_SCOPE forward<T>(it));
     }
 };

@@ -2,9 +2,11 @@
 
 #pragma once
 
-#include "utl/iterator/utl_iterator_tags.h"
-#include "utl/iterator/utl_iterator_traits_fwd.h"
 #include "utl/preprocessor/utl_config.h"
+
+#include "utl/iterator/utl_iterator_traits_fwd.h"
+
+#include "utl/iterator/utl_iterator_tags.h"
 
 #if UTL_CXX20
 
@@ -17,15 +19,15 @@ namespace iterator_concept {
 
 template <typename T>
 struct trait_type {
-    using type = T;
+    using type UTL_NODEBUG = T;
 };
 template <UTL_SCOPE details::iterator_traits::is_specialized T>
 struct trait_type<T> {
-    using type = UTL_SCOPE iterator_traits<T>;
+    using type UTL_NODEBUG = UTL_SCOPE iterator_traits<T>;
 };
 
 template <typename T>
-using trait_type_t = typename trait_type<T>::type;
+using trait_type_t UTL_NODEBUG = typename trait_type<T>::type;
 
 template <typename T>
 struct tag_type {};
@@ -37,24 +39,24 @@ concept with_iterator_category = requires { typename trait_type_t<T>::iterator_c
 
 template <with_iterator_concept T>
 struct tag_type<T> {
-    using type = typename trait_type_t<T>::iterator_concept;
+    using type UTL_NODEBUG = typename trait_type_t<T>::iterator_concept;
 };
 
 template <with_iterator_category T>
 requires (!with_iterator_concept<T>)
 struct tag_type<T> {
-    using type = typename trait_type_t<T>::iterator_category;
+    using type UTL_NODEBUG = typename trait_type_t<T>::iterator_category;
 };
 
 template <typename T>
 requires (!with_iterator_category<T> && !with_iterator_concept<T> &&
     !UTL_SCOPE details::iterator_traits::is_specialized<T>)
 struct tag_type<T> {
-    using type = UTL_SCOPE random_access_iterator_tag;
+    using type UTL_NODEBUG = UTL_SCOPE random_access_iterator_tag;
 };
 
 template <typename T>
-using tag_type_t = typename tag_type<T>::type;
+using tag_type_t UTL_NODEBUG = typename tag_type<T>::type;
 
 template <typename T, typename Tag>
 concept implements = iterator_tag<Tag> && requires {
@@ -78,15 +80,15 @@ namespace iterator_concept {
 
 template <typename T, typename = void>
 struct trait_type {
-    using type = T;
+    using type UTL_NODEBUG = T;
 };
 template <typename T>
 struct trait_type<T, enable_if_t<UTL_SCOPE details::iterator_traits::is_specialized<T>::value>> {
-    using type = UTL_SCOPE iterator_traits<T>;
+    using type UTL_NODEBUG = UTL_SCOPE iterator_traits<T>;
 };
 
 template <typename T>
-using trait_type_t = typename trait_type<T>::type;
+using trait_type_t UTL_NODEBUG = typename trait_type<T>::type;
 
 template <typename T, typename = void>
 struct has_member_iterator_concept : UTL_SCOPE false_type {};
@@ -100,24 +102,24 @@ struct has_member_iterator_category<T,
     UTL_SCOPE void_t<typename trait_type_t<T>::iterator_category>> : UTL_SCOPE true_type {};
 
 template <typename T UTL_REQUIRES_CXX11(has_member_iterator_concept<T>::value)>
-auto resolve(int) noexcept -> typename trait_type_t<T>::iterator_concept;
+UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> typename trait_type_t<T>::iterator_concept;
 
 template <typename T UTL_REQUIRES_CXX11(
     !has_member_iterator_concept<T>::value && has_member_iterator_category<T>::value)>
-auto resolve(int) noexcept -> typename trait_type_t<T>::iterator_category;
+UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> typename trait_type_t<T>::iterator_category;
 
 template <typename T UTL_REQUIRES_CXX11(!has_member_iterator_concept<T>::value &&
     !has_member_iterator_category<T>::value &&
     !UTL_SCOPE details::iterator_traits::is_specialized<T>::value)>
-auto resolve(int) noexcept -> UTL_SCOPE random_access_iterator_tag;
+UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> UTL_SCOPE random_access_iterator_tag;
 
 template <typename T>
 struct tag_type {
-    using type = decltype(UTL_SCOPE details::iterator_concept::resolve<T>(0));
+    using type UTL_NODEBUG = decltype(UTL_SCOPE details::iterator_concept::resolve<T>(0));
 };
 
 template <typename T>
-using tag_type_t = decltype(UTL_SCOPE details::iterator_concept::resolve<T>(0));
+using tag_type_t UTL_NODEBUG = decltype(UTL_SCOPE details::iterator_concept::resolve<T>(0));
 
 template <typename Tag, typename T, typename = void>
 struct implements : UTL_SCOPE false_type {};

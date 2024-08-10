@@ -18,15 +18,15 @@ template <typename S, typename I>
 inline constexpr bool disable_sized_sentinel_for = false;
 
 template <typename S, typename I>
-concept sized_sentinel_for = UTL_SCOPE sentinel_for<S, I> &&
-    !UTL_SCOPE disable_sized_sentinel_for<UTL_SCOPE remove_cv_t<S>, UTL_SCOPE remove_cv_t<I>> &&
+concept sized_sentinel_for =
+    sentinel_for<S, I> && !disable_sized_sentinel_for<remove_cv_t<S>, remove_cv_t<I>> &&
     requires(I const& i, S const& s) {
-        { s - i } -> UTL_SCOPE same_as<UTL_SCOPE iter_difference_t<I>>;
-        { i - s } -> UTL_SCOPE same_as<UTL_SCOPE iter_difference_t<I>>;
+        { s - i } -> same_as<iter_difference_t<I>>;
+        { i - s } -> same_as<iter_difference_t<I>>;
     };
 
 template <typename S, typename I>
-struct is_sized_sentinel_for : UTL_SCOPE bool_constant<sized_sentinel_for<S, I>> {};
+struct UTL_PUBLIC_TEMPLATE is_sized_sentinel_for : bool_constant<sized_sentinel_for<S, I>> {};
 
 template <typename S, typename I>
 inline constexpr bool is_sized_sentinel_for_v = sized_sentinel_for<S, I>;
@@ -69,25 +69,25 @@ namespace details {
 namespace sized_sentinel_for {
 
 template <typename S, typename I>
-auto subtractible(int) noexcept -> UTL_SCOPE conjunction<
+UTL_HIDE_FROM_ABI auto subtractible(int) noexcept -> UTL_SCOPE conjunction<
     UTL_SCOPE is_same<decltype(UTL_SCOPE declval<S const&>() - UTL_SCOPE declval<I const&>()),
         UTL_SCOPE iter_difference_t<I>>,
     UTL_SCOPE is_same<decltype(UTL_SCOPE declval<I const&>() - UTL_SCOPE declval<S const&>()),
         UTL_SCOPE iter_difference_t<I>>>;
 
 template <typename S, typename I>
-auto subtractible(float) noexcept -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto subtractible(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename S, typename I>
-using is_subtractible = decltype(UTL_SCOPE details::sized_sentinel_for::subtractible<S, I>(0));
+using is_subtractible UTL_NODEBUG =
+    decltype(UTL_SCOPE details::sized_sentinel_for::subtractible<S, I>(0));
 } // namespace sized_sentinel_for
 } // namespace details
 
 template <typename S, typename I>
-struct is_sized_sentinel_for :
-    UTL_SCOPE conjunction<UTL_SCOPE is_sentinel_for<S, I>,
-        UTL_SCOPE details::sized_sentinel_for::is_disabled<S, I>,
-        UTL_SCOPE details::sized_sentinel_for::is_subtractible<S, I>> {};
+struct UTL_PUBLIC_TEMPLATE is_sized_sentinel_for :
+    conjunction<is_sentinel_for<S, I>, details::sized_sentinel_for::is_disabled<S, I>,
+        details::sized_sentinel_for::is_subtractible<S, I>> {};
 
 #  if UTL_CXX14
 template <typename S, typename I>

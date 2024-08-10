@@ -45,7 +45,8 @@ concept indirectly_readable =
     details::indirectly_readable::concept_impl<UTL_SCOPE remove_cvref_t<T>>;
 
 template <typename T>
-struct is_indirectly_readable : UTL_SCOPE bool_constant<indirectly_readable<T>> {};
+struct UTL_PUBLIC_TEMPLATE is_indirectly_readable :
+    UTL_SCOPE bool_constant<indirectly_readable<T>> {};
 
 template <typename T>
 inline constexpr bool is_indirectly_readable_v = indirectly_readable<T>;
@@ -57,13 +58,16 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 namespace details {
 namespace indirectly_readable {
-template <typename T, typename = void>
-struct trait : UTL_SCOPE false_type {};
 
 template <typename T>
-struct trait<T,
-    UTL_SCOPE void_t<UTL_SCOPE iter_value_t<T>, UTL_SCOPE iter_reference_t<T>,
-        UTL_SCOPE iter_rvalue_reference_t<T>>> : UTL_SCOPE true_type {};
+UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+template <typename T>
+UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
+    -> UTL_SCOPE always_true_type<UTL_SCOPE iter_value_t<T>, UTL_SCOPE iter_reference_t<T>,
+        UTL_SCOPE iter_rvalue_reference_t<T>>;
+
+template <typename T>
+using trait UTL_NODEBUG = decltype(trait_impl<T>(0));
 
 } // namespace indirectly_readable
 } // namespace details

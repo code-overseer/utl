@@ -4,8 +4,9 @@
 
 #include "utl/preprocessor/utl_config.h"
 
-#include "utl/iterator/utl_iterator_tags.h"
 #include "utl/iterator/utl_iterator_traits_fwd.h"
+
+#include "utl/iterator/utl_iterator_tags.h"
 #include "utl/iterator/utl_legacy_bidirectional_iterator.h"
 #include "utl/iterator/utl_legacy_forward_iterator.h"
 #include "utl/iterator/utl_legacy_input_iterator.h"
@@ -36,31 +37,31 @@ concept simple_iter = non_pointer_iter<T> && requires { typename T::pointer; };
 
 template <typename Iter>
 struct pointer_type {
-    using type = void;
+    using type UTL_NODEBUG = void;
 };
 
 template <typename Iter>
 requires requires { typename Iter::pointer; }
 struct pointer_type<Iter> {
-    using type = typename Iter::pointer;
+    using type UTL_NODEBUG = typename Iter::pointer;
 };
 
 template <typename Iter>
 requires (
     !requires { typename Iter::pointer; } && requires(Iter it) { it.operator->(); })
 struct pointer_type<Iter> {
-    using type = decltype(UTL_SCOPE declval<Iter&>().operator->());
+    using type UTL_NODEBUG = decltype(UTL_SCOPE declval<Iter&>().operator->());
 };
 
 template <typename Iter>
 struct reference_type {
-    using type = UTL_SCOPE iter_reference_t<Iter>;
+    using type UTL_NODEBUG = UTL_SCOPE iter_reference_t<Iter>;
 };
 
 template <typename Iter>
 requires requires { typename Iter::reference; }
 struct reference_type<Iter> {
-    using type = typename Iter::reference;
+    using type UTL_NODEBUG = typename Iter::reference;
 };
 
 template <typename Iter>
@@ -68,33 +69,33 @@ struct category_type;
 
 template <UTL_SCOPE legacy_random_access_iterator Iter>
 struct category_type<Iter> {
-    using type = UTL_SCOPE random_access_iterator_tag;
+    using type UTL_NODEBUG = UTL_SCOPE random_access_iterator_tag;
 };
 
 template <UTL_SCOPE legacy_bidirectional_iterator Iter>
 struct category_type<Iter> {
-    using type = UTL_SCOPE bidirectional_iterator_tag;
+    using type UTL_NODEBUG = UTL_SCOPE bidirectional_iterator_tag;
 };
 
 template <UTL_SCOPE legacy_forward_iterator Iter>
 struct category_type<Iter> {
-    using type = UTL_SCOPE forward_iterator_tag;
+    using type UTL_NODEBUG = UTL_SCOPE forward_iterator_tag;
 };
 
 template <UTL_SCOPE legacy_input_iterator Iter>
 struct category_type<Iter> {
-    using type = UTL_SCOPE input_iterator_tag;
+    using type UTL_NODEBUG = UTL_SCOPE input_iterator_tag;
 };
 
 template <typename Iter>
 struct difference_type {
-    using type = void;
+    using type UTL_NODEBUG = void;
 };
 
 template <typename Iter>
 requires requires { typename UTL_SCOPE incrementable_traits<Iter>::difference_type; }
 struct difference_type<Iter> {
-    using type = typename UTL_SCOPE incrementable_traits<Iter>::difference_type;
+    using type UTL_NODEBUG = typename UTL_SCOPE incrementable_traits<Iter>::difference_type;
 };
 
 template <typename Iter>
@@ -124,7 +125,8 @@ struct legacy_traits<Iter> : private UTL_SCOPE details::iterator_traits::impl_ta
 } // namespace details
 
 template <details::iterator_traits::simple_iter Iter>
-struct iterator_traits<Iter> : private details::iterator_traits::impl_tag<Iter> {
+struct UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
+    private details::iterator_traits::impl_tag<Iter> {
     using difference_type = typename Iter::difference_type;
     using value_type = typename Iter::value_type;
     using pointer = typename Iter::pointer;
@@ -133,7 +135,8 @@ struct iterator_traits<Iter> : private details::iterator_traits::impl_tag<Iter> 
 };
 
 template <details::iterator_traits::non_pointer_iter Iter>
-struct iterator_traits<Iter> : private details::iterator_traits::impl_tag<Iter> {
+struct UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
+    private details::iterator_traits::impl_tag<Iter> {
     using difference_type = typename Iter::difference_type;
     using value_type = typename Iter::value_type;
     using pointer = void;
@@ -142,7 +145,7 @@ struct iterator_traits<Iter> : private details::iterator_traits::impl_tag<Iter> 
 };
 
 template <object_type T>
-struct iterator_traits<T*> : private details::iterator_traits::impl_tag<T*> {
+struct UTL_PUBLIC_TEMPLATE iterator_traits<T*> : private details::iterator_traits::impl_tag<T*> {
     using difference_type = pointer_traits<T*>::difference_type;
     using value_type = remove_cv_t<T>;
     using pointer = T*;
@@ -152,7 +155,7 @@ struct iterator_traits<T*> : private details::iterator_traits::impl_tag<T*> {
 };
 
 template <typename T>
-struct iterator_traits : private details::iterator_traits::legacy_traits<T> {};
+struct UTL_PUBLIC_TEMPLATE iterator_traits : private details::iterator_traits::legacy_traits<T> {};
 
 UTL_NAMESPACE_END
 
@@ -172,7 +175,7 @@ namespace details {
 namespace iterator_traits {
 
 template <typename T>
-using simple_iter = UTL_SCOPE conjunction<UTL_SCOPE has_member_difference_type<T>,
+using simple_iter UTL_NODEBUG = UTL_SCOPE conjunction<UTL_SCOPE has_member_difference_type<T>,
     UTL_SCOPE has_member_value_type<T>, UTL_SCOPE has_member_reference<T>,
     UTL_SCOPE is_iterator_tag<typename T::iterator_category>>;
 
@@ -198,36 +201,37 @@ struct traits<Iter, true, false> {
 };
 
 template <typename Iter>
-auto pointer_type(int) noexcept -> typename Iter::pointer;
+UTL_HIDE_FROM_ABI auto pointer_type(int) noexcept -> typename Iter::pointer;
 template <typename Iter>
-auto pointer_type(float) noexcept -> decltype(UTL_SCOPE declval<Iter&>().operator->());
+UTL_HIDE_FROM_ABI auto pointer_type(float) noexcept
+    -> decltype(UTL_SCOPE declval<Iter&>().operator->());
 template <typename Iter>
-auto pointer_type(...) noexcept -> void;
+UTL_HIDE_FROM_ABI auto pointer_type(...) noexcept -> void;
 
 template <typename Iter>
-auto reference_type(int) noexcept -> typename Iter::reference;
+UTL_HIDE_FROM_ABI auto reference_type(int) noexcept -> typename Iter::reference;
 template <typename Iter>
-auto reference_type(float) noexcept -> UTL_SCOPE iter_reference_t<Iter>;
+UTL_HIDE_FROM_ABI auto reference_type(float) noexcept -> UTL_SCOPE iter_reference_t<Iter>;
 
 template <typename Iter>
-auto category_type(int, int) noexcept
+UTL_HIDE_FROM_ABI auto category_type(int, int) noexcept
     -> UTL_SCOPE enable_if_t<UTL_TRAIT_is_legacy_random_access_iterator(Iter),
         UTL_SCOPE random_access_iterator_tag>;
 template <typename Iter>
-auto category_type(int, float) noexcept
+UTL_HIDE_FROM_ABI auto category_type(int, float) noexcept
     -> UTL_SCOPE enable_if_t<UTL_TRAIT_is_legacy_bidirectional_iterator(Iter),
         UTL_SCOPE bidirectional_iterator_tag>;
 template <typename Iter>
-auto category_type(float, float) noexcept -> UTL_SCOPE
+UTL_HIDE_FROM_ABI auto category_type(float, float) noexcept -> UTL_SCOPE
     enable_if_t<UTL_TRAIT_is_legacy_forward_iterator(Iter), UTL_SCOPE forward_iterator_tag>;
 template <typename Iter>
-auto category_type(...) noexcept -> UTL_SCOPE input_iterator_tag;
+UTL_HIDE_FROM_ABI auto category_type(...) noexcept -> UTL_SCOPE input_iterator_tag;
 
 template <typename Iter>
-auto difference_type(int) noexcept ->
+UTL_HIDE_FROM_ABI auto difference_type(int) noexcept ->
     typename UTL_SCOPE incrementable_traits<Iter>::difference_type;
 template <typename Iter>
-auto difference_type(float) noexcept -> void;
+UTL_HIDE_FROM_ABI auto difference_type(float) noexcept -> void;
 
 template <typename Iter, bool = UTL_TRAIT_is_legacy_input_iterator(Iter),
     bool = UTL_TRAIT_is_legacy_iterator(Iter)>
@@ -271,12 +275,12 @@ struct pointer_impl<T*, true> {
 } // namespace details
 
 template <typename Iter>
-struct iterator_traits :
+struct UTL_PUBLIC_TEMPLATE iterator_traits :
     details::iterator_traits::traits<Iter>,
     private details::iterator_traits::impl_tag<Iter> {};
 
 template <typename T>
-struct iterator_traits<T*> :
+struct UTL_PUBLIC_TEMPLATE iterator_traits<T*> :
     details::iterator_traits::pointer_impl<T*>,
     private details::iterator_traits::impl_tag<T*> {};
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/type_traits/utl_constants.h"
 
 #if UTL_CXX20
@@ -15,13 +16,13 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename It>
-concept legacy_iterator = UTL_SCOPE input_or_output_iterator<It> && UTL_SCOPE copyable<It>;
+concept legacy_iterator = input_or_output_iterator<It> && copyable<It>;
 
 template <typename It>
-struct is_legacy_iterator : UTL_SCOPE bool_constant<legacy_iterator<It>> {};
+struct UTL_PUBLIC_TEMPLATE is_legacy_iterator : bool_constant<legacy_iterator<It>> {};
 
 template <typename It>
-inline constexpr bool is_legacy_iterator_v = UTL_SCOPE legacy_iterator<It>;
+inline constexpr bool is_legacy_iterator_v = legacy_iterator<It>;
 
 UTL_NAMESPACE_END
 
@@ -39,21 +40,21 @@ namespace details {
 namespace legacy_iterator {
 
 template <typename T>
-auto post_incrementable(float) noexcept -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto post_incrementable(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-auto post_incrementable(int) noexcept
-    -> UTL_SCOPE is_referenceable<decltype(*static_cast<T (*)()>(0)()++)>;
+UTL_HIDE_FROM_ABI auto post_incrementable(int) noexcept
+    -> UTL_SCOPE is_referenceable<decltype(*static_cast<T& (*)()>(0)()++)>;
 
 template <typename T>
-auto pre_incrementable(float) noexcept -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto pre_incrementable(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-auto pre_incrementable(int) noexcept
-    -> UTL_SCOPE is_same<T&, decltype(++static_cast<T (*)()>(0)())>;
+UTL_HIDE_FROM_ABI auto pre_incrementable(int) noexcept
+    -> UTL_SCOPE is_same<T&, decltype(++static_cast<T& (*)()>(0)())>;
 
 template <typename T>
-using implemented = UTL_SCOPE conjunction<UTL_SCOPE is_dereferenceable<T>,
+using implemented UTL_NODEBUG = UTL_SCOPE conjunction<UTL_SCOPE is_dereferenceable<T>,
     decltype(UTL_SCOPE details::legacy_iterator::post_incrementable<T>(0)),
     decltype(UTL_SCOPE details::legacy_iterator::pre_incrementable<T>(0)),
     UTL_SCOPE is_copyable<T>>;
@@ -62,7 +63,7 @@ using implemented = UTL_SCOPE conjunction<UTL_SCOPE is_dereferenceable<T>,
 } // namespace details
 
 template <typename It>
-struct is_legacy_iterator : UTL_SCOPE details::legacy_iterator::implemented<It> {};
+struct UTL_PUBLIC_TEMPLATE is_legacy_iterator : details::legacy_iterator::implemented<It> {};
 
 #  if UTL_CXX14
 template <typename It>

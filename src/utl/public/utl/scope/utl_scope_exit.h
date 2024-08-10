@@ -7,6 +7,7 @@
 #include "utl/concepts/utl_constructible_as.h"
 #include "utl/exception.h"
 #include "utl/scope/utl_scope_impl.h"
+#include "utl/type_traits/utl_decay.h"
 #include "utl/type_traits/utl_is_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_constructible.h"
 #include "utl/type_traits/utl_logical_traits.h"
