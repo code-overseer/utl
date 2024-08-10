@@ -2,9 +2,9 @@
 
 #pragma once
 
-#if UTL_USE_STD_tuple
+#include "utl/preprocessor/utl_config.h"
 
-#  include "utl/preprocessor/utl_namespace.h"
+#if UTL_USE_STD_tuple
 
 #  include <tuple>
 
@@ -20,8 +20,6 @@ using std::tuple_size;
 UTL_NAMESPACE_END
 
 #else // UTL_USE_STD_tuple
-
-#  include "utl/preprocessor/utl_standard.h"
 
 #  define UTL_TUPLE_PRIVATE_HEADER_GUARD
 

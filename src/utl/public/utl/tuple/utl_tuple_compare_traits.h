@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "utl/compare/utl_compare_traits.h"
 #include "utl/preprocessor/utl_namespace.h"
 #include "utl/preprocessor/utl_standard.h"
+
+#include "utl/compare/utl_compare_traits.h"
 #include "utl/tuple/utl_tuple_traits.h"
 #include "utl/type_traits/utl_is_boolean_testable.h"
 #include "utl/type_traits/utl_logical_traits.h"
@@ -20,9 +21,10 @@ namespace compare_ops {
 namespace details {
 
 template <typename T>
-using const_ref_t = remove_reference_t<T> const&;
+using const_ref_t UTL_NODEBUG = remove_reference_t<T> const&;
 template <typename T>
-using sequence_t = conditional_t<TT_SCOPE is_tuple_like<T>::value, tuple_index_sequence<T>, void>;
+using sequence_t UTL_NODEBUG =
+    conditional_t<TT_SCOPE is_tuple_like<T>::value, tuple_index_sequence<T>, void>;
 
 template <typename T, typename U = T, typename Seq = sequence_t<T>, typename = void>
 struct all_have_eq_impl : false_type {};
@@ -169,26 +171,32 @@ struct all_have_nothrow_gteq : details::all_have_nothrow_gteq_impl<T, U> {};
 
 } // namespace compare_ops
 
+UTL_NAMESPACE_END
+
 #if UTL_CXX20
+
+UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace compare_traits {
 
 template <typename T, typename U, typename Cat, size_t... Is>
-auto all_three_way_comparable_with_test(float, index_sequence<Is...>) -> false_type;
+UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(float, index_sequence<Is...>)
+    -> false_type;
 
 template <typename T, typename U, typename Cat, size_t... Is>
-auto all_three_way_comparable_with_test(int, index_sequence<Is...>)
+UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(int, index_sequence<Is...>)
     -> bool_constant<tuple_size<T>::value == tuple_size<U>::value &&
         conjunction<decltype(three_way_comparable_with_test<
             remove_cvref_t<decltype(UTL_TUPLE_GET(Is, declval<T>()))>,
             remove_cvref_t<decltype(UTL_TUPLE_GET(Is, declval<U>()))>, Cat>(0))...>::value>;
 
 template <typename T, typename U, typename Cat, size_t... Is>
-auto all_nothrow_three_way_comparable_with_test(float, index_sequence<Is...>) -> false_type;
+UTL_HIDE_FROM_ABI auto all_nothrow_three_way_comparable_with_test(float, index_sequence<Is...>)
+    -> false_type;
 
 template <typename T, typename U, typename Cat, size_t... Is>
-auto all_nothrow_three_way_comparable_with_test(int, index_sequence<Is...>)
+UTL_HIDE_FROM_ABI auto all_nothrow_three_way_comparable_with_test(int, index_sequence<Is...>)
     -> bool_constant<tuple_size<T>::value == tuple_size<U>::value &&
         TT_SCOPE is_all_nothrow_gettable<T>::value && TT_SCOPE is_all_nothrow_gettable<U>::value &&
         conjunction<decltype(nothrow_three_way_comparable_with_test<
@@ -196,38 +204,38 @@ auto all_nothrow_three_way_comparable_with_test(int, index_sequence<Is...>)
             remove_cvref_t<decltype(UTL_TUPLE_GET(Is, declval<U>()))>, Cat>(0))...>::value>;
 
 template <typename T, typename U, typename Cat, size_t N = tuple_size<T>::value>
-using all_three_way_comparable_with_test_t =
+using all_three_way_comparable_with_test_t UTL_NODEBUG =
     decltype(all_three_way_comparable_with_test<T, U, Cat>(0, make_index_sequence<N>{}));
 
 template <typename T, typename U, typename Cat, size_t N = tuple_size<T>::value>
-using all_nothrow_three_way_comparable_with_test_t =
+using all_nothrow_three_way_comparable_with_test_t UTL_NODEBUG =
     decltype(all_nothrow_three_way_comparable_with_test<T, U, Cat>(0, make_index_sequence<N>{}));
 
 } // namespace compare_traits
 } // namespace details
 
 template <typename T, typename U = T, typename Cat = std::partial_ordering>
-struct is_all_three_way_comparable_with :
+struct UTL_PUBLIC_TEMPLATE is_all_three_way_comparable_with :
     details::compare_traits::all_three_way_comparable_with_test_t<T, U, Cat> {};
 
 template <typename T, typename U = T, typename Cat = std::partial_ordering>
-struct is_all_nothrow_three_way_comparable_with :
+struct UTL_PUBLIC_TEMPLATE is_all_nothrow_three_way_comparable_with :
     details::compare_traits::all_nothrow_three_way_comparable_with_test_t<T, U, Cat> {};
+
+UTL_NAMESPACE_END
 
 #else // UTL_CXX20
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U = T, typename Cat = void, typename = void>
-struct is_all_three_way_comparable_with : false_type {};
+struct UTL_PUBLIC_TEMPLATE is_all_three_way_comparable_with : false_type {};
 
 template <typename T, typename U = T, typename Cat = void, typename = void>
-struct is_all_nothrow_three_way_comparable_with : false_type {};
+struct UTL_PUBLIC_TEMPLATE is_all_nothrow_three_way_comparable_with : false_type {};
 
 UTL_NAMESPACE_END
 
 #endif // UTL_CXX20
-
-UTL_NAMESPACE_END
 
 #undef TT_SCOPE
