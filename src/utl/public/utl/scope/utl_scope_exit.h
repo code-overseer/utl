@@ -53,8 +53,8 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) inline auto make_scope_exit(Fn&& f)
 
 namespace details {
 namespace scope {
-struct exit_proxy_t {
-    UTL_HIDE_FROM_ABI constexpr explicit exit_proxy_t() noexcept = default;
+struct exit_factory_t {
+    UTL_HIDE_FROM_ABI constexpr explicit exit_factory_t() noexcept = default;
 
     template <typename Fn>
     UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) inline auto operator->*(Fn&& f) const
@@ -66,11 +66,11 @@ struct exit_proxy_t {
 };
 
 // Warning: technically not a customization point
-UTL_DEFINE_CUSTOMIZATION_POINT(exit_proxy_t, exit_proxy);
+UTL_DEFINE_CUSTOMIZATION_POINT(exit_factory_t, exit_factory);
 } // namespace scope
 } // namespace details
 
 #define UTL_ON_SCOPE_EXIT \
-    const auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::exit_proxy->*[&]()
+    const auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::exit_factory->*[&]()
 
 UTL_NAMESPACE_END

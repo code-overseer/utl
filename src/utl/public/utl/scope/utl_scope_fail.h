@@ -66,8 +66,8 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) inline auto make_scope_fail(Fn&& f)
 
 namespace details {
 namespace scope {
-struct fail_proxy_t {
-    UTL_HIDE_FROM_ABI constexpr explicit fail_proxy_t() noexcept = default;
+struct fail_factory_t {
+    UTL_HIDE_FROM_ABI constexpr explicit fail_factory_t() noexcept = default;
     template <typename Fn>
     UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) inline auto operator->*(Fn&& f) const
         noexcept(UTL_TRAIT_is_nothrow_constructible(scope_fail<decay_t<Fn>>, Fn))
@@ -77,12 +77,12 @@ struct fail_proxy_t {
     }
 };
 
-inline constexpr fail_proxy_t fail_proxy{};
+inline constexpr fail_factory_t fail_factory{};
 } // namespace scope
 } // namespace details
 
 #  define UTL_ON_SCOPE_FAIL \
-      const auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::fail_proxy->*[&]()
+      const auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::fail_factory->*[&]()
 
 #else  // if UTL_CXX17
 template <typename F>

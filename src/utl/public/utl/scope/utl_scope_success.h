@@ -65,8 +65,8 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) auto make_scope_success(Fn&& f) noe
 
 namespace details {
 namespace scope {
-struct success_proxy_t {
-    UTL_HIDE_FROM_ABI constexpr explicit success_proxy_t() noexcept = default;
+struct success_factory_t {
+    UTL_HIDE_FROM_ABI constexpr explicit success_factory_t() noexcept = default;
     template <typename Fn>
     UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) auto operator->*(Fn&& f) const
         noexcept(UTL_TRAIT_is_nothrow_constructible(scope_success<decay_t<Fn>>, Fn))
@@ -76,12 +76,12 @@ struct success_proxy_t {
     }
 };
 
-inline constexpr success_proxy_t success_proxy{};
+inline constexpr success_factory_t success_factory{};
 } // namespace scope
 } // namespace details
 
 #  define UTL_ON_SCOPE_SUCCESS \
-      const auto UTL_UNIQUE_VAR(ScopeSuccess) = UTL_SCOPE details::scope::success_proxy->*[&]()
+      const auto UTL_UNIQUE_VAR(ScopeSuccess) = UTL_SCOPE details::scope::success_factory->*[&]()
 
 #else
 template <typename F>
