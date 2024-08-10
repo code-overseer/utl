@@ -36,8 +36,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct underlying_type {
-    using type = UTL_BUILTIN_underlying_type(T);
+struct UTL_PUBLIC_TEMPLATE underlying_type {
+    using type UTL_NODEBUG = UTL_BUILTIN_underlying_type(T);
 };
 
 template <typename T>
@@ -54,7 +54,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct underlying_type : undefined_trait<T> {};
+struct UTL_PUBLIC_TEMPLATE underlying_type : undefined_trait<T> {};
 
 template <typename T>
 using underlying_type_t = typename underlying_type<T>::type;

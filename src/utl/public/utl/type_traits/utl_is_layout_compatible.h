@@ -30,7 +30,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct is_layout_compatible : bool_constant<UTL_BUILTIN_is_layout_compatible(T, U)> {};
+struct UTL_PUBLIC_TEMPLATE is_layout_compatible :
+    bool_constant<UTL_BUILTIN_is_layout_compatible(T, U)> {};
 
 #    if UTL_CXX14
 template <typename T, typename U>
@@ -48,9 +49,9 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct is_layout_compatible : undefined_trait<T, U> {};
+struct UTL_PUBLIC_TEMPLATE is_layout_compatible : undefined_trait<T, U> {};
 template <typename T>
-struct is_layout_compatible<T, T> : true_type {};
+struct UTL_PUBLIC_TEMPLATE is_layout_compatible<T, T> : true_type {};
 
 #    if UTL_CXX14
 template <typename T, typename U>

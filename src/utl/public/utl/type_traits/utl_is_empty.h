@@ -36,7 +36,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_empty : bool_constant<UTL_BUILTIN_is_empty(T)> {};
+struct UTL_PUBLIC_TEMPLATE is_empty : bool_constant<UTL_BUILTIN_is_empty(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -51,16 +51,19 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 namespace details {
+namespace emptiness {
 template <typename T>
-struct is_empty_check : T {
+struct UTL_ATTRIBUTE(EMPTY_BASES) check : T {
     int data;
 };
+} // namespace emptiness
+
 } // namespace details
 
 template <typename T>
-struct is_empty :
-    bool_constant<sizeof(details::is_empty_check<T>) == sizeof(details::is_empty_check<T>::data)> {
-};
+struct UTL_PUBLIC_TEMPLATE is_empty :
+    bool_constant<sizeof(T) == 1 &&
+        sizeof(details::emptiness::check<T>) == sizeof(details::emptiness::check<T>::data)> {};
 
 #    if UTL_CXX14
 template <typename T>

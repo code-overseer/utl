@@ -34,7 +34,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_null_pointer : bool_constant<UTL_BUILTIN_is_null_pointer(T)> {};
+struct UTL_PUBLIC_TEMPLATE is_null_pointer : bool_constant<UTL_BUILTIN_is_null_pointer(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -48,19 +48,19 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_null_pointer : false_type {};
+struct UTL_PUBLIC_TEMPLATE is_null_pointer : false_type {};
 
 template <>
-struct is_null_pointer<decltype(nullptr)> : true_type {};
+struct UTL_PUBLIC_TEMPLATE is_null_pointer<decltype(nullptr)> : true_type {};
 
 template <>
-struct is_null_pointer<decltype(nullptr) const> : true_type {};
+struct UTL_PUBLIC_TEMPLATE is_null_pointer<decltype(nullptr) const> : true_type {};
 
 template <>
-struct is_null_pointer<decltype(nullptr) volatile> : true_type {};
+struct UTL_PUBLIC_TEMPLATE is_null_pointer<decltype(nullptr) volatile> : true_type {};
 
 template <>
-struct is_null_pointer<decltype(nullptr) const volatile> : true_type {};
+struct UTL_PUBLIC_TEMPLATE is_null_pointer<decltype(nullptr) const volatile> : true_type {};
 
 #    if UTL_CXX14
 template <typename T>

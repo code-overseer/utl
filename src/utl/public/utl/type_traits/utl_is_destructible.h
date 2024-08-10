@@ -36,7 +36,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_destructible : bool_constant<UTL_BUILTIN_is_destructible(T)> {};
+struct UTL_PUBLIC_TEMPLATE is_destructible : bool_constant<UTL_BUILTIN_is_destructible(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -51,27 +51,32 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 namespace details {
-template <typename T, typename = void>
-struct is_destructor_callable : false_type {};
+namespace destructible {
+template <typename>
+UTL_HIDE_FROM_ABI auto callable_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename T>
-struct is_destructor_callable<T, void_t<decltype(declval<T&>().~T())>> {};
+UTL_HIDE_FROM_ABI auto callable_impl(int) noexcept
+    -> UTL_SCOPE always_true_type<decltype(declval<T&>().~T())>;
+template <typename T>
+using callable = decltype(callable_impl<T>(0));
+} // namespace destructible
 } // namespace details
 
 template <typename T>
-struct is_destructible :
+struct UTL_PUBLIC_TEMPLATE is_destructible :
     bool_constant<UTL_TRAIT_is_reference(T) ||
         (UTL_TRAIT_is_object(T) &&
-            details::is_destructor_callable<remove_all_extents_t<T>>::value)> {};
+            details::destructible::callable<remove_all_extents_t<T>>::value)> {};
 template <typename T>
-struct is_destructible<T const> : is_destructible<T> {};
+struct UTL_PUBLIC_TEMPLATE is_destructible<T const> : is_destructible<T> {};
 template <typename T>
-struct is_destructible<T volatile> : is_destructible<T> {};
+struct UTL_PUBLIC_TEMPLATE is_destructible<T volatile> : is_destructible<T> {};
 template <typename T>
-struct is_destructible<T const volatile> : is_destructible<T> {};
+struct UTL_PUBLIC_TEMPLATE is_destructible<T const volatile> : is_destructible<T> {};
 template <>
-struct is_destructible<void> : false_type {};
+struct UTL_PUBLIC_TEMPLATE is_destructible<void> : false_type {};
 template <typename T>
-struct is_destructible<T[]> : false_type {};
+struct UTL_PUBLIC_TEMPLATE is_destructible<T[]> : false_type {};
 
 #    if UTL_CXX14
 template <typename T>

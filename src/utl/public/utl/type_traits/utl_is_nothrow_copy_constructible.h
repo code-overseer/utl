@@ -37,7 +37,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_nothrow_copy_constructible :
+struct UTL_PUBLIC_TEMPLATE is_nothrow_copy_constructible :
     bool_constant<UTL_BUILTIN_is_nothrow_constructible(T, add_lvalue_reference_t<T const>)> {};
 
 #    if UTL_CXX14
@@ -55,7 +55,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_nothrow_copy_constructible :
+struct UTL_PUBLIC_TEMPLATE is_nothrow_copy_constructible :
     is_nothrow_constructible<T, add_lvalue_reference_t<T const>> {};
 
 #    if UTL_CXX14

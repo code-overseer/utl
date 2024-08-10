@@ -4,6 +4,7 @@
 
 #include "utl/preprocessor/utl_namespace.h"
 #include "utl/preprocessor/utl_standard.h"
+
 #include "utl/type_traits/utl_constants.h"
 
 UTL_NAMESPACE_BEGIN
@@ -13,16 +14,16 @@ namespace details {
 using size_t = decltype(sizeof(0));
 
 template <typename T, size_t = sizeof(T)>
-true_type is_complete(int);
+UTL_HIDE_FROM_ABI true_type is_complete(int);
 
 template <typename T>
-false_type is_complete(float);
+UTL_HIDE_FROM_ABI false_type is_complete(float);
 
 } // namespace details
 } // namespace type_traits
 
 template <typename T, typename R = decltype(type_traits::details::is_complete<T>(0))>
-struct is_complete : R {};
+struct UTL_PUBLIC_TEMPLATE is_complete : R {};
 
 #if UTL_CXX14
 template <typename T, typename R = decltype(type_traits::details::is_complete<T>(0))>

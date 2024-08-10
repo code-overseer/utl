@@ -9,14 +9,14 @@ UTL_NAMESPACE_BEGIN
 namespace utility {
 namespace details {
 template <typename T>
-T&& declval_impl(int) noexcept;
+UTL_HIDE_FROM_ABI T&& declval_impl(int) noexcept;
 
 template <typename T>
-T declval_impl(float) noexcept;
+UTL_HIDE_FROM_ABI T declval_impl(float) noexcept;
 } // namespace details
 } // namespace utility
 
 template <typename T>
-auto declval() noexcept -> decltype(utility::details::declval_impl<T>(0));
+UTL_HIDE_FROM_ABI auto declval() noexcept -> decltype(utility::details::declval_impl<T>(0));
 
 UTL_NAMESPACE_END

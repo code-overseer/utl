@@ -34,7 +34,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_void : bool_constant<UTL_BUILTIN_is_void(T)> {};
+struct UTL_PUBLIC_TEMPLATE is_void : bool_constant<UTL_BUILTIN_is_void(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -48,19 +48,19 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_void : false_type {};
+struct UTL_PUBLIC_TEMPLATE is_void : false_type {};
 
 template <>
-struct is_void<void> : true_type {};
+struct UTL_PUBLIC_TEMPLATE is_void<void> : true_type {};
 
 template <>
-struct is_void<void const> : true_type {};
+struct UTL_PUBLIC_TEMPLATE is_void<void const> : true_type {};
 
 template <>
-struct is_void<void volatile> : true_type {};
+struct UTL_PUBLIC_TEMPLATE is_void<void volatile> : true_type {};
 
 template <>
-struct is_void<void const volatile> : true_type {};
+struct UTL_PUBLIC_TEMPLATE is_void<void const volatile> : true_type {};
 
 #    if UTL_CXX14
 template <typename T>

@@ -32,7 +32,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_arithmetic : bool_constant<is_integral<T>::value || is_floating_point<T>::value> {};
+struct UTL_PUBLIC_TEMPLATE is_arithmetic :
+    bool_constant<is_integral<T>::value || is_floating_point<T>::value> {};
 
 #  if UTL_CXX14
 template <typename T>

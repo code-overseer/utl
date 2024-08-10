@@ -36,8 +36,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct add_pointer {
-    using type = UTL_BUILTIN_add_pointer(T);
+struct UTL_PUBLIC_TEMPLATE add_pointer {
+    using type UTL_NODEBUG = UTL_BUILTIN_add_pointer(T);
 };
 
 template <typename T>

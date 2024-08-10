@@ -11,36 +11,37 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace dereferenceable {
 template <typename T>
-auto trait_impl(int) noexcept -> UTL_SCOPE is_referenceable<decltype(*UTL_SCOPE declval<T>())>;
+UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
+    -> UTL_SCOPE is_referenceable<decltype(*UTL_SCOPE declval<T>())>;
 template <typename T>
-auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-using trait = decltype(trait_impl<T>(0));
+using trait UTL_NODEBUG = decltype(trait_impl<T>(0));
 
 template <typename T>
-auto nothrow_impl(int) noexcept -> UTL_SCOPE bool_constant<noexcept(*UTL_SCOPE declval<T>())>;
+UTL_HIDE_FROM_ABI auto nothrow_impl(int) noexcept
+    -> UTL_SCOPE bool_constant<noexcept(*UTL_SCOPE declval<T>())>;
 template <typename T>
-auto nothrow_impl(float) noexcept -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto nothrow_impl(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-using is_nothrow = decltype(nothrow_impl<T>(0));
+using is_nothrow UTL_NODEBUG = decltype(nothrow_impl<T>(0));
 
 } // namespace dereferenceable
 } // namespace details
 
 template <typename T>
-struct is_dereferenceable : details::dereferenceable::trait<T> {};
+struct UTL_PUBLIC_TEMPLATE is_dereferenceable : details::dereferenceable::trait<T> {};
 
 template <typename T>
-struct is_nothrow_dereferenceable : details::dereferenceable::is_nothrow<T> {};
+struct UTL_PUBLIC_TEMPLATE is_nothrow_dereferenceable : details::dereferenceable::is_nothrow<T> {};
 
 #if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_dereferenceable_v = details::dereferenceable::trait<T>::value;
 template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_nothrow_dereferenceable_v =
-    details::dereferenceable::is_nothrow<T>::value;
+UTL_INLINE_CXX17 constexpr bool is_nothrow_dereferenceable_v = details::dereferenceable::is_nothrow<T>::value;
 #endif
 
 UTL_NAMESPACE_END

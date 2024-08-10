@@ -15,29 +15,30 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace constructible {
 template <typename T, typename THead, typename TMid, typename... TTail>
-auto explicit_test(int) -> decltype((
+UTL_HIDE_FROM_ABI auto explicit_test(int) noexcept -> decltype((
     implicit_conv<T>({declval<THead>(), declval<TMid>(), declval<TTail>()...}), false_type{}));
 template <typename T, typename THead, typename TMid, typename... TTail>
-auto explicit_test(float) -> is_constructible<T, THead, TMid, TTail...>;
+UTL_HIDE_FROM_ABI auto explicit_test(float) noexcept -> is_constructible<T, THead, TMid, TTail...>;
 template <typename T, typename THead>
-auto explicit_test(int)
+UTL_HIDE_FROM_ABI auto explicit_test(int) noexcept
     -> conjunction<negation<is_convertible<THead, T>>, is_constructible<T, THead>>;
 template <typename T>
-auto explicit_test(int)
+UTL_HIDE_FROM_ABI auto explicit_test(int) noexcept
     -> conjunction<negation<decltype(implicit_test<T>(0))>, is_default_constructible<T>>;
 template <typename T, typename...>
-auto explicit_test(...) -> false_type;
+UTL_HIDE_FROM_ABI auto explicit_test(...) noexcept -> false_type;
 
 template <typename TTarget, typename... TArgs>
-using is_explicit = decltype(explicit_test<TTarget, TArgs...>(0));
+using is_explicit UTL_NODEBUG = decltype(explicit_test<TTarget, TArgs...>(0));
 } // namespace constructible
 } // namespace details
 
 template <typename TTarget, typename... TArgs>
-struct is_explicit_constructible : details::constructible::is_explicit<TTarget, TArgs...> {};
+struct UTL_PUBLIC_TEMPLATE is_explicit_constructible :
+    details::constructible::is_explicit<TTarget, TArgs...> {};
 
 template <typename TTarget, typename... TArgs>
-struct is_nothrow_explicit_constructible :
+struct UTL_PUBLIC_TEMPLATE is_nothrow_explicit_constructible :
     conjunction<is_explicit_constructible<TTarget, TArgs...>,
         is_nothrow_constructible<TTarget, TArgs...>> {};
 

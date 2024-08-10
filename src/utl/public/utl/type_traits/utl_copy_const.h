@@ -7,13 +7,13 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename From, typename To>
-struct copy_const {
-    using type = To;
+struct UTL_PUBLIC_TEMPLATE copy_const {
+    using type UTL_NODEBUG = To;
 };
 
 template <typename From, typename To>
-struct copy_const<From const, To> {
-    using type = To const;
+struct UTL_PUBLIC_TEMPLATE copy_const<From const, To> {
+    using type UTL_NODEBUG = To const;
 };
 
 template <typename F, typename T>

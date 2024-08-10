@@ -6,7 +6,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename... Ts>
-struct undefined_trait {
+struct UTL_PUBLIC_TEMPLATE undefined_trait {
 private:
     static_assert(!is_void<T>::value && sizeof(T) == 0,
         "Undefined trait, use preprocessor constant"
