@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_namespace.h"
+
 #include "utl/type_traits/utl_template_list.h"
 
 UTL_NAMESPACE_BEGIN
@@ -20,15 +21,16 @@ UTL_NAMESPACE_BEGIN
 template <typename Target, typename TypeList>
 struct merge_const;
 template <typename Target, template <typename...> class TypeList>
-struct merge_const<Target, TypeList<>> {
-    using type = Target;
+struct UTL_PUBLIC_TEMPLATE merge_const<Target, TypeList<>> {
+    using type UTL_NODEBUG = Target;
 };
 template <typename Target, template <typename...> class TypeList, typename U0, typename... Us>
-struct merge_const<Target, TypeList<U0 const, Us...>> {
-    using type = Target const;
+struct UTL_PUBLIC_TEMPLATE merge_const<Target, TypeList<U0 const, Us...>> {
+    using type UTL_NODEBUG = Target const;
 };
 template <typename Target, template <typename...> class TypeList, typename U0, typename... Us>
-struct merge_const<Target, TypeList<U0, Us...>> : merge_const<Target, type_list<Us...>> {};
+struct UTL_PUBLIC_TEMPLATE merge_const<Target, TypeList<U0, Us...>> :
+    merge_const<Target, type_list<Us...>> {};
 template <typename Target, typename TypeList>
 using merge_const_t = typename merge_const<Target, TypeList>::type;
 

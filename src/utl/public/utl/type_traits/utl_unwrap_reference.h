@@ -16,18 +16,18 @@ template <typename>
 class reference_wrapper;
 
 template <typename T>
-struct unwrap_reference {
-    using type = T;
+struct UTL_PUBLIC_TEMPLATE unwrap_reference {
+    using type UTL_NODEBUG = T;
 };
 
 template <typename T>
-struct unwrap_reference<reference_wrapper<T>> {
-    using type = T&;
+struct UTL_PUBLIC_TEMPLATE unwrap_reference<reference_wrapper<T>> {
+    using type UTL_NODEBUG = T&;
 };
 
 template <typename T>
-struct unwrap_reference<::std::reference_wrapper<T>> {
-    using type = T&;
+struct UTL_PUBLIC_TEMPLATE unwrap_reference<::std::reference_wrapper<T>> {
+    using type UTL_NODEBUG = T&;
 };
 
 template <typename T>

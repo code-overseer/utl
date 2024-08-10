@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "utl/memory/utl_uses_allocator.h"
 #include "utl/preprocessor/utl_config.h"
+
+#include "utl/memory/utl_uses_allocator.h"
 #include "utl/type_traits/utl_add_lvalue_reference.h"
 #include "utl/type_traits/utl_add_rvalue_reference.h"
 #include "utl/type_traits/utl_is_copy_assignable.h"
@@ -25,7 +26,7 @@ UTL_NAMESPACE_BEGIN
 using size_t = decltype(sizeof(0));
 
 template <typename... Types>
-struct variadic_traits {
+struct UTL_PUBLIC_TEMPLATE variadic_traits {
     static constexpr size_t size = sizeof...(Types);
 
     static constexpr bool is_nothrow_swappable =
@@ -69,43 +70,44 @@ struct variadic_traits {
         conjunction<UTL_SCOPE is_swappable<add_const_t<Types>>...>::value;
 
     template <typename... UTypes>
-    struct matches : conjunction<UTL_SCOPE is_same<Types, UTypes>...> {};
+    struct UTL_PUBLIC_TEMPLATE matches : conjunction<UTL_SCOPE is_same<Types, UTypes>...> {};
 
     template <typename... UTypes>
-    struct is_nothrow_assignable :
+    struct UTL_PUBLIC_TEMPLATE is_nothrow_assignable :
         conjunction<UTL_SCOPE is_nothrow_assignable<add_lvalue_reference_t<Types>, UTypes>...> {};
     template <typename... UTypes>
-    struct is_nothrow_const_assignable :
+    struct UTL_PUBLIC_TEMPLATE is_nothrow_const_assignable :
         conjunction<UTL_SCOPE
                 is_nothrow_assignable<add_lvalue_reference_t<add_const_t<Types>>, UTypes>...> {};
     template <typename... UTypes>
-    struct is_nothrow_constructible :
+    struct UTL_PUBLIC_TEMPLATE is_nothrow_constructible :
         conjunction<UTL_SCOPE is_nothrow_constructible<Types, UTypes>...> {};
     template <typename Alloc, typename... UTypes>
-    struct is_nothrow_constructible_with_allocator :
+    struct UTL_PUBLIC_TEMPLATE is_nothrow_constructible_with_allocator :
         conjunction<
             disjunction<UTL_SCOPE is_nothrow_constructible_with_allocator<Types, Alloc, UTypes>,
                 UTL_SCOPE is_nothrow_constructible<Types, UTypes>>... // disjunction
             > {};
     template <typename Alloc>
-    struct is_nothrow_constructible_with_allocator<Alloc> :
+    struct UTL_PUBLIC_TEMPLATE is_nothrow_constructible_with_allocator<Alloc> :
         conjunction<disjunction<UTL_SCOPE is_nothrow_constructible_with_allocator<Types, Alloc>,
             UTL_SCOPE is_nothrow_constructible<Types>>... // disjunction
             > {};
     template <typename... UTypes>
-    struct is_convertible : conjunction<UTL_SCOPE is_convertible<Types, UTypes>...> {};
+    struct UTL_PUBLIC_TEMPLATE is_convertible :
+        conjunction<UTL_SCOPE is_convertible<Types, UTypes>...> {};
     template <typename... UTypes>
-    struct is_implicit_constructible :
+    struct UTL_PUBLIC_TEMPLATE is_implicit_constructible :
         conjunction<UTL_SCOPE is_implicit_constructible<Types, UTypes>...> {};
     template <typename Alloc, typename... UTypes>
-    struct is_implicit_constructible_with_allocator :
+    struct UTL_PUBLIC_TEMPLATE is_implicit_constructible_with_allocator :
         conjunction<conditional_t<UTL_SCOPE uses_allocator<Types, Alloc>::value,
             UTL_SCOPE is_implicit_constructible_with_allocator<Types, Alloc, UTypes>,
             UTL_SCOPE is_implicit_constructible<Types, UTypes>>... // disjunction
             > {};
 
     template <typename Alloc>
-    struct is_implicit_constructible_with_allocator<Alloc> :
+    struct UTL_PUBLIC_TEMPLATE is_implicit_constructible_with_allocator<Alloc> :
         conjunction<conditional_t<UTL_SCOPE uses_allocator<Types, Alloc>::value,
             UTL_SCOPE is_implicit_constructible_with_allocator<Types, Alloc>,
             UTL_SCOPE is_implicit_constructible<Types>>... // disjunction
@@ -121,56 +123,59 @@ struct variadic_traits {
     template <typename... UTypes>
     using is_explicit_constructible = decltype(is_explicit_constructible_impl<UTypes...>());
     template <typename Alloc, typename... UTypes>
-    struct is_explicit_constructible_with_allocator :
+    struct UTL_PUBLIC_TEMPLATE is_explicit_constructible_with_allocator :
         disjunction<conditional_t<UTL_SCOPE uses_allocator<Types, Alloc>::value,
             UTL_SCOPE is_explicit_constructible_with_allocator<Types, Alloc, UTypes>,
             UTL_SCOPE is_explicit_constructible<Types, UTypes>>...> {};
     template <typename Alloc>
-    struct is_explicit_constructible_with_allocator<Alloc> :
+    struct UTL_PUBLIC_TEMPLATE is_explicit_constructible_with_allocator<Alloc> :
         disjunction<conditional_t<UTL_SCOPE uses_allocator<Types, Alloc>::value,
             UTL_SCOPE is_explicit_constructible_with_allocator<Types, Alloc>,
             UTL_SCOPE is_explicit_constructible<Types>>...> {};
 
     template <typename... UTypes>
-    struct is_constructible : conjunction<UTL_SCOPE is_constructible<Types, UTypes>...> {};
+    struct UTL_PUBLIC_TEMPLATE is_constructible :
+        conjunction<UTL_SCOPE is_constructible<Types, UTypes>...> {};
     template <typename Alloc, typename... UTypes>
-    struct is_constructible_with_allocator :
+    struct UTL_PUBLIC_TEMPLATE is_constructible_with_allocator :
         conjunction<disjunction<UTL_SCOPE is_constructible_with_allocator<Types, Alloc, UTypes>,
             UTL_SCOPE is_constructible<Types, UTypes>>... // disjunction
             > {};
     template <typename Alloc>
-    struct is_constructible_with_allocator<Alloc> :
+    struct UTL_PUBLIC_TEMPLATE is_constructible_with_allocator<Alloc> :
         conjunction<disjunction<UTL_SCOPE is_constructible_with_allocator<Types, Alloc>,
             UTL_SCOPE is_constructible<Types>>... // disjunction
             > {};
     template <typename... UTypes>
-    struct is_assignable :
+    struct UTL_PUBLIC_TEMPLATE is_assignable :
         conjunction<UTL_SCOPE is_assignable<add_lvalue_reference_t<Types>, UTypes>...> {};
     template <typename... UTypes>
-    struct is_const_assignable :
+    struct UTL_PUBLIC_TEMPLATE is_const_assignable :
         conjunction<
             UTL_SCOPE is_assignable<add_lvalue_reference_t<add_const_t<Types>>, UTypes>...> {};
     template <typename... UTypes>
-    struct is_dangling :
+    struct UTL_PUBLIC_TEMPLATE is_dangling :
         disjunction<UTL_SCOPE reference_constructs_from_temporary<Types, UTypes>...> {};
 
     template <typename Alloc, typename... UTypes>
-    struct is_dangling_without_allocator :
+    struct UTL_PUBLIC_TEMPLATE is_dangling_without_allocator :
         disjunction<conjunction<negation<UTL_SCOPE uses_allocator<Types, Alloc>>,
             UTL_SCOPE reference_constructs_from_temporary<Types, UTypes>>... // conjunction
             > {};
     template <typename... UTypes>
-    struct is_convertible_from : conjunction<UTL_SCOPE is_convertible<UTypes, Types>...> {};
+    struct UTL_PUBLIC_TEMPLATE is_convertible_from :
+        conjunction<UTL_SCOPE is_convertible<UTypes, Types>...> {};
     template <typename... UTypes>
-    struct is_swappable_with : conjunction<UTL_SCOPE is_swappable_with<Types&, UTypes>...> {};
+    struct UTL_PUBLIC_TEMPLATE is_swappable_with :
+        conjunction<UTL_SCOPE is_swappable_with<Types&, UTypes>...> {};
     template <typename... UTypes>
-    struct is_const_swappable_with :
+    struct UTL_PUBLIC_TEMPLATE is_const_swappable_with :
         conjunction<UTL_SCOPE is_swappable_with<Types const&, UTypes>...> {};
     template <typename... UTypes>
-    struct is_nothrow_swappable_with :
+    struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable_with :
         conjunction<UTL_SCOPE is_nothrow_swappable_with<Types&, UTypes>...> {};
     template <typename... UTypes>
-    struct is_nothrow_const_swappable_with :
+    struct UTL_PUBLIC_TEMPLATE is_nothrow_const_swappable_with :
         conjunction<UTL_SCOPE is_nothrow_swappable_with<Types const&, UTypes>...> {};
 };
 

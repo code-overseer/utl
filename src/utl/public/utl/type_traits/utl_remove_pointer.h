@@ -36,8 +36,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct remove_pointer {
-    using type = UTL_BUILTIN_remove_pointer(T);
+struct UTL_PUBLIC_TEMPLATE remove_pointer {
+    using type UTL_NODEBUG = UTL_BUILTIN_remove_pointer(T);
 };
 
 template <typename T>
@@ -50,24 +50,24 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct remove_pointer {
-    using type = T;
+struct UTL_PUBLIC_TEMPLATE remove_pointer {
+    using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct remove_pointer<T*> {
-    using type = T;
+struct UTL_PUBLIC_TEMPLATE remove_pointer<T*> {
+    using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct remove_pointer<T* const> {
-    using type = T;
+struct UTL_PUBLIC_TEMPLATE remove_pointer<T* const> {
+    using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct remove_pointer<T* volatile> {
-    using type = T;
+struct UTL_PUBLIC_TEMPLATE remove_pointer<T* volatile> {
+    using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct remove_pointer<T* const volatile> {
-    using type = T;
+struct UTL_PUBLIC_TEMPLATE remove_pointer<T* const volatile> {
+    using type UTL_NODEBUG = T;
 };
 
 template <typename T>

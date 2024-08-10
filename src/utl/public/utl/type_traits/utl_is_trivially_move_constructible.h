@@ -19,8 +19,7 @@ using std::is_trivially_move_constructible_v;
 #  elif UTL_CXX14 // if UTL_CXX17
 
 template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_trivially_move_constructible_v =
-    is_trivially_move_constructible<T>::value;
+UTL_INLINE_CXX17 constexpr bool is_trivially_move_constructible_v = is_trivially_move_constructible<T>::value;
 
 #  endif // if UTL_CXX17
 
@@ -38,7 +37,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_trivially_move_constructible :
+struct UTL_PUBLIC_TEMPLATE is_trivially_move_constructible :
     bool_constant<UTL_BUILTIN_is_trivially_constructible(T, add_rvalue_reference_t<T>)> {};
 
 #    if UTL_CXX14
@@ -56,7 +55,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_trivially_move_constructible :
+struct UTL_PUBLIC_TEMPLATE is_trivially_move_constructible :
     is_trivially_constructible<T, add_rvalue_reference_t<T>> {};
 
 #    if UTL_CXX14

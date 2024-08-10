@@ -19,8 +19,7 @@ using std::is_trivially_constructible_v;
 #  elif UTL_CXX14 // if UTL_CXX17
 
 template <typename T, typename... Args>
-UTL_INLINE_CXX17 constexpr bool is_trivially_constructible_v =
-    is_trivially_constructible<T, Args...>::value;
+UTL_INLINE_CXX17 constexpr bool is_trivially_constructible_v = is_trivially_constructible<T, Args...>::value;
 
 #  endif // if UTL_CXX17
 
@@ -41,7 +40,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename... Args>
-struct is_trivially_constructible :
+struct UTL_PUBLIC_TEMPLATE is_trivially_constructible :
     bool_constant<UTL_BUILTIN_is_trivially_constructible(T, Args...)> {};
 
 #    if UTL_CXX14
@@ -61,12 +60,11 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename... Args>
-struct is_trivially_constructible : undefined_trait<T, Args...> {};
+struct UTL_PUBLIC_TEMPLATE is_trivially_constructible : undefined_trait<T, Args...> {};
 
 #    if UTL_CXX14
 template <typename T, typename... Args>
-UTL_INLINE_CXX17 constexpr bool is_trivially_constructible_v =
-    is_trivially_constructible<T, Args...>::value;
+UTL_INLINE_CXX17 constexpr bool is_trivially_constructible_v = is_trivially_constructible<T, Args...>::value;
 #    endif // UTL_CXX14
 
 #    define UTL_TRAIT_SUPPORTED_is_nothrow_constructible 0

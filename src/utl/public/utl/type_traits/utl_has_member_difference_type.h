@@ -3,17 +3,18 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/type_traits/utl_constants.h"
 
 #if UTL_CXX20
 
 UTL_NAMESPACE_BEGIN
 template <typename T>
-struct has_member_difference_type : UTL_SCOPE false_type {};
+struct UTL_PUBLIC_TEMPLATE has_member_difference_type : UTL_SCOPE false_type {};
 
 template <typename T>
 requires requires { typename T::difference_type; }
-struct has_member_difference_type<T> : UTL_SCOPE true_type {};
+struct UTL_PUBLIC_TEMPLATE has_member_difference_type<T> : UTL_SCOPE true_type {};
 
 UTL_NAMESPACE_END
 
@@ -34,7 +35,8 @@ struct has_member_difference_type_impl<T, void_t<typename T::difference_type>> :
 } // namespace type_traits
 
 template <typename T>
-struct has_member_difference_type : type_traits::details::has_member_difference_type_impl<T> {};
+struct UTL_PUBLIC_TEMPLATE has_member_difference_type :
+    type_traits::details::has_member_difference_type_impl<T> {};
 
 UTL_NAMESPACE_END
 

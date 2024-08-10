@@ -11,17 +11,17 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace referenceable {
 template <typename T>
-T& check_trait(int) noexcept;
+UTL_HIDE_FROM_ABI T& check_trait(int) noexcept;
 template <typename T>
-T check_trait(float) noexcept;
+UTL_HIDE_FROM_ABI T check_trait(float) noexcept;
 
 template <typename T>
-using trait = bool_constant<UTL_TRAIT_is_lvalue_reference(decltype(check_trait<T>(0)))>;
+using trait UTL_NODEBUG = bool_constant<UTL_TRAIT_is_lvalue_reference(decltype(check_trait<T>(0)))>;
 } // namespace referenceable
 } // namespace details
 
 template <typename T>
-struct is_referenceable : details::referenceable::trait<T> {};
+struct UTL_PUBLIC_TEMPLATE is_referenceable : details::referenceable::trait<T> {};
 
 #if UTL_CXX14
 template <typename T>

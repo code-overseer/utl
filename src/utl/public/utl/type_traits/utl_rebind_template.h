@@ -7,11 +7,11 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename From, template <typename...> To>
-struct rebind_template;
+struct UTL_PUBLIC_TEMPLATE rebind_template;
 
 template <template <typename...> class From, template <typename...> class To, typename... A>
-struct rebind_template<From<A...>, To> {
-    using type = To<A...>;
+struct UTL_PUBLIC_TEMPLATE rebind_template<From<A...>, To> {
+    using type UTL_NODEBUG = To<A...>;
 };
 
 template <typename From, template <typename...> To>

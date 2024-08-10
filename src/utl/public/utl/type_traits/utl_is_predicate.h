@@ -9,7 +9,7 @@
 
 UTL_NAMESPACE_BEGIN
 template <typename F, typename... Ts>
-struct is_predicate : bool_constant<predicate<F, Ts...>> {};
+struct UTL_PUBLIC_TEMPLATE is_predicate : bool_constant<predicate<F, Ts...>> {};
 
 template <typename F, typename... Ts>
 inline constexpr bool is_predicate_v = predicate<F, Ts...>;
@@ -24,7 +24,7 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 template <typename F, typename... Ts>
-struct is_predicate : is_boolean_testable<invoke_result_t<F, Ts...>> {};
+struct UTL_PUBLIC_TEMPLATE is_predicate : is_boolean_testable<invoke_result_t<F, Ts...>> {};
 
 #  if UTL_CXX14
 template <typename F, typename... Ts>

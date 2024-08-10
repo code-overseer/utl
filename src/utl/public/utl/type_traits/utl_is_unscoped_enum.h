@@ -12,7 +12,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_unscoped_enum :
+struct UTL_PUBLIC_TEMPLATE is_unscoped_enum :
     bool_constant<UTL_TRAIT_is_enum(T) && UTL_TRAIT_is_convertible(T, underlying_type_t<T>)> {};
 
 #if UTL_CXX14

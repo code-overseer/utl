@@ -38,8 +38,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct remove_const {
-    using type = UTL_BUILTIN_remove_const(T);
+struct UTL_PUBLIC_TEMPLATE remove_const {
+    using type UTL_NODEBUG = UTL_BUILTIN_remove_const(T);
 };
 
 template <typename T>
@@ -52,12 +52,12 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct remove_const {
-    using type = T;
+struct UTL_PUBLIC_TEMPLATE remove_const {
+    using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct remove_const<T const> {
-    using type = T;
+struct UTL_PUBLIC_TEMPLATE remove_const<T const> {
+    using type UTL_NODEBUG = T;
 };
 
 template <typename T>

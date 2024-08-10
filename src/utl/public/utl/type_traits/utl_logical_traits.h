@@ -7,33 +7,35 @@
 
 UTL_NAMESPACE_BEGIN
 template <bool B, typename T, typename>
-struct conditional {
-    using type = T;
+struct UTL_PUBLIC_TEMPLATE conditional {
+    using type UTL_NODEBUG = T;
 };
 template <typename T0, typename T1>
-struct conditional<false, T0, T1> {
-    using type = T1;
+struct UTL_PUBLIC_TEMPLATE conditional<false, T0, T1> {
+    using type UTL_NODEBUG = T1;
 };
 
 template <bool V, typename T, typename F>
 using conditional_t = typename conditional<V, T, F>::type;
 
 template <typename...>
-struct disjunction : false_type {};
+struct UTL_PUBLIC_TEMPLATE disjunction : false_type {};
 template <typename T>
-struct disjunction<T> : conditional_t<T::value, true_type, false_type> {};
+struct UTL_PUBLIC_TEMPLATE disjunction<T> : conditional_t<T::value, true_type, false_type> {};
 template <typename Head, typename... Tail>
-struct disjunction<Head, Tail...> : conditional_t<Head::value, true_type, disjunction<Tail...>> {};
+struct UTL_PUBLIC_TEMPLATE disjunction<Head, Tail...> :
+    conditional_t<Head::value, true_type, disjunction<Tail...>> {};
 
 template <typename...>
-struct conjunction : true_type {};
+struct UTL_PUBLIC_TEMPLATE conjunction : true_type {};
 template <typename T>
-struct conjunction<T> : conditional_t<T::value, true_type, false_type> {};
+struct UTL_PUBLIC_TEMPLATE conjunction<T> : conditional_t<T::value, true_type, false_type> {};
 template <typename Head, typename... Tail>
-struct conjunction<Head, Tail...> : conditional_t<Head::value, conjunction<Tail...>, false_type> {};
+struct UTL_PUBLIC_TEMPLATE conjunction<Head, Tail...> :
+    conditional_t<Head::value, conjunction<Tail...>, false_type> {};
 
 template <typename T>
-struct negation : bool_constant<!T::value> {};
+struct UTL_PUBLIC_TEMPLATE negation : bool_constant<!T::value> {};
 
 #if UTL_CXX14
 template <typename... Ts>

@@ -3,17 +3,18 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/type_traits/utl_constants.h"
 
 #if UTL_CXX20
 
 UTL_NAMESPACE_BEGIN
 template <typename T>
-struct has_member_value : false_type {};
+struct UTL_PUBLIC_TEMPLATE has_member_value : false_type {};
 
 template <typename T>
 requires (!UTL_TRAIT_is_function(decltype(T::value)) && requires { T::value; })
-struct has_member_value<T> : true_type {};
+struct UTL_PUBLIC_TEMPLATE has_member_value<T> : true_type {};
 
 UTL_NAMESPACE_END
 
@@ -34,7 +35,7 @@ struct has_member_value_impl<T, enable_if_t<!UTL_TRAIT_is_function(decltype(T::v
 } // namespace type_traits
 
 template <typename T>
-struct has_member_value : type_traits::details::has_member_value_impl<T> {};
+struct UTL_PUBLIC_TEMPLATE has_member_value : type_traits::details::has_member_value_impl<T> {};
 
 UTL_NAMESPACE_END
 

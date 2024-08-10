@@ -38,7 +38,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_nothrow_move_assignable :
+struct UTL_PUBLIC_TEMPLATE is_nothrow_move_assignable :
     bool_constant<UTL_BUILTIN_is_nothrow_assignable(
         add_lvalue_reference_t<T>, add_rvalue_reference_t<T>)> {};
 
@@ -57,7 +57,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_nothrow_move_assignable :
+struct UTL_PUBLIC_TEMPLATE is_nothrow_move_assignable :
     is_nothrow_assignable<add_lvalue_reference_t<T>, add_rvalue_reference_t<T>> {};
 
 #    if UTL_CXX14

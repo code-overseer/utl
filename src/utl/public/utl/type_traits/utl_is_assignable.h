@@ -40,7 +40,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct is_assignable : bool_constant<UTL_BUILTIN_is_assignable(T, U)> {};
+struct UTL_PUBLIC_TEMPLATE is_assignable : bool_constant<UTL_BUILTIN_is_assignable(T, U)> {};
 
 #    if UTL_CXX14
 template <typename T, typename U>
@@ -60,18 +60,18 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace assignable {
 template <typename T, typename U>
-auto impl(int) noexcept -> decltype((declval<T>() = declval<U>()), true_type);
+UTL_HIDE_FROM_ABI auto impl(int) noexcept -> decltype((declval<T>() = declval<U>()), true_type);
 
 template <typename T, typename U>
-auto impl(float) noexcept -> false_type;
+UTL_HIDE_FROM_ABI auto impl(float) noexcept -> false_type;
 
 template <typename T, typename U>
-using impl_t = decltype(impl<T, U>(0));
+using impl_t UTL_NODEBUG = decltype(impl<T, U>(0));
 } // namespace assignable
 } // namespace details
 
 template <typename T, typename U>
-struct is_assignable : details::assignable::impl_t<T, U> {};
+struct UTL_PUBLIC_TEMPLATE is_assignable : details::assignable::impl_t<T, U> {};
 
 #    if UTL_CXX14
 template <typename T, typename U>

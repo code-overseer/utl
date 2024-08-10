@@ -12,10 +12,10 @@ template <size_t N>
 using signed_type_t = typename signed_type<N>::type;
 
 // clang-format off
-template <> struct signed_type<1> { using type = int8_t; };
-template <> struct signed_type<2> { using type = int16_t; };
-template <> struct signed_type<4> { using type = int32_t; };
-template <> struct signed_type<8> { using type = int64_t; };
+template <> struct UTL_PUBLIC_TEMPLATE signed_type<1> { using type UTL_NODEBUG = int8_t; };
+template <> struct UTL_PUBLIC_TEMPLATE signed_type<2> { using type UTL_NODEBUG = int16_t; };
+template <> struct UTL_PUBLIC_TEMPLATE signed_type<4> { using type UTL_NODEBUG = int32_t; };
+template <> struct UTL_PUBLIC_TEMPLATE signed_type<8> { using type UTL_NODEBUG = int64_t; };
 // clang-format on
 
 UTL_STD_NAMESPACE_END

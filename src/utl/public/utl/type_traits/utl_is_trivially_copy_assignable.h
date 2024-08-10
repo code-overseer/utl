@@ -37,7 +37,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_trivially_copy_assignable :
+struct UTL_PUBLIC_TEMPLATE is_trivially_copy_assignable :
     bool_constant<UTL_BUILTIN_is_trivially_assignable(
         add_lvalue_reference_t<T>, add_lvalue_reference_t<T const>)> {};
 
@@ -56,7 +56,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_trivially_copy_assignable :
+struct UTL_PUBLIC_TEMPLATE is_trivially_copy_assignable :
     is_trivially_assignable<add_lvalue_reference_t<T>, add_lvalue_reference_t<T const>> {};
 
 #    if UTL_CXX14

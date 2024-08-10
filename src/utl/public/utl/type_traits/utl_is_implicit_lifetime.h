@@ -27,8 +27,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_implicit_lifetime {
-    using type = UTL_BUILTIN_is_implicit_lifetime(T);
+struct UTL_PUBLIC_TEMPLATE is_implicit_lifetime {
+    using type UTL_NODEBUG = UTL_BUILTIN_is_implicit_lifetime(T);
 };
 
 template <typename T>
@@ -47,7 +47,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_implicit_lifetime :
+struct UTL_PUBLIC_TEMPLATE is_implicit_lifetime :
     bool_constant<UTL_TRAIT_is_trivially_destructible(T) &&
         (UTL_TRAIT_is_aggregate(T) || UTL_TRAIT_is_trivially_default_constructible(T) ||
             UTL_TRAIT_is_trivially_copy_constructible(T) ||

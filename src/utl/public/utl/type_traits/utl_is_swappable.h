@@ -33,19 +33,23 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename L, typename R>
-struct is_swappable_with : bool_constant<ranges::details::swap::invocable<L, R>> {};
+struct UTL_PUBLIC_TEMPLATE is_swappable_with :
+    bool_constant<ranges::details::swap::invocable<L, R>> {};
 template <typename L, typename R>
-struct is_nothrow_swappable_with : bool_constant<ranges::details::swap::nothrow_invocable<L, R>> {};
+struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable_with :
+    bool_constant<ranges::details::swap::nothrow_invocable<L, R>> {};
 
 template <typename T>
-struct is_swappable : false_type {};
+struct UTL_PUBLIC_TEMPLATE is_swappable : false_type {};
 template <typename T>
-struct is_nothrow_swappable : false_type {};
+struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable : false_type {};
 
 template <referenceable T>
-struct is_swappable<T> : bool_constant<ranges::details::swap::invocable<T&, T&>> {};
+struct UTL_PUBLIC_TEMPLATE is_swappable<T> :
+    bool_constant<ranges::details::swap::invocable<T&, T&>> {};
 template <referenceable T>
-struct is_nothrow_swappable<T> : bool_constant<ranges::details::swap::nothrow_invocable<T&, T&>> {};
+struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable<T> :
+    bool_constant<ranges::details::swap::nothrow_invocable<T&, T&>> {};
 
 template <typename L, typename R>
 inline constexpr bool is_swappable_with_v = ranges::details::swap::invocable<L, R>;
@@ -69,37 +73,38 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace swappable {
 template <typename L, typename R>
-auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R>
-auto trait_impl(int) noexcept
+UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
     -> UTL_SCOPE always_true_type<decltype(UTL_SCOPE ranges::swap(
                                       UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>())),
         decltype(UTL_SCOPE ranges::swap(UTL_SCOPE declval<R>(), UTL_SCOPE declval<L>()))>;
 
 template <typename L, typename R>
-auto nothrow_impl(float) noexcept -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto nothrow_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R>
-auto nothrow_impl(int) noexcept
+UTL_HIDE_FROM_ABI auto nothrow_impl(int) noexcept
     -> UTL_SCOPE bool_constant<noexcept(UTL_SCOPE ranges::swap(
                                    UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>())) &&
         noexcept(UTL_SCOPE ranges::swap(UTL_SCOPE declval<R>(), UTL_SCOPE declval<L>()))>;
 
 template <typename L, typename R>
-using trait = decltype(trait_impl<L, R>(0));
+using trait UTL_NODEBUG = decltype(trait_impl<L, R>(0));
 template <typename L, typename R>
-using is_nothrow = decltype(nothrow_impl<L, R>(0));
+using is_nothrow UTL_NODEBUG = decltype(nothrow_impl<L, R>(0));
 } // namespace swappable
 } // namespace details
 
 template <typename L, typename R>
-struct is_swappable_with : details::swappable::trait<L, R> {};
+struct UTL_PUBLIC_TEMPLATE is_swappable_with : details::swappable::trait<L, R> {};
 template <typename L, typename R>
-struct is_nothrow_swappable_with : details::swappable::is_nothrow<L, R> {};
+struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable_with : details::swappable::is_nothrow<L, R> {};
 
 template <typename T>
-struct is_swappable : conjunction<is_referenceable<T>, is_swappable_with<T&, T&>> {};
+struct UTL_PUBLIC_TEMPLATE is_swappable :
+    conjunction<is_referenceable<T>, is_swappable_with<T&, T&>> {};
 template <typename T>
-struct is_nothrow_swappable :
+struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable :
     conjunction<is_referenceable<T>, is_nothrow_swappable_with<T&, T&>> {};
 
 #    if UTL_CXX14

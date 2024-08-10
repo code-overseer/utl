@@ -7,20 +7,20 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename From, typename To>
-struct copy_cv {
-    using type = To;
+struct UTL_PUBLIC_TEMPLATE copy_cv {
+    using type UTL_NODEBUG = To;
 };
 template <typename From, typename To>
-struct copy_cv<From const, To> {
-    using type = To const;
+struct UTL_PUBLIC_TEMPLATE copy_cv<From const, To> {
+    using type UTL_NODEBUG = To const;
 };
 template <typename From, typename To>
-struct copy_cv<From volatile, To> {
-    using type = To volatile;
+struct UTL_PUBLIC_TEMPLATE copy_cv<From volatile, To> {
+    using type UTL_NODEBUG = To volatile;
 };
 template <typename From, typename To>
-struct copy_cv<From const volatile, To> {
-    using type = To const volatile;
+struct UTL_PUBLIC_TEMPLATE copy_cv<From const volatile, To> {
+    using type UTL_NODEBUG = To const volatile;
 };
 
 template <typename F, typename T>
