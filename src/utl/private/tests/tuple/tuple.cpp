@@ -328,6 +328,9 @@ static_assert(
 #include <tuple>
 
 namespace tuple_test {
+static_assert(utl::details::tuple::is_gettable<0, std::tuple<int, float>>::value);
+static_assert(utl::details::tuple::is_all_gettable<std::tuple<int, float>>::value);
+
 static_assert(utl::is_constructible<utl::tuple<long long, double>, std::tuple<int, float>>::value,
     "If all element are constructible, tuple is constructible from const reference");
 static_assert(utl::is_constructible<utl::tuple<long long, double>, std::pair<int, float>>::value,

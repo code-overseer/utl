@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attributes.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/preprocessor/utl_config.h"
 
 #include "utl/tuple/utl_tuple_fwd.h"
 
+#include "utl/tuple/utl_tuple_get_element.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_copy_cvref.h"
 #include "utl/type_traits/utl_is_reference.h"
@@ -109,7 +108,9 @@ template <size_t, typename T>
 UTL_HIDE_FROM_ABI auto has_element_impl(float) noexcept -> UTL_SCOPE false_type;
 template <size_t I, typename T>
 UTL_HIDE_FROM_ABI auto has_element_impl(int) noexcept
-    -> UTL_SCOPE always_true_type<UTL_SCOPE tuple_element_t<I, T>>;
+    -> UTL_SCOPE bool_constant<(I < tuple_size<T>::value) &&
+        UTL_TRAIT_is_convertible(decltype(UTL_SCOPE get_element<I>(UTL_SCOPE declval<T>())),
+            UTL_SCOPE tuple_element_t<I, T> const&)>;
 template <size_t I, typename T>
 using has_element_trait UTL_NODEBUG = decltype(has_element_impl<I, T>(0));
 

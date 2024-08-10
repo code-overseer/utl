@@ -4,7 +4,9 @@
 
 #if UTL_CXX20
 
+#  include "utl/concepts/utl_convertible_to.h"
 #  include "utl/concepts/utl_reference.h"
+#  include "utl/tuple/utl_tuple_get_element.h"
 #  include "utl/tuple/utl_tuple_traits.h"
 
 UTL_NAMESPACE_BEGIN
@@ -14,7 +16,13 @@ namespace tuple {
 template <typename T>
 concept has_size = requires { tuple_size<T>::value; };
 template <typename T, size_t I>
-concept has_element = requires { typename tuple_element<I, T>::type; };
+concept has_element = has_size<T> && requires(T t) {
+    requires I < tuple_size<T>::value;
+    typename tuple_element<I, T>::type;
+    {
+        UTL_SCOPE get_element<I>(UTL_SCOPE forward<T>(t))
+    } -> convertible_to<tuple_element_t<I, T> const&>;
+};
 } // namespace tuple
 } // namespace details
 

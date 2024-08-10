@@ -4,8 +4,7 @@
 
 #include "utl/tuple/utl_tuple_fwd.h"
 
-#include "utl/tuple/utl_tuple_concepts.h"
-#include "utl/tuple/utl_tuple_traits.h"
+#include "utl/type_traits/utl_remove_cvref.h"
 #include "utl/type_traits/utl_remove_reference.h"
 #include "utl/utility/utl_customization_point.h"
 #include "utl/utility/utl_declval.h"
@@ -21,11 +20,10 @@ void get(T&&) = delete;
 
 template <size_t I>
 struct get_element_t {
-
     constexpr explicit get_element_t() noexcept = default;
 
-    template <typename T UTL_REQUIRES_CXX11(is_tuple_like<remove_reference_t<T>>::value)>
-    UTL_REQUIRES_CXX20(tuple_like<remove_reference_t<T>> && requires(T&& t) { get<I>(UTL_SCOPE forward<T>(t)); })
+    template <typename T>
+    UTL_REQUIRES_CXX20(requires(T&& t) { get<I>(UTL_SCOPE forward<T>(t)); })
     UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr auto operator()(
         T&& t UTL_LIFETIMEBOUND) const noexcept(noexcept(get<I>(UTL_SCOPE declval<T>())))
         -> decltype(get<I>(UTL_SCOPE declval<T>())) {
@@ -73,7 +71,7 @@ UTL_HIDE_FROM_ABI auto nothrow_impl(float) -> UTL_SCOPE false_type;
 
 template <size_t I, typename T>
 UTL_HIDE_FROM_ABI auto gettable_impl(float) -> UTL_SCOPE false_type;
-template <size_t I, typename T, typename U>
+template <size_t I, typename T>
 UTL_HIDE_FROM_ABI auto gettable_impl(int)
     -> UTL_SCOPE always_true_type<decltype(UTL_SCOPE get_element<I>(UTL_SCOPE declval<T>()))>;
 

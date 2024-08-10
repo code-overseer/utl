@@ -17,6 +17,7 @@
 #include "utl/memory/utl_uses_allocator.h"
 #include "utl/ranges/utl_swap.h"
 #include "utl/tuple/utl_tuple_compare_traits.h"
+#include "utl/tuple/utl_tuple_details.h"
 #include "utl/tuple/utl_tuple_traits.h"
 #include "utl/type_traits/utl_common_reference.h"
 #include "utl/type_traits/utl_decay.h"
