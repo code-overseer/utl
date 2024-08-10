@@ -9,10 +9,10 @@
 UTL_NAMESPACE_BEGIN
 
 template <size_t I, typename List>
-struct template_element;
+struct template_element {};
 
 template <typename List>
-struct template_size;
+struct template_size {};
 
 template <size_t I, typename List>
 using template_element_t = typename template_element<I, List>::type;
@@ -23,7 +23,7 @@ struct UTL_PUBLIC_TEMPLATE template_element<0, List<Head, Tail...>> {
 };
 
 template <typename... T>
-struct type_list;
+struct type_list {};
 
 template <size_t I, template <typename...> class List, typename Head, typename... Tail>
 struct UTL_PUBLIC_TEMPLATE template_element<I, List<Head, Tail...>> :
@@ -35,7 +35,7 @@ struct UTL_PUBLIC_TEMPLATE template_size<List<Args...>> {
 };
 
 template <typename T, typename List>
-struct template_count;
+struct template_count {};
 
 template <typename T, template <typename...> class List>
 struct UTL_PUBLIC_TEMPLATE template_count<T, List<>> : integral_constant<size_t, 0> {};
@@ -59,7 +59,7 @@ struct UTL_PUBLIC_TEMPLATE template_index<T, TList<Head, Tail...>> :
     integral_constant<size_t, 1 + template_index<T, TList<Tail...>>::value> {};
 
 template <typename T, typename U>
-struct template_concat;
+struct template_concat {};
 template <template <typename...> class List, typename... Ts, typename... Us>
 struct UTL_PUBLIC_TEMPLATE template_concat<List<Ts...>, List<Us...>> {
     using type UTL_NODEBUG = List<Ts..., Us...>;

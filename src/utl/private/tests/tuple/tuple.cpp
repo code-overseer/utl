@@ -32,8 +32,7 @@ static_assert(utl::is_same<utl::tuple_element_t<0, STRIP(t)>, int>::value,
     "tuple_element should return the indexed element");
 static_assert(utl::is_same<utl::tuple_element_t<1, STRIP(t)>, float>::value,
     "tuple_element should return the indexed element");
-static_assert(!utl::tuple_traits::is_gettable<2, decltype(t)>::value, "Should not be gettable");
-static_assert(!utl::tuple_traits::is_gettable<2, decltype(t)>::value, "Should not be gettable");
+static_assert(!utl::details::tuple::is_gettable<2, decltype(t)>::value, "Should not be gettable");
 
 template <typename T, typename Tuple, typename = void>
 struct not_gettable_by_type : utl::true_type {};

@@ -205,8 +205,9 @@ private:
     template <template <typename...> class L0, template <typename...> class L1, typename... Args0,
         typename... Args1, size_t... Is, size_t... Js>
     UTL_HIDE_FROM_ABI constexpr pair(L0<Args0...>& l0, L1<Args1...>& l1, index_sequence<Is...>,
-        index_sequence<Js...>) noexcept(conjunction<TT_SCOPE is_nothrow_gettable<Is, L0<Args0>&>...,
-        TT_SCOPE is_nothrow_gettable<Js, L1<Args1>&>...,
+        index_sequence<
+            Js...>) noexcept(conjunction<details::tuple::is_nothrow_gettable<Is, L0<Args0>&>...,
+        details::tuple::is_nothrow_gettable<Js, L1<Args1>&>...,
         UTL_SCOPE is_nothrow_constructible<T0, Args0...>,
         UTL_SCOPE is_nothrow_constructible<T1, Args1...>>::value)
         : first(forward<Args0>(UTL_TUPLE_GET(Is, l0))...)
@@ -489,48 +490,48 @@ public:
 
 public:
     template <typename P,
-        enable_if_t<TT_SCOPE is_all_gettable<P, 2>::value &&
-                TT_SCOPE
-                    rebind_references_t<traits::template is_implicit_constructible, P, 2>::value &&
-                !TT_SCOPE rebind_references_t<traits::template is_dangling, P, 2>::value,
+        enable_if_t<details::tuple::is_all_gettable<P, 2>::value &&
+                details::tuple::rebind_references_t<traits::template is_implicit_constructible, P,
+                    2>::value &&
+                !details::tuple::rebind_references_t<traits::template is_dangling, P, 2>::value,
             int> = 0>
     UTL_HIDE_FROM_ABI constexpr pair(P&& p) noexcept(
-        TT_SCOPE is_all_nothrow_gettable<P, 2>::value &&
-        TT_SCOPE rebind_references_t<traits::template is_nothrow_constructible, P, 2>::value)
+        details::tuple::is_all_nothrow_gettable<P, 2>::value &&
+        details::tuple::rebind_references_t<traits::template is_nothrow_constructible, P, 2>::value)
         : first(UTL_TUPLE_GET(0, forward<P>(p)))
         , second(UTL_TUPLE_GET(1, forward<P>(p))) {}
 
     template <typename P,
-        enable_if_t<TT_SCOPE is_all_gettable<P, 2>::value &&
-                TT_SCOPE
-                    rebind_references_t<traits::template is_explicit_constructible, P, 2>::value &&
-                !TT_SCOPE rebind_references_t<traits::template is_dangling, P, 2>::value,
+        enable_if_t<details::tuple::is_all_gettable<P, 2>::value &&
+                details::tuple::rebind_references_t<traits::template is_explicit_constructible, P,
+                    2>::value &&
+                !details::tuple::rebind_references_t<traits::template is_dangling, P, 2>::value,
             int> = 1>
     UTL_HIDE_FROM_ABI explicit constexpr pair(P&& p) noexcept(
-        TT_SCOPE is_all_nothrow_gettable<P, 2>::value &&
-        TT_SCOPE rebind_references_t<traits::template is_nothrow_constructible, P, 2>::value)
+        details::tuple::is_all_nothrow_gettable<P, 2>::value &&
+        details::tuple::rebind_references_t<traits::template is_nothrow_constructible, P, 2>::value)
         : first(UTL_TUPLE_GET(0, forward<P>(p)))
         , second(UTL_TUPLE_GET(1, forward<P>(p))) {}
 
     template <typename P,
-        enable_if_t<TT_SCOPE is_all_gettable<P, 2>::value &&
-                TT_SCOPE
-                    rebind_references_t<traits::template is_implicit_constructible, P, 2>::value &&
-                TT_SCOPE rebind_references_t<traits::template is_dangling, P, 2>::value,
+        enable_if_t<details::tuple::is_all_gettable<P, 2>::value &&
+                details::tuple::rebind_references_t<traits::template is_implicit_constructible, P,
+                    2>::value &&
+                details::tuple::rebind_references_t<traits::template is_dangling, P, 2>::value,
             int> = 2>
-    constexpr pair(P&& p) noexcept(TT_SCOPE is_all_nothrow_gettable<P, 2>::value &&
-        TT_SCOPE rebind_references_t<traits::template is_nothrow_constructible, P, 2>::value) =
-        delete;
+    constexpr pair(P&& p) noexcept(details::tuple::is_all_nothrow_gettable<P, 2>::value &&
+        details::tuple::rebind_references_t<traits::template is_nothrow_constructible, P,
+            2>::value) = delete;
 
     template <typename P,
-        enable_if_t<TT_SCOPE is_all_gettable<P, 2>::value &&
-                TT_SCOPE
-                    rebind_references_t<traits::template is_explicit_constructible, P, 2>::value &&
-                TT_SCOPE rebind_references_t<traits::template is_dangling, P, 2>::value,
+        enable_if_t<details::tuple::is_all_gettable<P, 2>::value &&
+                details::tuple::rebind_references_t<traits::template is_explicit_constructible, P,
+                    2>::value &&
+                details::tuple::rebind_references_t<traits::template is_dangling, P, 2>::value,
             int> = 3>
-    explicit constexpr pair(P&& p) noexcept(TT_SCOPE is_all_nothrow_gettable<P, 2>::value &&
-        TT_SCOPE rebind_references_t<traits::template is_nothrow_constructible, P, 2>::value) =
-        delete;
+    explicit constexpr pair(P&& p) noexcept(details::tuple::is_all_nothrow_gettable<P, 2>::value &&
+        details::tuple::rebind_references_t<traits::template is_nothrow_constructible, P,
+            2>::value) = delete;
 
 public:
     // TODO change to tuple-like
@@ -588,21 +589,23 @@ public:
 public:
     template <typename P>
     UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 enable_if_t<tuple_size<P>::value == 2 &&
-            conjunction<TT_SCOPE is_all_gettable<P>,
-                TT_SCOPE rebind_references_t<traits::template is_assignable, P>>::value,
+            conjunction<details::tuple::is_all_gettable<P>,
+                details::tuple::rebind_references_t<traits::template is_assignable, P>>::value,
         pair&>
-    operator=(P&& p) noexcept(TT_SCOPE is_all_nothrow_gettable<P>::value &&
-        TT_SCOPE rebind_references_t<traits::template is_nothrow_assignable, P>::value) {
+    operator=(P&& p) noexcept(details::tuple::is_all_nothrow_gettable<P>::value &&
+        details::tuple::rebind_references_t<traits::template is_nothrow_assignable, P>::value) {
         return assign(UTL_TUPLE_GET(0, forward<P>(p)), UTL_TUPLE_GET(1, forward<P>(p)));
     }
 
     template <typename P>
     UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 enable_if_t<tuple_size<P>::value == 2 &&
-            conjunction<TT_SCOPE is_all_gettable<P>,
-                TT_SCOPE rebind_references_t<traits::template is_const_assignable, P>>::value,
+            conjunction<details::tuple::is_all_gettable<P>,
+                details::tuple::rebind_references_t<traits::template is_const_assignable,
+                    P>>::value,
         pair const&>
-    operator=(P&& p) const noexcept(TT_SCOPE is_all_nothrow_gettable<P, 2>::value &&
-        TT_SCOPE rebind_references_t<traits::template is_nothrow_const_assignable, P, 2>::value) {
+    operator=(P&& p) const noexcept(details::tuple::is_all_nothrow_gettable<P, 2>::value &&
+        details::tuple::rebind_references_t<traits::template is_nothrow_const_assignable, P,
+            2>::value) {
         return assign(UTL_TUPLE_GET(0, forward<P>(p)), UTL_TUPLE_GET(1, forward<P>(p)));
     }
 

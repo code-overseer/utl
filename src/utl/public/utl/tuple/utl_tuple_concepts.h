@@ -9,16 +9,6 @@
 
 UTL_NAMESPACE_BEGIN
 
-namespace tuple_traits {
-template <typename T, size_t I>
-concept gettable = requires {
-    tuple_size<T>::value;
-    typename tuple_element<I, T>::type;
-    requires (I < tuple_size<T>::value);
-    UTL_SCOPE tuple_traits::get<I>(declval<T>());
-};
-} // namespace tuple_traits
-
 namespace details {
 namespace tuple {
 template <typename T>
