@@ -34,6 +34,8 @@
 #include "utl/ranges/utl_swap.h"
 #include "utl/tuple/utl_tuple_compare_traits.h"
 #include "utl/tuple/utl_tuple_concepts.h"
+#include "utl/tuple/utl_tuple_details.h"
+#include "utl/tuple/utl_tuple_get_element.h"
 #include "utl/type_traits/utl_common_comparison_category.h"
 #include "utl/type_traits/utl_common_reference.h"
 #include "utl/type_traits/utl_common_type.h"
@@ -55,8 +57,6 @@
 #include "utl/utility/utl_ignore.h"
 #include "utl/utility/utl_move.h"
 #include "utl/utility/utl_sequence.h"
-
-#define TT_SCOPE UTL_SCOPE tuple_traits::
 
 // TODO: if std is included or forward declared use std, else use UTL
 namespace std {
@@ -83,7 +83,7 @@ template <typename T>
 using add_const_rvalue_reference UTL_NODEBUG = add_rvalue_reference<T const>;
 
 template <typename T>
-concept unrecognized = tuple_like<T> && !is_tuple<T>::value;
+concept unrecognized = tuple_like<remove_reference_t<T>> && !is_tuple_v<T>;
 
 template <typename...>
 struct invalid_swap_t {
@@ -103,19 +103,21 @@ private:
     UTL_HIDE_FROM_ABI ~invalid_t() = default;
 };
 
-template <tuple_like TupleLike, size_t... Is>
+template <typename TupleLike, size_t... Is>
+requires tuple_like<remove_reference_t<TupleLike>>
 UTL_HIDE_FROM_ABI auto nothrow_accessible(index_sequence<Is...>) noexcept
-    -> bool_constant<(...&& noexcept(UTL_TUPLE_GET(Is, UTL_SCOPE declval<TupleLike>())))>;
+    -> bool_constant<(...&& noexcept(UTL_SCOPE get_element<Is>(UTL_SCOPE declval<TupleLike>())))>;
 
-template <tuple_like TupleLike>
+template <typename TupleLike>
+requires tuple_like<remove_reference_t<TupleLike>>
 inline constexpr bool is_nothrow_accessible_v = decltype(nothrow_accessible<TupleLike>(
     make_index_sequence<tuple_size<TupleLike>::value>{}))::value;
 
 template <unrecognized TupleLike, size_t... Is>
 UTL_HIDE_FROM_ABI constexpr auto forward_unrecognized(
     TupleLike&& t, index_sequence<Is...>) noexcept(is_nothrow_accessible_v<TupleLike>)
-    -> UTL_SCOPE tuple<decltype(TT_SCOPE decl_element<Is, TupleLike>())...> {
-    return {UTL_TUPLE_GET(Is, UTL_SCOPE forward<TupleLike>(t))...};
+    -> UTL_SCOPE tuple<decltype(UTL_SCOPE details::tuple::decl_element<Is, TupleLike>())...> {
+    return {UTL_SCOPE get_element<Is>(UTL_SCOPE forward<TupleLike>(t))...};
 }
 
 template <unrecognized TupleLike>
@@ -429,7 +431,7 @@ public:
 
     template <size_t I>
     requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get() const& noexcept UTL_LIFETIMEBOUND-> T const& {
+    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get() const& noexcept UTL_LIFETIMEBOUND -> T const& {
         return head;
     }
 
@@ -518,35 +520,41 @@ private:
 
     using base_type::get;
 
-    template <tuple_like TupleLike, size_t... Is>
+    template <typename TupleLike, size_t... Is>
+    requires tuple_like<remove_reference_t<TupleLike>>
     UTL_HIDE_FROM_ABI constexpr tuple(TupleLike&& other, index_sequence<Is...>) noexcept(
         details::tuple::is_nothrow_accessible_v<TupleLike> &&
-        is_nothrow_constructible_v<base_type, decltype(TT_SCOPE decl_element<Is, TupleLike>())...>)
-        : base_type(UTL_TUPLE_GET(Is, UTL_SCOPE forward<TupleLike>(other))...) {}
+        is_nothrow_constructible_v<base_type,
+            decltype(UTL_SCOPE details::tuple::decl_element<Is, TupleLike>())...>)
+        : base_type(UTL_SCOPE get_element<Is>(UTL_SCOPE forward<TupleLike>(other))...) {}
 
     template <allocator_type Alloc, typename TupleLike, size_t... Is>
+    requires tuple_like<remove_reference_t<TupleLike>>
     UTL_HIDE_FROM_ABI constexpr tuple(allocator_arg_t, Alloc const& alloc, TupleLike&& other,
         index_sequence<Is...>) noexcept(details::tuple::is_nothrow_accessible_v<TupleLike> &&
         is_nothrow_constructible_v<base_type, allocator_arg_t, Alloc const&,
-            decltype(TT_SCOPE decl_element<Is, TupleLike>())...>)
-        : base_type(
-              allocator_arg, alloc, UTL_TUPLE_GET(Is, UTL_SCOPE forward<TupleLike>(other))...) {}
+            decltype(UTL_SCOPE details::tuple::decl_element<Is, TupleLike>())...>)
+        : base_type(allocator_arg, alloc,
+              UTL_SCOPE get_element<Is>(UTL_SCOPE forward<TupleLike>(other))...) {}
 
-    template <tuple_like TupleLike, size_t... Is>
+    template <typename TupleLike, size_t... Is>
+    requires tuple_like<remove_reference_t<TupleLike>>
     UTL_HIDE_FROM_ABI constexpr tuple& assign(TupleLike&& other, index_sequence<Is...>) noexcept(
         details::tuple::is_nothrow_accessible_v<TupleLike>&& noexcept(
             UTL_SCOPE declval<base_type&>().assign(
-                UTL_TUPLE_GET(Is, UTL_SCOPE declval<TupleLike>())...))) {
-        return (tuple&)base_type::assign(UTL_TUPLE_GET(Is, UTL_SCOPE forward<TupleLike>(other))...);
+                UTL_SCOPE get_element<Is>(UTL_SCOPE declval<TupleLike>())...))) {
+        return (tuple&)base_type::assign(
+            UTL_SCOPE get_element<Is>(UTL_SCOPE forward<TupleLike>(other))...);
     }
 
-    template <tuple_like TupleLike, size_t... Is>
+    template <typename TupleLike, size_t... Is>
+    requires tuple_like<remove_reference_t<TupleLike>>
     UTL_HIDE_FROM_ABI constexpr tuple const& assign(TupleLike&& other, index_sequence<Is...>) const
         noexcept(details::tuple::is_nothrow_accessible_v<TupleLike>&& noexcept(
             UTL_SCOPE declval<base_type const&>().assign(
-                UTL_TUPLE_GET(Is, UTL_SCOPE declval<TupleLike>())...))) {
+                UTL_SCOPE get_element<Is>(UTL_SCOPE declval<TupleLike>())...))) {
         return (tuple const&)base_type::assign(
-            UTL_TUPLE_GET(Is, UTL_SCOPE forward<TupleLike>(other))...);
+            UTL_SCOPE get_element<Is>(UTL_SCOPE forward<TupleLike>(other))...);
     }
 
 public:
@@ -1026,31 +1034,35 @@ namespace tuple {
 
 template <tuple_like T, tuple_like U, size_t... Is>
 UTL_HIDE_FROM_ABI auto three_way_result(T const& l, U const& r, index_sequence<Is...>) noexcept
-    -> common_comparison_category_t<decltype(UTL_TUPLE_GET(Is, l) <=> UTL_TUPLE_GET(Is, r))...>;
+    -> common_comparison_category_t<decltype(UTL_SCOPE get_element<Is>(l) <=>
+        UTL_SCOPE get_element<Is>(r))...>;
 
 template <tuple_like T, tuple_like U, size_t... Is>
 UTL_HIDE_FROM_ABI auto is_nothrow_three_way(T const& l, U const& r, index_sequence<Is...>) noexcept
-    -> bool_constant<(...&& noexcept(UTL_TUPLE_GET(Is, l) <=> UTL_TUPLE_GET(Is, r)))>;
+    -> bool_constant<(
+        ...&& noexcept(UTL_SCOPE get_element<Is>(l) <=> UTL_SCOPE get_element<Is>(r)))>;
 
-template <tuple_like T, tuple_like U>
+template <typename T, typename U>
+requires tuple_like<remove_reference_t<T>> && tuple_like<remove_reference_t<U>>
 using three_way_result_t UTL_NODEBUG = decltype(three_way_result(
     UTL_SCOPE declval<T>(), UTL_SCOPE declval<U>(), tuple_index_sequence<T>{}));
 
-template <tuple_like T, tuple_like U>
+template <typename T, typename U>
+requires tuple_like<remove_reference_t<T>> && tuple_like<remove_reference_t<U>>
 UTL_INLINE_CXX17 constexpr bool is_nothrow_three_way_v = decltype(is_nothrow_three_way(
     UTL_SCOPE declval<T>(), UTL_SCOPE declval<U>(), tuple_index_sequence<T>{}))::value;
 
 template <size_t I, tuple_like T, tuple_like U>
-requires (I == tuple_size<T>::value)
+requires (I == tuple_size_v<T>)
 UTL_ATTRIBUTES(CONST, HIDE_FROM_ABI) constexpr three_way_result_t<T, U> three_way(T const&, U const&) noexcept {
     return three_way_result_t<T, U>::equal;
 }
 
 template <size_t I, tuple_like T, tuple_like U>
-requires (I < tuple_size<T>::value)
+requires (I < tuple_size_v<T>)
 UTL_HIDE_FROM_ABI constexpr three_way_result_t<T, U> three_way(T const& l, U const& r) noexcept(
     is_nothrow_three_way_v<T, U>) {
-    auto c = UTL_TUPLE_GET(I, l) <=> UTL_TUPLE_GET(I, r);
+    auto c = UTL_SCOPE get_element<I>(l) <=> UTL_SCOPE get_element<I>(r);
     return c != 0 ? c : three_way<I + 1>(l, r);
 }
 
@@ -1061,17 +1073,17 @@ UTL_HIDE_FROM_ABI constexpr three_way_result_t<T, U> three_way(T const& l, U con
 }
 
 template <size_t I, tuple_like T, tuple_like U>
-requires (I == tuple_size<T>::value)
+requires (I == tuple_size_v<T>)
 UTL_ATTRIBUTES(CONST, HIDE_FROM_ABI) constexpr bool equals(T const& l, U const& r) noexcept {
     return true;
 }
 
 template <size_t I, tuple_like T, tuple_like U>
-requires (I < tuple_size<T>::value)
+requires (I < tuple_size_v<T>)
 UTL_HIDE_FROM_ABI constexpr bool equals(T const& l, U const& r) noexcept(
     is_nothrow_accessible_v<T> && is_nothrow_accessible_v<U> &&
     compare_ops::all_have_nothrow_eq<T, U>::value) {
-    return (UTL_TUPLE_GET(I, l) == UTL_TUPLE_GET(I, r)) && equals<I + 1>(l, r);
+    return (UTL_SCOPE get_element<I>(l) == UTL_SCOPE get_element<I>(r)) && equals<I + 1>(l, r);
 }
 
 template <tuple_like T, tuple_like U>
@@ -1118,5 +1130,3 @@ UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) constexpr tuple<Args&&...> forward_as_t
 }
 
 UTL_NAMESPACE_END
-
-#undef TT_SCOPE

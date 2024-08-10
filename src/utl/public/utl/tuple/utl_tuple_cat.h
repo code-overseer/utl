@@ -99,8 +99,8 @@ UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl(T0&& t0, T1&& t1, T2&& t2, Tail&
 template <typename... Tuples>
 UTL_ATTRIBUTES(NODISCARD, FLATTEN, HIDE_FROM_ABI) constexpr auto tuple_cat(Tuples&&... args) noexcept(
     noexcept(details::tuple::tuple_cat_impl(details::tuple::tuple_forward(declval<Tuples>())...)))
-    -> TT_SCOPE concat_elements_t<Tuples...> {
-    using return_type = TT_SCOPE concat_elements_t<Tuples...>;
+    -> TT_SCOPE concat_elements_t<remove_reference_t<Tuples>...> {
+    using return_type = TT_SCOPE concat_elements_t<remove_reference_t<Tuples>...>;
     return return_type(
         details::tuple::tuple_cat_impl(details::tuple::tuple_forward(forward<Tuples>(args))...));
 }

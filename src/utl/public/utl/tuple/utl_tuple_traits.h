@@ -10,6 +10,7 @@
 
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_copy_cvref.h"
+#include "utl/type_traits/utl_is_reference.h"
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/type_traits/utl_remove_cvref.h"
 #include "utl/type_traits/utl_template_list.h"
@@ -208,17 +209,39 @@ struct UTL_PUBLIC_TEMPLATE is_all_nothrow_gettable<TupleLike, 0> :
     is_nothrow_gettable<0, TupleLike> {};
 
 namespace details {
-
-template <typename T, typename = void>
-struct is_tuple_like_impl : false_type {};
+namespace tuple {
+template <size_t, typename T>
+UTL_HIDE_FROM_ABI auto has_element_impl(float) noexcept -> UTL_SCOPE false_type;
+template <size_t I, typename T>
+UTL_HIDE_FROM_ABI auto has_element_impl(int) noexcept
+    -> UTL_SCOPE always_true_type<UTL_SCOPE tuple_element_t<I, T>>;
+template <size_t I, typename T>
+using has_element UTL_NODEBUG = decltype(has_element_impl<I, T>(0));
 
 template <typename T>
-struct is_tuple_like_impl<T, void_t<decltype(tuple_size<T>::value)>> :
-    is_all_gettable<T, tuple_size<T>::value> {};
+UTL_HIDE_FROM_ABI auto has_all_elements_impl(float) noexcept -> UTL_SCOPE false_type;
+template <typename T, size_t... Is>
+UTL_HIDE_FROM_ABI auto has_all_elements_impl(UTL_SCOPE index_sequence<Is...>) noexcept
+    -> UTL_SCOPE conjunction<UTL_SCOPE always_true_type<tuple_element_t<Is, T>>...>;
+template <typename T>
+UTL_HIDE_FROM_ABI auto has_all_elements_impl(int) noexcept -> decltype(has_all_elements_impl<T>(
+    UTL_SCOPE make_index_sequence<UTL_SCOPE tuple_size<T>::value>{}));
+template <typename T>
+using has_all_elements UTL_NODEBUG = decltype(has_all_elements_impl<T>(0));
+
+template <typename T>
+UTL_HIDE_FROM_ABI auto is_tuple_like_impl(float) noexcept -> UTL_SCOPE false_type;
+template <typename T>
+UTL_HIDE_FROM_ABI auto is_tuple_like_impl(int) noexcept
+    -> conjunction<bool_constant<!is_reference<T>::value>,
+        always_true_type<decltype(tuple_size<T>::value)>, has_all_elements<T>>;
+template <typename T>
+using tuple_like_impl UTL_NODEBUG = decltype(is_tuple_like_impl<T>(0));
+} // namespace tuple
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_tuple_like : details::is_tuple_like_impl<T> {};
+struct is_tuple_like : details::tuple::tuple_like_impl<T> {};
 
 namespace details {
 
