@@ -13,12 +13,12 @@ MODULE_INCLUDES := $(shell find $(PRIVATE_DIR) $(PUBLIC_DIR) -name '*.h')
 
 .PHONY = all clean print preprocess compile
 CXX := c++
-CXX_FLAGS := -std=c++20 -fPIC -O1 -I$(PUBLIC_DIR) -I$(PRIVATE_DIR) -DUTL_BUILD_TESTS -Wall -Wpedantic
+CXX_FLAGS := -std=c++20 -fPIC -O1 -I$(PUBLIC_DIR) -I$(PRIVATE_DIR) -DUTL_BUILD_TESTS -DUTL_BUILDING_LIBRARY=1 -Wall -Wpedantic
 LINKER_FLAGS := -lm
-OBJECTS := $(addsuffix .o, $(basename $(MODULE_SRCS:$(MODULE_ROOT)/%=%)))
+OBJECTS := $(addsuffix .o, $(MODULE_SRCS:$(MODULE_ROOT)/%=%))
 OBJECT_PATHS := $(addprefix $(INTERMEDIATE_DIR)/,$(OBJECTS))
 DEPENDENCIES := $(OBJECTS:.o=.d)
-PREPROCESSED := $(OBJECTS:.o=.prep.cpp)
+PREPROCESSED := $(OBJECTS:.o=.i)
 
 all: $(BIN)
 
@@ -29,20 +29,20 @@ $(BIN): $(OBJECT_PATHS)
 compile: $(OBJECTS)
 	@
 
-$(OBJECTS):%.o: $(MODULE_ROOT)/%.cpp
+$(OBJECTS):%.cpp.o: $(MODULE_ROOT)/%.cpp
 	@mkdir -p '$(INTERMEDIATE_DIR)/$(@D)'
 	@echo "Creating object" $@
-	@$(CXX) $(CXX_FLAGS) -MMD -MP -MF '$(INTERMEDIATE_DIR)/$(patsubst %.o,%.d,$@)' -MT '$(INTERMEDIATE_DIR)/$@' -c $< -o '$(INTERMEDIATE_DIR)/$@'
+	@$(CXX) $(CXX_FLAGS) -MMD -MP -MF '$(INTERMEDIATE_DIR)/$(@:.o=.d)' -MT '$(INTERMEDIATE_DIR)/$@' -c $< -o '$(INTERMEDIATE_DIR)/$@'
 
 -include $(INTERMEDIATE_DIR)/$(DEPENDENCIES)
 
 preprocess: $(PREPROCESSED)
 	@
 
-$(PREPROCESSED):%.prep.cpp: $(MODULE_ROOT)/%.cpp
+$(PREPROCESSED):%.cpp.i: $(MODULE_ROOT)/%.cpp
 	@mkdir -p '$(INTERMEDIATE_DIR)/$(@D)'
 	@echo "Running preprocessor" $@
-	@$(CXX) $(CXX_FLAGS) -MMD -MP -MF '$(INTERMEDIATE_DIR)/$(patsubst %.prep.cpp,%.d,$@)' -MT '$(INTERMEDIATE_DIR)/$@' -E $< -o '$(INTERMEDIATE_DIR)/$@'
+	@$(CXX) $(CXX_FLAGS) -MMD -MP -MF '$(INTERMEDIATE_DIR)/$(@:.i=.d)' -MT '$(INTERMEDIATE_DIR)/$@' -E $< -o '$(INTERMEDIATE_DIR)/$@'
 
 clean:
 	@echo "Cleaning up..."
