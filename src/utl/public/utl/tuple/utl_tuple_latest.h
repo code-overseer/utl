@@ -10,7 +10,7 @@
 #  error "Private header accessed"
 #endif
 
-#ifndef UTL_CXX20
+#if !UTL_CXX20
 #  error "Header compiled with invalid standard"
 #endif
 
