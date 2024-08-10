@@ -7,14 +7,14 @@
 
 UTL_NAMESPACE_BEGIN
 
-struct ignore_t {
-    explicit constexpr ignore_t() noexcept = default;
+struct UTL_ABI_PUBLIC ignore_t {
+    UTL_HIDE_FROM_ABI explicit constexpr ignore_t() noexcept = default;
 #if UTL_CXX14
     template <typename T>
-    constexpr void operator=(T&&) const noexcept {}
+    UTL_HIDE_FROM_ABI constexpr void operator=(T&&) const noexcept {}
 #else
     template <typename T>
-    constexpr ignore_t const& operator=(T&&) const noexcept {
+    UTL_HIDE_FROM_ABI constexpr ignore_t const& operator=(T&&) const noexcept {
         return *this;
     }
 #endif

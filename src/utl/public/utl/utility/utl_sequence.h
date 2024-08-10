@@ -29,7 +29,7 @@ UTL_NAMESPACE_BEGIN
 using size_t = decltype(sizeof(0));
 
 template <typename T, T... Is>
-struct integer_sequence {};
+struct UTL_PUBLIC_TEMPLATE integer_sequence {};
 
 namespace details {
 namespace sequence {
@@ -39,12 +39,12 @@ struct combine;
 
 template <typename T, T... Is, T... Js>
 struct combine<integer_sequence<T, Is...>, integer_sequence<T, Js...>> {
-    using type = integer_sequence<T, Is..., (sizeof...(Is) + Js)...>;
+    using type UTL_NODEBUG = integer_sequence<T, Is..., (sizeof...(Is) + Js)...>;
 };
 
 template <typename T>
 struct combine<integer_sequence<T>, integer_sequence<T>> {
-    using type = integer_sequence<T>;
+    using type UTL_NODEBUG = integer_sequence<T>;
 };
 
 template <typename T, size_t N>
@@ -52,12 +52,12 @@ struct generate;
 
 template <typename T>
 struct generate<T, 0> {
-    using type = integer_sequence<T>;
+    using type UTL_NODEBUG = integer_sequence<T>;
 };
 
 template <typename T>
 struct generate<T, 1> {
-    using type = integer_sequence<T, 0>;
+    using type UTL_NODEBUG = integer_sequence<T, 0>;
 };
 
 template <typename T, size_t N>
