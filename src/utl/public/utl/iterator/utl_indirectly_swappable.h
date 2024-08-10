@@ -15,8 +15,8 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename L, typename R = L>
-concept indirectly_swappable = UTL_SCOPE indirectly_readable<L> &&
-    UTL_SCOPE indirectly_readable<R> && requires(L const l, R const r) {
+concept indirectly_swappable =
+    indirectly_readable<L> && indirectly_readable<R> && requires(L const l, R const r) {
         UTL_SCOPE ranges::iter_swap(l, l);
         UTL_SCOPE ranges::iter_swap(l, r);
         UTL_SCOPE ranges::iter_swap(r, l);
@@ -24,7 +24,7 @@ concept indirectly_swappable = UTL_SCOPE indirectly_readable<L> &&
     };
 
 template <typename L, typename R>
-struct is_indirectly_swappable : UTL_SCOPE bool_constant<indirectly_swappable<L, R>> {};
+struct UTL_PUBLIC_TEMPLATE is_indirectly_swappable : bool_constant<indirectly_swappable<L, R>> {};
 
 template <typename L, typename R>
 inline constexpr bool is_indirectly_swappable_v = indirectly_swappable<L, R>;
@@ -38,9 +38,9 @@ namespace details {
 namespace indirectly_swappable {
 
 template <typename L, typename R>
-auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R>
-auto trait_impl(int) noexcept -> UTL_SCOPE
+UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept -> UTL_SCOPE
     conjunction<UTL_SCOPE is_indirectly_readable<L>, UTL_SCOPE is_indirectly_readable<R>,
         UTL_SCOPE is_invocable<decltype(UTL_SCOPE ranges::iter_swap), L const, R const>>;
 
@@ -51,12 +51,11 @@ using trait = decltype(UTL_SCOPE details::indirectly_swappable::trait_impl<L, R>
 } // namespace details
 
 template <typename L, typename R = L>
-struct is_indirectly_swappable : details::indirectly_swappable::trait<L, R> {};
+struct UTL_PUBLIC_TEMPLATE is_indirectly_swappable : details::indirectly_swappable::trait<L, R> {};
 
 #  if UTL_CXX14
 template <typename L, typename R = L>
-UTL_INLINE_CXX17 constexpr bool is_indirectly_swappable_v =
-    details::indirectly_swappable::trait<L, R>::value;
+UTL_INLINE_CXX17 constexpr bool is_indirectly_swappable_v = details::indirectly_swappable::trait<L, R>::value;
 #  endif
 
 UTL_NAMESPACE_END

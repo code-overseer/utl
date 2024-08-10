@@ -33,10 +33,12 @@ concept contiguous_iterator = UTL_SCOPE random_access_iterator<T> &&
     };
 
 template <typename T>
-struct is_contiguous_iterator : UTL_SCOPE bool_constant<contiguous_iterator<T>> {};
+struct UTL_PUBLIC_TEMPLATE is_contiguous_iterator :
+    UTL_SCOPE bool_constant<contiguous_iterator<T>> {};
 
 template <typename T>
 inline constexpr bool is_contiguous_iterator_v = contiguous_iterator<T>;
+#  define UTL_TRAIT_is_contiguous_iterator(...) UTL_SCOPE contiguous_iterator<__VA_ARGS__>
 
 UTL_NAMESPACE_END
 
@@ -53,7 +55,8 @@ namespace details {
 namespace contiguous_iterator {
 
 template <typename T>
-auto check(int) noexcept -> UTL_SCOPE conjunction<UTL_SCOPE is_random_access_iterator<T>,
+UTL_HIDE_FROM_ABI auto check(
+    int) noexcept -> UTL_SCOPE conjunction<UTL_SCOPE is_random_access_iterator<T>,
     UTL_SCOPE details::iterator_concept::implements<UTL_SCOPE contiguous_iterator_tag, T>,
     UTL_SCOPE is_lvalue_reference<UTL_SCOPE iter_reference_t<T>>,
     UTL_SCOPE
@@ -62,20 +65,25 @@ auto check(int) noexcept -> UTL_SCOPE conjunction<UTL_SCOPE is_random_access_ite
         UTL_SCOPE add_pointer_t<UTL_SCOPE iter_reference_t<T>>>>;
 
 template <typename T>
-auto check(float) noexcept -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto check(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-using implemented = decltype(UTL_SCOPE details::contiguous_iterator::check<T>(0));
+using implemented UTL_NODEBUG = decltype(UTL_SCOPE details::contiguous_iterator::check<T>(0));
 
 } // namespace contiguous_iterator
 } // namespace details
 
 template <typename T>
-struct is_contiguous_iterator : UTL_SCOPE details::contiguous_iterator::implemented<T> {};
+struct UTL_PUBLIC_TEMPLATE is_contiguous_iterator :
+    UTL_SCOPE details::contiguous_iterator::implemented<T> {};
 
 #  if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_contiguous_iterator_v = is_contiguous_iterator<T>::value;
+#    define UTL_TRAIT_is_contiguous_iterator(...) UTL_SCOPE is_contiguous_iterator_v<__VA_ARGS__>
+#  else
+#    define UTL_TRAIT_is_contiguous_iterator(...) \
+        UTL_SCOPE is_contiguous_iterator<__VA_ARGS__>::value
 #  endif
 
 UTL_NAMESPACE_END

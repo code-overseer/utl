@@ -18,7 +18,7 @@ namespace details {
 namespace weakly_incrementable {
 template <typename T>
 concept pre_incrementable = requires(T t) {
-    { ++t } -> UTL_SCOPE same_as<T&>;
+    { ++t } -> same_as<T&>;
 };
 }
 } // namespace details
@@ -32,7 +32,7 @@ concept weakly_incrementable = movable<T> && requires(T t) {
 };
 
 template <typename T>
-struct is_weakly_incrementable : bool_constant<weakly_incrementable<T>> {};
+struct UTL_PUBLIC_TEMPLATE is_weakly_incrementable : bool_constant<weakly_incrementable<T>> {};
 
 template <typename T>
 inline constexpr bool is_weakly_incrementable_v = weakly_incrementable<T>;
@@ -53,32 +53,32 @@ namespace details {
 namespace weakly_incrementable {
 
 template <typename T>
-auto pre_incrementable_impl(int) noexcept
+UTL_HIDE_FROM_ABI auto pre_incrementable_impl(int) noexcept
     -> UTL_SCOPE is_same<decltype(++UTL_SCOPE declval<T&>()), T&>;
 template <typename T>
-auto pre_incrementable_impl(float) noexcept -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto pre_incrementable_impl(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-using pre_incrementable =
+using pre_incrementable UTL_NODEBUG =
     decltype(UTL_SCOPE details::weakly_incrementable::pre_incrementable_impl<T>(0));
 
 template <typename T>
-auto trait_impl(int) noexcept
+UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
     -> UTL_SCOPE conjunction<UTL_SCOPE is_signed<UTL_SCOPE iter_difference_t<T>>,
         UTL_SCOPE is_integral<UTL_SCOPE iter_difference_t<T>>, pre_incrementable<T>,
-        UTL_SCOPE always_true<decltype(UTL_SCOPE declval<T&>()++)>>;
+        UTL_SCOPE always_true_type<decltype(UTL_SCOPE declval<T&>()++)>>;
 
 template <typename T>
-auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-using trait = decltype(UTL_SCOPE details::weakly_incrementable::trait_impl<T>(0));
+using trait UTL_NODEBUG = decltype(UTL_SCOPE details::weakly_incrementable::trait_impl<T>(0));
 
 } // namespace weakly_incrementable
 } // namespace details
 
 template <typename T>
-struct is_weakly_incrementable : details::weakly_incrementable::trait<T> {};
+struct UTL_PUBLIC_TEMPLATE is_weakly_incrementable : details::weakly_incrementable::trait<T> {};
 
 #  if UTL_CXX14
 template <typename T>

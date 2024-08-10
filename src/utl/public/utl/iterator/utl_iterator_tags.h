@@ -3,31 +3,32 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/type_traits/utl_constants.h"
 
 UTL_NAMESPACE_BEGIN
 
-struct input_iterator_tag {};
-struct output_iterator_tag {};
-struct forward_iterator_tag : input_iterator_tag {};
-struct bidirectional_iterator_tag : forward_iterator_tag {};
-struct random_access_iterator_tag : bidirectional_iterator_tag {};
-struct contiguous_iterator_tag : random_access_iterator_tag {};
+struct UTL_ABI_PUBLIC input_iterator_tag {};
+struct UTL_ABI_PUBLIC output_iterator_tag {};
+struct UTL_ABI_PUBLIC forward_iterator_tag : input_iterator_tag {};
+struct UTL_ABI_PUBLIC bidirectional_iterator_tag : forward_iterator_tag {};
+struct UTL_ABI_PUBLIC random_access_iterator_tag : bidirectional_iterator_tag {};
+struct UTL_ABI_PUBLIC contiguous_iterator_tag : random_access_iterator_tag {};
 
 template <typename T>
-struct is_iterator_tag : UTL_SCOPE false_type {};
+struct UTL_PUBLIC_TEMPLATE is_iterator_tag : UTL_SCOPE false_type {};
 template <>
-struct is_iterator_tag<input_iterator_tag> : UTL_SCOPE true_type {};
+struct UTL_PUBLIC_TEMPLATE is_iterator_tag<input_iterator_tag> : UTL_SCOPE true_type {};
 template <>
-struct is_iterator_tag<output_iterator_tag> : UTL_SCOPE true_type {};
+struct UTL_PUBLIC_TEMPLATE is_iterator_tag<output_iterator_tag> : UTL_SCOPE true_type {};
 template <>
-struct is_iterator_tag<forward_iterator_tag> : UTL_SCOPE true_type {};
+struct UTL_PUBLIC_TEMPLATE is_iterator_tag<forward_iterator_tag> : UTL_SCOPE true_type {};
 template <>
-struct is_iterator_tag<bidirectional_iterator_tag> : UTL_SCOPE true_type {};
+struct UTL_PUBLIC_TEMPLATE is_iterator_tag<bidirectional_iterator_tag> : UTL_SCOPE true_type {};
 template <>
-struct is_iterator_tag<random_access_iterator_tag> : UTL_SCOPE true_type {};
+struct UTL_PUBLIC_TEMPLATE is_iterator_tag<random_access_iterator_tag> : UTL_SCOPE true_type {};
 template <>
-struct is_iterator_tag<contiguous_iterator_tag> : UTL_SCOPE true_type {};
+struct UTL_PUBLIC_TEMPLATE is_iterator_tag<contiguous_iterator_tag> : UTL_SCOPE true_type {};
 
 #if UTL_CXX14
 template <typename T>

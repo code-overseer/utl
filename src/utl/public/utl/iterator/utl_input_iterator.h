@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/iterator/utl_indirectly_readable.h"
 #include "utl/iterator/utl_input_or_output_iterator.h"
 #include "utl/iterator/utl_iterator_concept_t.h"
-#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_constants.h"
 
 #if UTL_CXX20
@@ -20,7 +21,7 @@ concept input_iterator =
     UTL_SCOPE details::iterator_concept::implements<T, UTL_SCOPE input_iterator_tag>;
 
 template <typename T>
-struct is_input_iterator : UTL_SCOPE bool_constant<input_iterator<T>> {};
+struct UTL_PUBLIC_TEMPLATE is_input_iterator : UTL_SCOPE bool_constant<input_iterator<T>> {};
 
 template <typename T>
 inline constexpr bool is_input_iterator_v = input_iterator<T>;
@@ -33,7 +34,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_input_iterator :
+struct UTL_PUBLIC_TEMPLATE is_input_iterator :
     UTL_SCOPE
         conjunction<UTL_SCOPE is_input_or_output_iterator<T>, UTL_SCOPE is_indirectly_readable<T>,
             UTL_SCOPE details::iterator_concept::implements<UTL_SCOPE input_iterator_tag, T>> {};

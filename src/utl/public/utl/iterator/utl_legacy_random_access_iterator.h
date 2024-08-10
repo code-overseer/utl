@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "utl/iterator/utl_legacy_bidirectional_iterator.h"
 #include "utl/preprocessor/utl_config.h"
+
+#include "utl/iterator/utl_legacy_bidirectional_iterator.h"
 #include "utl/type_traits/utl_constants.h"
 
 #if UTL_CXX20
@@ -15,15 +16,14 @@ UTL_NAMESPACE_BEGIN
 
 template <typename It>
 concept legacy_random_access_iterator =
-    UTL_SCOPE legacy_bidirectional_iterator<It> && UTL_SCOPE random_access_iterator<It>;
+    legacy_bidirectional_iterator<It> && UTL_SCOPE random_access_iterator<It>;
 
 template <typename It>
-struct is_legacy_random_access_iterator :
-    UTL_SCOPE bool_constant<legacy_random_access_iterator<It>> {};
+struct UTL_PUBLIC_TEMPLATE is_legacy_random_access_iterator :
+    bool_constant<legacy_random_access_iterator<It>> {};
 
 template <typename It>
-inline constexpr bool is_legacy_random_access_iterator_v =
-    UTL_SCOPE legacy_random_access_iterator<It>;
+inline constexpr bool is_legacy_random_access_iterator_v = legacy_random_access_iterator<It>;
 
 UTL_NAMESPACE_END
 
@@ -39,20 +39,22 @@ namespace details {
 namespace legacy_random_access_iterator {
 
 template <typename It>
-auto check(float) -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto check(float) -> UTL_SCOPE false_type;
 
 template <typename It>
-auto check(int) -> UTL_SCOPE conjunction<UTL_SCOPE is_legacy_bidirectional_iterator<It>,
+UTL_HIDE_FROM_ABI auto check(
+    int) -> UTL_SCOPE conjunction<UTL_SCOPE is_legacy_bidirectional_iterator<It>,
     UTL_SCOPE is_totally_ordered<It>, UTL_SCOPE details::random_access_iterator::is_indexible<It>>;
 
 template <typename It>
-using implemented = decltype(UTL_SCOPE details::legacy_random_access_iterator::check<It>(0));
+using implemented UTL_NODEBUG =
+    decltype(UTL_SCOPE details::legacy_random_access_iterator::check<It>(0));
 
 } // namespace legacy_random_access_iterator
 } // namespace details
 
 template <typename It>
-struct is_legacy_random_access_iterator :
+struct UTL_PUBLIC_TEMPLATE is_legacy_random_access_iterator :
     UTL_SCOPE details::legacy_random_access_iterator::implemented<It> {};
 
 #  if UTL_CXX14

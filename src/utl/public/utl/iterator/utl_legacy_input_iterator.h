@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "utl/iterator/utl_legacy_iterator.h"
 #include "utl/preprocessor/utl_config.h"
+
+#include "utl/iterator/utl_legacy_iterator.h"
 #include "utl/type_traits/utl_constants.h"
 
 #if UTL_CXX20
@@ -16,14 +17,14 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename It>
-concept legacy_input_iterator = UTL_SCOPE legacy_iterator<It> && UTL_SCOPE input_iterator<It> &&
-    UTL_SCOPE equality_comparable<It>;
+concept legacy_input_iterator =
+    legacy_iterator<It> && input_iterator<It> && equality_comparable<It>;
 
 template <typename It>
-struct is_legacy_input_iterator : UTL_SCOPE bool_constant<legacy_input_iterator<It>> {};
+struct UTL_PUBLIC_TEMPLATE is_legacy_input_iterator : bool_constant<legacy_input_iterator<It>> {};
 
 template <typename It>
-inline constexpr bool is_legacy_input_iterator_v = UTL_SCOPE legacy_input_iterator<It>;
+inline constexpr bool is_legacy_input_iterator_v = legacy_input_iterator<It>;
 
 UTL_NAMESPACE_END
 
@@ -36,13 +37,13 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename It>
-struct is_legacy_input_iterator :
-    UTL_SCOPE conjunction<UTL_SCOPE is_legacy_iterator<It>, UTL_SCOPE is_equality_comparable<It>,
-        UTL_SCOPE is_inequality_comparable<It>> {};
+struct UTL_PUBLIC_TEMPLATE is_legacy_input_iterator :
+    conjunction<is_legacy_iterator<It>, is_equality_comparable<It>, is_inequality_comparable<It>> {
+};
 
 #  if UTL_CXX14
 template <typename It>
-UTL_INLINE_CXX17 constexpr bool is_legacy_input_iterator_v = UTL_SCOPE is_legacy_input_iterator<It>::value;
+UTL_INLINE_CXX17 constexpr bool is_legacy_input_iterator_v = is_legacy_input_iterator<It>::value;
 #  endif
 
 UTL_NAMESPACE_END

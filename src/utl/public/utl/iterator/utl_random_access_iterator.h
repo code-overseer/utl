@@ -2,13 +2,14 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/iterator/utl_bidirectional_iterator.h"
 #include "utl/iterator/utl_iter_difference_t.h"
 #include "utl/iterator/utl_iter_reference_t.h"
 #include "utl/iterator/utl_iterator_concept_t.h"
 #include "utl/iterator/utl_iterator_tags.h"
 #include "utl/iterator/utl_sized_sentinel_for.h"
-#include "utl/preprocessor/utl_config.h"
 
 #if UTL_CXX20
 
@@ -18,20 +19,19 @@
 
 UTL_NAMESPACE_BEGIN
 template <typename T>
-concept random_access_iterator = UTL_SCOPE bidirectional_iterator<T> &&
-    UTL_SCOPE details::iterator_concept::implements<T, UTL_SCOPE random_access_iterator_tag> &&
-    UTL_SCOPE totally_ordered<T> && UTL_SCOPE sized_sentinel_for<T, T> &&
-    requires(T t, T const u, UTL_SCOPE iter_difference_t<T> const n) {
-        { t += n } -> UTL_SCOPE same_as<T&>;
-        { u + n } -> UTL_SCOPE same_as<T>;
-        { n + u } -> UTL_SCOPE same_as<T>;
-        { t -= n } -> UTL_SCOPE same_as<T&>;
-        { u - n } -> UTL_SCOPE same_as<T>;
-        { u[n] } -> UTL_SCOPE same_as<UTL_SCOPE iter_reference_t<T>>;
+concept random_access_iterator = bidirectional_iterator<T> &&
+    details::iterator_concept::implements<T, random_access_iterator_tag> && totally_ordered<T> &&
+    sized_sentinel_for<T, T> && requires(T t, T const u, iter_difference_t<T> const n) {
+        { t += n } -> same_as<T&>;
+        { u + n } -> same_as<T>;
+        { n + u } -> same_as<T>;
+        { t -= n } -> same_as<T&>;
+        { u - n } -> same_as<T>;
+        { u[n] } -> same_as<iter_reference_t<T>>;
     };
 
 template <typename T>
-struct is_random_access_iterator : UTL_SCOPE bool_constant<random_access_iterator<T>> {};
+struct UTL_PUBLIC_TEMPLATE is_random_access_iterator : bool_constant<random_access_iterator<T>> {};
 
 template <typename T>
 inline constexpr bool is_random_access_iterator_v = random_access_iterator<T>;
@@ -51,7 +51,7 @@ namespace details {
 namespace random_access_iterator {
 
 template <typename T>
-auto indexible(int) noexcept -> UTL_SCOPE
+UTL_HIDE_FROM_ABI auto indexible(int) noexcept -> UTL_SCOPE
     conjunction<UTL_SCOPE is_same<decltype(UTL_SCOPE declval<T&>() +=
                                       UTL_SCOPE declval<UTL_SCOPE iter_difference_t<T>>()),
                     T&>,
@@ -72,20 +72,20 @@ auto indexible(int) noexcept -> UTL_SCOPE
             UTL_SCOPE iter_reference_t<T>>>;
 
 template <typename T>
-auto indexible(float) noexcept -> UTL_SCOPE false_type;
+UTL_HIDE_FROM_ABI auto indexible(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-using is_indexible = decltype(UTL_SCOPE details::random_access_iterator::indexible<T>(0));
+using is_indexible UTL_NODEBUG =
+    decltype(UTL_SCOPE details::random_access_iterator::indexible<T>(0));
 
 } // namespace random_access_iterator
 } // namespace details
 
 template <typename T>
-struct is_random_access_iterator :
-    UTL_SCOPE conjunction<UTL_SCOPE is_bidirectional_iterator<T>,
-        UTL_SCOPE details::iterator_concept::implements<UTL_SCOPE random_access_iterator_tag, T>,
-        UTL_SCOPE is_totally_ordered<T>, UTL_SCOPE is_sized_sentinel_for<T, T>,
-        UTL_SCOPE details::random_access_iterator::is_indexible<T>> {};
+struct UTL_PUBLIC_TEMPLATE is_random_access_iterator :
+    conjunction<is_bidirectional_iterator<T>,
+        details::iterator_concept::implements<random_access_iterator_tag, T>, is_totally_ordered<T>,
+        is_sized_sentinel_for<T, T>, details::random_access_iterator::is_indexible<T>> {};
 
 #  if UTL_CXX14
 template <typename T>

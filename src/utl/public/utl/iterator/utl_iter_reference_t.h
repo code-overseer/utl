@@ -16,7 +16,7 @@ namespace iter_reference {
 
 template <UTL_CONCEPT_CXX20(UTL_SCOPE dereferenceable) T UTL_REQUIRES_CXX11(
     UTL_TRAIT_is_dereferenceable(T))>
-auto resolve(int) noexcept -> decltype(*UTL_SCOPE declval<T&>());
+UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> decltype(*UTL_SCOPE declval<T&>());
 
 } // namespace iter_reference
 } // namespace details

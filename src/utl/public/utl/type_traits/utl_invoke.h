@@ -19,6 +19,7 @@ UTL_NAMESPACE_END
 
 #else // if UTL_USE_STD_TYPE_TRAITS && UTL_CXX17
 
+#  include "utl/type_traits/utl_declval.h"
 #  include "utl/type_traits/utl_enable_if.h"
 #  include "utl/type_traits/utl_is_base_of.h"
 #  include "utl/type_traits/utl_is_dereferenceable.h"
@@ -64,24 +65,27 @@ constexpr auto unwrap(T&& t) noexcept(UTL_TRAIT_is_nothrow_dereferenceable(T)) -
     return *t;
 }
 
+template <typename T>
+using unwrap_t UTL_NODEBUG = decltype(UTL_SCOPE details::invocable::unwrap(UTL_SCOPE declval<T>()));
+
 template <typename F, typename A, typename Class = class_type_t<remove_cvref_t<F>>>
 using requires_member_function =
     enable_if_t<UTL_TRAIT_is_member_function_pointer(remove_cvref_t<F>) &&
-            UTL_TRAIT_is_base_of(Class, remove_cvref_t<decltype(unwrap(declval<A>()))>),
+            UTL_TRAIT_is_base_of(Class, remove_cvref_t<unwrap_t<A>>),
         int>;
 template <typename F, typename A, typename Class = class_type_t<remove_cvref_t<F>>>
 using requires_member_function_ptr_arg =
     enable_if_t<UTL_TRAIT_is_member_function_pointer(remove_cvref_t<F>) &&
-            !UTL_TRAIT_is_base_of(Class, remove_cvref_t<decltype(unwrap(declval<A>()))>),
+            !UTL_TRAIT_is_base_of(Class, remove_cvref_t<unwrap_t<A>>),
         int>;
 template <typename F, typename A, typename Class = class_type_t<remove_cvref_t<F>>>
 using requires_member_object = enable_if_t<UTL_TRAIT_is_member_object_pointer(remove_cvref_t<F>) &&
-        UTL_TRAIT_is_base_of(Class, remove_cvref_t<decltype(unwrap(declval<A>()))>),
+        UTL_TRAIT_is_base_of(Class, remove_cvref_t<unwrap_t<A>>),
     int>;
 template <typename F, typename A, typename Class = class_type_t<remove_cvref_t<F>>>
 using requires_member_object_ptr_arg =
     enable_if_t<UTL_TRAIT_is_member_object_pointer(remove_cvref_t<F>) &&
-            !UTL_TRAIT_is_base_of(Class, remove_cvref_t<decltype(unwrap(declval<A>()))>),
+            !UTL_TRAIT_is_base_of(Class, remove_cvref_t<unwrap_t<A>>),
         int>;
 
 template <typename F, typename A, typename... Args, requires_member_function<F, A> = 0>
@@ -142,15 +146,20 @@ template <typename Result, typename T>
 struct nothrow_returnable_as :
     bool_constant<noexcept(noexcept_test<Result>(static_cast<T (*)()>(0)()))> {};
 
+template <typename F, typename... Args>
+using resolve_result_t UTL_NODEBUG = decltype(UTL_SCOPE details::invocable::invoke(
+    UTL_SCOPE declval<F>(), UTL_SCOPE declval<Args>()...));
+
 template <typename R, typename F, typename... Args>
-auto resolve(int) noexcept -> returnable_as<R, decltype(invoke(declval<F>(), declval<Args>()...))>;
+auto resolve(int) noexcept -> returnable_as<R, resolve_result_t<F, Args...>>;
 template <typename R, typename F, typename... Args>
 auto resolve(float) noexcept -> false_type;
 
 template <typename R, typename F, typename... Args,
-    bool V = noexcept(invoke(declval<F>(), declval<Args>()...))>
-auto resolve_nothrow(int) noexcept -> bool_constant<V &&
-    nothrow_returnable_as<R, decltype(invoke(declval<F>(), declval<Args>()...))>::value>;
+    bool V = noexcept(
+        UTL_SCOPE details::invocable::invoke(UTL_SCOPE declval<F>(), UTL_SCOPE declval<Args>()...))>
+auto resolve_nothrow(int) noexcept
+    -> bool_constant<V && nothrow_returnable_as<R, resolve_result_t<F, Args...>>::value>;
 template <typename R, typename F, typename... Args>
 auto resolve_nothrow(float) noexcept -> false_type;
 

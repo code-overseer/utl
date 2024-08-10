@@ -2,9 +2,11 @@
 
 #pragma once
 
-#include "utl/iterator/utl_indirectly_readable_traits.h"
-#include "utl/iterator/utl_iterator_traits_fwd.h"
 #include "utl/preprocessor/utl_config.h"
+
+#include "utl/iterator/utl_iterator_traits_fwd.h"
+
+#include "utl/iterator/utl_indirectly_readable_traits.h"
 #include "utl/type_traits/utl_remove_cvref.h"
 
 #if UTL_CXX20
@@ -14,7 +16,7 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace iter_value {
 template <UTL_SCOPE details::iterator_traits::is_specialized T>
-typename UTL_SCOPE iterator_traits<T>::value_type resolve(int) noexcept;
+UTL_HIDE_FROM_ABI typename UTL_SCOPE iterator_traits<T>::value_type resolve(int) noexcept;
 } // namespace iter_value
 } // namespace details
 
@@ -29,7 +31,7 @@ namespace iter_value {
 
 template <typename T UTL_REQUIRES_CXX11(
     UTL_SCOPE details::iterator_traits::is_specialized<T>::value)>
-typename UTL_SCOPE iterator_traits<T>::value_type resolve(int) noexcept;
+UTL_HIDE_FROM_ABI typename UTL_SCOPE iterator_traits<T>::value_type resolve(int) noexcept;
 } // namespace iter_value
 } // namespace details
 
@@ -43,7 +45,8 @@ namespace details {
 namespace iter_value {
 
 template <typename T>
-typename UTL_SCOPE indirectly_readable_traits<T>::value_type resolve(float) noexcept;
+UTL_HIDE_FROM_ABI typename UTL_SCOPE indirectly_readable_traits<T>::value_type resolve(
+    float) noexcept;
 
 } // namespace iter_value
 } // namespace details
