@@ -3,7 +3,10 @@
 #include "utl/tuple/utl_tuple.h"
 #include "utl/type_traits/utl_std_traits.h"
 UTL_DISABLE_WARNING_PUSH()
+#if UTL_COMPILER_GNU_BASED
 UTL_DISABLE_WARNING("-Wunused-const-variable")
+#endif
+
 namespace tuple_test {
 template <int>
 struct copy_only;

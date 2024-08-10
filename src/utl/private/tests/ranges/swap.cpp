@@ -6,7 +6,9 @@
 #include "utl/ranges/utl_swap.h"
 #include "utl/utility/utl_swap.h"
 UTL_DISABLE_WARNING_PUSH()
+#if UTL_COMPILER_GNU_BASED
 UTL_DISABLE_WARNING("-Wunused-function")
+#endif
 
 namespace {
 struct non_default_ctor {
