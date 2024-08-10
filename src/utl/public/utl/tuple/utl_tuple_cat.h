@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_namespace.h"
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/type_traits/utl_is_reference.h"
 
 #if !defined(UTL_TUPLE_PRIVATE_HEADER_GUARD)
@@ -22,11 +23,11 @@ template <typename T, size_t... Is>
 struct is_all_reference_impl<T, index_sequence<Is...>> :
     conjunction<is_reference<tuple_element_t<Is, T>>...> {};
 template <typename T>
-using is_all_reference = is_all_reference_impl<T, tuple_index_sequence<T>>;
+using is_all_reference UTL_NODEBUG = is_all_reference_impl<T, tuple_index_sequence<T>>;
 
 // unpacks into references
 template <typename Tuple, size_t... Ns>
-constexpr auto tuple_forward(Tuple&& tuple, index_sequence<Ns...>) noexcept(
+UTL_HIDE_FROM_ABI constexpr auto tuple_forward(Tuple&& tuple, index_sequence<Ns...>) noexcept(
     TT_SCOPE is_all_nothrow_gettable<Tuple>::value /* Only check the get expresions */
     /* We're constructing a tuple of references, so the construction should always be noexcept */
     ) -> UTL_SCOPE tuple<decltype(TT_SCOPE decl_element<Ns, Tuple>())...> {
@@ -34,32 +35,34 @@ constexpr auto tuple_forward(Tuple&& tuple, index_sequence<Ns...>) noexcept(
 }
 
 template <typename Tuple>
-constexpr auto tuple_forward(Tuple&& tuple) noexcept(
+UTL_HIDE_FROM_ABI constexpr auto tuple_forward(Tuple&& tuple) noexcept(
     noexcept(tuple_forward(declval<Tuple>(), tuple_index_sequence<Tuple>{})))
     -> decltype(tuple_forward(declval<Tuple>(), tuple_index_sequence<Tuple>{})) {
     return tuple_forward(forward<Tuple>(tuple), tuple_index_sequence<Tuple>{});
 }
 
 template <typename T>
-constexpr auto tuple_cat_impl(T&& tuple) noexcept -> T&& {
+UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl(T&& tuple) noexcept -> T&& {
     static_assert(is_all_reference<T>::value, "Elements must all be references");
     return forward<T>(tuple);
 }
 
 template <typename T0>
-constexpr auto tuple_cat_impl(T0&& tuple0, UTL_SCOPE tuple<> const& tuple1) noexcept -> T0&& {
+UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl(
+    T0&& tuple0, UTL_SCOPE tuple<> const& tuple1) noexcept -> T0&& {
     static_assert(is_all_reference<T0>::value, "Elements must all be references");
     return forward<T0>(tuple0);
 }
 
 template <typename T0>
-constexpr auto tuple_cat_impl(UTL_SCOPE tuple<> const& tuple1, T0&& tuple0) noexcept -> T0&& {
+UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl(
+    UTL_SCOPE tuple<> const& tuple1, T0&& tuple0) noexcept -> T0&& {
     static_assert(is_all_reference<T0>::value, "Elements must all be references");
     return forward<T0>(tuple0);
 }
 
 template <typename T0, typename T1, size_t... I0, size_t... I1>
-constexpr auto tuple_cat_impl_idx(T0&& tuple0, T1&& tuple1, index_sequence<I0...>,
+UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl_idx(T0&& tuple0, T1&& tuple1, index_sequence<I0...>,
     index_sequence<I1...>) noexcept(TT_SCOPE is_all_nothrow_gettable<T0>::value &&
     TT_SCOPE is_all_nothrow_gettable<T1>::value &&
     is_nothrow_constructible<TT_SCOPE concat_elements_t<T0, T1>,
@@ -70,9 +73,9 @@ constexpr auto tuple_cat_impl_idx(T0&& tuple0, T1&& tuple1, index_sequence<I0...
 }
 
 template <typename T0, typename T1>
-constexpr auto tuple_cat_impl(T0&& t0, T1&& t1) noexcept(noexcept(tuple_cat_impl_idx(
-    declval<T0>(), declval<T1>(), tuple_index_sequence<T0>{}, tuple_index_sequence<T1>{})))
-    -> TT_SCOPE concat_elements_t<T0, T1> {
+UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl(T0&& t0, T1&& t1) noexcept(
+    noexcept(tuple_cat_impl_idx(declval<T0>(), declval<T1>(), tuple_index_sequence<T0>{},
+        tuple_index_sequence<T1>{}))) -> TT_SCOPE concat_elements_t<T0, T1> {
     static_assert(conjunction<is_all_reference<T0>, is_all_reference<T1>>::value,
         "Elements must all be references");
     return tuple_cat_impl_idx(
@@ -80,7 +83,7 @@ constexpr auto tuple_cat_impl(T0&& t0, T1&& t1) noexcept(noexcept(tuple_cat_impl
 }
 
 template <typename T0, typename T1, typename T2, typename... Tail>
-constexpr auto tuple_cat_impl(T0&& t0, T1&& t1, T2&& t2, Tail&&... tail) noexcept(
+UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl(T0&& t0, T1&& t1, T2&& t2, Tail&&... tail) noexcept(
     noexcept(tuple_cat_impl(tuple_cat_impl(declval<T0>(), declval<T1>()), declval<T2>(),
         declval<Tail>()...))) -> TT_SCOPE concat_elements_t<T0, T1, T2, Tail...> {
     static_assert(conjunction<is_all_reference<T0>, is_all_reference<T1>, is_all_reference<T2>,
@@ -94,8 +97,7 @@ constexpr auto tuple_cat_impl(T0&& t0, T1&& t1, T2&& t2, Tail&&... tail) noexcep
 } // namespace details
 
 template <typename... Tuples>
-UTL_ATTRIBUTES(NODISCARD, FLATTEN)
-constexpr auto tuple_cat(Tuples&&... args) noexcept(
+UTL_ATTRIBUTES(NODISCARD, FLATTEN, HIDE_FROM_ABI) constexpr auto tuple_cat(Tuples&&... args) noexcept(
     noexcept(details::tuple::tuple_cat_impl(details::tuple::tuple_forward(declval<Tuples>())...)))
     -> TT_SCOPE concat_elements_t<Tuples...> {
     using return_type = TT_SCOPE concat_elements_t<Tuples...>;

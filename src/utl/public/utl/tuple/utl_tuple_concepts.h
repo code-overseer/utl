@@ -14,12 +14,13 @@ concept gettable = requires {
     tuple_size<T>::value;
     typename tuple_element<I, T>::type;
     requires (I < tuple_size<T>::value);
-    tuple_traits::get<I>(declval<T>());
+    UTL_SCOPE tuple_traits::get<I>(declval<T>());
 };
 } // namespace tuple_traits
 
 template <typename T>
-concept tuple_like = requires { tuple_size<T>::value; } && tuple_traits::is_all_gettable<T>::value;
+concept tuple_like =
+    requires { tuple_size<T>::value; } && UTL_SCOPE tuple_traits::is_all_gettable<T>::value;
 
 UTL_NAMESPACE_END
 
