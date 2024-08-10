@@ -293,7 +293,7 @@ struct UTL_PUBLIC_TEMPLATE allocator_traits {
     using is_always_equal = details::allocator::is_always_equal<allocator_type>;
     using allocation_result = allocation_result<pointer, size_type>;
     using nothrow_move_assignable = bool_constant<propagate_on_container_move_assignment::value ||
-        is_always_equal::value && UTL_SCOPE is_nothrow_move_assignable<allocator_type>::value>;
+        (is_always_equal::value && UTL_SCOPE is_nothrow_move_assignable<allocator_type>::value)>;
 
     template <typename T>
     using rebind_alloc = typename details::allocator::rebind<Alloc, T>::type;

@@ -2,6 +2,10 @@
 
 #include "utl/tuple/utl_tuple.h"
 #include "utl/type_traits/utl_std_traits.h"
+UTL_DISABLE_WARNING_PUSH()
+#if UTL_COMPILER_GNU_BASED
+UTL_DISABLE_WARNING("-Wunused-const-variable")
+#endif
 
 namespace tuple_test {
 template <int>
@@ -340,3 +344,4 @@ static_assert(
 static_assert(!utl::is_constructible<utl::tuple<long long&&, double>, std::pair<int, float>>::value,
     "If all element are constructible, tuple is constructible from const reference");
 } // namespace tuple_test
+UTL_DISABLE_WARNING_POP()

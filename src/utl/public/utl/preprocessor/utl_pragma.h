@@ -56,3 +56,21 @@
 
 #endif
 /* TODO: Find out ICC's warning pragma */
+
+#if UTL_COMPILER_MSVC
+#  define UTL_DISABLE_WARNING_PUSH() UTL_PRAGMA(warning(push))
+#  define UTL_DISABLE_WARNING_POP() UTL_PRAGMA(warning(pop))
+#  define UTL_DISABLE_WARNING(warningNumber) UTL_PRAGMA(warning(disable : warningNumber))
+#elif UTL_COMPILER_CLANG | UTL_COMPILER_ICX
+#  define UTL_DISABLE_WARNING_PUSH() UTL_PRAGMA(clang diagnostic push)
+#  define UTL_DISABLE_WARNING_POP() UTL_PRAGMA(clang diagnostic pop)
+#  define UTL_DISABLE_WARNING(warningName) UTL_PRAGMA(clang diagnostic ignored warningName)
+#elif UTL_COMPILER_GCC
+#  define UTL_DISABLE_WARNING_PUSH() UTL_PRAGMA(GCC diagnostic push)
+#  define UTL_DISABLE_WARNING_POP() UTL_PRAGMA(GCC diagnostic pop)
+#  define UTL_DISABLE_WARNING(warningName) UTL_PRAGMA(GCC diagnostic ignored warningName)
+#else
+#  define UTL_DISABLE_WARNING_PUSH()
+#  define UTL_DISABLE_WARNING_POP()
+#  define UTL_DISABLE_WARNING(warningName)
+#endif

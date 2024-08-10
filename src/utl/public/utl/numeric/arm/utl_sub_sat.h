@@ -63,7 +63,6 @@ UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
 template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T
         UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(2, T))>
 UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
-    using w_type = int32_t;
     static constexpr auto max = UTL_NUMERIC_maximum(T);
     static constexpr int ls = 2 * CHAR_BIT;
     static constexpr int rs = sizeof(l) * CHAR_BIT - 1;
@@ -84,7 +83,6 @@ UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
 template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T
         UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(1, T))>
 UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
-    using w_type = int32_t;
     static constexpr auto max = UTL_NUMERIC_maximum(T);
     static constexpr int ls = 3 * CHAR_BIT;
     static constexpr int rs = sizeof(l) * CHAR_BIT - 1;

@@ -5,6 +5,10 @@
 
 #include "utl/ranges/utl_swap.h"
 #include "utl/utility/utl_swap.h"
+UTL_DISABLE_WARNING_PUSH()
+#if UTL_COMPILER_GNU_BASED
+UTL_DISABLE_WARNING("-Wunused-function")
+#endif
 
 namespace {
 struct non_default_ctor {
@@ -147,4 +151,5 @@ void adl_test() {
     adl_W<std::string[8]> w1, w2;
     utl::ranges::swap(w1, w2);
 }
+UTL_DISABLE_WARNING_POP()
 } // namespace
