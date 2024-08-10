@@ -29,7 +29,7 @@ UTL_PRAGMA_WARN(
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC) constexpr remove_reference_t<T>&& move(
+UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC, HIDE_FROM_ABI) constexpr remove_reference_t<T>&& move(
     T&& t UTL_LIFETIMEBOUND) noexcept {
     return static_cast<remove_reference_t<T>&&>(t);
 }
@@ -37,7 +37,7 @@ UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC) constexpr remove_reference_t<T>&& mo
 namespace details {
 namespace utility {
 template <typename T>
-using move_if_noexcept_result_t =
+using move_if_noexcept_result_t UTL_NODEBUG =
     conditional_t<!UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_copy_constructible(T),
         T const&, T&&>;
 
@@ -45,7 +45,7 @@ using move_if_noexcept_result_t =
 } // namespace details
 
 template <typename T>
-UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC) constexpr details::utility::move_if_noexcept_result_t<T>
+UTL_ATTRIBUTES(NODISCARD, CONST, INTRINSIC, HIDE_FROM_ABI) constexpr details::utility::move_if_noexcept_result_t<T>
 move_if_noexcept(T& t UTL_LIFETIMEBOUND) noexcept {
     return move(t);
 }
