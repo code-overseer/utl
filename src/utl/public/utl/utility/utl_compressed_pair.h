@@ -117,7 +117,7 @@ public:
         : first_base(forward<U0>(first))
         , second_base(forward<U1>(second)) {}
 
-#define UTL_DEFINE_GETTERS(NAME)                                                       \
+#define __UTL_DEFINE_GETTERS(NAME)                                                     \
     UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)                                    \
     constexpr NAME##_type& NAME()& noexcept { return NAME##_base::get(); }             \
     UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)                                    \
@@ -127,9 +127,9 @@ public:
     UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)                                    \
     constexpr NAME##_type const&& NAME() const&& noexcept { return NAME##_base::get(); }
 
-    UTL_DEFINE_GETTERS(first);
-    UTL_DEFINE_GETTERS(second);
-#undef UTL_DEFINE_GETTERS
+    __UTL_DEFINE_GETTERS(first);
+    __UTL_DEFINE_GETTERS(second);
+#undef __UTL_DEFINE_GETTERS
 };
 
 UTL_NAMESPACE_END
