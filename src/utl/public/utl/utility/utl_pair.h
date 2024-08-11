@@ -42,8 +42,6 @@ UTL_NAMESPACE_END
 #  include "utl/utility/utl_move.h"
 #  include "utl/utility/utl_sequence.h"
 
-#  define TT_SCOPE UTL_SCOPE tuple_traits::
-
 UTL_NAMESPACE_BEGIN
 
 template <typename T0, typename T1>
@@ -76,18 +74,22 @@ UTL_INLINE_CXX17 constexpr piecewise_construct_t piecewise_construct{};
 
 namespace details {
 namespace pair {
-template <size_t I, typename P>
+template <size_t I, typename P> UTL_REQUIRES_CXX20(I == 0 && requires(P&& p) {
+        requires is_pair<P>::value;
+        UTL_SCOPE forward<P>(p).first;
+    })
 UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get(P&& p UTL_LIFETIMEBOUND) noexcept
-    -> enable_if_t<!I && is_pair<P>::value,
-        copy_cvref_t<decltype(declval<P>()), decltype(p.first)>> {
-    return forward<P>(p).first;
+    -> UTL_ENABLE_IF_CXX11(decltype(UTL_SCOPE declval<P>().first), (I == 0 && UTL_SCOPE is_pair<P>::value)) {
+    return UTL_SCOPE forward<P>(p).first;
 }
 
-template <size_t I, typename P>
+template <size_t I, typename P> UTL_REQUIRES_CXX20(I == 1 && requires(P&& p) {
+        requires is_pair<P>::value;
+        UTL_SCOPE forward<P>(p).second;
+    })
 UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get(P&& p UTL_LIFETIMEBOUND) noexcept
-    -> enable_if_t<(I == 1) && is_pair<P>::value,
-        copy_cvref_t<decltype(declval<P>()), decltype(p.second)>> {
-    return forward<P>(p).second;
+    -> UTL_ENABLE_IF_CXX11(decltype(UTL_SCOPE declval<P>().second), (I == 0 && UTL_SCOPE is_pair<P>::value)) {
+    return UTL_SCOPE forward<P>(p).second;
 }
 } // namespace pair
 } // namespace details
@@ -781,5 +783,3 @@ template <size_t I, typename T0, typename T1>
 struct UTL_PUBLIC_TEMPLATE tuple_element<I, UTL_SCOPE pair<T0, T1>> :
     UTL_SCOPE template_element<I, UTL_SCOPE pair<T0, T1>> {};
 UTL_STD_NAMESPACE_END
-
-#undef TT_SCOPE
