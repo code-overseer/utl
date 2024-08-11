@@ -85,24 +85,6 @@ using add_const_rvalue_reference UTL_NODEBUG = add_rvalue_reference<T const>;
 template <typename T>
 concept unrecognized = tuple_like<remove_reference_t<T>> && !is_tuple_v<T>;
 
-template <typename...>
-struct invalid_swap_t {
-    UTL_HIDE_FROM_ABI inline constexpr void swap(invalid_swap_t& other) const noexcept {}
-    UTL_HIDE_FROM_ABI inline constexpr void swap(invalid_swap_t const& other) const noexcept {}
-
-private:
-    UTL_HIDE_FROM_ABI ~invalid_swap_t() = default;
-};
-
-template <typename...>
-struct storage;
-template <size_t I, typename T, typename = void>
-struct offset_impl;
-struct invalid_t {
-private:
-    UTL_HIDE_FROM_ABI ~invalid_t() = default;
-};
-
 template <typename TupleLike, size_t... Is>
 requires tuple_like<remove_reference_t<TupleLike>>
 UTL_HIDE_FROM_ABI auto nothrow_accessible(index_sequence<Is...>) noexcept
@@ -125,147 +107,6 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN) constexpr auto forward_unrecognized(Tuple
     is_nothrow_accessible_v<TupleLike>) {
     return forward_unrecognized(t, make_index_sequence<tuple_size<TupleLike>::value>{});
 }
-
-template <>
-struct storage<> {
-    UTL_HIDE_FROM_ABI constexpr storage() noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr storage& operator=(storage const&) noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr storage& operator=(storage&&) noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr void swap(storage<>& other) noexcept {}
-};
-
-template <typename T>
-struct storage<T> {
-public:
-    using head_type UTL_NODEBUG = T;
-    using move_assign_t UTL_NODEBUG =
-        UTL_SCOPE conditional_t<UTL_SCOPE is_move_assignable_v<T>, invalid_t, storage>;
-    using move_construct_t UTL_NODEBUG =
-        UTL_SCOPE conditional_t<UTL_SCOPE is_move_constructible_v<T>, invalid_t, storage>;
-
-    UTL_HIDE_FROM_ABI constexpr storage() noexcept(is_nothrow_default_constructible_v<T>) = default;
-    UTL_HIDE_FROM_ABI constexpr storage(storage const&) noexcept(
-        is_nothrow_copy_constructible_v<T>) = default;
-    UTL_HIDE_FROM_ABI constexpr storage& operator=(storage const&) noexcept(
-        is_nothrow_copy_assignable_v<T>) = default;
-
-#if UTL_ENFORCE_NONMOVABILIITY
-    constexpr storage(move_construct_t&&) noexcept(is_nothrow_move_constructible_v<T>) = delete;
-    constexpr storage& operator=(move_assign_t&&) noexcept(
-        is_nothrow_move_assignable_v<T>) = delete;
-#else
-    UTL_HIDE_FROM_ABI constexpr storage(storage&&) noexcept(
-        is_nothrow_move_constructible_v<T>) = default;
-    UTL_HIDE_FROM_ABI constexpr storage& operator=(storage&&) noexcept(
-        is_nothrow_move_assignable_v<T>) = default;
-#endif
-
-    template <constructible_as<T> U>
-    UTL_HIDE_FROM_ABI constexpr storage(U&& head) noexcept(is_nothrow_constructible_v<T, U>)
-        : head(forward<U>(head)) {}
-
-    template <allocator_usable_with<T> Alloc>
-    requires constructible_from<T, allocator_arg_t, Alloc const&>
-    UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
-        is_nothrow_constructible_v<T, allocator_arg_t, Alloc const&>)
-        : head(allocator_arg, alloc) {}
-
-    template <allocator_usable_with<T> Alloc>
-    requires (!constructible_from<T, allocator_arg_t, Alloc const&> &&
-        constructible_from<T, Alloc const&>)
-    UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
-        is_nothrow_constructible_v<T, Alloc const&>)
-        : head(alloc) {}
-
-    template <allocator_type Alloc>
-    requires constructible_from<T>
-    UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
-        is_nothrow_default_constructible_v<T>)
-        : head() {}
-
-    template <allocator_usable_with<T> Alloc, typename U>
-    requires constructible_from<T, allocator_arg_t, Alloc const&, U>
-    UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc,
-        U&& other_head) noexcept(is_nothrow_constructible_v<T, allocator_arg_t, Alloc const&, U>)
-        : head(allocator_arg, alloc, UTL_SCOPE forward<U>(other_head)) {}
-
-    template <allocator_usable_with<T> Alloc, typename U>
-    requires (!constructible_from<T, allocator_arg_t, Alloc const&, U> &&
-        constructible_from<T, U, Alloc const&>)
-    UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc,
-        U&& other_head) noexcept(is_nothrow_constructible_v<T, U, Alloc const&>)
-        : head(UTL_SCOPE forward<U>(other_head), alloc) {}
-
-    template <allocator_type Alloc, typename U>
-    requires constructible_from<T, U>
-    UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc,
-        U&& other_head) noexcept(is_nothrow_constructible_v<T, U>)
-        : head(UTL_SCOPE forward<U>(other_head)) {}
-
-    template <typename U>
-    UTL_HIDE_FROM_ABI constexpr void swap(storage<U>& other) noexcept(
-        is_nothrow_swappable_with_v<T&, U&>) {
-        UTL_SCOPE ranges::swap(head, other.head);
-    }
-
-    template <typename U>
-    UTL_HIDE_FROM_ABI constexpr void swap(storage<U> const& other) noexcept(
-        is_nothrow_swappable_with_v<T&, U const&>) {
-        UTL_SCOPE ranges::swap(head, other.head);
-    }
-
-    template <typename U>
-    UTL_HIDE_FROM_ABI constexpr void swap(storage<U>& other) const
-        noexcept(is_nothrow_swappable_with_v<T const&, U&>) {
-        UTL_SCOPE ranges::swap(head, other.head);
-    }
-
-    template <typename U>
-    UTL_HIDE_FROM_ABI constexpr void swap(storage<U> const& other) const
-        noexcept(is_nothrow_swappable_with_v<T const&, U const&>) {
-        UTL_SCOPE ranges::swap(head, other.head);
-    }
-
-    template <typename U>
-    UTL_HIDE_FROM_ABI constexpr storage& assign(U&& other) noexcept(
-        is_nothrow_assignable_v<T&, U>) {
-        head = UTL_SCOPE forward<U>(other);
-        return *this;
-    }
-
-    template <typename U>
-    UTL_HIDE_FROM_ABI constexpr storage const& assign(U&& other) const
-        noexcept(is_nothrow_assignable_v<T const&, U>) {
-        head = UTL_SCOPE forward<U>(other);
-        return *this;
-    }
-
-    template <size_t I>
-    requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get() && noexcept -> T&& {
-        return UTL_SCOPE move(head);
-    }
-
-    template <size_t I>
-    requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get() & noexcept -> T& {
-        return head;
-    }
-
-    template <size_t I>
-    requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get() const&& noexcept -> T const&& {
-        return UTL_SCOPE move(head);
-    }
-
-    template <size_t I>
-    requires (I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get() const& noexcept -> T const& {
-        return head;
-    }
-
-    UTL_ATTRIBUTE(NO_UNIQUE_ADDRESS) head_type head;
-};
 
 template <typename T, typename... Tail>
 struct storage<T, Tail...> {
@@ -469,36 +310,12 @@ public:
     UTL_ATTRIBUTE(NO_UNIQUE_ADDRESS) tail_type tail;
 };
 
-template <typename... Ts>
-struct offset_impl<0, storage<Ts...>> {
-    using type UTL_NODEBUG = storage<Ts...>;
-    static_assert(is_standard_layout<type>::value, "Must be standard layout");
-    static constexpr size_t value = offsetof(type, head);
-};
-
-template <size_t I, typename T0, typename... Ts>
-struct offset_impl<I, storage<T0, Ts...>, enable_if_t<(I > 0)>> {
-    using type UTL_NODEBUG = storage<T0, Ts...>;
-    static_assert(is_standard_layout<type>::value, "Must be standard layout");
-    static_assert(I < type::element_count, "Index out of bounds");
-    static constexpr size_t value =
-        offset_impl<I - 1, storage<Ts...>>::value + offsetof(type, tail);
-};
-
 } // namespace tuple
 } // namespace details
 
-template <>
-class UTL_PUBLIC_TEMPLATE tuple<> : private details::tuple::storage<> {
-public:
-    using storage::storage;
-    using storage::operator=;
-    UTL_HIDE_FROM_ABI constexpr void swap(tuple const& other) const noexcept {}
-    UTL_HIDE_FROM_ABI friend inline constexpr void swap(tuple const&, tuple const&) noexcept {}
-};
-
 template <typename... Types>
-class UTL_PUBLIC_TEMPLATE tuple : private details::tuple::storage<Types...> {
+class UTL_ATTRIBUTES(
+    PUBLIC_TEMPLATE, EMPTY_BASES) tuple : private details::tuple::storage<Types...> {
 private:
     template <size_t I, typename T>
     friend struct tuple_element_offset;
@@ -1014,21 +831,6 @@ public:
     }
 };
 
-template <size_t I, typename T>
-struct tuple_element_offset;
-
-template <size_t I, typename... Ts>
-struct tuple_element_offset<I, tuple<Ts...>> :
-    enable_if_t<is_base_of<details::tuple::storage<Ts...>, tuple<Ts...>>::value,
-        details::tuple::offset_impl<I, details::tuple::storage<Ts...>>> {};
-
-template <typename... Ts>
-UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) constexpr tuple<unwrap_reference_t<decay_t<Ts>>...>
-make_tuple(Ts&&... ts) noexcept(
-    is_nothrow_constructible<tuple<unwrap_reference_t<decay_t<Ts>>...>, Ts...>::value) {
-    return tuple<unwrap_reference_t<decay_t<Ts>>...>{forward<Ts>(ts)...};
-}
-
 namespace details {
 namespace tuple {
 
@@ -1115,18 +917,6 @@ UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) constexpr auto operator<=>(tuple<Ts...>
 UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) constexpr UTL_SCOPE strong_ordering operator<=>(
     tuple<> const&, tuple<> const&) noexcept {
     return UTL_SCOPE strong_ordering::equal;
-}
-
-template <typename... Args>
-UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) constexpr tuple<Args&...> tie(
-    Args&... args UTL_LIFETIMEBOUND) noexcept {
-    return {args...};
-}
-
-template <typename... Args>
-UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) constexpr tuple<Args&&...> forward_as_tuple(
-    Args&&... args UTL_LIFETIMEBOUND) noexcept {
-    return {UTL_SCOPE forward<Args>(args)...};
 }
 
 UTL_NAMESPACE_END

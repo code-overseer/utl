@@ -127,9 +127,9 @@ UTL_NAMESPACE_END
 #endif // if UTL_USE_STD_TYPE_TRAITS && UTL_USE_STD_swap
 
 #if UTL_CXX20
-#  define UTL_TRAIT_is_swappable_with(...) UTL_SCOPE details::swappable::swap_invocable<__VA_ARGS__>
+#  define UTL_TRAIT_is_swappable_with(...) UTL_SCOPE ranges::details::swap::invocable<__VA_ARGS__>
 #  define UTL_TRAIT_is_nothrow_swappable_with(...) \
-      UTL_SCOPE details::swappable::nothrow_swap_invocable<__VA_ARGS__>
+      UTL_SCOPE ranges::details::swap::nothrow_invocable<__VA_ARGS__>
 #  define UTL_TRAIT_is_swappable(...) UTL_SCOPE is_swappable_v<__VA_ARGS__>
 #  define UTL_TRAIT_is_nothrow_swappable(...) UTL_SCOPE is_nothrow_swappable_v<__VA_ARGS__>
 #elif UTL_CXX14

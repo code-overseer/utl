@@ -30,15 +30,13 @@ struct UTL_PUBLIC_TEMPLATE template_element<I, List<Head, Tail...>> :
     template_element<I - 1, type_list<Tail...>> {};
 
 template <template <typename...> class List, typename... Args>
-struct UTL_PUBLIC_TEMPLATE template_size<List<Args...>> {
-    static constexpr size_t value = sizeof...(Args);
-};
+struct UTL_PUBLIC_TEMPLATE template_size<List<Args...>> : size_constant<sizeof...(Args)> {};
 
 template <typename T, typename List>
 struct template_count {};
 
 template <typename T, template <typename...> class List>
-struct UTL_PUBLIC_TEMPLATE template_count<T, List<>> : integral_constant<size_t, 0> {};
+struct UTL_PUBLIC_TEMPLATE template_count<T, List<>> : size_constant<0> {};
 
 template <typename T, template <typename...> class List, typename... Args>
 struct UTL_PUBLIC_TEMPLATE template_count<T, List<T, Args...>> :
