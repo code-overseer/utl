@@ -16,24 +16,23 @@ using std::has_unique_object_representations_v;
 
 UTL_NAMESPACE_END
 
+#  define UTL_TRAIT_SUPPORTED_has_unique_object_representations 1
+
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #  if UTL_SHOULD_USE_BUILTIN(has_unique_object_representations)
 #    define UTL_BUILTIN_has_unique_object_representations(...) \
         __has_unique_object_representations(__VA_ARGS__)
-
-#    define UTL_TRAIT_SUPPORTED_has_unique_object_representations 1
-
 #  endif // UTL_SHOULD_USE_BUILTIN(has_unique_object_representations)
 
 #  ifdef UTL_BUILTIN_has_unique_object_representations
 
+#    include "utl/type_traits/utl_constants.h"
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct has_unique_object_representations {
-    static constexpr bool value = UTL_BUILTIN_has_unique_object_representations(T);
-};
+struct UTL_PUBLIC_TEMPLATE has_unique_object_representations :
+    bool_constant<UTL_BUILTIN_has_unique_object_representations(T)> {};
 
 #    if UTL_CXX14
 template <typename T>

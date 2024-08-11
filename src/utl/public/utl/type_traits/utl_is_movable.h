@@ -7,19 +7,18 @@
 #include "utl/type_traits/utl_is_assignable.h"
 #include "utl/type_traits/utl_is_move_constructible.h"
 #include "utl/type_traits/utl_is_object.h"
-#include "utl/utility/utl_swap.h"
+#include "utl/type_traits/utl_is_swappable.h"
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_movable :
+struct UTL_PUBLIC_TEMPLATE is_movable :
     bool_constant<UTL_TRAIT_is_object(T) && UTL_TRAIT_is_move_constructible(T) &&
         UTL_TRAIT_is_assignable(T&, T) && UTL_TRAIT_is_swappable(T)> {};
 
 #if UTL_CXX14
 template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_movable_v =
-    UTL_TRAIT_is_object(T) && UTL_TRAIT_is_move_constructible(T) &&
+UTL_INLINE_CXX17 constexpr bool is_movable_v = UTL_TRAIT_is_object(T) && UTL_TRAIT_is_move_constructible(T) &&
     UTL_TRAIT_is_assignable(T&, T) && UTL_TRAIT_is_swappable(T);
 #endif // UTL_CXX14
 

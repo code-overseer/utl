@@ -36,7 +36,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename Base, typename Derive>
-struct is_base_of : bool_constant<UTL_BUILTIN_is_base_of(Base, Derive)> {};
+struct UTL_PUBLIC_TEMPLATE is_base_of : bool_constant<UTL_BUILTIN_is_base_of(Base, Derive)> {};
 
 #    if UTL_CXX14
 template <typename Base, typename Derive>
@@ -56,20 +56,23 @@ UTL_NAMESPACE_BEGIN
 namespace type_traits {
 namespace details {
 template <typename Base, typename Derive>
-auto unambiguous_public_inheritance(int) noexcept
+UTL_HIDE_FROM_ABI auto unambiguous_public_inheritance(int) noexcept
     -> decltype(((true_type(*)(Base const volatile*))0)(
         static_cast<Derive const volatile*>((Base const volatile*)0)));
 
 template <typename Base, typename Derive>
-auto unambiguous_public_inheritance(float) noexcept -> undefined_trait<Base, Derive>;
+UTL_HIDE_FROM_ABI auto unambiguous_public_inheritance(float) noexcept
+    -> undefined_trait<Base, Derive>;
 
 template <typename Base, typename Derive>
-using is_unambiguous_public_inheritance = decltype(unambiguous_public_inheritance<Base, Derive>(0));
+using is_unambiguous_public_inheritance UTL_NODEBUG =
+    decltype(unambiguous_public_inheritance<Base, Derive>(0));
 } // namespace details
 } // namespace type_traits
 
 template <typename Base, typename Derive>
-struct is_base_of : type_traits::details::is_unambiguous_public_inheritance<Base, Derive> {};
+struct UTL_PUBLIC_TEMPLATE is_base_of :
+    type_traits::details::is_unambiguous_public_inheritance<Base, Derive> {};
 
 #    if UTL_CXX14
 template <typename T>

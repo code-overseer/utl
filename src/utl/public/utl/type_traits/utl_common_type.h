@@ -37,15 +37,16 @@ template <typename... T>
 using common_type_t = typename common_type<T...>::type;
 
 template <>
-struct common_type<> {};
+struct UTL_PUBLIC_TEMPLATE common_type<> {};
 template <typename T>
-struct common_type<T> : common_type<T, T> {};
+struct UTL_PUBLIC_TEMPLATE common_type<T> : common_type<T, T> {};
 
 namespace details {
 namespace common_type {
 
 template <typename T, typename U>
-using ternary_result_t = decay_t<decltype(false ? declval<T>() : declval<U>())>;
+using ternary_result_t UTL_NODEBUG =
+    UTL_SCOPE decay_t<decltype(false ? UTL_SCOPE declval<T>() : UTL_SCOPE declval<U>())>;
 
 template <typename T, typename U, typename = void>
 struct impl_2 {};
@@ -81,22 +82,23 @@ template <typename T, typename U, typename... Vs>
 using impl_gt_2 = sfinae_gt_2<type_list<T, U, Vs...>>;
 
 template <typename T, typename U, size_t = sizeof(::std::common_type<T, U>)>
-::std::common_type<T, U> resolve_common_type(int);
+UTL_HIDE_FROM_ABI ::std::common_type<T, U> resolve_common_type(int);
 
 template <typename T, typename U>
-impl_0<T, U> resolve_common_type(float);
+UTL_HIDE_FROM_ABI impl_0<T, U> resolve_common_type(float);
 
 template <typename T, typename U, typename R = decltype(resolve_common_type<T, U>(0))>
-using impl = R;
+using impl UTL_NODEBUG = R;
 
 } // namespace common_type
 } // namespace details
 
 template <typename T, typename U>
-struct common_type<T, U> : details::common_type::impl<T, U> {};
+struct UTL_PUBLIC_TEMPLATE common_type<T, U> : details::common_type::impl<T, U> {};
 
 template <typename T, typename U, typename... Vs>
-struct common_type<T, U, Vs...> : details::common_type::impl_gt_2<T, U, Vs...> {};
+struct UTL_PUBLIC_TEMPLATE common_type<T, U, Vs...> :
+    details::common_type::impl_gt_2<T, U, Vs...> {};
 
 UTL_NAMESPACE_END
 #endif

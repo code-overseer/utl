@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "utl/atomic.h"
 #include "utl/preprocessor/utl_config.h"
-#include "utl_reference_countable_destroy.h"
+
+#include "utl/memory/utl_addressof.h"
+#include "utl/memory/utl_reference_counting_destroy.h"
 
 UTL_NAMESPACE_BEGIN
 /**
@@ -21,13 +22,13 @@ UTL_NAMESPACE_BEGIN
  *           is provided in the form void destroy(reference_count<T>* ptr).
  */
 template <typename T>
-class reference_count {
+class UTL_PUBLIC_TEMPLATE reference_count {
 protected:
     /**
      * Constructs the reference_count object with an initial count of 1.
      */
-    constexpr reference_count() noexcept : count_(1) {}
-    UTL_CONSTEXPR_CXX20 ~reference_count() noexcept = default;
+    UTL_HIDE_FROM_ABI constexpr reference_count() noexcept : count_(1) {}
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~reference_count() noexcept = default;
 
     /**
      * Copy and move operations are deleted to enforce non-copyability and non-movability
@@ -39,33 +40,13 @@ protected:
 
 private:
     /**
-     * ADL function to increment the reference count.
-     *
-     * @param obj The reference_count object to increment the count for.
-     */
-    friend void increment(reference_count& obj) noexcept { ++obj.count_; }
-
-    /**
-     * ADL function to decrement the reference count. Destroys the object when the count reaches
-     * zero.
-     *
-     * @param obj The reference_count object to decrement the count for.
-     */
-    friend void decrement(reference_count& obj) noexcept {
-        if (--obj.count_ < 1) {
-            UTL_ASSERT(obj.count_ >= 0);
-            reference_counting::details::destroy(UTL_SCOPE addressof(obj));
-        }
-    }
-
-    /**
      * ADL function to increment the reference count for objects of type T.
      *
      * @param obj The object of type T to increment the count for.
      */
-    friend void increment(T& obj) noexcept {
-        static_assert(UTL_TRAIT_VALUE(is_base_of, reference_count, T), "Invalid type relation");
-        increment((reference_count&)obj);
+    UTL_HIDE_FROM_ABI friend void increment(T& obj) noexcept {
+        static_assert(UTL_TRAIT_is_base_of(reference_count, T), "Invalid type relation");
+        ++((reference_count&)obj).count_;
     }
 
     /**
@@ -73,9 +54,13 @@ private:
      *
      * @param obj The object of type T to decrement the count for.
      */
-    friend void decrement(T& obj) noexcept {
-        static_assert(UTL_TRAIT_VALUE(is_base_of, reference_count, T), "Invalid type relation");
-        decrement((reference_count&)obj);
+    UTL_HIDE_FROM_ABI friend void decrement(T& obj) noexcept {
+        static_assert(UTL_TRAIT_is_base_of(reference_count, T), "Invalid type relation");
+        auto& ref = (reference_count&)obj;
+        if (--ref.count_ < 1) {
+            UTL_ASSERT(ref.count_ == 0);
+            reference_counting::destroy(UTL_SCOPE addressof(obj));
+        }
     }
 
     /**

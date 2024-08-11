@@ -45,8 +45,7 @@ struct is_nothrow_constructible :
 
 #    if UTL_CXX14
 template <typename T, typename... Args>
-UTL_INLINE_CXX17 constexpr bool is_nothrow_constructible_v =
-    UTL_BUILTIN_is_nothrow_constructible(T, Args...);
+UTL_INLINE_CXX17 constexpr bool is_nothrow_constructible_v = UTL_BUILTIN_is_nothrow_constructible(T, Args...);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -84,8 +83,8 @@ auto nothrow_impl(nothrow_branch_t<false, true>) noexcept -> false_type;
 
 template <typename T, typename... Args>
 using nothrow_impl_t = decltype(nothrow_impl<T, Args...>(
-    nothrow_branch_t<UTL_TRAIT_VALUE(is_constructible, T, Args...),
-        UTL_TRAIT_VALUE(is_reference, T)>{}));
+    nothrow_branch_t<UTL_SCOPE is_constructible<T, Args...>::value,
+        UTL_SCOPE is_reference<T>::value>{}));
 
 } // namespace constructible
 } // namespace details

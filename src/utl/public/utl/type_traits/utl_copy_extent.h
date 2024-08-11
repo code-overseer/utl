@@ -7,16 +7,16 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename From, typename To>
-struct copy_extent {
-    using type = To;
+struct UTL_PUBLIC_TEMPLATE copy_extent {
+    using type UTL_NODEBUG = To;
 };
 template <typename From, typename To>
-struct copy_extent<From[], To> {
-    using type = To[];
+struct UTL_PUBLIC_TEMPLATE copy_extent<From[], To> {
+    using type UTL_NODEBUG = To[];
 };
 template <typename From, typename To, size_t N>
-struct copy_extent<From[N], To> {
-    using type = To[N];
+struct UTL_PUBLIC_TEMPLATE copy_extent<From[N], To> {
+    using type UTL_NODEBUG = To[N];
 };
 
 template <typename F, typename T>

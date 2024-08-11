@@ -35,7 +35,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_function : bool_constant<UTL_BUILTIN_is_function(T)> {};
+struct UTL_PUBLIC_TEMPLATE is_function : bool_constant<UTL_BUILTIN_is_function(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -54,7 +54,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_function : bool_constant<!is_const<T const>::value && !is_reference<T>::value> {};
+struct UTL_PUBLIC_TEMPLATE is_function :
+    bool_constant<!is_const<T const>::value && !is_reference<T>::value> {};
 
 #    if UTL_CXX14
 template <typename T>

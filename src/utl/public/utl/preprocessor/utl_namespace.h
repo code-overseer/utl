@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_abi.h"
+
 #ifndef UTL_NS
 #  define UTL_NS utl
 #endif
@@ -15,10 +17,15 @@
 #  error "Cannot define UTL_NAMESPACE_END"
 #endif
 
-#define UTL_NAMESPACE_BEGIN namespace UTL_NS {
+/* extern C++ for MSVC */
+#define UTL_NAMESPACE_BEGIN \
+    UTL_EXTERN_CXX_BEGIN    \
+    namespace UTL_ATTRIBUTE(TYPE_VISIBILITY("default")) UTL_NS {
 
 #ifndef UTL_NAMESPACE_END
-#  define UTL_NAMESPACE_END }
+#  define UTL_NAMESPACE_END \
+      }                     \
+      UTL_EXTERN_CXX_END
 #endif
 
 #include <stddef.h>
@@ -36,9 +43,12 @@
 #  define UTL_STD_ABI_NAMESPACE_END
 #endif
 
-#define UTL_STD_NAMESPACE_BEGIN \
-    namespace std {             \
-    UTL_STD_ABI_NAMESPACE_BEGIN
+/* extern C++ for MSVC > C++20, no effect anywhere else */
+#define UTL_STD_NAMESPACE_BEGIN                                                    \
+    UTL_EXTERN_CXX_BEGIN namespace UTL_ATTRIBUTE(TYPE_VISIBILITY("default")) std { \
+        UTL_STD_ABI_NAMESPACE_BEGIN
+
 #define UTL_STD_NAMESPACE_END \
     UTL_STD_ABI_NAMESPACE_END \
-    }
+    }                         \
+    UTL_EXTERN_CXX_END

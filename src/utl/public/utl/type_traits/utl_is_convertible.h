@@ -37,12 +37,12 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T, typename... Args>
-struct is_convertible : bool_constant<UTL_BUILTIN_is_convertible(T, Args...)> {};
+template <typename From, typename To>
+struct UTL_PUBLIC_TEMPLATE is_convertible : bool_constant<UTL_BUILTIN_is_convertible(From, To)> {};
 
 #    if UTL_CXX14
-template <typename T, typename... Args>
-UTL_INLINE_CXX17 constexpr bool is_convertible_v = UTL_BUILTIN_is_convertible(T, Args...);
+template <typename From, typename To>
+UTL_INLINE_CXX17 constexpr bool is_convertible_v = UTL_BUILTIN_is_convertible(From, To);
 #    endif // UTL_CXX14
 
 UTL_NAMESPACE_END
@@ -58,20 +58,20 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace convertible {
 template <typename T>
-void implicit_conv(T) noexcept;
+UTL_HIDE_FROM_ABI void implicit_conv(T) noexcept;
 
 template <typename From, typename To, typename = decltype(implicit_conv<To>(declval<From>()))>
-auto conv_test(int) noexcept -> true_type;
+UTL_HIDE_FROM_ABI auto conv_test(int) noexcept -> true_type;
 template <typename, typename>
-auto conv_test(float) noexcept -> false_type;
+UTL_HIDE_FROM_ABI auto conv_test(float) noexcept -> false_type;
 
 template <typename From, typename To>
-using impl_t = decltype(conv_test<From, To>(0));
+using impl_t UTL_NODEBUG = decltype(conv_test<From, To>(0));
 } // namespace convertible
 } // namespace details
 
 template <typename From, typename To>
-struct is_convertible :
+struct UTL_PUBLIC_TEMPLATE is_convertible :
     disjunction<conjunction<is_void<From>, is_void<To>>, details::convertible::impl_t<From, To>> {};
 
 #    if UTL_CXX14

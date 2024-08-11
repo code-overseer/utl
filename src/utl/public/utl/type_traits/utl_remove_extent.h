@@ -42,8 +42,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct remove_extent {
-    using type = UTL_BUILTIN_remove_extent(T);
+struct UTL_PUBLIC_TEMPLATE remove_extent {
+    using type UTL_NODEBUG = UTL_BUILTIN_remove_extent(T);
 };
 
 template <typename T>
@@ -56,16 +56,16 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct remove_extent {
-    using type = T;
+struct UTL_PUBLIC_TEMPLATE remove_extent {
+    using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct remove_extent<T[]> {
-    using type = T;
+struct UTL_PUBLIC_TEMPLATE remove_extent<T[]> {
+    using type UTL_NODEBUG = T;
 };
 template <typename T, size_t N>
-struct remove_extent<T[N]> {
-    using type = T;
+struct UTL_PUBLIC_TEMPLATE remove_extent<T[N]> {
+    using type UTL_NODEBUG = T;
 };
 template <typename T>
 using remove_extent_t = typename remove_extent<T>::type;

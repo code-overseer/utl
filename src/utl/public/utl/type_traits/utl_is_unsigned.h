@@ -38,7 +38,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_unsigned : bool_constant<UTL_BUILTIN_is_unsigned(T)> {};
+struct UTL_PUBLIC_TEMPLATE is_unsigned : bool_constant<UTL_BUILTIN_is_unsigned(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -57,9 +57,10 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_unsigned : conjunction<is_arithmetic<T>, bool_constant<(T(-1) > T(0))>> {};
+struct UTL_PUBLIC_TEMPLATE is_unsigned :
+    conjunction<is_arithmetic<T>, bool_constant<(T(-1) > T(0))>> {};
 template <>
-struct is_unsigned<bool> : true_type {};
+struct UTL_PUBLIC_TEMPLATE is_unsigned<bool> : true_type {};
 
 #    if UTL_CXX14
 template <typename T>

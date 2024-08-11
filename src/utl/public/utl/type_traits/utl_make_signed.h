@@ -36,8 +36,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct make_signed {
-    using type = UTL_BUILTIN_make_signed(T);
+struct UTL_PUBLIC_TEMPLATE make_signed {
+    using type UTL_NODEBUG = UTL_BUILTIN_make_signed(T);
 };
 
 template <typename T>
@@ -65,7 +65,7 @@ using signed_table_entry_t = typename signed_table_entry<I>::type;
 #    define UTL_GENERATE_TABLE_ENTRY(N, T) \
         template <>                        \
         struct signed_table_entry<N> {     \
-            using type = T;                \
+            using type UTL_NODEBUG = T;    \
         }
 
 UTL_GENERATE_TABLE_ENTRY(0, signed char);
@@ -82,7 +82,7 @@ UTL_GENERATE_TABLE_ENTRY(5, __int128_t);
 template <typename T, size_t Idx = 0, bool = (is_integral<T>::value || is_enum<T>::value)>
 struct find_signed;
 template <typename T, size_t Idx = 0>
-using find_signed_t = typename find_signed<T, Idx>::type;
+using find_signed_t UTL_NODEBUG = typename find_signed<T, Idx>::type;
 
 template <typename T, size_t Idx>
 struct find_signed<T, Idx, true> :
@@ -92,64 +92,64 @@ struct find_signed<T, Idx, true> :
 } // namespace details
 
 template <typename T>
-struct make_signed {
-    using type = details::type_traits::find_signed_t<T>;
+struct UTL_PUBLIC_TEMPLATE make_signed {
+    using type UTL_NODEBUG = details::type_traits::find_signed_t<T>;
 };
 template <typename T>
-struct make_signed<T const> {
-    using type = typename make_signed<T>::type const;
+struct UTL_PUBLIC_TEMPLATE make_signed<T const> {
+    using type UTL_NODEBUG = typename make_signed<T>::type const;
 };
 template <typename T>
-struct make_signed<T volatile> {
-    using type = typename make_signed<T>::type volatile;
+struct UTL_PUBLIC_TEMPLATE make_signed<T volatile> {
+    using type UTL_NODEBUG = typename make_signed<T>::type volatile;
 };
 template <typename T>
-struct make_signed<T const volatile> {
-    using type = typename make_signed<T>::type const volatile;
+struct UTL_PUBLIC_TEMPLATE make_signed<T const volatile> {
+    using type UTL_NODEBUG = typename make_signed<T>::type const volatile;
 };
 template <>
-struct make_signed<bool> {};
+struct UTL_PUBLIC_TEMPLATE make_signed<bool> {};
 template <>
-struct make_signed<unsigned char> {
-    using type = signed char;
+struct UTL_PUBLIC_TEMPLATE make_signed<unsigned char> {
+    using type UTL_NODEBUG = signed char;
 };
 template <>
-struct make_signed<signed char> {
-    using type = signed char;
+struct UTL_PUBLIC_TEMPLATE make_signed<signed char> {
+    using type UTL_NODEBUG = signed char;
 };
 template <>
-struct make_signed<unsigned short> {
-    using type = signed short;
+struct UTL_PUBLIC_TEMPLATE make_signed<unsigned short> {
+    using type UTL_NODEBUG = signed short;
 };
 template <>
-struct make_signed<signed short> {
-    using type = signed short;
+struct UTL_PUBLIC_TEMPLATE make_signed<signed short> {
+    using type UTL_NODEBUG = signed short;
 };
 template <>
-struct make_signed<unsigned int> {
-    using type = signed int;
+struct UTL_PUBLIC_TEMPLATE make_signed<unsigned int> {
+    using type UTL_NODEBUG = signed int;
 };
 template <>
-struct make_signed<signed int> {
-    using type = signed int;
+struct UTL_PUBLIC_TEMPLATE make_signed<signed int> {
+    using type UTL_NODEBUG = signed int;
 };
 template <>
-struct make_signed<unsigned long> {
-    using type = signed long;
+struct UTL_PUBLIC_TEMPLATE make_signed<unsigned long> {
+    using type UTL_NODEBUG = signed long;
 };
 template <>
-struct make_signed<signed long> {
-    using type = signed long;
+struct UTL_PUBLIC_TEMPLATE make_signed<signed long> {
+    using type UTL_NODEBUG = signed long;
 };
 
 #    ifdef UTL_SUPPORTS_INT128
 template <>
-struct make_signed<__uint128_t> {
-    using type = __int128_t;
+struct UTL_PUBLIC_TEMPLATE make_signed<__uint128_t> {
+    using type UTL_NODEBUG = __int128_t;
 };
 template <>
-struct make_signed<__int128_t> {
-    using type = __int128_t;
+struct UTL_PUBLIC_TEMPLATE make_signed<__int128_t> {
+    using type UTL_NODEBUG = __int128_t;
 };
 #    endif
 

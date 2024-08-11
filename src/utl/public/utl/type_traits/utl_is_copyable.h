@@ -3,14 +3,16 @@
 #pragma once
 
 #include "utl/type_traits/utl_common.h"
+#include "utl/type_traits/utl_is_copy_assignable.h"
 #include "utl/type_traits/utl_is_copy_constructible.h"
 #include "utl/type_traits/utl_is_movable.h"
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_copyable :
-    bool_constant<UTL_TRAIT_is_movable(T) && UTL_TRAIT_is_copy_constructible(T)> {};
+struct UTL_PUBLIC_TEMPLATE is_copyable :
+    bool_constant<UTL_TRAIT_is_movable(T) && UTL_TRAIT_is_copy_constructible(T) &&
+        UTL_TRAIT_is_copy_assignable(T)> {};
 
 #if UTL_CXX14
 template <typename T>

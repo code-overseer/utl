@@ -36,8 +36,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct decay {
-    using type = UTL_BUILTIN_decay(T);
+struct UTL_PUBLIC_TEMPLATE decay {
+    using type UTL_NODEBUG = UTL_BUILTIN_decay(T);
 };
 
 template <typename T>
@@ -58,28 +58,28 @@ namespace details {
 namespace type_traits {
 template <typename T, typename = void>
 struct decay_impl {
-    using type = remove_cv_t<T>;
+    using type UTL_NODEBUG = remove_cv_t<T>;
 };
 
 template <typename T>
 struct decay_impl<T, enable_if_t<is_function<T>::value>> {
-    using type = T*;
+    using type UTL_NODEBUG = T*;
 };
 
 template <typename T>
 struct decay_impl<T[]> {
-    using type = T*;
+    using type UTL_NODEBUG = T*;
 };
 
 template <typename T, size_t N>
 struct decay_impl<T[N]> {
-    using type = T*;
+    using type UTL_NODEBUG = T*;
 };
 } // namespace type_traits
 } // namespace details
 
 template <typename T>
-struct decay : details::type_traits::decay_impl<remove_reference_t<T>> {};
+struct UTL_PUBLIC_TEMPLATE decay : details::type_traits::decay_impl<remove_reference_t<T>> {};
 
 template <typename T>
 using decay_t = typename details::type_traits::decay_impl<remove_reference_t<T>>::type;

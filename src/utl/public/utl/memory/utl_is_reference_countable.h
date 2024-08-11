@@ -3,7 +3,9 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/type_traits/utl_is_base_of.h"
+#include "utl/type_traits/utl_logical_traits.h"
 #include "utl_reference_counting_fwd.h"
 
 UTL_NAMESPACE_BEGIN
@@ -21,7 +23,7 @@ UTL_NAMESPACE_BEGIN
  *       reference counting.
  */
 template <typename T>
-struct is_reference_countable :
+struct UTL_PUBLIC_TEMPLATE is_reference_countable :
     disjunction<is_base_of<atomic_reference_count<T>, T>, is_base_of<reference_count<T>, T>> {};
 
 /**
@@ -31,7 +33,7 @@ struct is_reference_countable :
  * countable.
  */
 template <typename T>
-struct is_reference_countable<atomic_reference_count<T>> : true_type {};
+struct UTL_PUBLIC_TEMPLATE is_reference_countable<atomic_reference_count<T>> : true_type {};
 
 /**
  * Specialization of `is_reference_countable` for `reference_count`.
@@ -39,7 +41,7 @@ struct is_reference_countable<atomic_reference_count<T>> : true_type {};
  * This specialization ensures that `reference_count` itself is considered reference countable.
  */
 template <typename T>
-struct is_reference_countable<reference_count<T>> : true_type {};
+struct UTL_PUBLIC_TEMPLATE is_reference_countable<reference_count<T>> : true_type {};
 
 /**
  * Specialization of `is_reference_countable` for `const`-qualified types.
@@ -48,7 +50,7 @@ struct is_reference_countable<reference_count<T>> : true_type {};
  * are also considered reference countable.
  */
 template <typename T>
-struct is_reference_countable<T const> : is_reference_countable<T> {};
+struct UTL_PUBLIC_TEMPLATE is_reference_countable<T const> : is_reference_countable<T> {};
 
 #if UTL_CXX20
 

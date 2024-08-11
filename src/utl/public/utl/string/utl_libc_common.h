@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/string/utl_is_string_char.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_empty.h"
@@ -11,59 +12,37 @@
 #include "utl/type_traits/utl_is_unsigned.h"
 #include "utl/type_traits/utl_remove_cv.h"
 
-#include <string.h>
-
-#if UTL_DISABLE_SSE_LIBC
-#  define UTL_DISABLE_SIMD_LIBC 1
-#elif UTL_DISABLE_AVX_LIBC
-#  define UTL_DISABLE_AVX512_LIBC 1
-#endif
-
-#if !UTL_DISABLE_SIMD_LIBC
-#  if UTL_SUPPORTS_SIMD_INTRINSICS && UTL_ARCH_x86
-#    include <immintrin.h>
-#  endif // UTL_SUPPORTS_SIMD_INTRINSICS && UTL_ARCH_x86
-
-#  if UTL_SIMD_ARM_SVE && !UTL_DISABLE_SVE_LIBC
-#    include <arm_sve.h>
-#  elif UTL_SIMD_ARM_NEON && !UTL_DISABLE_NEON_LIBC
-#    include <arm_neon.h>
-#  else
-#    define UTL_DISABLE_SIMD_LIBC 1
-#  endif
-#endif
+#include <cstring>
 
 UTL_NAMESPACE_BEGIN
-
+#define __UTL_ATTRIBUTE_LIBC_API (CONST)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_TYPE_AGGREGATE_LIBC_API
 namespace libc {
 
 enum class element_count_t : size_t {
 };
 
-#define UTL_LIBC_CONST UTL_ATTRIBUTES(NODISCARD, CONST)
-
 template <typename T>
-UTL_LIBC_CONST constexpr size_t byte_count(element_count_t c) noexcept {
+UTL_ATTRIBUTE(LIBC_API) constexpr size_t byte_count(element_count_t c) noexcept {
     return sizeof(T) * size_t(c);
 }
 
 template <typename T>
-UTL_LIBC_CONST constexpr bool is_pointer_in_range(
+UTL_ATTRIBUTE(LIBC_API) constexpr bool is_pointer_in_range(
     T const* begin, T const* end, T const* ptr) noexcept {
-    return UTL_CONSTANT_P(begin <= end && ptr < end) || !(ptr < begin) && ptr < end;
+    return UTL_CONSTANT_P(begin <= end && ptr < end) || (!(ptr < begin) && ptr < end);
 }
-UTL_LIBC_CONST
-constexpr element_count_t operator-(element_count_t val, size_t op) noexcept {
+
+UTL_ATTRIBUTE(LIBC_API) constexpr element_count_t operator-(element_count_t val, size_t op) noexcept {
     return (element_count_t)((size_t)val - op);
 }
 
-UTL_LIBC_CONST
-constexpr bool operator==(element_count_t val, size_t op) noexcept {
+UTL_ATTRIBUTE(LIBC_API) constexpr bool operator==(element_count_t val, size_t op) noexcept {
     return (size_t)val == op;
 }
 
 template <typename T>
-UTL_LIBC_CONST constexpr T* operator+(T* ptr, element_count_t offset) noexcept {
+UTL_ATTRIBUTE(LIBC_API) constexpr T* operator+(T* ptr, element_count_t offset) noexcept {
     return ptr + (size_t)offset;
 }
 
@@ -79,15 +58,16 @@ template <typename T>
 concept trivially_copyable = UTL_SCOPE is_trivially_copyable_v<T>;
 #else
 template <typename T, size_t N>
-using exact_size = bool_constant<!UTL_TRAIT_is_empty(T) && (sizeof(T) == N)>;
+using exact_size UTL_NODEBUG = bool_constant<!UTL_TRAIT_is_empty(T) && (sizeof(T) == N)>;
 #endif
 
 template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
-unsigned char as_byte(T val) noexcept {
+UTL_ATTRIBUTE(LIBC_API) unsigned char as_byte(T val) noexcept {
     return *((unsigned char const*)&val);
 }
 } // namespace libc
 
-#undef UTL_LIBC_CONST
+#undef __UTL_ATTRIBUTE_LIBC_API
+#undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_LIBC_API
 
 UTL_NAMESPACE_END

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_is_boolean_testable.h"
@@ -17,56 +18,56 @@ using strict_result_t = decltype(UTL_SCOPE declval<T>() > UTL_SCOPE declval<U>()
 template <typename T, typename U UTL_REQUIRES_CXX11(
     UTL_TRAIT_is_boolean_testable(strict_result_t<T, U>))>
 UTL_REQUIRES_CXX20(UTL_TRAIT_is_boolean_testable(strict_result_t<T, U>))
-UTL_SCOPE true_type strict_impl(int) noexcept;
+UTL_HIDE_FROM_ABI UTL_HIDE_FROM_ABI UTL_SCOPE true_type strict_impl(int) noexcept;
 template <typename T, typename U>
-UTL_SCOPE false_type strict_impl(float) noexcept;
+UTL_HIDE_FROM_ABI UTL_SCOPE false_type strict_impl(float) noexcept;
 template <typename T, typename U UTL_REQUIRES_CXX11(
     UTL_TRAIT_is_nothrow_boolean_testable(strict_result_t<T, U>))>
 UTL_REQUIRES_CXX20(UTL_TRAIT_is_nothrow_boolean_testable(strict_result_t<T, U>))
-UTL_SCOPE true_type strict_nothrow_check(int) noexcept;
+UTL_HIDE_FROM_ABI UTL_SCOPE true_type strict_nothrow_check(int) noexcept;
 template <typename T, typename U>
-UTL_SCOPE false_type strict_nothrow_check(float) noexcept;
+UTL_HIDE_FROM_ABI UTL_SCOPE false_type strict_nothrow_check(float) noexcept;
 
 template <typename T, typename U>
-using strict_impl_t = decltype(strict_impl<T, U>(0));
+using strict_impl_t UTL_NODEBUG = decltype(strict_impl<T, U>(0));
 template <typename T, typename U>
-using strict_nothrow_t = decltype(strict_nothrow_check<T, U>(0));
+using strict_nothrow_t UTL_NODEBUG = decltype(strict_nothrow_check<T, U>(0));
 
 template <typename T, typename U>
-using result_t = decltype(UTL_SCOPE declval<T>() >= UTL_SCOPE declval<U>());
+using result_t UTL_NODEBUG = decltype(UTL_SCOPE declval<T>() >= UTL_SCOPE declval<U>());
 
 template <typename T, typename U UTL_REQUIRES_CXX11(UTL_TRAIT_is_boolean_testable(result_t<T, U>))>
 UTL_REQUIRES_CXX20(UTL_TRAIT_is_boolean_testable(result_t<T, U>))
-UTL_SCOPE true_type impl(int) noexcept;
+UTL_HIDE_FROM_ABI UTL_SCOPE true_type impl(int) noexcept;
 template <typename T, typename U>
-UTL_SCOPE false_type impl(float) noexcept;
+UTL_HIDE_FROM_ABI UTL_SCOPE false_type impl(float) noexcept;
 
 template <typename T, typename U UTL_REQUIRES_CXX11(
     UTL_TRAIT_is_nothrow_boolean_testable(result_t<T, U>))>
 UTL_REQUIRES_CXX20(UTL_TRAIT_is_nothrow_boolean_testable(result_t<T, U>))
-UTL_SCOPE true_type nothrow_check(int) noexcept;
+UTL_HIDE_FROM_ABI UTL_SCOPE true_type nothrow_check(int) noexcept;
 template <typename T, typename U>
-UTL_SCOPE false_type nothrow_check(float) noexcept;
+UTL_HIDE_FROM_ABI UTL_SCOPE false_type nothrow_check(float) noexcept;
 
 template <typename T, typename U>
-using impl_t = decltype(impl<T, U>(0));
+using impl_t UTL_NODEBUG = decltype(impl<T, U>(0));
 template <typename T, typename U>
-using nothrow_t = decltype(nothrow_check<T, U>(0));
+using nothrow_t UTL_NODEBUG = decltype(nothrow_check<T, U>(0));
 } // namespace superordinate_comparable
 } // namespace details
 
 template <typename T, typename U>
-struct is_strict_superordinate_comparable_with :
+struct UTL_PUBLIC_TEMPLATE is_strict_superordinate_comparable_with :
     details::superordinate_comparable::strict_impl_t<T, U> {};
 template <typename T>
-struct is_strict_superordinate_comparable :
+struct UTL_PUBLIC_TEMPLATE is_strict_superordinate_comparable :
     details::superordinate_comparable::strict_impl_t<T, T> {};
 
 template <typename T, typename U>
-struct is_nothrow_strict_superordinate_comparable_with :
+struct UTL_PUBLIC_TEMPLATE is_nothrow_strict_superordinate_comparable_with :
     details::superordinate_comparable::strict_nothrow_t<T, U> {};
 template <typename T>
-struct is_nothrow_strict_superordinate_comparable :
+struct UTL_PUBLIC_TEMPLATE is_nothrow_strict_superordinate_comparable :
     details::superordinate_comparable::strict_nothrow_t<T, T> {};
 
 #if UTL_CXX14
@@ -107,15 +108,18 @@ UTL_INLINE_CXX17 constexpr bool is_nothrow_strict_superordinate_comparable_v =
 #endif // UTL_CXX14
 
 template <typename T, typename U>
-struct is_superordinate_comparable_with : details::superordinate_comparable::impl_t<T, U> {};
+struct UTL_PUBLIC_TEMPLATE is_superordinate_comparable_with :
+    details::superordinate_comparable::impl_t<T, U> {};
 template <typename T>
-struct is_superordinate_comparable : details::superordinate_comparable::impl_t<T, T> {};
+struct UTL_PUBLIC_TEMPLATE is_superordinate_comparable :
+    details::superordinate_comparable::impl_t<T, T> {};
 
 template <typename T, typename U>
-struct is_nothrow_superordinate_comparable_with :
+struct UTL_PUBLIC_TEMPLATE is_nothrow_superordinate_comparable_with :
     details::superordinate_comparable::nothrow_t<T, U> {};
 template <typename T>
-struct is_nothrow_superordinate_comparable : details::superordinate_comparable::nothrow_t<T, T> {};
+struct UTL_PUBLIC_TEMPLATE is_nothrow_superordinate_comparable :
+    details::superordinate_comparable::nothrow_t<T, T> {};
 
 #if UTL_CXX14
 

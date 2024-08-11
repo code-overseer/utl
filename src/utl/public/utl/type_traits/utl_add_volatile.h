@@ -32,8 +32,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct add_volatile {
-    using type = T volatile;
+struct UTL_PUBLIC_TEMPLATE add_volatile {
+    using type UTL_NODEBUG = T volatile;
 };
 
 template <typename T>

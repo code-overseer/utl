@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/utility/utl_declval.h"
 #include "utl/utility/utl_signs.h"
 #include "utl_sequence.h"
@@ -10,7 +11,6 @@
 #include <cstdint>
 
 UTL_NAMESPACE_BEGIN
-#define UTL_SEQ_CONST UTL_ATTRIBUTES(NODISCARD, CONST)
 
 namespace seq {
 namespace details {
@@ -68,35 +68,41 @@ template <size_t N>
 UTL_INLINE_CXX17 constexpr index_t<N> index = {};
 
 template <typename T, T I>
-UTL_SEQ_CONST constexpr auto to_sequence(scalar_t<T, I>) noexcept -> sequence_t<T, I> {
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto to_sequence(scalar_t<T, I>) noexcept
+    -> sequence_t<T, I> {
     return {};
 }
 template <typename T, T... Is>
-UTL_SEQ_CONST constexpr auto to_array(sequence_t<T, Is...>) noexcept -> array_t<T, Is...> const& {
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto to_array(sequence_t<T, Is...>) noexcept
+    -> array_t<T, Is...> const& {
     return array<T, Is...>;
 }
 
 #define UTL_BINOP_RESULT(OP, L, R) decltype(declval<L>() OP declval<R>())
-#define UTL_DEFINE_OP(NAME, SYM)                                                                   \
-    template <typename T, T... Is, typename U, U J>                                                \
-    UTL_SEQ_CONST constexpr auto NAME(sequence_t<T, Is...>, scalar_t<U, J>) noexcept               \
-        -> sequence_t<UTL_BINOP_RESULT(SYM, T, U), (Is SYM J)...> {                                \
-        return {};                                                                                 \
-    }                                                                                              \
-    template <typename T, T... Is, typename U, U... Js>                                            \
-    UTL_SEQ_CONST constexpr auto NAME(sequence_t<T, Is...>, sequence_t<U, Js...>) noexcept         \
-        -> sequence_t<UTL_BINOP_RESULT(SYM, T, U), (Is SYM Js)...> {                               \
-        return {};                                                                                 \
-    }                                                                                              \
-    template <typename T, T... Is, typename U, U J>                                                \
-    UTL_SEQ_CONST constexpr auto operator SYM(sequence_t<T, Is...>, scalar_t<U, J>) noexcept       \
-        -> sequence_t<UTL_BINOP_RESULT(SYM, T, U), (Is SYM J)...> {                                \
-        return {};                                                                                 \
-    }                                                                                              \
-    template <typename T, T... Is, typename U, U... Js>                                            \
-    UTL_SEQ_CONST constexpr auto operator SYM(sequence_t<T, Is...>, sequence_t<U, Js...>) noexcept \
-        -> sequence_t<UTL_BINOP_RESULT(SYM, T, U), (Is SYM Js)...> {                               \
-        return {};                                                                                 \
+#define UTL_DEFINE_OP(NAME, SYM)                                                     \
+    template <typename T, T... Is, typename U, U J>                                  \
+    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)                                  \
+    constexpr auto NAME(sequence_t<T, Is...>, scalar_t<U, J>) noexcept               \
+        -> sequence_t<UTL_BINOP_RESULT(SYM, T, U), (Is SYM J)...> {                  \
+        return {};                                                                   \
+    }                                                                                \
+    template <typename T, T... Is, typename U, U... Js>                              \
+    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)                                  \
+    constexpr auto NAME(sequence_t<T, Is...>, sequence_t<U, Js...>) noexcept         \
+        -> sequence_t<UTL_BINOP_RESULT(SYM, T, U), (Is SYM Js)...> {                 \
+        return {};                                                                   \
+    }                                                                                \
+    template <typename T, T... Is, typename U, U J>                                  \
+    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)                                  \
+    constexpr auto operator SYM(sequence_t<T, Is...>, scalar_t<U, J>) noexcept       \
+        -> sequence_t<UTL_BINOP_RESULT(SYM, T, U), (Is SYM J)...> {                  \
+        return {};                                                                   \
+    }                                                                                \
+    template <typename T, T... Is, typename U, U... Js>                              \
+    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)                                  \
+    constexpr auto operator SYM(sequence_t<T, Is...>, sequence_t<U, Js...>) noexcept \
+        -> sequence_t<UTL_BINOP_RESULT(SYM, T, U), (Is SYM Js)...> {                 \
+        return {};                                                                   \
     }
 
 UTL_DEFINE_OP(add, +)
@@ -113,20 +119,22 @@ UTL_DEFINE_OP(bw_xor, ^)
 #undef UTL_BINOP_RESULT
 
 template <typename T, T I>
-UTL_SEQ_CONST constexpr auto bw_neg(scalar_t<T, I>) noexcept -> scalar_t<decltype(~I), ~I> {
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto bw_neg(scalar_t<T, I>) noexcept
+    -> scalar_t<decltype(~I), ~I> {
     return {};
 }
 template <typename T, T... Is>
-UTL_SEQ_CONST constexpr auto bw_neg(sequence_t<T, Is...>) noexcept
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto bw_neg(sequence_t<T, Is...>) noexcept
     -> sequence_t<decltype(~declval<T>()), (~Is)...> {
     return {};
 }
 template <typename T, T I>
-UTL_SEQ_CONST constexpr auto operator~(scalar_t<T, I>) noexcept -> scalar_t<decltype(~I), ~I> {
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto operator~(scalar_t<T, I>) noexcept
+    -> scalar_t<decltype(~I), ~I> {
     return {};
 }
 template <typename T, T... Is>
-UTL_SEQ_CONST constexpr auto operator~(sequence_t<T, Is...>) noexcept
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto operator~(sequence_t<T, Is...>) noexcept
     -> sequence_t<decltype(~declval<T>()), (~Is)...> {
     return {};
 }
@@ -137,53 +145,54 @@ template <typename T, size_t N>
 UTL_INLINE_CXX17 constexpr auto zero = bw_xor(range<T, N>, range<T, N>);
 
 template <size_t N, typename T, T... Is>
-UTL_SEQ_CONST constexpr T access(sequence_t<T, Is...>) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr T access(sequence_t<T, Is...>) noexcept {
     return array<T, Is...>[N];
 }
 
 template <typename T, T... Is, size_t... Js>
-UTL_SEQ_CONST constexpr auto shuffle(sequence_t<T, Is...>, sequence_t<size_t, Js...>) noexcept
-    -> sequence_t<T, array<T, Is...>[Js]...> {
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto shuffle(sequence_t<T, Is...>,
+    sequence_t<size_t, Js...>) noexcept -> sequence_t<T, array<T, Is...>[Js]...> {
     return {};
 }
 template <typename T, T... Is, size_t J>
-UTL_SEQ_CONST constexpr auto pow(sequence_t<T, Is...>, index_t<J>) noexcept
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto pow(sequence_t<T, Is...>, index_t<J>) noexcept
     -> sequence_t<T, details::pow(Is, J)...> {
     return {};
 }
 template <typename T, T... Is, size_t... Js>
-UTL_SEQ_CONST constexpr auto pow(sequence_t<T, Is...>, sequence_t<size_t, Js...>) noexcept
-    -> sequence_t<T, details::pow(Is, Js)...> {
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto pow(sequence_t<T, Is...>,
+    sequence_t<size_t, Js...>) noexcept -> sequence_t<T, details::pow(Is, Js)...> {
     return {};
 }
 
 template <size_t N, typename T, T I>
-UTL_SEQ_CONST constexpr auto repeat(scalar_t<T, I>) noexcept
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto repeat(scalar_t<T, I>) noexcept
     -> decltype(bw_or(zero<T, N>, scalar<T, I>)) {
     return {};
 }
 template <size_t N, typename T, T... Is>
-UTL_SEQ_CONST constexpr auto repeat(sequence_t<T, Is...>) noexcept -> decltype(shuffle(
-    sequence<T, Is...>, div(range<size_t, N * sizeof...(Is)>, index<sizeof...(Is)>))) {
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto repeat(sequence_t<T, Is...>) noexcept
+    -> decltype(shuffle(
+        sequence<T, Is...>, div(range<size_t, N * sizeof...(Is)>, index<sizeof...(Is)>))) {
     return {};
 }
 template <size_t N, typename T, T... Is>
-UTL_SEQ_CONST constexpr auto tile(sequence_t<T, Is...>) noexcept -> decltype(shuffle(
-    sequence<T, Is...>, mod(range<size_t, N * sizeof...(Is)>, index<sizeof...(Is)>))) {
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto tile(sequence_t<T, Is...>) noexcept
+    -> decltype(shuffle(
+        sequence<T, Is...>, mod(range<size_t, N * sizeof...(Is)>, index<sizeof...(Is)>))) {
     return {};
 }
 template <typename T, T... Is>
-UTL_SEQ_CONST constexpr auto flip(sequence_t<T, Is...>) noexcept -> decltype(shuffle(
-    sequence<T, Is...>, sub(index<sizeof...(Is)>, range<size_t, sizeof...(Is)>))) {
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto flip(sequence_t<T, Is...>) noexcept
+    -> decltype(shuffle(
+        sequence<T, Is...>, sub(index<sizeof...(Is)>, range<size_t, sizeof...(Is)>))) {
     return {};
 }
 
 template <typename T, T... Is, T... Js>
-UTL_SEQ_CONST constexpr auto concat(sequence_t<T, Is...>, sequence_t<T, Js...>) noexcept
-    -> sequence_t<T, Is..., Js...> {
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto concat(
+    sequence_t<T, Is...>, sequence_t<T, Js...>) noexcept -> sequence_t<T, Is..., Js...> {
     return {};
 }
 } // namespace seq
-
-#undef UTL_SEQ_CONST
 UTL_NAMESPACE_END

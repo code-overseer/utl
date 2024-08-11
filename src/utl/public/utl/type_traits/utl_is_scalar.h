@@ -36,7 +36,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_scalar : bool_constant<UTL_BUILTIN_is_scalar(T)> {};
+struct UTL_PUBLIC_TEMPLATE is_scalar : bool_constant<UTL_BUILTIN_is_scalar(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -58,7 +58,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct is_scalar :
+struct UTL_PUBLIC_TEMPLATE is_scalar :
     bool_constant<UTL_TRAIT_is_arithmetic(T) || UTL_TRAIT_is_member_pointer(T) ||
         UTL_TRAIT_is_pointer(T) || UTL_TRAIT_is_null_pointer(T) || UTL_TRAIT_is_enum(T)> {};
 

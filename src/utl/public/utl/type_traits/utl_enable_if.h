@@ -7,11 +7,11 @@
 UTL_NAMESPACE_BEGIN
 
 template <bool, typename = void>
-struct enable_if;
+struct UTL_PUBLIC_TEMPLATE enable_if {};
 
 template <typename T>
-struct enable_if<true, T> {
-    using type = T;
+struct UTL_PUBLIC_TEMPLATE enable_if<true, T> {
+    using type UTL_NODEBUG = T;
 };
 
 template <bool B, typename T = void>

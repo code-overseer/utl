@@ -2,8 +2,10 @@
 
 #pragma once
 
-#include "utl/compare/utl_compare_fwd.h"
 #include "utl/preprocessor/utl_config.h"
+
+#include "utl/compare/utl_compare_fwd.h"
+
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_is_convertible.h"
@@ -16,47 +18,48 @@ namespace three_way_comparable {
 #if UTL_CXX20
 
 template <typename T, typename U>
-using result_t = decltype(UTL_SCOPE declval<T>() <=> UTL_SCOPE declval<U>());
+using result_t UTL_NODEBUG = decltype(UTL_SCOPE declval<T>() <=> UTL_SCOPE declval<U>());
 
-template <typename T, typename U UTL_REQUIRES_CXX11(sizeof(result_t<T, U>) > 0)>
-UTL_SCOPE true_type possible(int) noexcept;
-template <typename T, typename U, typename Cat UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_convertible(result_t<T, U>, Cat))>
-UTL_SCOPE true_type impl(int) noexcept;
-template <typename T, typename U, typename Cat UTL_REQUIRES_CXX11(
-    UTL_TRAIT_is_nothrow_convertible(result_t<T, U>, Cat))>
-UTL_SCOPE true_type nothrow_check(int) noexcept;
+template <typename T, typename U UTL_REQUIRES_CXX11((sizeof(result_t<T, U>) > 0))>
+UTL_HIDE_FROM_ABI UTL_SCOPE true_type possible(int) noexcept;
+template <typename T, typename U, typename Cat UTL_REQUIRES_CXX11( UTL_TRAIT_is_convertible(result_t<T, U>, Cat))>
+UTL_HIDE_FROM_ABI UTL_SCOPE true_type impl(int) noexcept;
+template <typename T, typename U, typename Cat UTL_REQUIRES_CXX11( UTL_TRAIT_is_nothrow_convertible(result_t<T, U>, Cat))>
+UTL_HIDE_FROM_ABI UTL_SCOPE true_type nothrow_check(int) noexcept;
 
 #endif // UTL_CXX20
 
 template <typename T, typename U>
-UTL_SCOPE false_type possible(float) noexcept;
+UTL_HIDE_FROM_ABI UTL_SCOPE false_type possible(float) noexcept;
 
 template <typename T, typename U>
-UTL_SCOPE false_type impl(float) noexcept;
+UTL_HIDE_FROM_ABI UTL_SCOPE false_type impl(float) noexcept;
 
 template <typename T, typename U>
-UTL_SCOPE false_type nothrow_check(float) noexcept;
+UTL_HIDE_FROM_ABI UTL_SCOPE false_type nothrow_check(float) noexcept;
 
 template <typename T, typename U>
-using possible_t = decltype(possible<T, U>(0));
+using possible_t UTL_NODEBUG = decltype(possible<T, U>(0));
 template <typename T, typename U, typename Cat>
-using impl_t = decltype(impl<T, U, Cat>(0));
+using impl_t UTL_NODEBUG = decltype(impl<T, U, Cat>(0));
 template <typename T, typename U, typename Cat>
-using nothrow_t = decltype(nothrow_check<T, U, Cat>(0));
+using nothrow_t UTL_NODEBUG = decltype(nothrow_check<T, U, Cat>(0));
 } // namespace three_way_comparable
 } // namespace details
 
 template <typename T, typename U, typename Cat = UTL_SCOPE partial_ordering>
-struct is_three_way_comparable_with : details::three_way_comparable::impl_t<T, U, Cat> {};
+struct UTL_PUBLIC_TEMPLATE is_three_way_comparable_with :
+    details::three_way_comparable::impl_t<T, U, Cat> {};
 template <typename T, typename Cat = UTL_SCOPE partial_ordering>
-struct is_three_way_comparable : details::three_way_comparable::impl_t<T, T, Cat> {};
+struct UTL_PUBLIC_TEMPLATE is_three_way_comparable :
+    details::three_way_comparable::impl_t<T, T, Cat> {};
 
 template <typename T, typename U, typename Cat = UTL_SCOPE partial_ordering>
-struct is_nothrow_three_way_comparable_with :
+struct UTL_PUBLIC_TEMPLATE is_nothrow_three_way_comparable_with :
     details::three_way_comparable::nothrow_t<T, U, Cat> {};
 template <typename T, typename Cat = UTL_SCOPE partial_ordering>
-struct is_nothrow_three_way_comparable : details::three_way_comparable::nothrow_t<T, T, Cat> {};
+struct UTL_PUBLIC_TEMPLATE is_nothrow_three_way_comparable :
+    details::three_way_comparable::nothrow_t<T, T, Cat> {};
 
 #if UTL_CXX14
 

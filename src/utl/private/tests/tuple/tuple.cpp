@@ -2,6 +2,10 @@
 
 #include "utl/tuple/utl_tuple.h"
 #include "utl/type_traits/utl_std_traits.h"
+UTL_DISABLE_WARNING_PUSH()
+#if UTL_COMPILER_GNU_BASED
+UTL_DISABLE_WARNING("-Wunused-const-variable")
+#endif
 
 namespace tuple_test {
 template <int>
@@ -28,8 +32,7 @@ static_assert(utl::is_same<utl::tuple_element_t<0, STRIP(t)>, int>::value,
     "tuple_element should return the indexed element");
 static_assert(utl::is_same<utl::tuple_element_t<1, STRIP(t)>, float>::value,
     "tuple_element should return the indexed element");
-static_assert(!utl::tuple_traits::is_gettable<2, decltype(t)>::value, "Should not be gettable");
-static_assert(!utl::tuple_traits::is_gettable<2, decltype(t)>::value, "Should not be gettable");
+static_assert(!utl::details::tuple::is_gettable<2, decltype(t)>::value, "Should not be gettable");
 
 template <typename T, typename Tuple, typename = void>
 struct not_gettable_by_type : utl::true_type {};
@@ -340,3 +343,4 @@ static_assert(
 static_assert(!utl::is_constructible<utl::tuple<long long&&, double>, std::pair<int, float>>::value,
     "If all element are constructible, tuple is constructible from const reference");
 } // namespace tuple_test
+UTL_DISABLE_WARNING_POP()

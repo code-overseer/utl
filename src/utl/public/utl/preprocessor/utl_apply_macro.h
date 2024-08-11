@@ -12,7 +12,17 @@
 #define UTL_EVAL4(...) UTL_EVAL3(UTL_EVAL3(UTL_EVAL3(__VA_ARGS__)))
 #define UTL_EVAL(...) UTL_EVAL4(UTL_EVAL4(UTL_EVAL4(__VA_ARGS__)))
 
-#if !UTL_CXX20
+#if UTL_CXX20 && !UTL_MSVC_PREPROCESSOR
+
+#  define UTL_APPLY_MACRO_PARENTHESIS ()
+#  define UTL_APPLY_MACRO_IMPL(F, _0, ...) \
+      F(_0)                                \
+      __VA_OPT__(UTL_APPLY_MACRO_LOOP UTL_APPLY_MACRO_PARENTHESIS UTL_PASTE((F, __VA_ARGS__)))
+#  define UTL_APPLY_MACRO_LOOP() UTL_APPLY_MACRO_IMPL
+
+#  define UTL_APPLY_MACRO(F, ...) __VA_OPT__(UTL_EVAL(UTL_APPLY_MACRO_IMPL(F, __VA_ARGS__)))
+
+#else
 
 #  define UTL_APPLY_MACRO_END(...)
 #  define UTL_APPLY_MACRO_OUT
@@ -22,7 +32,7 @@
 #  define UTL_APPLY_MACRO_GET_END1(...) UTL_APPLY_MACRO_GET_END2
 #  define UTL_APPLY_MACRO_GET_END(...) UTL_APPLY_MACRO_GET_END1
 #  define UTL_APPLY_MACRO_NEXT0(test, next, ...) next UTL_APPLY_MACRO_OUT
-#  if !UTL_COMPILER_MSVC
+#  if !UTL_MSVC_PREPROCESSOR
 #    define UTL_APPLY_MACRO_NEXT1(test, next) UTL_APPLY_MACRO_NEXT0(test, next, 0)
 #    define UTL_APPLY_MACRO_NEXT(test, next) \
         UTL_APPLY_MACRO_NEXT1(UTL_APPLY_MACRO_GET_END test, next)
@@ -30,7 +40,7 @@
         f(x) UTL_APPLY_MACRO_NEXT(peek, UTL_APPLY_MACRO1)(f, peek, __VA_ARGS__)
 #    define UTL_APPLY_MACRO1(f, x, peek, ...) \
         f(x) UTL_APPLY_MACRO_NEXT(peek, UTL_APPLY_MACRO0)(f, peek, __VA_ARGS__)
-#  else /* if !UTL_COMPILER_MSVC */
+#  else /* if !UTL_MSVC_PREPROCESSOR */
 #    define UTL_APPLY_MACRO_NEXT1(test, next) UTL_PASTE(UTL_APPLY_MACRO_NEXT0(test, next, 0))
 #    define UTL_APPLY_MACRO_NEXT(test, next) \
         UTL_PASTE(UTL_APPLY_MACRO_NEXT1(UTL_APPLY_MACRO_GET_END test, next))
@@ -38,7 +48,7 @@
         f(x) UTL_PASTE(UTL_APPLY_MACRO_NEXT(peek, UTL_APPLY_MACRO1)(f, peek, __VA_ARGS__))
 #    define UTL_APPLY_MACRO1(f, x, peek, ...) \
         f(x) UTL_PASTE(UTL_APPLY_MACRO_NEXT(peek, UTL_APPLY_MACRO0)(f, peek, __VA_ARGS__))
-#  endif /* if !UTL_COMPILER_MSVC */
+#  endif /* if !UTL_MSVC_PREPROCESSOR */
 
 #  define UTL_APPLY_MACRO_LIST_NEXT1(test, next) \
       UTL_APPLY_MACRO_NEXT0(test, UTL_APPLY_MACRO_COMMA next, 0)
@@ -56,14 +66,4 @@
 #  define UTL_APPLY_MACRO(f, ...) \
       UTL_EVAL(UTL_APPLY_MACRO1(f, __VA_ARGS__, ()()(), ()()(), ()()(), 0))
 
-#else /* if !UTL_CXX20 */
-
-#  define UTL_APPLY_MACRO_PARENTHESIS ()
-#  define UTL_APPLY_MACRO_IMPL(F, _0, ...) \
-      F(_0)                                \
-      __VA_OPT__(UTL_APPLY_MACRO_LOOP UTL_APPLY_MACRO_PARENTHESIS UTL_PASTE((F, __VA_ARGS__)))
-#  define UTL_APPLY_MACRO_LOOP() UTL_APPLY_MACRO_IMPL
-
-#  define UTL_APPLY_MACRO(F, ...) __VA_OPT__(UTL_EVAL(UTL_APPLY_MACRO_IMPL(F, __VA_ARGS__)))
-
-#endif /* if !UTL_CXX20 */
+#endif /* if UTL_CXX20 */

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_compiler.h"
-#include "utl/preprocessor/utl_msvc_traits.h"
+#include "utl/preprocessor/utl_msvc_builtins.h"
 #include "utl/preprocessor/utl_standard.h"
 
 #ifdef __is_identifier
@@ -12,11 +12,9 @@
 #  define UTL_IS_RESERVED_IDENTIFIER(...) 0
 #endif
 
-#if UTL_COMPILER_MSVC
-#  define UTL_HAS_BUILTIN(BUILTIN) UTL_MSVC_SUPPORTS##BUILTIN
-#elif defined(__has_builtin)
+#ifdef __has_builtin
 #  define UTL_HAS_BUILTIN(BUILTIN) __has_builtin(BUILTIN)
-#else /* ifdef __has_builtin */
+#else
 #  define UTL_HAS_BUILTIN(...) 0
 #endif /* ifdef __has_builtin */
 
@@ -54,6 +52,12 @@
 #  define UTL_BUILTIN_unreachable() __assume(0)
 #else /* UTL_HAS_BUILTIN(__builtin_unreachable) */
 
+#  if UTL_HAS_BUILTIN(__builtin_expect)
+#    define UTL_BUILTIN_expect(VALUE, EXP) __builtin_expect(VALUE, EXP)
+#  else
+#    define UTL_BUILTIN_expect(VALUE, _1) VALUE
+#  endif
+
 #  ifdef UTL_CXX
 extern "C" void abort(void);
 #  else
@@ -84,4 +88,28 @@ void abort(void);
 #if UTL_HAS_BUILTIN(__is_pointer_interconvertible_base_of) || UTL_COMPILER_GCC_AT_LEAST(12, 0, 0)
 #  define UTL_BUILTIN_is_pointer_interconvertible_base_of(...) \
       __is_pointer_interconvertible_base_of(__VA_ARGS__)
+#endif
+
+#if UTL_HAS_BUILTIN(__builtin_source_location)
+#  define UTL_BUILTIN_source_location() __builtin_source_location()
+#endif
+
+#if UTL_HAS_BUILTIN(__builtin_FILE)
+#  define UTL_BUILTIN_FILE() __builtin_FILE()
+#endif
+
+#if UTL_HAS_BUILTIN(__builtin_FUNCTION)
+#  define UTL_BUILTIN_FUNCTION() __builtin_FUNCTION()
+#endif
+
+#if UTL_HAS_BUILTIN(__builtin_LINE)
+#  define UTL_BUILTIN_LINE() __builtin_LINE()
+#endif
+
+#if UTL_HAS_BUILTIN(__builtin_COLUMN)
+#  define UTL_BUILTIN_COLUMN() __builtin_COLUMN()
+#endif
+
+#if UTL_HAS_BUILTIN(__builtin_FUNCSIG)
+#  define UTL_BUILTIN_FUNCSIG() __builtin_FUNCSIG()
 #endif

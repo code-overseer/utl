@@ -82,7 +82,7 @@ auto nothrow_impl(nothrow_branch_t<false, true>) noexcept -> false_type;
 
 template <typename T, typename U>
 using nothrow_impl_t = decltype(nothrow_impl<T, U>(
-    nothrow_branch_t<UTL_TRAIT_VALUE(is_assignable, T, Args), UTL_TRAIT_VALUE(is_reference, T)>{}));
+    nothrow_branch_t<UTL_SCOPE is_assignable<T, Args>::value, UTL_SCOPE is_reference<T>::value>{}));
 
 } // namespace assignable
 } // namespace details

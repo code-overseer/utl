@@ -2,84 +2,179 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_config.h"
+
 #include "utl/memory/utl_addressof.h"
-#include "utl/type_traits/utl_constants.h"
-#include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_is_function.h"
 #include "utl/type_traits/utl_is_pointer.h"
 #include "utl/type_traits/utl_logical_traits.h"
-#include "utl/type_traits/utl_void_t.h"
+#include "utl/utility/utl_customization_point.h"
+
+#if UTL_CXX20
+
+#  include "utl/concepts/utl_referenceable.h"
+
+UTL_NAMESPACE_BEGIN
+
+namespace details {
+namespace pointer_traits {
+template <typename P>
+struct diff_type;
+
+template <typename P>
+using diff_type_t = typename diff_type<P>::type;
+
+template <typename P>
+requires requires { typename P::difference_type; }
+struct diff_type<P> {
+    using type UTL_NODEBUG = typename P::difference_type;
+};
+
+template <typename P>
+struct diff_type {
+    using type UTL_NODEBUG = decltype((char*)(0) - (char*)(0));
+};
+
+template <typename Ptr, typename T>
+struct rebind_impl;
+template <typename Ptr, typename T>
+requires requires { typename Ptr::template rebind<T>; }
+struct rebind_impl<Ptr, T> {
+    using type UTL_NODEBUG = typename Ptr::template rebind<T>;
+};
+
+template <template <typename...> class Template, typename T, typename... Args, typename U>
+requires requires { typename Template<T, Args...>::template rebind<U>; }
+struct rebind_impl<Template<T, Args...>, U> {
+    using type UTL_NODEBUG = typename Template<T, Args...>::template rebind<U>;
+};
+
+template <template <typename...> class Template, typename T, typename... Args, typename U>
+struct rebind_impl<Template<T, Args...>, U> {
+    using type UTL_NODEBUG = Template<U, Args...>;
+};
+
+template <typename From, typename To>
+struct rebind_impl<From*, To> {
+    using type UTL_NODEBUG = To*;
+};
+
+template <typename Ptr>
+struct impl {};
+
+template <typename Ptr>
+requires requires { typename Ptr::element_type; }
+struct impl<Ptr> {
+    using pointer = Ptr;
+    using element_type = typename pointer::element_type;
+    using difference_type = diff_type_t<pointer>;
+
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN) static constexpr pointer pointer_to(element_type& ref)
+    requires UTL_SCOPE
+    referenceable<element_type> {
+        return pointer::pointer_to(ref);
+    }
+
+    template <typename U>
+    using rebind = typename rebind_impl<pointer, U>::type;
+};
+
+template <template <typename...> class Template, typename T, typename... Args>
+struct impl<Template<T, Args...>> {
+    using pointer = Template<T, Args...>;
+    using element_type = T;
+    using difference_type = diff_type_t<pointer>;
+
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN) static constexpr pointer pointer_to(element_type& ref)
+    requires UTL_SCOPE
+    referenceable<element_type> {
+        return pointer::pointer_to(ref);
+    }
+
+    template <typename U>
+    using rebind = typename rebind_impl<pointer, U>::type;
+};
+
+} // namespace pointer_traits
+} // namespace details
+
+UTL_NAMESPACE_END
+
+#else
+
+#  include "utl/type_traits/utl_constants.h"
+#  include "utl/type_traits/utl_declval.h"
+#  include "utl/type_traits/utl_has_member_difference_type.h"
+#  include "utl/type_traits/utl_has_member_element_type.h"
 
 UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace pointer_traits {
 
-template <typename Ptr, typename = void>
-struct diff_type {
-    using type = decltype(declval<char*>() - declval<char*>());
-};
-
-template <typename Ptr>
-struct diff_type<Ptr, void_t<typename Ptr::difference_type>> {
-    using type = typename Ptr::difference_type;
-};
-
-template <typename T, typename = void>
-struct has_element_type : false_type {};
-template <typename T>
-struct has_element_type<T, void_t<typename T::element_type>> : true_type {};
-
 struct invalid_t {};
 
 template <typename Element>
 struct pointer_to_arg {
-    using type = Element&;
+    using type UTL_NODEBUG = Element&;
 };
 template <>
 struct pointer_to_arg<void> {
-    using type = invalid_t;
+    using type UTL_NODEBUG = invalid_t;
 };
 
-template <typename T, typename U, typename = void>
-struct has_rebind : false_type {};
+template <typename P>
+UTL_HIDE_FROM_ABI auto diff_type_impl(int) -> typename P::difference_type;
+template <typename P>
+UTL_HIDE_FROM_ABI auto diff_type_impl(short) -> decltype((char*)(0) - (char*)(0));
+
+template <typename P>
+using diff_type_t UTL_NODEBUG = decltype(diff_type_impl<P>(0));
 
 template <typename T, typename U>
-struct has_rebind<T, U, void_t<typename T::template rebind<U>>> : true_type {};
+UTL_HIDE_FROM_ABI auto has_rebind_impl(float) noexcept -> UTL_SCOPE false_type;
+
+template <typename T, typename U>
+UTL_HIDE_FROM_ABI auto has_rebind_impl(int) noexcept
+    -> UTL_SCOPE always_true_type<typename T::template rebind<U>>;
+
+template <typename T, typename U>
+using has_rebind UTL_NODEBUG = decltype(has_rebind_impl<T, U>(0));
 
 template <typename Ptr, typename T, bool = has_rebind<Ptr, T>::value>
 struct rebind_impl;
 
 template <typename Ptr, typename T>
 struct rebind_impl<Ptr, T, true> {
-    using type = typename Ptr::template rebind<T>;
+    using type UTL_NODEBUG = typename Ptr::template rebind<T>;
 };
 
 template <template <typename...> class Template, typename T, typename... Args, typename U>
 struct rebind_impl<Template<T, Args...>, U, true> {
-    using type = typename Template<T, Args...>::template rebind<U>;
+    using type UTL_NODEBUG = typename Template<T, Args...>::template rebind<U>;
 };
 
 template <template <typename...> class Template, typename T, typename... Args, typename U>
 struct rebind_impl<Template<T, Args...>, U, false> {
-    using type = Template<U, Args...>;
+    using type UTL_NODEBUG = Template<U, Args...>;
 };
 
 template <typename From, typename To>
 struct rebind_impl<From*, To, false> {
-    using type = To*;
+    using type UTL_NODEBUG = To*;
 };
 
-template <typename Ptr, bool = has_element_type<Ptr>::value>
+template <typename Ptr, bool = UTL_TRAIT_has_member_element_type(Ptr)>
 struct impl {};
 
 template <typename Ptr>
 struct impl<Ptr, true> {
     using pointer = Ptr;
     using element_type = typename pointer::element_type;
-    using difference_type = typename diff_type<pointer>::type;
+    using difference_type = diff_type_t<pointer>;
 
-    static constexpr pointer pointer_to(typename pointer_to_arg<element_type>::type ref) {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN) static constexpr pointer pointer_to(
+        typename pointer_to_arg<element_type>::type ref) {
         return pointer::pointer_to(ref);
     }
 
@@ -91,77 +186,40 @@ template <template <typename...> class Template, typename T, typename... Args>
 struct impl<Template<T, Args...>, false> {
     using pointer = Template<T, Args...>;
     using element_type = T;
-    using difference_type = typename diff_type<pointer>::type;
+    using difference_type = diff_type_t<pointer>;
 
-    static constexpr pointer pointer_to(typename pointer_to_arg<element_type>::type ref) {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN) static constexpr pointer pointer_to(
+        typename pointer_to_arg<element_type>::type ref) {
         return pointer::pointer_to(ref);
     }
 
     template <typename U>
     using rebind = typename rebind_impl<pointer, U>::type;
 };
+
 } // namespace pointer_traits
 } // namespace details
 
-template <typename T>
-struct pointer_traits : details::pointer_traits::impl<T> {};
+UTL_NAMESPACE_END
+
+#endif
+
+UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct pointer_traits<T*> {
+struct UTL_PUBLIC_TEMPLATE pointer_traits : details::pointer_traits::impl<T> {};
+
+template <typename T>
+struct UTL_PUBLIC_TEMPLATE pointer_traits<T*> {
     using pointer = T*;
     using element_type = T;
-    using difference_type = typename details::pointer_traits::diff_type<T*>::type;
+    using difference_type = details::pointer_traits::diff_type_t<T*>;
+    template <typename U>
+    using rebind = U*;
 
-    static constexpr pointer pointer_to(element_type& ref) noexcept {
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN) static constexpr pointer pointer_to(element_type& ref) noexcept {
         return UTL_SCOPE addressof(ref);
     }
 };
-
-namespace details {
-namespace pointer_traits {
-
-template <typename Ptr, typename = void>
-struct has_to_address : false_type {};
-
-template <typename Ptr>
-struct has_to_address<Ptr,
-    void_t<decltype(UTL_SCOPE pointer_traits<Ptr>::to_address(declval<Ptr const&>()))>> :
-    true_type {};
-
-template <typename Ptr, typename = void>
-struct has_arrow_operator : false_type {};
-
-template <typename Ptr>
-struct has_arrow_operator<Ptr, decltype((void)declval<Ptr const&>().operator->())> : true_type {};
-
-struct to_address_t {
-    template <typename T>
-    UTL_ATTRIBUTES(NODISCARD, CONST)
-    inline constexpr T* operator()(T* ptr) const noexcept {
-        static_assert(!is_function<T>::value, "T cannot be a function");
-        return ptr;
-    }
-
-    template <typename T, enable_if_t<!is_pointer<T>::value && has_to_address<T>::value, int> = 0>
-    UTL_ATTRIBUTE(NODISCARD)
-    inline constexpr auto operator()(T const& ptr) const noexcept
-        -> decltype(UTL_SCOPE pointer_traits<T>::to_address(ptr)) {
-        return UTL_SCOPE pointer_traits<T>::to_address(ptr);
-    };
-
-    template <typename T,
-        enable_if_t<!is_pointer<T>::value && !has_to_address<T>::value &&
-                has_arrow_operator<T>::value,
-            int> = 1>
-    UTL_ATTRIBUTE(NODISCARD)
-    inline constexpr auto operator()(T const& ptr) const noexcept
-        -> decltype(this->operator()(ptr.operator->())) {
-        return this->operator()(ptr.operator->());
-    }
-};
-} // namespace pointer_traits
-} // namespace details
-
-UTL_INLINE_CXX17 constexpr details::pointer_traits::to_address_t to_address = {};
 
 UTL_NAMESPACE_END

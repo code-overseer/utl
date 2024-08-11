@@ -8,7 +8,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct alignment_of : size_constant<alignof(T)> {};
+struct UTL_PUBLIC_TEMPLATE alignment_of : size_constant<alignof(T)> {};
 
 template <typename T>
 UTL_INLINE_CXX17 constexpr size_t alignment_of_v = alignof(T);

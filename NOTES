@@ -1,6 +1,10 @@
 * Supporting modules will probably be a massive PITA
 * TODO: hide private symbols, put the visibility macros in utl_abi
-* TODO: Maybe move all the type_traits builtins to a single file
-* TODO: defined some sort of standardization for #if and #ifdef checks
+* TODO: Maybe move all the type_traits builtins to a single file?
 * TODO: Find stable impementation of type traits introduced in C++20 and remove support for buggy implementations
-* TODO: Maybe remove utl ordering and just use <compare>, the header is not particularly large
+* TODO: Maybe remove utl ordering and just use <compare>? the header is not particularly large
+# TODO: Fix for C++11 T.T
+# TODO: Shorten UTL_SCOPE to _UTL
+# TODO: Map APPLE Clang to LLVM
+# TODO: fix UTL_TRAIT_* for llvm < 18
+# TODO: define CONSTEXPR_ASSERT for C++11

@@ -2,38 +2,55 @@
 
 #pragma once
 
+#include "utl/preprocessor/utl_config.h"
+
+#include "utl/concepts/utl_constructible_as.h"
 #include "utl/exception.h"
 #include "utl/scope/utl_scope_impl.h"
+#include "utl/type_traits/utl_decay.h"
+#include "utl/type_traits/utl_is_constructible.h"
+#include "utl/type_traits/utl_is_nothrow_constructible.h"
+#include "utl/type_traits/utl_logical_traits.h"
+#include "utl/utility/utl_customization_point.h"
 
 UTL_NAMESPACE_BEGIN
 
 #if UTL_CXX17
+
 template <typename F>
-class scope_fail : private details::scope::impl<scope_fail<F>, F> {
+class
+    UTL_ATTRIBUTES(PUBLIC_TEMPLATE, NODISCARD) scope_fail : private details::scope::impl<scope_fail<F>, F> {
     using base_type = details::scope::impl<scope_fail<F>, F>;
-    using is_movable = typename base_type::is_movable;
-    using move_t = conditional_t<is_movable::value, scope_fail, details::scope::invalid_t>;
+    using typename base_type::invalid_t;
+    using typename base_type::is_movable;
+    using move_t = conditional_t<is_movable::value, scope_fail, invalid_t>;
     friend base_type;
 
 public:
-    template <typename Fn, typename = enable_if_t<UTL_TRAIT_is_constructible(F, Fn&&)>>
-    explicit scope_fail(Fn&& func) noexcept(UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
+    template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn
+            UTL_REQUIRES_CXX11(UTL_TRAIT_is_constructible(F, Fn&&))>
+    UTL_HIDE_FROM_ABI explicit scope_fail(Fn&& func) noexcept(
+        UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
         : base_type(UTL_SCOPE forward<Fn>(func))
-        , exceptions_(uncaught_exceptions()) {}
-    scope_fail(move_t&& other) noexcept(UTL_TRAIT_is_nothrow_move_constructible(F))
+        , exceptions_(UTL_SCOPE uncaught_exceptions()) {}
+    scope_fail(scope_fail const&) = delete;
+    UTL_HIDE_FROM_ABI scope_fail(move_t&& other) noexcept(
+        UTL_TRAIT_is_nothrow_move_constructible(F))
         : base_type(UTL_SCOPE move(other))
         , exceptions_(other.exceptions_) {}
 
     using base_type::release;
 
-    ~scope_fail() noexcept {
+    UTL_HIDE_FROM_ABI ~scope_fail() noexcept {
         if (!should_invoke()) {
             release();
         }
     }
 
 private:
-    bool should_invoke() const noexcept { return exceptions_ < uncaught_exceptions(); }
+    UTL_HIDE_FROM_ABI bool should_invoke() const noexcept {
+        return exceptions_ < UTL_SCOPE uncaught_exceptions();
+    }
     int exceptions_;
 };
 
@@ -41,28 +58,32 @@ template <typename Fn>
 explicit scope_fail(Fn&& f) -> scope_fail<decay_t<Fn>>;
 
 template <typename Fn>
-auto make_scope_fail(Fn&& f) noexcept(UTL_TRAIT_is_nothrow_constructible(scope_fail<decay_t<Fn>>,
-    Fn)) -> enable_if_t<UTL_TRAIT_is_constructible(scope_fail<decay_t<Fn>>, Fn),
-    scope_fail<decay_t<Fn>>> {
+UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) inline auto make_scope_fail(Fn&& f) noexcept(
+    UTL_TRAIT_is_nothrow_constructible(scope_fail<decay_t<Fn>>, Fn))
+    -> enable_if_t<UTL_TRAIT_is_constructible(scope_fail<decay_t<Fn>>, Fn),
+        scope_fail<decay_t<Fn>>> {
     return scope_fail<decay_t<Fn>>{UTL_SCOPE forward<Fn>(f)};
 }
 
 namespace details {
 namespace scope {
-UTL_INLINE_CXX17 constexpr struct fail_proxy_t {
+struct fail_factory_t {
+    UTL_HIDE_FROM_ABI constexpr explicit fail_factory_t() noexcept = default;
     template <typename Fn>
-    auto operator->*(Fn&& f) const
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) inline auto operator->*(Fn&& f) const
         noexcept(UTL_TRAIT_is_nothrow_constructible(scope_fail<decay_t<Fn>>, Fn))
             -> enable_if_t<UTL_TRAIT_is_constructible(scope_fail<decay_t<Fn>>, Fn),
                 scope_fail<decay_t<Fn>>> {
         return scope_fail<decay_t<Fn>>{UTL_SCOPE forward<Fn>(f)};
     }
-} fail_proxy = {};
+};
+
+inline constexpr fail_factory_t fail_factory{};
 } // namespace scope
 } // namespace details
 
 #  define UTL_ON_SCOPE_FAIL \
-      const auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::fail_proxy->*[&]()
+      const auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::fail_factory->*[&]()
 
 #else  // if UTL_CXX17
 template <typename F>

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/preprocessor/utl_config.h"
+
 #include "utl/type_traits/utl_declval.h"
 #include "utl/utility/utl_forward.h"
 
@@ -15,7 +16,7 @@
 namespace std {
 /* UTL_UNDEFINED_BEHAVIOUR */
 template <typename T, typename... Args>
-inline constexpr T* utl_construct_at_impl(T* location, Args&&... args) noexcept(
+UTL_HIDE_FROM_ABI inline constexpr T* utl_construct_at_impl(T* location, Args&&... args) noexcept(
     noexcept(::new((void*)0) T(declval<Args>()...))) {
     return ::new ((void*)(location)) T(forward<Args>(args)...);
 }
@@ -23,7 +24,7 @@ inline constexpr T* utl_construct_at_impl(T* location, Args&&... args) noexcept(
 
 UTL_NAMESPACE_BEGIN
 template <typename T, typename... Args>
-inline constexpr T* construct_at(T* location, Args&&... args) noexcept(
+UTL_HIDE_FROM_ABI inline constexpr T* construct_at(T* location, Args&&... args) noexcept(
     noexcept(::new((void*)0) T(declval<Args>()...))) {
     UTL_ASSERT_CXX14(location != nullptr);
     return ::std::utl_construct_at_impl(location, forward<Args>(args)...);
@@ -50,7 +51,7 @@ UTL_NAMESPACE_END
 #      include <new>
 UTL_NAMESPACE_BEGIN
 template <typename T, typename... Args>
-inline constexpr T* construct_at(T* location, Args&&... args) noexcept(
+inline UTL_HIDE_FROM_ABI constexpr T* construct_at(T* location, Args&&... args) noexcept(
     noexcept(::new((void*)0) T(declval<Args>()...))) {
     UTL_ASSERT_CXX14(location != nullptr);
     [[msvc::constexpr]] return ::new ((void*)(location)) T(forward<Args>(args)...);
@@ -65,7 +66,7 @@ UTL_NAMESPACE_END
 #  include <new>
 UTL_NAMESPACE_BEGIN
 template <typename T, typename... Args>
-inline T* construct_at(T* location, Args&&... args) noexcept(
+inline UTL_HIDE_FROM_ABI T* construct_at(T* location, Args&&... args) noexcept(
     noexcept(::new((void*)0) T(declval<Args>()...))) {
     UTL_ASSERT(location != nullptr);
     return ::new ((void*)(location)) T(forward<Args>(args)...);

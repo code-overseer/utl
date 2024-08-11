@@ -4,10 +4,11 @@
 
 #include "utl/preprocessor/utl_config.h"
 
-#include <limits>
-
+#if UTL_CXX20
 UTL_NAMESPACE_BEGIN
 
-using std::numeric_limits;
+template <typename T, typename Arg>
+concept subscriptable_with = requires(T t, Arg arg) { t[arg]; };
 
 UTL_NAMESPACE_END
+#endif

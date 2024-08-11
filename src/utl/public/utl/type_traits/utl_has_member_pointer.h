@@ -4,15 +4,17 @@
 
 #include "utl/preprocessor/utl_config.h"
 
+#include "utl/type_traits/utl_constants.h"
+
 #if UTL_CXX20
 
 UTL_NAMESPACE_BEGIN
 template <typename T>
-struct has_member_pointer : false_type {};
+struct UTL_PUBLIC_TEMPLATE has_member_pointer : UTL_SCOPE false_type {};
 
 template <typename T>
 requires requires { typename T::pointer; }
-struct has_member_pointer<T> : true_type {};
+struct UTL_PUBLIC_TEMPLATE has_member_pointer<T> : UTL_SCOPE true_type {};
 
 UTL_NAMESPACE_END
 
@@ -24,15 +26,15 @@ UTL_NAMESPACE_BEGIN
 namespace type_traits {
 namespace details {
 template <typename T, typename = void>
-struct has_member_pointer_impl : false_type {};
+struct has_member_pointer_impl : UTL_SCOPE false_type {};
 
 template <typename T>
-struct has_member_pointer_impl<T, void_t<typename T::pointer>> : true_type {};
+struct has_member_pointer_impl<T, void_t<typename T::pointer>> : UTL_SCOPE true_type {};
 } // namespace details
 } // namespace type_traits
 
 template <typename T>
-struct has_member_pointer : type_traits::details::has_member_pointer_impl<T> {};
+struct UTL_PUBLIC_TEMPLATE has_member_pointer : type_traits::details::has_member_pointer_impl<T> {};
 
 UTL_NAMESPACE_END
 

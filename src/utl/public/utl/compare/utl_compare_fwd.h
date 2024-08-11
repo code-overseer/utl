@@ -11,9 +11,9 @@
 namespace std {
 /* UTL_UNDEFINED_BEHAVIOUR */
 /* @note (22/12/2023) GCC does not put the orderings under an inline namespace */
-class strong_ordering;
-class partial_ordering;
-class weak_ordering;
+class UTL_ABI_PUBLIC strong_ordering;
+class UTL_ABI_PUBLIC partial_ordering;
+class UTL_ABI_PUBLIC weak_ordering;
 } // namespace std
 #else
 UTL_STD_NAMESPACE_BEGIN
@@ -32,7 +32,7 @@ class weak_ordering;
 
 namespace details {
 namespace compare {
-using value_t = signed char;
+using value_t UTL_NODEBUG = signed char;
 enum class order_t : value_t {
     equal = 0,
     less = -1,
@@ -41,14 +41,40 @@ enum class order_t : value_t {
 enum class unorder_t : value_t {
     unordered = 2
 };
-class obscure {
-    friend class UTL_SCOPE strong_ordering;
-    friend class UTL_SCOPE partial_ordering;
-    friend class UTL_SCOPE weak_ordering;
-    struct zero_t {
-        UTL_CONSTEVAL zero_t(zero_t*) noexcept {}
-    };
+struct UTL_ABI_PUBLIC zero_t {
+    UTL_HIDE_FROM_ABI UTL_CONSTEVAL zero_t(zero_t*) noexcept {}
 };
+template <typename T>
+struct less_value {
+    UTL_ABI_PUBLIC static T const less;
+};
+template <typename T>
+struct greater_value {
+    UTL_ABI_PUBLIC static T const greater;
+};
+template <typename T>
+struct equal_value {
+    UTL_ABI_PUBLIC static T const equal;
+};
+template <typename T>
+struct equivalent_value {
+    UTL_ABI_PUBLIC static T const equivalent;
+};
+template <typename T>
+struct unordered_value {
+    UTL_ABI_PUBLIC static T const unordered;
+};
+
+template <typename T>
+UTL_INLINE_CXX17 constexpr T less_value<T>::less{order_t::less};
+template <typename T>
+UTL_INLINE_CXX17 constexpr T greater_value<T>::greater{order_t::greater};
+template <typename T>
+UTL_INLINE_CXX17 constexpr T equal_value<T>::equal{order_t::equal};
+template <typename T>
+UTL_INLINE_CXX17 constexpr T equivalent_value<T>::equivalent{order_t::equal};
+template <typename T>
+UTL_INLINE_CXX17 constexpr T unordered_value<T>::unordered{unorder_t::unordered};
 } // namespace compare
 } // namespace details
 

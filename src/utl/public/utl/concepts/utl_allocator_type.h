@@ -9,8 +9,8 @@
 #include "utl/concepts/utl_move_constructible.h"
 #include "utl/concepts/utl_swappable.h"
 #include "utl/preprocessor/utl_config.h"
+#include "utl/type_traits/utl_is_swappable.h"
 #include "utl/utility/utl_move.h"
-#include "utl/utility/utl_swap.h"
 
 #if UTL_CXX20
 UTL_NAMESPACE_BEGIN
@@ -52,7 +52,8 @@ concept move_assignability =
     });
 
 template <typename T>
-concept swappability = !swap_propogation<T> || (swappable<T> && is_nothrow_swappable_v<T>);
+concept swappability =
+    !swap_propogation<T> || (UTL_SCOPE swappable<T> && UTL_SCOPE is_nothrow_swappable_v<T>);
 
 } // namespace allocator
 } // namespace details
