@@ -86,7 +86,7 @@ template <typename Tuple, size_t... Ns>
 UTL_HIDE_FROM_ABI constexpr auto tuple_forward(Tuple&& tuple, index_sequence<Ns...>) noexcept(
     is_all_nothrow_gettable<Tuple>::value /* Only check the get expresions */
     /* We're constructing a tuple of references, so the construction should always be noexcept */
-    ) -> UTL_SCOPE tuple<decltype(decl_element<Ns, Tuple>())...> {
+    ) -> UTL_SCOPE tuple<get_type_t<Ns, Tuple>...> {
     return {UTL_SCOPE get_element<Ns>(UTL_SCOPE forward<Tuple>(tuple))...};
 }
 
@@ -121,10 +121,8 @@ template <typename T0, typename T1, size_t... I0, size_t... I1>
 UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl_idx(T0&& tuple0, T1&& tuple1, index_sequence<I0...>,
     index_sequence<I1...>) noexcept(is_all_nothrow_gettable<T0>::value &&
     is_all_nothrow_gettable<T1>::value &&
-    is_nothrow_constructible<concat_elements_t<T0, T1>,
-        decltype(UTL_SCOPE get_element<I0>(UTL_SCOPE declval<T0>()))...,
-        decltype(UTL_SCOPE get_element<I1>(UTL_SCOPE declval<T1>()))...>::value)
-    -> concat_elements_t<T0, T1> {
+    is_nothrow_constructible<concat_elements_t<T0, T1>, get_type_t<I0, T0>...,
+        get_type_t<I1, T1>...>::value) -> concat_elements_t<T0, T1> {
     return {UTL_SCOPE get_element<I0>(UTL_SCOPE forward<T0>(tuple0))...,
         UTL_SCOPE get_element<I1>(UTL_SCOPE forward<T1>(tuple1))...};
 }
