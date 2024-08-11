@@ -301,8 +301,8 @@ private:
     template <typename TupleLike, size_t... Is>
     UTL_HIDE_FROM_ABI constexpr tuple(TupleLike&& other, index_sequence<Is...>) noexcept(
         conjunction<details::tuple::is_all_nothrow_gettable<TupleLike, sizeof...(Is)>,
-            details::tuple::rebind_references_t<traits::template is_nothrow_constructible,
-                TupleLike, sizeof...(Is)>>::value)
+            typename traits::template is_nothrow_constructible<
+                details::tuple::get_type_t<Is, TupleLike>...>>::value)
         : base_type(UTL_SCOPE get_element<Is>(UTL_SCOPE forward<TupleLike>(other))...) {}
 
     template <typename Alloc, typename TupleLike, size_t... Is>
@@ -310,18 +310,16 @@ private:
         index_sequence<
             Is...>) noexcept(conjunction<details::tuple::is_all_nothrow_gettable<TupleLike,
                                              sizeof...(Is)>,
-        details::tuple::rebind_references_t<
-            variadic_proxy<traits::template is_nothrow_constructible_with_allocator,
-                Alloc>::template apply,
-            TupleLike, sizeof...(Types)>>::value)
+        typename traits::template is_nothrow_constructible_with_allocator<Alloc,
+            details::tuple::get_type_t<Is, TupleLike>...>>::value)
         : base_type(allocator_arg, alloc,
               UTL_SCOPE get_element<Is>(UTL_SCOPE forward<TupleLike>(other))...) {}
 
     template <typename TupleLike, size_t... Is>
     UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 tuple& assign(TupleLike&& other, index_sequence<Is...>) noexcept(
         conjunction<details::tuple::is_all_nothrow_gettable<TupleLike, sizeof...(Is)>,
-            details::tuple::rebind_references_t<traits::template is_nothrow_assignable, TupleLike,
-                sizeof...(Is)>>::value) {
+            typename traits::template is_nothrow_assignable<
+                details::tuple::get_type_t<Is, TupleLike>...>>::value) {
         return (tuple&)base_type::assign(
             UTL_SCOPE get_element<Is>(UTL_SCOPE forward<TupleLike>(other))...);
     }
@@ -329,8 +327,8 @@ private:
     template <typename TupleLike, size_t... Is>
     UTL_HIDE_FROM_ABI constexpr tuple const& assign(TupleLike&& other, index_sequence<Is...>) const
         noexcept(conjunction<details::tuple::is_all_nothrow_gettable<TupleLike, sizeof...(Is)>,
-            details::tuple::rebind_references_t<traits::template is_nothrow_const_assignable,
-                TupleLike, sizeof...(Is)>>::value) {
+            typename traits::template is_nothrow_const_assignable<
+                details::tuple::get_type_t<Is, TupleLike>...>>::value) {
         return (tuple const&)base_type::assign(
             UTL_SCOPE get_element<Is>(UTL_SCOPE forward<TupleLike>(other))...);
     }
