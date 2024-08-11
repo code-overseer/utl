@@ -4,23 +4,33 @@
 
 #if UTL_CXX20
 
+#  include "utl/concepts/utl_convertible_to.h"
+#  include "utl/concepts/utl_reference.h"
+#  include "utl/tuple/utl_tuple_get_element.h"
 #  include "utl/tuple/utl_tuple_traits.h"
 
 UTL_NAMESPACE_BEGIN
 
-namespace tuple_traits {
+namespace details {
+namespace tuple {
+template <typename T>
+concept has_size = requires { tuple_size<T>::value; };
 template <typename T, size_t I>
-concept gettable = requires {
-    tuple_size<T>::value;
+concept has_element = has_size<T> && requires(T t) {
+    requires I < tuple_size<T>::value;
     typename tuple_element<I, T>::type;
-    requires (I < tuple_size<T>::value);
-    UTL_SCOPE tuple_traits::get<I>(declval<T>());
+    {
+        UTL_SCOPE get_element<I>(UTL_SCOPE forward<T>(t))
+    } -> convertible_to<tuple_element_t<I, T> const&>;
 };
-} // namespace tuple_traits
+} // namespace tuple
+} // namespace details
 
 template <typename T>
 concept tuple_like =
-    requires { tuple_size<T>::value; } && UTL_SCOPE tuple_traits::is_all_gettable<T>::value;
+    (!reference<T> && details::tuple::has_size<T> && []<size_t... Is>(index_sequence<Is...>) {
+        return (... && details::tuple::has_element<T, Is>);
+    }(make_index_sequence<tuple_size_v<T>>{}));
 
 UTL_NAMESPACE_END
 

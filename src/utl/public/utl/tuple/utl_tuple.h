@@ -32,13 +32,7 @@ UTL_NAMESPACE_END
 #  include "utl/utility/utl_pair.h"
 #  include "utl_tuple_cat.h"
 #  include "utl_tuple_get.h"
-
-UTL_NAMESPACE_BEGIN
-#  ifdef UTL_DEFINE_PAIR_PIECEWISE_CONSTRUCTOR
-UTL_DEFINE_PAIR_PIECEWISE_CONSTRUCTOR()
-#    undef UTL_DEFINE_PAIR_PIECEWISE_CONSTRUCTOR
-#  endif
-UTL_NAMESPACE_END
+#  include "utl_tuple_get_element.h"
 
 #  undef UTL_TUPLE_PRIVATE_HEADER_GUARD
 

@@ -57,7 +57,7 @@
 #endif
 /* TODO: Find out ICC's warning pragma */
 
-#if UTL_COMPILER_MSVC
+#if UTL_COMPILER_MSVC | UTL_COMPILER_ICC
 #  define UTL_DISABLE_WARNING_PUSH() UTL_PRAGMA(warning(push))
 #  define UTL_DISABLE_WARNING_POP() UTL_PRAGMA(warning(pop))
 #  define UTL_DISABLE_WARNING(warningNumber) UTL_PRAGMA(warning(disable : warningNumber))

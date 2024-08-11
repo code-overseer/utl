@@ -24,21 +24,24 @@
       __clang_major__ > MAJOR ||                           \
           (__clang_major__ == MAJOR &&                     \
               (__clang_minor__ > MINOR ||                  \
-                  (__clang_minor__ == MINOR && __clang_patchlevel__ > PATCH)))
+                  (__clang_minor__ == MINOR && __clang_patchlevel__ >= PATCH)))
 
 #  define UTL_COMPILER_TAG \
       __UTL_COMPILER_TAG_CONCAT(CLANG, __clang_major__, __clang_minor__, __clang_patchlevel__)
 #elif defined(__INTEL_COMPILER)
 #  define UTL_COMPILER_ICC 1
-#  define UTL_COMPILER_ICC_AT_LEAST(VERSION) __VERSION__ >= VERSION
-#  define UTL_COMPILER_TAG UTL_CONCAT(ICC, __VERSION__)
+#  define UTL_COMPILER_ICC_AT_LEAST(YEAR, UPDATE) \
+      __INTEL_COMPILER > YEAR || (__INTEL_COMPILER == YEAR && __INTEL_COMPILER_UPDATE >= UPDATE)
+#  define UTL_COMPILER_TAG \
+      __UTL_COMPILER_TAG_CONCAT(ICC, __INTEL_COMPILER, __INTEL_COMPILER_UPDATE, )
+
 #elif defined(__GNUC__)
 #  define UTL_COMPILER_GCC 1
 #  define UTL_COMPILER_GCC_AT_LEAST(MAJOR, MINOR, PATCH) \
       __GNUC__ > MAJOR ||                                \
           (__GNUC__ == MAJOR &&                          \
               (__GNUC_MINOR__ > MINOR ||                 \
-                  (__GNUC_MINOR__ == MINOR && __GNUC_PATCHLEVEL__ > PATCH)))
+                  (__GNUC_MINOR__ == MINOR && __GNUC_PATCHLEVEL__ >= PATCH)))
 #  define UTL_COMPILER_TAG \
       __UTL_COMPILER_TAG_CONCAT(GCC, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__)
 #elif defined(_MSC_VER)

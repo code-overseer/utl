@@ -9,7 +9,7 @@
 #include "utl/preprocessor/utl_declspec.h"
 #include "utl/preprocessor/utl_msvc_extensions.h"
 
-#if UTL_HAS_CPP_ATTRIBUTE(nodiscard)
+#if UTL_HAS_CPP_ATTRIBUTE(nodiscard) && UTL_CXX17
 #  define UTL_NODISCARD [[nodiscard]]
 #  define __UTL_ATTRIBUTE_NODISCARD nodiscard
 #  define __UTL_ATTRIBUTE_TYPE_CPP_NODISCARD
@@ -181,21 +181,21 @@
 #  define __UTL_ATTRIBUTE_TYPE_CPP_VISIBILITY(VISIBILITY)
 #elif UTL_HAS_GNU_ATTRIBUTE(__visibility__)
 #  define __UTL_ATTRIBUTE_VISIBILITY __visibility__
-#  define __UTL_ATTRIBUTE_TYPE_CPP_VISIBILITY(VISIBILITY)
+#  define __UTL_ATTRIBUTE_TYPE_GNU_VISIBILITY(VISIBILITY)
 #endif
 
-#if UTL_HAS_CPP_ATTRIBUTE(type_visibility)
+#if UTL_HAS_CPP_ATTRIBUTE(type_visibility) && UTL_CXX17
 #  define __UTL_ATTRIBUTE_TYPE_VISIBILITY type_visibility
 #  define __UTL_ATTRIBUTE_TYPE_CPP_TYPE_VISIBILITY(VISIBILITY)
-#elif UTL_HAS_CPP_ATTRIBUTE(clang::type_visibility)
+#elif UTL_HAS_CPP_ATTRIBUTE(clang::type_visibility) && UTL_CXX17
 #  define __UTL_ATTRIBUTE_TYPE_VISIBILITY clang::type_visibility
 #  define __UTL_ATTRIBUTE_TYPE_CPP_TYPE_VISIBILITY(VISIBILITY)
-#elif UTL_HAS_CPP_ATTRIBUTE(gnu::type_visibility)
+#elif UTL_HAS_CPP_ATTRIBUTE(gnu::type_visibility) && UTL_CXX17
 #  define __UTL_ATTRIBUTE_TYPE_VISIBILITY gnu::type_visibility
 #  define __UTL_ATTRIBUTE_TYPE_CPP_TYPE_VISIBILITY(VISIBILITY)
 #elif UTL_HAS_GNU_ATTRIBUTE(__type_visibility__)
 #  define __UTL_ATTRIBUTE_TYPE_VISIBILITY __type_visibility__
-#  define __UTL_ATTRIBUTE_TYPE_CPP_TYPE_VISIBILITY(VISIBILITY)
+#  define __UTL_ATTRIBUTE_TYPE_GNU_TYPE_VISIBILITY(VISIBILITY)
 #endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(gnu::dllimport)
@@ -256,7 +256,7 @@
 #  define __UTL_ATTRIBUTE_TYPE_GNU_REINITIALIZES
 #endif /* UTL_HAS_CPP_ATTRIBUTE(clang::reinitializes) */
 
-#if UTL_HAS_CPP_ATTRIBUTE(maybe_unused)
+#if UTL_HAS_CPP_ATTRIBUTE(maybe_unused) && UTL_CXX17
 #  define __UTL_ATTRIBUTE_MAYBE_UNUSED maybe_unused
 #  define __UTL_ATTRIBUTE_TYPE_CPP_MAYBE_UNUSED
 #elif UTL_HAS_CPP_ATTRIBUTE(gnu::unused)
@@ -267,7 +267,7 @@
 #  define __UTL_ATTRIBUTE_TYPE_GNU_MAYBE_UNUSED
 #endif /* UTL_HAS_CPP_ATTRIBUTE(maybe_unused) */
 
-#if UTL_HAS_CPP_ATTRIBUTE(fallthrough)
+#if UTL_HAS_CPP_ATTRIBUTE(fallthrough) && UTL_CXX17
 #  define UTL_FALLTHROUGH [[fallthrough]]
 #  define __UTL_ATTRIBUTE_FALLTHROUGH fallthrough
 #  define __UTL_ATTRIBUTE_TYPE_CPP_FALLTHROUGH
@@ -301,7 +301,7 @@
 #  define UTL_NODEBUG
 #endif
 
-#if UTL_CXX20 & UTL_HAS_CPP_ATTRIBUTE(likely)
+#if UTL_HAS_CPP_ATTRIBUTE(likely) && UTL_CXX20
 #  define UTL_LIKELY [[likely]]
 #  define __UTL_ATTRIBUTE_LIKELY likely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_LIKELY
@@ -313,7 +313,7 @@
 #  define UTL_LIKELY
 #endif /* UTL_HAS_CPP_ATTRIBUTE(likely) */
 
-#if UTL_CXX20 & UTL_HAS_CPP_ATTRIBUTE(unlikely)
+#if UTL_HAS_CPP_ATTRIBUTE(unlikely) && UTL_CXX20
 #  define UTL_UNLIKELY [[unlikely]]
 #  define __UTL_ATTRIBUTE_UNLIKELY unlikely
 #  define __UTL_ATTRIBUTE_TYPE_CPP_UNLIKELY
