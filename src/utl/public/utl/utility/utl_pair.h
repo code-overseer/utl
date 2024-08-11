@@ -210,8 +210,8 @@ private:
         details::tuple::is_nothrow_gettable<Js, L1<Args1>&>...,
         UTL_SCOPE is_nothrow_constructible<T0, Args0...>,
         UTL_SCOPE is_nothrow_constructible<T1, Args1...>>::value)
-        : first(forward<Args0>(UTL_TUPLE_GET(Is, l0))...)
-        , second(forward<Args1>(UTL_TUPLE_GET(Js, l1))...) {}
+        : first(forward<Args0>(UTL_SCOPE get_element<Is>(l0))...)
+        , second(forward<Args1>(UTL_SCOPE get_element<Js>(l1))...) {}
 
 public:
     using first_type UTL_NODEBUG = T0;
@@ -498,8 +498,8 @@ public:
     UTL_HIDE_FROM_ABI constexpr pair(P&& p) noexcept(
         details::tuple::is_all_nothrow_gettable<P, 2>::value &&
         details::tuple::rebind_references_t<traits::template is_nothrow_constructible, P, 2>::value)
-        : first(UTL_TUPLE_GET(0, forward<P>(p)))
-        , second(UTL_TUPLE_GET(1, forward<P>(p))) {}
+        : first(UTL_SCOPE get_key(UTL_SCOPE forward<P>(p)))
+        , second(UTL_SCOPE get_value(UTL_SCOPE forward<P>(p))) {}
 
     template <typename P,
         enable_if_t<details::tuple::is_all_gettable<P, 2>::value &&
@@ -510,8 +510,8 @@ public:
     UTL_HIDE_FROM_ABI explicit constexpr pair(P&& p) noexcept(
         details::tuple::is_all_nothrow_gettable<P, 2>::value &&
         details::tuple::rebind_references_t<traits::template is_nothrow_constructible, P, 2>::value)
-        : first(UTL_TUPLE_GET(0, forward<P>(p)))
-        , second(UTL_TUPLE_GET(1, forward<P>(p))) {}
+        : first(UTL_SCOPE get_key(UTL_SCOPE forward<P>(p)))
+        , second(UTL_SCOPE get_value(UTL_SCOPE forward<P>(p))) {}
 
     template <typename P,
         enable_if_t<details::tuple::is_all_gettable<P, 2>::value &&
@@ -594,7 +594,8 @@ public:
         pair&>
     operator=(P&& p) noexcept(details::tuple::is_all_nothrow_gettable<P>::value &&
         details::tuple::rebind_references_t<traits::template is_nothrow_assignable, P>::value) {
-        return assign(UTL_TUPLE_GET(0, forward<P>(p)), UTL_TUPLE_GET(1, forward<P>(p)));
+        return assign(UTL_SCOPE get_key(UTL_SCOPE forward<P>(p)),
+            UTL_SCOPE get_value(UTL_SCOPE forward<P>(p)));
     }
 
     template <typename P>
@@ -606,7 +607,8 @@ public:
     operator=(P&& p) const noexcept(details::tuple::is_all_nothrow_gettable<P, 2>::value &&
         details::tuple::rebind_references_t<traits::template is_nothrow_const_assignable, P,
             2>::value) {
-        return assign(UTL_TUPLE_GET(0, forward<P>(p)), UTL_TUPLE_GET(1, forward<P>(p)));
+        return assign(UTL_SCOPE get_key(UTL_SCOPE forward<P>(p)),
+            UTL_SCOPE get_value(UTL_SCOPE forward<P>(p)));
     }
 
     UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~pair() = default;
