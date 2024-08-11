@@ -386,15 +386,17 @@ public:
 
     UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~tuple() = default;
 
-    template <same_as<tuple> U = tuple>
-    UTL_HIDE_FROM_ABI constexpr tuple const& operator=(U const& other) const
-        noexcept(noexcept(assign(other, index_sequence_for<Types...>{}))) {
+    UTL_HIDE_FROM_ABI constexpr tuple const& operator=(tuple const& other) const
+        noexcept((... && is_nothrow_assignable_v<Types const&, Types const&>))
+    requires (... && is_assignable_v<Types const&, Types const&>)
+    {
         return assign(other, index_sequence_for<Types...>{});
     }
 
-    template <same_as<tuple> U = tuple>
-    UTL_HIDE_FROM_ABI constexpr tuple const& operator=(U&& other) const
-        noexcept(noexcept(assign(UTL_SCOPE declval<U>(), index_sequence_for<Types...>{}))) {
+    UTL_HIDE_FROM_ABI constexpr tuple const& operator=(tuple&& other) const
+        noexcept((... && is_nothrow_assignable_v<Types const&, Types&&>))
+    requires (... && is_assignable_v<Types const&, Types &&>)
+    {
         return assign(UTL_SCOPE move(other), index_sequence_for<Types...>{});
     }
 
