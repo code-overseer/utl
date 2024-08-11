@@ -15,7 +15,9 @@
 #include "utl/utility/utl_pair_fwd.h"
 
 #include "utl/compare/utl_compare_traits.h"
+#include "utl/concepts/utl_assignable_from.h"
 #include "utl/concepts/utl_common_with.h"
+#include "utl/concepts/utl_equality_comparable.h"
 #include "utl/concepts/utl_swappable.h"
 #include "utl/tuple/utl_tuple_concepts.h"
 #include "utl/tuple/utl_tuple_get_element.h"
@@ -49,12 +51,6 @@ private:
         reference_constructs_from_temporary<T1, U1>>;
     template <typename U0, typename U1>
     using reference_valid UTL_NODEBUG = negation<reference_dangles<U0, U1>>;
-    template <typename U0, typename U1>
-    using assign_from_pair UTL_NODEBUG =
-        conjunction<is_assignable<T0&, U0>, is_assignable<T1&, U1>>;
-    template <typename U0, typename U1>
-    using const_assign_from_pair UTL_NODEBUG =
-        conjunction<is_assignable<T0 const&, U0>, is_assignable<T1 const&, U1>>;
     template <typename U0, typename U1>
     using nothrow_assign_from_pair UTL_NODEBUG =
         conjunction<is_nothrow_assignable<T0&, U0>, is_nothrow_assignable<T1&, U1>>;
@@ -355,7 +351,8 @@ public:
 public:
     template <typename P>
     requires pair_like<remove_reference_t<P>> &&
-        details::tuple::rebind_references_t<assign_from_pair, P>::value
+        assignable_from<T0&, decltype(UTL_SCOPE get_key(UTL_SCOPE declval<P>()))> &&
+        assignable_from<T1&, decltype(UTL_SCOPE get_value(UTL_SCOPE declval<P>()))>
     UTL_HIDE_FROM_ABI constexpr pair& operator=(P&& p) noexcept(
         details::tuple::is_all_nothrow_gettable<P>::value &&
         details::tuple::rebind_references_t<nothrow_assign_from_pair, P>::value) {
@@ -365,9 +362,10 @@ public:
 
     template <typename P>
     requires pair_like<remove_reference_t<P>> &&
-        details::tuple::rebind_references_t<const_assign_from_pair, P>::value
+        assignable_from<T0 const&, decltype(UTL_SCOPE get_key(UTL_SCOPE declval<P>()))> &&
+        assignable_from<T1 const&, decltype(UTL_SCOPE get_value(UTL_SCOPE declval<P>()))>
     UTL_HIDE_FROM_ABI constexpr pair const& operator=(P&& p) const
-        noexcept(details::tuple::is_all_nothrow_gettable<P, 2>::value &&
+        noexcept(details::tuple::is_all_nothrow_gettable<P>::value &&
             details::tuple::rebind_references_t<nothrow_const_assign_from_pair, P, 2>::value) {
         return assign(UTL_SCOPE get_key(UTL_SCOPE forward<P>(p)),
             UTL_SCOPE get_value(UTL_SCOPE forward<P>(p)));
