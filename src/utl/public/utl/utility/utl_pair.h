@@ -549,7 +549,8 @@ public:
             UTL_SCOPE is_constructible<T1, Args1...>::value>>
     UTL_HIDE_FROM_ABI constexpr pair(piecewise_construct_t, tuple<Args0...> l0,
         tuple<Args1...> l1) noexcept(UTL_SCOPE is_nothrow_constructible<pair, tuple<Args0...>&,
-        tuple<Args1...>&, index_sequence_for<Args0...>, index_sequence_for<Args1...>>::value);
+        tuple<Args1...>&, index_sequence_for<Args0...>, index_sequence_for<Args1...>>::value)
+        : pair(l0, l1, index_sequence_for<Args0...>{}, index_sequence_for<Args1...>{}) {}
 
 public:
     template <typename U0, typename U1>
@@ -613,14 +614,6 @@ public:
 
     UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~pair() = default;
 }; // pair
-
-#  define UTL_DEFINE_PAIR_PIECEWISE_CONSTRUCTOR()                                                 \
-      template <typename T0, typename T1>                                                         \
-      template <typename... Args0, typename... Args1, typename>                                   \
-      inline constexpr pair<T0, T1>::pair(piecewise_construct_t, tuple<Args0...> l0,              \
-          tuple<Args1...> l1) noexcept(UTL_SCOPE is_nothrow_constructible<pair, tuple<Args0...>&, \
-          tuple<Args1...>&, index_sequence_for<Args0...>, index_sequence_for<Args1...>>::value)   \
-          : pair(l0, l1, index_sequence_for<Args0...>{}, index_sequence_for<Args1...>{}) {}
 
 template <typename T0, typename T1, typename U0, typename U1>
 UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) constexpr enable_if_t<
