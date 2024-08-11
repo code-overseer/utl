@@ -374,53 +374,64 @@ public:
 
 public:
     template <typename P,
-        enable_if_t<is_pair_like<P>::value &&
-                details::tuple::rebind_references_t<construct_implicitly, P>::value &&
-                details::tuple::rebind_references_t<reference_valid, P>::value,
+        enable_if_t<conjunction<is_pair_like<P>,
+                        construct_implicitly<details::tuple::get_type_t<0, P>,
+                            details::tuple::get_type_t<1, P>>,
+                        reference_valid<details::tuple::get_type_t<0, P>,
+                            details::tuple::get_type_t<1, P>>>::value,
             int> = 0>
     UTL_HIDE_FROM_ABI constexpr pair(P&& p) noexcept(
-        details::tuple::is_all_nothrow_gettable<P>::value &&
-        details::tuple::rebind_references_t<nothrow_construct, P>::value)
+        conjunction<details::tuple::is_all_nothrow_gettable<P>,
+            nothrow_construct<details::tuple::get_type_t<0, P>,
+                details::tuple::get_type_t<1, P>>>::value)
         : first(UTL_SCOPE get_key(UTL_SCOPE forward<P>(p)))
         , second(UTL_SCOPE get_value(UTL_SCOPE forward<P>(p))) {}
 
     template <typename P,
-        enable_if_t<is_pair_like<P>::value &&
-                details::tuple::rebind_references_t<construct_explicitly, P>::value &&
-                details::tuple::rebind_references_t<reference_valid, P>::value,
+        enable_if_t<conjunction<is_pair_like<P>,
+                        construct_explicitly<details::tuple::get_type_t<0, P>,
+                            details::tuple::get_type_t<1, P>>,
+                        reference_valid<details::tuple::get_type_t<0, P>,
+                            details::tuple::get_type_t<1, P>>>::value,
             int> = 1>
     UTL_HIDE_FROM_ABI explicit constexpr pair(P&& p) noexcept(
-        details::tuple::is_all_nothrow_gettable<P>::value &&
-        details::tuple::rebind_references_t<nothrow_construct, P>::value)
+        conjunction<details::tuple::is_all_nothrow_gettable<P>,
+            nothrow_construct<details::tuple::get_type_t<0, P>,
+                details::tuple::get_type_t<1, P>>>::value)
         : first(UTL_SCOPE get_key(UTL_SCOPE forward<P>(p)))
         , second(UTL_SCOPE get_value(UTL_SCOPE forward<P>(p))) {}
 
     template <typename P,
-        enable_if_t<is_pair_like<P>::value &&
-                details::tuple::rebind_references_t<construct_implicitly, P>::value &&
-                details::tuple::rebind_references_t<reference_dangles, P>::value,
+        enable_if_t<conjunction<is_pair_like<P>,
+                        construct_implicitly<details::tuple::get_type_t<0, P>,
+                            details::tuple::get_type_t<1, P>>,
+                        reference_dangles<details::tuple::get_type_t<0, P>,
+                            details::tuple::get_type_t<1, P>>>::value,
             int> = 2>
     UTL_HIDE_FROM_ABI constexpr pair(P&& p) noexcept(
-        details::tuple::is_all_nothrow_gettable<P>::value &&
-        details::tuple::rebind_references_t<nothrow_construct, P>::value) = delete;
+        conjunction<details::tuple::is_all_nothrow_gettable<P>,
+            nothrow_construct<details::tuple::get_type_t<0, P>,
+                details::tuple::get_type_t<1, P>>>::value) = delete;
 
     template <typename P,
-        enable_if_t<is_pair_like<P>::value &&
-                details::tuple::rebind_references_t<construct_explicitly, P>::value &&
-                details::tuple::rebind_references_t<reference_dangles, P>::value,
+        enable_if_t<conjunction<is_pair_like<P>,
+                        construct_explicitly<details::tuple::get_type_t<0, P>,
+                            details::tuple::get_type_t<1, P>>,
+                        reference_dangles<details::tuple::get_type_t<0, P>,
+                            details::tuple::get_type_t<1, P>>>::value,
             int> = 3>
     UTL_HIDE_FROM_ABI explicit constexpr pair(P&& p) noexcept(
-        details::tuple::is_all_nothrow_gettable<P>::value &&
-        details::tuple::rebind_references_t<nothrow_construct, P>::value) = delete;
+        conjunction<details::tuple::is_all_nothrow_gettable<P>,
+            nothrow_construct<details::tuple::get_type_t<0, P>,
+                details::tuple::get_type_t<1, P>>>::value) = delete;
 
 private:
     template <typename U, size_t... Is>
-    UTL_HIDE_FROM_ABI static auto constructs_first_impl(index_sequence<Is...>) noexcept -> UTL_SCOPE
-        is_constructible<T0, decltype(UTL_SCOPE get_element<Is>(UTL_SCOPE declval<U>()))...>;
+    UTL_HIDE_FROM_ABI static auto constructs_first_impl(index_sequence<Is...>) noexcept
+        -> UTL_SCOPE is_constructible<T0, details::tuple::get_type_t<Is, U>...>;
     template <typename U, size_t... Is>
     UTL_HIDE_FROM_ABI static auto constructs_second_impl(index_sequence<Is...>) noexcept
-        -> UTL_SCOPE
-        is_constructible<T1, decltype(UTL_SCOPE get_element<Is>(UTL_SCOPE declval<U>()))...>;
+        -> UTL_SCOPE is_constructible<T1, details::tuple::get_type_t<Is, U>...>;
 
     template <typename U>
     using constructs_first UTL_NODEBUG =
@@ -482,21 +493,27 @@ public:
 
 public:
     template <typename P>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 enable_if_t<is_pair_like<P>::value &&
-            details::tuple::rebind_references_t<assign_from_pair, P>::value,
+    UTL_HIDE_FROM_ABI
+        UTL_CONSTEXPR_CXX14 enable_if_t<conjunction<is_pair_like<P>,
+                                                assign_from_pair<details::tuple::get_type_t<0, P>,
+                                                    details::tuple::get_type_t<1, P>>>::value,
         pair&>
-    operator=(P&& p) noexcept(details::tuple::is_all_nothrow_gettable<P>::value &&
-        details::tuple::rebind_references_t<nothrow_assign_from_pair, P>::value) {
+    operator=(P&& p) noexcept(conjunction<details::tuple::is_all_nothrow_gettable<P>,
+        nothrow_assign_from_pair<details::tuple::get_type_t<0, P>,
+            details::tuple::get_type_t<1, P>>>::value) {
         return assign(UTL_SCOPE get_key(UTL_SCOPE forward<P>(p)),
             UTL_SCOPE get_value(UTL_SCOPE forward<P>(p)));
     }
 
     template <typename P>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 enable_if_t<is_pair_like<P>::value &&
-            details::tuple::rebind_references_t<const_assign_from_pair, P>::value,
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 enable_if_t<
+        conjunction<is_pair_like<P>,
+            const_assign_from_pair<details::tuple::get_type_t<0, P>,
+                details::tuple::get_type_t<1, P>>>::value,
         pair const&>
-    operator=(P&& p) const noexcept(details::tuple::is_all_nothrow_gettable<P, 2>::value &&
-        details::tuple::rebind_references_t<nothrow_const_assign_from_pair, P, 2>::value) {
+    operator=(P&& p) const noexcept(conjunction<details::tuple::is_all_nothrow_gettable<P>,
+        nothrow_const_assign_from_pair<details::tuple::get_type_t<0, P>,
+            details::tuple::get_type_t<1, P>>>::value) {
         return assign(UTL_SCOPE get_key(UTL_SCOPE forward<P>(p)),
             UTL_SCOPE get_value(UTL_SCOPE forward<P>(p)));
     }

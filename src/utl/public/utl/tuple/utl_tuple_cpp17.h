@@ -394,6 +394,17 @@ public:
     }
 
 public:
+#if UTL_COMPILER_CLANG_AT_LEAST(10, 0, 0) | UTL_COMPILER_MSVC_AT_LEAST(1924)
+    UTL_DISABLE_WARNING_PUSH()
+#  if UTL_COMPILER_CLANG
+    UTL_DISABLE_WARNING("-Wc++20-extensions")
+#  elif UTL_COMPILER_MSVC
+    UTL_DISABLE_WARNING(5053)
+#  endif
+    explicit(UTL_TRAIT_disjunction(is_explicit_constructible<Types>...)) constexpr tuple() noexcept(
+        traits::is_nothrow_default_constructible) = default;
+    UTL_DISABLE_WARNING_POP()
+#else
     template <bool NotEmpty = (sizeof...(Types) >= 1),
         enable_if_t<NotEmpty && traits::is_implicit_default_constructible, int> = 0>
     UTL_HIDE_FROM_ABI constexpr tuple() noexcept(traits::is_nothrow_default_constructible)
@@ -403,6 +414,7 @@ public:
         enable_if_t<NotEmpty && traits::is_explicit_default_constructible, int> = 1>
     UTL_HIDE_FROM_ABI explicit constexpr tuple() noexcept(traits::is_nothrow_default_constructible)
         : base_type() {}
+#endif
 
 public:
     template <bool NotEmpty = (sizeof...(Types) >= 1),

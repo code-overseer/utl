@@ -252,37 +252,24 @@ public:
 public:
     template <typename P>
     requires pair_like<remove_reference_t<P>> &&
-                 details::tuple::rebind_references_t<reference_valid, P>::value
-    UTL_HIDE_FROM_ABI explicit(
-        details::tuple::rebind_references_t<construct_explicitly, P>::value) constexpr pair(P&&
+                 reference_valid<details::tuple::get_type_t<0, P>,
+                     details::tuple::get_type_t<1, P>>::value
+    UTL_HIDE_FROM_ABI explicit(construct_explicitly<details::tuple::get_type_t<0, P>,
+        details::tuple::get_type_t<1, P>>::value) constexpr pair(P&&
             p) noexcept(details::tuple::is_all_nothrow_gettable<P>::value &&
-        details::tuple::rebind_references_t<nothrow_construct, P>::value)
+        nothrow_construct<details::tuple::get_type_t<0, P>,
+            details::tuple::get_type_t<1, P>>::value)
         : first(UTL_SCOPE get_key(UTL_SCOPE forward<P>(p)))
         , second(UTL_SCOPE get_value(UTL_SCOPE forward<P>(p))) {}
 
     template <typename P>
     requires pair_like<remove_reference_t<P>> &&
-        details::tuple::rebind_references_t<reference_dangles, P>::value
-    UTL_HIDE_FROM_ABI explicit(
-        details::tuple::rebind_references_t<construct_explicitly, P>::value) constexpr pair(P&&
+        reference_dangles<details::tuple::get_type_t<0, P>, details::tuple::get_type_t<1, P>>::value
+    UTL_HIDE_FROM_ABI explicit(construct_explicitly<details::tuple::get_type_t<0, P>,
+        details::tuple::get_type_t<1, P>>::value) constexpr pair(P&&
             p) noexcept(details::tuple::is_all_nothrow_gettable<P>::value &&
-        details::tuple::rebind_references_t<nothrow_construct, P>::value) = delete;
-
-private:
-    template <typename U, size_t... Is>
-    UTL_HIDE_FROM_ABI static auto constructs_first_impl(index_sequence<Is...>) noexcept -> UTL_SCOPE
-        is_constructible<T0, decltype(UTL_SCOPE get_element<Is>(UTL_SCOPE declval<U>()))...>;
-    template <typename U, size_t... Is>
-    UTL_HIDE_FROM_ABI static auto constructs_second_impl(index_sequence<Is...>) noexcept
-        -> UTL_SCOPE
-        is_constructible<T1, decltype(UTL_SCOPE get_element<Is>(UTL_SCOPE declval<U>()))...>;
-
-    template <typename U>
-    using constructs_first UTL_NODEBUG =
-        decltype(constructs_first_impl<U>(tuple_index_sequence<U>{}));
-    template <typename U>
-    using constructs_second UTL_NODEBUG =
-        decltype(constructs_second_impl<U>(tuple_index_sequence<U>{}));
+        nothrow_construct<details::tuple::get_type_t<0, P>,
+            details::tuple::get_type_t<1, P>>::value) = delete;
 
 public:
     template <typename L0, typename L1>
@@ -351,22 +338,24 @@ public:
 public:
     template <typename P>
     requires pair_like<remove_reference_t<P>> &&
-        assignable_from<T0&, decltype(UTL_SCOPE get_key(UTL_SCOPE declval<P>()))> &&
-        assignable_from<T1&, decltype(UTL_SCOPE get_value(UTL_SCOPE declval<P>()))>
+        assignable_from<T0&, details::tuple::get_type_t<0, P>> &&
+        assignable_from<T1&, details::tuple::get_type_t<1, P>>
     UTL_HIDE_FROM_ABI constexpr pair& operator=(P&& p) noexcept(
         details::tuple::is_all_nothrow_gettable<P>::value &&
-        details::tuple::rebind_references_t<nothrow_assign_from_pair, P>::value) {
+        nothrow_assign_from_pair<details::tuple::get_type_t<0, P>,
+            details::tuple::get_type_t<1, P>>::value) {
         return assign(UTL_SCOPE get_key(UTL_SCOPE forward<P>(p)),
             UTL_SCOPE get_value(UTL_SCOPE forward<P>(p)));
     }
 
     template <typename P>
     requires pair_like<remove_reference_t<P>> &&
-        assignable_from<T0 const&, decltype(UTL_SCOPE get_key(UTL_SCOPE declval<P>()))> &&
-        assignable_from<T1 const&, decltype(UTL_SCOPE get_value(UTL_SCOPE declval<P>()))>
+        assignable_from<T0 const&, details::tuple::get_type_t<0, P>> &&
+        assignable_from<T1 const&, details::tuple::get_type_t<1, P>>
     UTL_HIDE_FROM_ABI constexpr pair const& operator=(P&& p) const
         noexcept(details::tuple::is_all_nothrow_gettable<P>::value &&
-            details::tuple::rebind_references_t<nothrow_const_assign_from_pair, P, 2>::value) {
+            nothrow_const_assign_from_pair<details::tuple::get_type_t<0, P>,
+                details::tuple::get_type_t<1, P>>::value) {
         return assign(UTL_SCOPE get_key(UTL_SCOPE forward<P>(p)),
             UTL_SCOPE get_value(UTL_SCOPE forward<P>(p)));
     }

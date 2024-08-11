@@ -50,6 +50,11 @@ auto decl_element() noexcept -> decltype(UTL_SCOPE get_element<I>(UTL_SCOPE decl
 template <size_t I, typename T UTL_REQUIRES_CXX11((I >= tuple_size_v<T>))>
 void decl_element() noexcept = delete;
 
+template <size_t I, typename T UTL_REQUIRES_CXX11((I < tuple_size_v<T>))>
+UTL_REQUIRES_CXX20(requires {
+    UTL_SCOPE get_element<I>(UTL_SCOPE declval<T>()); })
+using get_type_t = decltype(UTL_SCOPE get_element<I>(UTL_SCOPE declval<T>()));
+
 template <template <typename...> class Target, typename T, size_t... Is>
 UTL_HIDE_FROM_ABI Target<decltype(decl_element<Is, T>())...> rebind_references_impl(
     T&&, UTL_SCOPE index_sequence<Is...>) noexcept;
