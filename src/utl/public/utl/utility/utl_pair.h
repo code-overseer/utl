@@ -24,6 +24,18 @@ UTL_NAMESPACE_END
 
 #else // UTL_USE_STDPAIR
 
+#  define UTL_PAIR_PRIVATE_HEADER_GUARD
+
+#  if !UTL_CXX20
+#    include "utl/utility/utl_pair_cpp17.h"
+#  else
+#    include "utl/utility/utl_pair_latest.h"
+#  endif
+
+#  undef UTL_PAIR_PRIVATE_HEADER_GUARD
+
+#endif // UTL_USE_STDPAIR
+#if 0
 #  include "utl/preprocessor/utl_config.h"
 
 #  include "utl/compare/utl_compare_traits.h"
@@ -564,11 +576,9 @@ operator>=(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
     return !static_cast<bool>(l < r);
 }
 
-#endif // UTL_USE_STDPAIR
-
 UTL_NAMESPACE_END
 
-#if !UTL_CXX20
+#  if !UTL_CXX20
 
 UTL_NAMESPACE_BEGIN
 
@@ -612,7 +622,7 @@ struct UTL_PUBLIC_TEMPLATE
 
 } // namespace std
 
-#else  // if !UTL_CXX20
+#  else  // if !UTL_CXX20
 
 namespace std {
 template <typename T0, typename T1, UTL_SCOPE common_with<T0> U0, UTL_SCOPE common_with<T1> U1>
@@ -633,4 +643,5 @@ struct UTL_PUBLIC_TEMPLATE
         UTL_SCOPE common_reference_t<TQual<T1>, UQual<U1>>>;
 };
 } // namespace std
-#endif // if !UTL_CXX20
+#  endif // if !UTL_CXX20
+#endif

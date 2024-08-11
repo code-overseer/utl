@@ -16,6 +16,9 @@ struct pair;
 template <typename T>
 struct is_pair;
 
+template <typename T>
+struct is_pair_like;
+
 UTL_NAMESPACE_END
 
 #endif // UTL_USE_STDPAIR

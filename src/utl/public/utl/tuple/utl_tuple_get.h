@@ -15,8 +15,7 @@ UTL_NAMESPACE_BEGIN
 template <size_t I, typename... U UTL_REQUIRES_CXX11((I < sizeof...(U)))>
 UTL_REQUIRES_CXX20(I < sizeof...(U))
 UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 auto get(
-    tuple<U...>&& target UTL_LIFETIMEBOUND) noexcept
-    -> decltype(UTL_SCOPE details::tuple::decl_element<I, decltype(target)>()) {
+    tuple<U...>&& target UTL_LIFETIMEBOUND) noexcept -> tuple_element_t<I, tuple<U...>>&& {
     static_assert(is_base_of<details::tuple::storage<U...>, tuple<U...>>::value, "Invalid tuple");
     return ((details::tuple::storage<U...>&&)UTL_SCOPE move(target)).template get<I>();
 }
@@ -24,26 +23,23 @@ UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 auto get(
 template <size_t I, typename... U UTL_REQUIRES_CXX11((I < sizeof...(U)))>
 UTL_REQUIRES_CXX20(I < sizeof...(U))
 UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 auto get(
-    tuple<U...>& target UTL_LIFETIMEBOUND) noexcept
-    -> decltype(UTL_SCOPE details::tuple::decl_element<I, decltype(target)>()) {
+    tuple<U...>& target UTL_LIFETIMEBOUND) noexcept -> tuple_element_t<I, tuple<U...>>& {
     static_assert(is_base_of<details::tuple::storage<U...>, tuple<U...>>::value, "Invalid tuple");
     return ((details::tuple::storage<U...>&)target).template get<I>();
 }
 
 template <size_t I, typename... U UTL_REQUIRES_CXX11((I < sizeof...(U)))>
 UTL_REQUIRES_CXX20(I < sizeof...(U))
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get(
-    tuple<U...> const&& target UTL_LIFETIMEBOUND) noexcept
-    -> decltype(UTL_SCOPE details::tuple::decl_element<I, decltype(target)>()) {
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get(tuple<U...> const&& target
+        UTL_LIFETIMEBOUND) noexcept -> tuple_element_t<I, tuple<U...>> const&& {
     static_assert(is_base_of<details::tuple::storage<U...>, tuple<U...>>::value, "Invalid tuple");
     return ((details::tuple::storage<U...> const&&)UTL_SCOPE move(target)).template get<I>();
 }
 
 template <size_t I, typename... U UTL_REQUIRES_CXX11((I < sizeof...(U)))>
 UTL_REQUIRES_CXX20(I < sizeof...(U))
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get(
-    tuple<U...> const& target UTL_LIFETIMEBOUND) noexcept
-    -> decltype(UTL_SCOPE details::tuple::decl_element<I, decltype(target)>()) {
+UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get(tuple<U...> const& target
+        UTL_LIFETIMEBOUND) noexcept -> tuple_element_t<I, tuple<U...>> const& {
     static_assert(is_base_of<details::tuple::storage<U...>, tuple<U...>>::value, "Invalid tuple");
     return ((details::tuple::storage<U...> const&)target).template get<I>();
 }

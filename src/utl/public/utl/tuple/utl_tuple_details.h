@@ -5,8 +5,10 @@
 #include "utl/tuple/utl_tuple_fwd.h"
 
 #include "utl/memory/utl_uses_allocator.h"
+#include "utl/tuple/utl_tuple_get_element.h"
 #include "utl/type_traits/utl_copy_cvref.h"
 #include "utl/type_traits/utl_decay.h"
+#include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_is_base_of.h"
 #include "utl/type_traits/utl_is_move_assignable.h"
 #include "utl/type_traits/utl_is_move_constructible.h"
@@ -42,9 +44,8 @@ namespace details {
 namespace tuple {
 template <size_t I, typename T UTL_REQUIRES_CXX11((I < tuple_size_v<T>))>
 UTL_REQUIRES_CXX20(requires {
-    typename tuple_element_t<I, T > ;
-})
-auto decl_element() noexcept -> copy_cvref_t<T&&, tuple_element_t<I, T>>;
+    UTL_SCOPE get_element<I>(UTL_SCOPE declval<T>()); })
+auto decl_element() noexcept -> decltype(UTL_SCOPE get_element<I>(UTL_SCOPE declval<T>()));
 
 template <size_t I, typename T UTL_REQUIRES_CXX11((I >= tuple_size_v<T>))>
 void decl_element() noexcept = delete;
