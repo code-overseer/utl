@@ -13,7 +13,7 @@ MODULE_INCLUDES := $(shell find $(PRIVATE_DIR) $(PUBLIC_DIR) -name '*.h')
 
 .PHONY = all clean print preprocess compile
 CXX := c++
-CXX_FLAGS := -std=c++20 -fPIC -O1 -I$(PUBLIC_DIR) -I$(PRIVATE_DIR) -DUTL_BUILD_TESTS -DUTL_BUILDING_LIBRARY=1 -Wall -Wpedantic -Wno-gnu-zero-variadic-macro-arguments
+CXX_FLAGS := -std=c++17 -fPIC -O1 -I$(PUBLIC_DIR) -I$(PRIVATE_DIR) -DUTL_BUILD_TESTS -DUTL_BUILDING_LIBRARY=1 -Wall -Wpedantic -Wno-gnu-zero-variadic-macro-arguments
 LINKER_FLAGS := -lm
 OBJECTS := $(addsuffix .o, $(MODULE_SRCS:$(MODULE_ROOT)/%=%))
 OBJECT_PATHS := $(addprefix $(INTERMEDIATE_DIR)/,$(OBJECTS))
