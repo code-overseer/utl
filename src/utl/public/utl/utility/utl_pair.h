@@ -28,6 +28,8 @@ UTL_NAMESPACE_END
 
 #  include "utl/compare/utl_compare_traits.h"
 #  include "utl/concepts/utl_common_with.h"
+#  include "utl/tuple/utl_tuple_concepts.h"
+#  include "utl/tuple/utl_tuple_get_element.h"
 #  include "utl/tuple/utl_tuple_traits.h"
 #  include "utl/type_traits/utl_common_reference.h"
 #  include "utl/type_traits/utl_common_type.h"
@@ -172,7 +174,7 @@ struct invalid_swap_t {
 } // namespace details
 
 template <typename T0, typename T1>
-struct pair : private variadic_traits<T0, T1> {
+struct pair {
 private:
     using traits UTL_NODEBUG = variadic_traits<T0, T1>;
     using this_type UTL_NODEBUG = pair<T0, T1>;
@@ -202,16 +204,15 @@ private:
         return *this;
     }
 
-    template <template <typename...> class L0, template <typename...> class L1, typename... Args0,
-        typename... Args1, size_t... Is, size_t... Js>
-    UTL_HIDE_FROM_ABI constexpr pair(L0<Args0...>& l0, L1<Args1...>& l1, index_sequence<Is...>,
-        index_sequence<
-            Js...>) noexcept(conjunction<details::tuple::is_nothrow_gettable<Is, L0<Args0>&>...,
-        details::tuple::is_nothrow_gettable<Js, L1<Args1>&>...,
-        UTL_SCOPE is_nothrow_constructible<T0, Args0...>,
-        UTL_SCOPE is_nothrow_constructible<T1, Args1...>>::value)
-        : first(forward<Args0>(UTL_SCOPE get_element<Is>(l0))...)
-        , second(forward<Args1>(UTL_SCOPE get_element<Js>(l1))...) {}
+    template <typename L0, typename L1, size_t... Is, size_t... Js>
+    UTL_REQUIRES_CXX20(tuple_like<remove_reference_t<L0>> && tuple_like<remove_reference_t<L1>>)
+    UTL_HIDE_FROM_ABI constexpr pair(L0& l0, L1& l1, index_sequence<Is...>,
+        index_sequence<Js...>) noexcept(conjunction<details::tuple::is_all_nothrow_gettable<L0&>,
+        details::tuple::is_all_nothrow_gettable<L1&>,
+        UTL_SCOPE is_nothrow_constructible<T0, tuple_element_t<Is, L0>...>,
+        UTL_SCOPE is_nothrow_constructible<T1, tuple_element_t<Js, L1>...>>::value)
+        : first(UTL_SCOPE forward<tuple_element_t<Is, L0>>(UTL_SCOPE get_element<Is>(l0))...)
+        , second(UTL_SCOPE forward<tuple_element_t<Js, L1>>(UTL_SCOPE get_element<Js>(l1))...) {}
 
 public:
     using first_type UTL_NODEBUG = T0;
@@ -533,20 +534,43 @@ public:
         details::tuple::rebind_references_t<traits::template is_nothrow_constructible, P,
             2>::value) = delete;
 
-public:
-    // TODO change to tuple-like
-    template <template <typename...> class L0, template <typename...> class L1, typename... Args0,
-        typename... Args1,
-        typename = enable_if_t<UTL_SCOPE is_constructible<T0, Args0...>::value &&
-            UTL_SCOPE is_constructible<T1, Args1...>::value>>
-    UTL_HIDE_FROM_ABI constexpr pair(piecewise_construct_t, L0<Args0...> l0,
-        L1<Args1...> l1) noexcept(UTL_SCOPE is_nothrow_constructible<pair, L0<Args0...>&,
-        L1<Args1...>&, index_sequence_for<Args0...>, index_sequence_for<Args1...>>::value)
-        : pair(l0, l1, index_sequence_for<Args0...>{}, index_sequence_for<Args1...>{}) {}
+private:
+    template <typename U, size_t... Is>
+    UTL_HIDE_FROM_ABI static auto constructs_first_impl(index_sequence<Is...>) noexcept
+        -> UTL_SCOPE is_constructible<T0, tuple_element_t<Is, U>...>;
+    template <typename U, size_t... Is>
+    UTL_HIDE_FROM_ABI static auto constructs_second_impl(index_sequence<Is...>) noexcept
+        -> UTL_SCOPE is_constructible<T1, tuple_element_t<Is, U>...>;
 
-    template <typename... Args0, typename... Args1,
-        typename = enable_if_t<UTL_SCOPE is_constructible<T0, Args0...>::value &&
-            UTL_SCOPE is_constructible<T1, Args1...>::value>>
+    template <typename U>
+    using constructs_first UTL_NODEBUG =
+        decltype(constructs_first_impl<U>(tuple_index_sequence<U>{}));
+    template <typename U>
+    using constructs_second UTL_NODEBUG =
+        decltype(constructs_second_impl<U>(tuple_index_sequence<U>{}));
+
+public:
+    template <typename L0,
+        typename L1 UTL_REQUIRES_CXX11(conjunction<is_tuple_like<remove_reference_t<L0>>,
+            is_tuple_like<remove_reference_t<L1>>, constructs_first<L0>,
+            constructs_second<L1>>::value)>
+    UTL_REQUIRES_CXX20(
+        tuple_like<remove_reference_t<L0>>&&
+            tuple_like<remove_reference_t<L1>>&& []<size_t... Is>(index_sequence<Is...>) {
+                return constructible_from<T0, tuple_element_t<Is, L0>...>;
+            }(tuple_index_sequence<L0>{}) &&
+        []<size_t... Is>(index_sequence<Is...>) {
+            return constructible_from<T1, tuple_element_t<Is, L1>...>;
+        }(tuple_index_sequence<L1>{}))
+    UTL_HIDE_FROM_ABI constexpr pair(piecewise_construct_t, L0 l0, L1 l1) noexcept(
+        UTL_SCOPE is_nothrow_constructible<pair, L0&, L1&, tuple_index_sequence<L0>,
+            tuple_index_sequence<L1>>::value)
+        : pair(l0, l1, tuple_index_sequence<L0>{}, tuple_index_sequence<L1>{}) {}
+
+    template <typename... Args0,
+        typename... Args1 UTL_REQUIRES_CXX11(conjunction<UTL_SCOPE is_constructible<T0, Args0...>,
+            UTL_SCOPE is_constructible<T1, Args1...>>::value)>
+    UTL_REQUIRES_CXX20(constructible_from<T0, Args0...> && constructible_from<T1, Args1...>)
     UTL_HIDE_FROM_ABI constexpr pair(piecewise_construct_t, tuple<Args0...> l0,
         tuple<Args1...> l1) noexcept(UTL_SCOPE is_nothrow_constructible<pair, tuple<Args0...>&,
         tuple<Args1...>&, index_sequence_for<Args0...>, index_sequence_for<Args1...>>::value)
