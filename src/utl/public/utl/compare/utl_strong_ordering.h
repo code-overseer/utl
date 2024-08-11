@@ -32,10 +32,10 @@ public:
     using details::compare::greater_value<strong_ordering>::greater;
     using details::compare::equal_value<strong_ordering>::equal;
 
-    UTL_HIDE_FROM_ABI constexpr operator partial_ordering() const {
+    UTL_HIDE_FROM_ABI constexpr operator partial_ordering() const noexcept {
         return partial_ordering(order_t(value));
     }
-    UTL_HIDE_FROM_ABI constexpr operator weak_ordering() const {
+    UTL_HIDE_FROM_ABI constexpr operator weak_ordering() const noexcept {
         return weak_ordering(order_t(value));
     }
 #if UTL_CXX20

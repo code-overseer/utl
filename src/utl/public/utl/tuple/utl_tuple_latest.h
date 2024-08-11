@@ -882,9 +882,9 @@ UTL_ATTRIBUTES(CONST, HIDE_FROM_ABI) constexpr bool equals(T const& l, U const& 
 
 template <size_t I, tuple_like T, tuple_like U>
 requires (I < tuple_size_v<T>)
-UTL_HIDE_FROM_ABI constexpr bool equals(T const& l, U const& r) noexcept(
-    is_nothrow_accessible_v<T> && is_nothrow_accessible_v<U> &&
-    compare_ops::all_have_nothrow_eq<T, U>::value) {
+UTL_HIDE_FROM_ABI constexpr bool equals(
+    T const& l, U const& r) noexcept(conjunction<details::tuple::is_all_nothrow_gettable<T>,
+    details::tuple::is_all_nothrow_gettable<U>, compare_ops::all_have_nothrow_eq<T, U>>::value) {
     return (UTL_SCOPE get_element<I>(l) == UTL_SCOPE get_element<I>(r)) && equals<I + 1>(l, r);
 }
 

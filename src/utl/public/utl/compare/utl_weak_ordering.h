@@ -30,7 +30,7 @@ public:
     using details::compare::equivalent_value<weak_ordering>::equivalent;
     using details::compare::greater_value<weak_ordering>::greater;
 
-    UTL_HIDE_FROM_ABI constexpr operator partial_ordering() const {
+    UTL_HIDE_FROM_ABI constexpr operator partial_ordering() const noexcept {
         return partial_ordering(order_t(value));
     }
 

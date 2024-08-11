@@ -22,7 +22,6 @@
 #include "utl/type_traits/utl_common_reference.h"
 #include "utl/type_traits/utl_common_type.h"
 #include "utl/type_traits/utl_is_equality_comparable.h"
-#include "utl/type_traits/utl_template_list.h"
 #include "utl/utility/utl_forward.h"
 #include "utl/utility/utl_move.h"
 #include "utl/utility/utl_pair_details.h"
@@ -40,22 +39,50 @@ private:
     using defer UTL_NODEBUG = V;
 
     template <typename U0, typename U1>
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE)
-    UTL_CONSTEXPR_CXX14 pair& assign(U0&& u0, U1&& u1) noexcept(
-        UTL_TRAIT_is_nothrow_assignable(T0&, U0) && UTL_TRAIT_is_nothrow_assignable(T1&, U1)) {
-        first = UTL_SCOPE forward<U0>(u0);
-        second = UTL_SCOPE forward<U1>(u1);
-        return *this;
-    }
+    using construct_explicitly UTL_NODEBUG =
+        disjunction<is_explicit_constructible<T0, U0>, is_explicit_constructible<T1, U1>>;
+    template <typename U0, typename U1>
+    using construct_implicitly UTL_NODEBUG =
+        conjunction<is_implicit_constructible<T0, U0>, is_implicit_constructible<T1, U1>>;
+    template <typename U0, typename U1>
+    using nothrow_construct UTL_NODEBUG =
+        conjunction<is_nothrow_constructible<T0, U0>, is_nothrow_constructible<T1, U1>>;
+    template <typename U0, typename U1>
+    using reference_dangles UTL_NODEBUG = disjunction<reference_constructs_from_temporary<T0, U0>,
+        reference_constructs_from_temporary<T1, U1>>;
+    template <typename U0, typename U1>
+    using reference_valid UTL_NODEBUG = negation<reference_dangles<U0, U1>>;
+    template <typename U0, typename U1>
+    using assign_from_pair UTL_NODEBUG =
+        conjunction<is_assignable<T0&, U0>, is_assignable<T1&, U1>>;
+    template <typename U0, typename U1>
+    using const_assign_from_pair UTL_NODEBUG =
+        conjunction<is_assignable<T0 const&, U0>, is_assignable<T1 const&, U1>>;
+    template <typename U0, typename U1>
+    using nothrow_assign_from_pair UTL_NODEBUG =
+        conjunction<is_nothrow_assignable<T0&, U0>, is_nothrow_assignable<T1&, U1>>;
+    template <typename U0, typename U1>
+    using nothrow_const_assign_from_pair UTL_NODEBUG =
+        conjunction<is_nothrow_assignable<T0 const&, U0>, is_nothrow_assignable<T1 const&, U1>>;
 
     template <typename U0, typename U1>
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) UTL_CONSTEXPR_CXX14 pair const& assign(U0&& u0, U1&& u1) const
-        noexcept(UTL_TRAIT_is_nothrow_assignable(T0 const&, U0) &&
-            UTL_TRAIT_is_nothrow_assignable(T1 const&, U1)) {
-        first = UTL_SCOPE forward<U0>(u0);
-        second = UTL_SCOPE forward<U1>(u1);
-        return *this;
-    }
+    using swappable UTL_NODEBUG =
+        conjunction<is_swappable_with<T0&, U0&>, is_swappable_with<T1&, U1&>>;
+    template <typename U0, typename U1>
+    using const_swappable UTL_NODEBUG =
+        conjunction<is_swappable_with<T0 const&, U0&>, is_swappable_with<T1 const&, U1&>>;
+    template <typename U0, typename U1>
+    using nothrow_swappable UTL_NODEBUG =
+        conjunction<is_nothrow_swappable_with<T0&, U0&>, is_nothrow_swappable_with<T1&, U1&>>;
+    template <typename U0, typename U1>
+    using nothrow_const_swappable UTL_NODEBUG =
+        conjunction<is_nothrow_swappable_with<T0 const&, U0&>,
+            is_nothrow_swappable_with<T1 const&, U1&>>;
+
+    using swap_type UTL_NODEBUG =
+        conditional_t<swappable<T0&, T1&>::value, pair, details::pair::invalid_swap_t<T0, T1>>;
+    using const_swap_type UTL_NODEBUG = conditional_t<const_swappable<T0 const&, T1 const&>::value,
+        pair, details::pair::invalid_swap_t<T0, T1>> const;
 
     template <typename L0, typename L1, size_t... Is, size_t... Js>
     UTL_HIDE_FROM_ABI constexpr pair(L0& l0, L1& l1, index_sequence<Is...>,
@@ -67,47 +94,21 @@ private:
         , second(UTL_SCOPE forward<tuple_element_t<Js, L1>>(UTL_SCOPE get_element<Js>(l1))...) {}
 
     template <typename U0, typename U1>
-    using construct_explicitly =
-        disjunction<is_explicit_constructible<T0, U0>, is_explicit_constructible<T1, U1>>;
-    template <typename U0, typename U1>
-    using construct_implicitly =
-        conjunction<is_implicit_constructible<T0, U0>, is_implicit_constructible<T1, U1>>;
-    template <typename U0, typename U1>
-    using nothrow_construct =
-        conjunction<is_nothrow_constructible<T0, U0>, is_nothrow_constructible<T1, U1>>;
-    template <typename U0, typename U1>
-    using reference_dangles = disjunction<reference_constructs_from_temporary<T0, U0>,
-        reference_constructs_from_temporary<T1, U1>>;
-    template <typename U0, typename U1>
-    using reference_valid = negation<reference_dangles<U0, U1>>;
-    template <typename U0, typename U1>
-    using assign_from_pair = conjunction<is_assignable<T0&, U0>, is_assignable<T1&, U1>>;
-    template <typename U0, typename U1>
-    using const_assign_from_pair =
-        conjunction<is_assignable<T0 const&, U0>, is_assignable<T1 const&, U1>>;
-    template <typename U0, typename U1>
-    using nothrow_assign_from_pair =
-        conjunction<is_nothrow_assignable<T0&, U0>, is_nothrow_assignable<T1&, U1>>;
-    template <typename U0, typename U1>
-    using nothrow_const_assign_from_pair =
-        conjunction<is_nothrow_assignable<T0 const&, U0>, is_nothrow_assignable<T1 const&, U1>>;
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE)
+    UTL_CONSTEXPR_CXX14 pair& assign(U0&& u0, U1&& u1) noexcept(
+        nothrow_assign_from_pair<U0&&, U1&&>::value) {
+        first = UTL_SCOPE forward<U0>(u0);
+        second = UTL_SCOPE forward<U1>(u1);
+        return *this;
+    }
 
     template <typename U0, typename U1>
-    using swappable = conjunction<is_swappable_with<T0&, U0&>, is_swappable_with<T1&, U1&>>;
-    template <typename U0, typename U1>
-    using const_swappable =
-        conjunction<is_swappable_with<T0 const&, U0&>, is_swappable_with<T1 const&, U1&>>;
-    template <typename U0, typename U1>
-    using nothrow_swappable =
-        conjunction<is_nothrow_swappable_with<T0&, U0&>, is_nothrow_swappable_with<T1&, U1&>>;
-    template <typename U0, typename U1>
-    using nothrow_const_swappable = conjunction<is_nothrow_swappable_with<T0 const&, U0&>,
-        is_nothrow_swappable_with<T1 const&, U1&>>;
-
-    using swap_type UTL_NODEBUG =
-        conditional_t<swappable<T0&, T1&>::value, pair, details::pair::invalid_swap_t<T0, T1>>;
-    using const_swap_type UTL_NODEBUG = conditional_t<const_swappable<T0 const&, T1 const&>::value,
-        pair, details::pair::invalid_swap_t<T0, T1>> const;
+    UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) UTL_CONSTEXPR_CXX14 pair const& assign(U0&& u0, U1&& u1) const
+        noexcept(nothrow_const_assign_from_pair<U0&&, U1&&>::value) {
+        first = UTL_SCOPE forward<U0>(u0);
+        second = UTL_SCOPE forward<U1>(u1);
+        return *this;
+    }
 
 public:
     using first_type = T0;
@@ -136,7 +137,7 @@ public:
         typename V = defer<const_assign_from_pair<T0&&, T1&&>, U0, U1>>
     UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 enable_if_t<V::value, pair const&> operator=(pair&& other) const
         noexcept(nothrow_const_assign_from_pair<T0&&, T1&&>::value) {
-        return assign(other.first, other.second);
+        return assign(UTL_SCOPE move(other).first, UTL_SCOPE move(other).second);
     }
 
 public:
@@ -429,27 +430,20 @@ private:
         decltype(constructs_second_impl<U>(tuple_index_sequence<U>{}));
 
 public:
-    template <typename L0,
-        typename L1 UTL_REQUIRES_CXX11(conjunction<is_tuple_like<remove_reference_t<L0>>,
-            is_tuple_like<remove_reference_t<L1>>, constructs_first<L0>,
-            constructs_second<L1>>::value)>
-    UTL_REQUIRES_CXX20(
-        tuple_like<remove_reference_t<L0>>&&
-            tuple_like<remove_reference_t<L1>>&& []<size_t... Is>(index_sequence<Is...>) {
-                return constructible_from<T0, tuple_element_t<Is, L0>...>;
-            }(tuple_index_sequence<L0>{}) &&
-        []<size_t... Is>(index_sequence<Is...>) {
-            return constructible_from<T1, tuple_element_t<Is, L1>...>;
-        }(tuple_index_sequence<L1>{}))
+    template <typename L0, typename L1,
+        enable_if_t<conjunction<is_tuple_like<remove_reference_t<L0>>,
+                        is_tuple_like<remove_reference_t<L1>>, constructs_first<L0>,
+                        constructs_second<L1>>::value,
+            bool> = true>
     UTL_HIDE_FROM_ABI constexpr pair(piecewise_construct_t, L0 l0, L1 l1) noexcept(
         UTL_SCOPE is_nothrow_constructible<pair, L0&, L1&, tuple_index_sequence<L0>,
             tuple_index_sequence<L1>>::value)
         : pair(l0, l1, tuple_index_sequence<L0>{}, tuple_index_sequence<L1>{}) {}
 
-    template <typename... Args0,
-        typename... Args1 UTL_REQUIRES_CXX11(conjunction<UTL_SCOPE is_constructible<T0, Args0...>,
-            UTL_SCOPE is_constructible<T1, Args1...>>::value)>
-    UTL_REQUIRES_CXX20(constructible_from<T0, Args0...> && constructible_from<T1, Args1...>)
+    template <typename... Args0, typename... Args1,
+        enable_if_t<conjunction<UTL_SCOPE is_constructible<T0, Args0...>,
+                        UTL_SCOPE is_constructible<T1, Args1...>>::value,
+            bool> = true>
     UTL_HIDE_FROM_ABI constexpr pair(piecewise_construct_t, tuple<Args0...> l0,
         tuple<Args1...> l1) noexcept(UTL_SCOPE is_nothrow_constructible<pair, tuple<Args0...>&,
         tuple<Args1...>&, index_sequence_for<Args0...>, index_sequence_for<Args1...>>::value)
@@ -483,7 +477,7 @@ public:
     UTL_HIDE_FROM_ABI
         UTL_CONSTEXPR_CXX14 enable_if_t<const_assign_from_pair<U0&&, U1&&>::value, pair const&>
     operator=(pair<U0, U1>&& p) const noexcept(nothrow_const_assign_from_pair<U0&&, U1&&>::value) {
-        return assign(move(p).first, move(p).second);
+        return assign(UTL_SCOPE move(p).first, UTL_SCOPE move(p).second);
     }
 
 public:
@@ -507,7 +501,7 @@ public:
             UTL_SCOPE get_value(UTL_SCOPE forward<P>(p)));
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~pair() = default;
+    UTL_HIDE_FROM_ABI ~pair() = default;
 }; // pair
 
 template <typename T0, typename T1, typename U0, typename U1>
