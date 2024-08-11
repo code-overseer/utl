@@ -33,147 +33,15 @@ UTL_NAMESPACE_END
 #  include "utl/tuple/utl_tuple_traits.h"
 #  include "utl/type_traits/utl_common_reference.h"
 #  include "utl/type_traits/utl_common_type.h"
-#  include "utl/type_traits/utl_decay.h"
 #  include "utl/type_traits/utl_is_equality_comparable.h"
 #  include "utl/type_traits/utl_template_list.h"
-#  include "utl/type_traits/utl_unwrap_reference.h"
 #  include "utl/type_traits/utl_variadic_traits.h"
 #  include "utl/utility/utl_forward.h"
 #  include "utl/utility/utl_move.h"
+#  include "utl/utility/utl_pair_details.h"
 #  include "utl/utility/utl_sequence.h"
 
 UTL_NAMESPACE_BEGIN
-
-template <typename T0, typename T1>
-struct pair;
-
-template <typename...>
-class tuple;
-
-template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pair : false_type {};
-template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pair<T&&> : is_pair<T> {};
-template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pair<T&> : is_pair<T> {};
-template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pair<T const> : is_pair<T> {};
-template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pair<T volatile> : is_pair<T> {};
-template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pair<T const volatile> : is_pair<T> {};
-template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_pair<pair<T, U>> : true_type {};
-
-struct UTL_ABI_PUBLIC piecewise_construct_t {
-    UTL_HIDE_FROM_ABI explicit constexpr piecewise_construct_t() noexcept = default;
-};
-
-/// Tag for piecewise construction of pair objects.
-UTL_INLINE_CXX17 constexpr piecewise_construct_t piecewise_construct{};
-
-namespace details {
-namespace pair {
-template <size_t I, typename P> UTL_REQUIRES_CXX20(I == 0 && requires(P&& p) {
-        requires is_pair<P>::value;
-        UTL_SCOPE forward<P>(p).first;
-    })
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get(P&& p UTL_LIFETIMEBOUND) noexcept
-    -> UTL_ENABLE_IF_CXX11(decltype(UTL_SCOPE declval<P>().first), (I == 0 && UTL_SCOPE is_pair<P>::value)) {
-    return UTL_SCOPE forward<P>(p).first;
-}
-
-template <size_t I, typename P> UTL_REQUIRES_CXX20(I == 1 && requires(P&& p) {
-        requires is_pair<P>::value;
-        UTL_SCOPE forward<P>(p).second;
-    })
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get(P&& p UTL_LIFETIMEBOUND) noexcept
-    -> UTL_ENABLE_IF_CXX11(decltype(UTL_SCOPE declval<P>().second), (I == 0 && UTL_SCOPE is_pair<P>::value)) {
-    return UTL_SCOPE forward<P>(p).second;
-}
-} // namespace pair
-} // namespace details
-
-template <size_t I, typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get(pair<T0, T1>&& pair UTL_LIFETIMEBOUND) noexcept -> decltype(details::pair::get<I>(move(pair))) {
-    return details::pair::get<I>(move(pair));
-}
-
-template <size_t I, typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get(pair<T0, T1> const&& pair UTL_LIFETIMEBOUND) noexcept -> decltype(details::pair::get<I>(move(pair))) {
-    return details::pair::get<I>(move(pair));
-}
-
-template <size_t I, typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get(pair<T0, T1> const& pair UTL_LIFETIMEBOUND) noexcept -> decltype(details::pair::get<I>(pair)) {
-    return details::pair::get<I>(move(pair));
-}
-
-template <size_t I, typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get(
-    pair<T0, T1>& pair UTL_LIFETIMEBOUND) noexcept -> decltype(details::pair::get<I>(pair)) {
-    return details::pair::get<I>(move(pair));
-}
-
-template <typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr T0&& get(
-    pair<T0, T1>&& pair UTL_LIFETIMEBOUND) noexcept {
-    return move(pair).first;
-}
-
-template <typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr T0 const&& get(
-    pair<T0, T1> const&& pair UTL_LIFETIMEBOUND) noexcept {
-    return move(pair).first;
-}
-
-template <typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr T0 const& get(
-    pair<T0, T1> const& pair UTL_LIFETIMEBOUND) noexcept {
-    return pair.first;
-}
-
-template <typename T0, typename T1>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr T0& get(
-    pair<T0, T1>& pair UTL_LIFETIMEBOUND) noexcept {
-    return pair.first;
-}
-
-template <typename T1, typename T0>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr T1&& get(
-    pair<T0, T1>&& pair UTL_LIFETIMEBOUND) noexcept {
-    return move(pair).second;
-}
-
-template <typename T1, typename T0>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr T1 const&& get(
-    pair<T0, T1> const&& pair UTL_LIFETIMEBOUND) noexcept {
-    return move(pair).second;
-}
-
-template <typename T1, typename T0>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr T1 const& get(
-    pair<T0, T1> const& pair UTL_LIFETIMEBOUND) noexcept {
-    return pair.second;
-}
-
-template <typename T1, typename T0>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr T1& get(
-    pair<T0, T1>& pair UTL_LIFETIMEBOUND) noexcept {
-    return pair.second;
-}
-
-namespace details {
-namespace pair {
-
-template <typename, typename>
-struct invalid_swap_t {
-    UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void swap(invalid_swap_t& other) const noexcept {}
-    UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void swap(invalid_swap_t const& other) const noexcept {}
-};
-
-} // namespace pair
-} // namespace details
 
 template <typename T0, typename T1>
 struct pair {
@@ -696,13 +564,6 @@ operator>=(pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(
     return !static_cast<bool>(l < r);
 }
 
-template <typename T, typename U>
-UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI, ALWAYS_INLINE) constexpr pair<unwrap_reference_t<decay_t<T>>, unwrap_reference_t<decay_t<U>>>
-make_pair(T&& t, U&& u) {
-    return pair<unwrap_reference_t<decay_t<T>>, unwrap_reference_t<decay_t<U>>>{
-        forward<T>(t), forward<U>(u)};
-}
-
 #endif // UTL_USE_STDPAIR
 
 UTL_NAMESPACE_END
@@ -773,13 +634,3 @@ struct UTL_PUBLIC_TEMPLATE
 };
 } // namespace std
 #endif // if !UTL_CXX20
-
-UTL_STD_NAMESPACE_BEGIN
-template <typename T0, typename T1>
-struct UTL_PUBLIC_TEMPLATE tuple_size<UTL_SCOPE pair<T0, T1>> :
-    UTL_SCOPE template_size<UTL_SCOPE pair<T0, T1>> {};
-
-template <size_t I, typename T0, typename T1>
-struct UTL_PUBLIC_TEMPLATE tuple_element<I, UTL_SCOPE pair<T0, T1>> :
-    UTL_SCOPE template_element<I, UTL_SCOPE pair<T0, T1>> {};
-UTL_STD_NAMESPACE_END
