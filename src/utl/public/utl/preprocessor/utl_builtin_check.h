@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_msvc_builtins.h"
 #include "utl/preprocessor/utl_standard.h"
 
 #include "utl/configuration/utl_compiler.h"
