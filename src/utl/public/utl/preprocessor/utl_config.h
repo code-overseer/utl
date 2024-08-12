@@ -38,7 +38,6 @@
 #  define UTL_OPTIMIZATIONS_ENABLED 1
 #endif
 
-#include "utl/preprocessor/utl_exceptions.h"
 #include "utl/preprocessor/utl_modifiers.h"
 #include "utl/preprocessor/utl_namespace.h"
 #include "utl/preprocessor/utl_pragma.h"
@@ -51,6 +50,7 @@
 #include "utl/configuration/utl_attributes.h"
 #include "utl/configuration/utl_builtins.h"
 #include "utl/configuration/utl_compiler.h"
+#include "utl/configuration/utl_exceptions.h"
 
 #ifndef __cpp_aligned_new
 #  define UTL_SUPPORTS_ALIGNED_ALLOCATION 0
