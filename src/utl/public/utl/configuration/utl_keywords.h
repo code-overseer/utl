@@ -30,6 +30,7 @@
 #  define __UTL_KEYWORD_MSVC__w64
 #  define __UTL_KEYWORD_MSVC__forceinline
 
+/* TODO wtf */
 #  define __UTL_SAL_ANNOTATION_Check_return_
 
 #elif UTL_COMPILER_GNU_BASED
