@@ -2,9 +2,7 @@
 
 #pragma once
 
-#include "utl/configuration/utl_compiler.h"
-#include "utl/configuration/utl_namespace.h"
-#include "utl/configuration/utl_standard.h"
+#include "utl/utl_config.h"
 
 #if UTL_COMPILER_GCC
 // TODO: add preprocessor flag to either include std header/use this UB/disable std compatibility

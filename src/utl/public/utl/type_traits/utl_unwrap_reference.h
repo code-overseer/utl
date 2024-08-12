@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/configuration/utl_namespace.h"
+#include "utl/utl_config.h"
 
 UTL_STD_NAMESPACE_BEGIN
 /* UTL_UNDEFINED_BEHAVIOUR */

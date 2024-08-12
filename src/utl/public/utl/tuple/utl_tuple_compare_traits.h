@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "utl/configuration/utl_namespace.h"
-#include "utl/configuration/utl_standard.h"
+#include "utl/utl_config.h"
 
 #include "utl/compare/utl_compare_traits.h"
 #include "utl/tuple/utl_tuple_get_element.h"
