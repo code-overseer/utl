@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/algorithm/utl_find_if.h"
 #include "utl/concepts/utl_predicate.h"

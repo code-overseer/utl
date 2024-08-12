@@ -10,7 +10,7 @@
 #  error "Private header accessed"
 #endif
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/utility/utl_pair_fwd.h"
 

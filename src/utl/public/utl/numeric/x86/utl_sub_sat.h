@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #ifndef UTL_NUMERIC_PRIVATE_HEADER_GUARD
 #  error "Private header accessed"

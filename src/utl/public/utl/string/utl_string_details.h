@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/numeric/utl_add_sat.h"
 #include "utl/numeric/utl_limits.h"

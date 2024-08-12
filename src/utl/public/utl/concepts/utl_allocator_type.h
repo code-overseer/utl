@@ -2,13 +2,14 @@
 
 #pragma once
 
+#include "utl/utl_config.h"
+
 #include "utl/concepts/utl_assignable_from.h"
 #include "utl/concepts/utl_copy_constructible.h"
 #include "utl/concepts/utl_empty_type.h"
 #include "utl/concepts/utl_equality_comparable.h"
 #include "utl/concepts/utl_move_constructible.h"
 #include "utl/concepts/utl_swappable.h"
-#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_is_swappable.h"
 #include "utl/utility/utl_move.h"
 

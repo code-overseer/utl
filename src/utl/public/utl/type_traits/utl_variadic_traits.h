@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/memory/utl_uses_allocator.h"
 #include "utl/type_traits/utl_add_lvalue_reference.h"

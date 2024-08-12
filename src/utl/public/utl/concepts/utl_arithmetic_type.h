@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include "utl/utl_config.h"
+
 #include "utl/concepts/utl_floating_point.h"
 #include "utl/concepts/utl_integral.h"
-#include "utl/preprocessor/utl_config.h"
 
 #if UTL_CXX20
 UTL_NAMESPACE_BEGIN

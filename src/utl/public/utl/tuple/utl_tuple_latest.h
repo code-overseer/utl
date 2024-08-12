@@ -14,7 +14,7 @@
 #  error "Header compiled with invalid standard"
 #endif
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/compare/utl_compare_traits.h"
 #include "utl/compare/utl_strong_ordering.h"

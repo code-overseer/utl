@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_is_nothrow_copy_constructible.h"
 #include "utl/utility/utl_move.h"

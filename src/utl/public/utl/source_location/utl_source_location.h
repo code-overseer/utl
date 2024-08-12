@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #if UTL_COMPILER_CLANG_AT_LEAST(16, 0, 0) | UTL_COMPILER_GCC_AT_LEAST(13, 1, 0) | \
     UTL_COMPILER_MSVC_AT_LEAST(1937) | UTL_COMPILER_ICX_AT_LEAST(20230200)

@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include "utl/utl_config.h"
+
 #include "utl/concepts/utl_convertible_to.h"
 #include "utl/concepts/utl_same_as.h"
-#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_remove_cvref.h"
 
 #if UTL_CXX20

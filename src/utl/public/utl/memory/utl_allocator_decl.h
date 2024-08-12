@@ -2,8 +2,9 @@
 
 #pragma once
 
+#include "utl/utl_config.h"
+
 #include "utl/preprocessor/utl_assertion.h"
-#include "utl/preprocessor/utl_config.h"
 
 #include "utl/memory/utl_allocator_fwd.h"
 

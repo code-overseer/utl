@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_indirectly_writable.h"
 #include "utl/iterator/utl_input_or_output_iterator.h"

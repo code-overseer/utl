@@ -3,6 +3,7 @@
 #pragma once
 
 #include "utl/configuration/utl_namespace.h"
+
 #include "utl/type_traits/utl_merge_const.h"
 #include "utl/type_traits/utl_merge_volatile.h"
 #include "utl/type_traits/utl_template_list.h"

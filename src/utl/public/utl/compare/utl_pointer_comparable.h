@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 #if UTL_CXX20
 #  include "utl_strong_ordering.h"
 #endif

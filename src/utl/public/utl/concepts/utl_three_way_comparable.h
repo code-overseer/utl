@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include "utl/utl_config.h"
+
 #include "utl/compare/utl_compare_fwd.h"
+
 #include "utl/concepts/utl_boolean_testable.h"
 #include "utl/concepts/utl_equality_comparable.h"
 #include "utl/concepts/utl_partially_ordered_with.h"
 #include "utl/concepts/utl_same_as.h"
-#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_common_comparison_category.h"
 #include "utl/type_traits/utl_remove_reference.h"
 

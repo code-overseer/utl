@@ -1,6 +1,6 @@
 // Copyright 2023-2024 Bryan Wong
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/utility/utl_pair_fwd.h"
 

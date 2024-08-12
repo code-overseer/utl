@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_is_floating_point.h"
@@ -11,7 +11,7 @@
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/type_traits/utl_remove_cv.h"
 #include "utl/type_traits/utl_undefined_trait.h"
-#include "utl/utlfloat.h"
+#include "utl/utl_float.h"
 
 #include <cfloat>
 #include <climits>

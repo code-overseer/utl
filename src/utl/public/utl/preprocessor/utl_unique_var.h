@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_concatenation.h"
-
 #include "utl/configuration/utl_compiler.h"
+
+#include "utl/preprocessor/utl_concatenation.h"
 
 #if UTL_COMPILER_CLANG | UTL_COMPILER_GCC | UTL_COMPILER_MSVC | UTL_COMPILER_INTEL
 

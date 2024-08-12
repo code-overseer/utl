@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/compare/utl_pointer_comparable.h"
 #include "utl/concepts.h" // convertible_to

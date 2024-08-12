@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/concepts/utl_totally_ordered.h"
 #include "utl/type_traits/utl_is_equality_comparable.h"
