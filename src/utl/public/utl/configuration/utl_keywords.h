@@ -6,7 +6,7 @@
 
 #if UTL_COMPILER_MSVC
 #  define UTL_HAS_KEYWORD(NAME)                            \
-      UTL_IS_EMPTY(UTL_CONCAT(__UTL_MSVC_KEYWORD, NAME)) | \
+      UTL_IS_EMPTY(UTL_CONCAT(__UTL_KEYWORD_MSVC, NAME)) | \
           UTL_IS_EMPTY(UTL_CONCAT(__UTL_SAL_ANNOTATION, NAME))
 
 #  define UTL_HAS_SAL_ANNOTATION(NAME) UTL_IS_EMPTY(UTL_CONCAT(__UTL_SAL_ANNOTATION, NAME))
@@ -20,22 +20,22 @@
 #  define UTL_W64 __w64
 #  define UTL_FORCEINLINE __forceinline
 
-#  define __UTL_MSVC_KEYWORD__declspec
-#  define __UTL_MSVC_KEYWORD__cdecl
-#  define __UTL_MSVC_KEYWORD__fastcall
-#  define __UTL_MSVC_KEYWORD__stdcall
-#  define __UTL_MSVC_KEYWORD__restrict
-#  define __UTL_MSVC_KEYWORD__vectorcall
-#  define __UTL_MSVC_KEYWORD__unaligned
-#  define __UTL_MSVC_KEYWORD__w64
-#  define __UTL_MSVC_KEYWORD__forceinline
+#  define __UTL_KEYWORD_MSVC__declspec
+#  define __UTL_KEYWORD_MSVC__cdecl
+#  define __UTL_KEYWORD_MSVC__fastcall
+#  define __UTL_KEYWORD_MSVC__stdcall
+#  define __UTL_KEYWORD_MSVC__restrict
+#  define __UTL_KEYWORD_MSVC__vectorcall
+#  define __UTL_KEYWORD_MSVC__unaligned
+#  define __UTL_KEYWORD_MSVC__w64
+#  define __UTL_KEYWORD_MSVC__forceinline
 
 #  define __UTL_SAL_ANNOTATION_Check_return_
 
 #elif UTL_COMPILER_GNU_BASED
 #  define UTL_HAS_KEYWORD(NAME) UTL_IS_EMPTY(UTL_CONCAT(__UTL_GNU_KEYWORD, NAME))
 
-#  define __UTL_GNU_KEYWORD__restrict__
+#  define __UTL_KEYWORD_GNU__restrict__
 
 #  define UTL_CDECL
 #  define UTL_FASTCALL
