@@ -80,7 +80,9 @@ IncludeBlocks:   Regroup
 IncludeCategories:
   - Regex:           '.*\.generated\.h'
     Priority:        100
-  - Regex:           '"utl/preprocessor/utl_config.h"'
+  - Regex:           '"utl/configuration/utl_config.h"'
+    Priority:        0
+  - Regex:           '"utl/configuration/.*"'
     Priority:        0
   - Regex:           '"utl/preprocessor/.*"'
     Priority:        5

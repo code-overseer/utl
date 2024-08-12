@@ -2,13 +2,22 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attribute_check.h"
-#include "utl/preprocessor/utl_attribute_list.h"
-
 #include "utl/configuration/utl_builtins.h"
 #include "utl/configuration/utl_compiler.h"
 #include "utl/configuration/utl_declspec.h"
 #include "utl/configuration/utl_keywords.h"
+
+#if defined(__cplusplus) && defined(__has_cpp_attribute)
+#  define UTL_HAS_CPP_ATTRIBUTE(NAME) __has_cpp_attribute(NAME)
+#else /* ifdef __has_cpp_attribute */
+#  define UTL_HAS_CPP_ATTRIBUTE(NAME) 0
+#endif /* ifdef __has_cpp_attribute */
+
+#ifdef __has_attribute
+#  define UTL_HAS_GNU_ATTRIBUTE(NAME) __has_attribute(NAME)
+#else /* ifdef __has_attribute */
+#  define UTL_HAS_GNU_ATTRIBUTE(NAME) 0
+#endif /* ifdef __has_attribute */
 
 #if UTL_HAS_CPP_ATTRIBUTE(nodiscard) && UTL_CXX17
 #  define UTL_NODISCARD [[nodiscard]]

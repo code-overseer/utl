@@ -6,6 +6,7 @@
 #include "utl/configuration/utl_allocation.h"
 #include "utl/configuration/utl_architecture.h"
 #include "utl/configuration/utl_attributes.h"
+#include "utl/configuration/utl_build_type.h"
 #include "utl/configuration/utl_builtins.h"
 #include "utl/configuration/utl_compiler.h"
 #include "utl/configuration/utl_exceptions.h"
@@ -17,6 +18,5 @@
 #include "utl/configuration/utl_target.h"
 #include "utl/configuration/utl_types.h"
 
-#if __OPTIMIZE__
-#  define UTL_OPTIMIZATIONS_ENABLED 1
-#endif
+#include "utl/preprocessor/utl_attribute_check.h"
+#include "utl/preprocessor/utl_attribute_list.h"
