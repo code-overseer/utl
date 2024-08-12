@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_concatenation.h"
-#include "utl/preprocessor/utl_to_string.h"
-
 #include "utl/configuration/utl_attributes.h"
 #include "utl/configuration/utl_compiler.h"
 #include "utl/configuration/utl_exceptions.h"
 #include "utl/configuration/utl_standard.h"
 #include "utl/configuration/utl_target.h"
+
+#include "utl/preprocessor/utl_concatenation.h"
+#include "utl/preprocessor/utl_to_string.h"
 
 #if UTL_COMPILER_MSVC
 
@@ -49,11 +49,19 @@
 
 #endif
 
-#if !UTL_HAS_ATTRIBUTE(TYPE_VISIBILITY)
+#if !UTL_HAS_GNU_ATTRIBUTE(TYPE_VISIBILITY)
 /* For GNU compilers that don't have type visibility we must keep the templates visible */
 #  define __UTL_PUBLIC_TEMPLATE __attribute__((__visibility__("default")))
 #  define __UTL_ATTRIBUTE_PUBLIC_TEMPLATE (VISIBILITY("default"))
 #  define __UTL_ATTRIBUTE_TYPE_AGGREGATE_PUBLIC_TEMPLATE
+#  define __UTL_NAMESPACE_VISIBILITY
+#else
+#  define __UTL_NAMESPACE_VISIBILITY __attribute__((__type_visibility__("default")))
+#  define __UTL_PUBLIC_TEMPLATE
+#  define __UTL_ATTRIBUTE_PUBLIC_TEMPLATE
+#  ifdef __UTL_ATTRIBUTE_TYPE_AGGREGATE_PUBLIC_TEMPLATE
+#    error '__UTL_ATTRIBUTE_TYPE_AGGREGATE_PUBLIC_TEMPLATE' cannot be defined
+#  endif
 #endif
 
 #define __UTL_ODR_SIGNATURE_1(_0, _1, _2, _3, _4) _0##_1##_2##_3##_4
