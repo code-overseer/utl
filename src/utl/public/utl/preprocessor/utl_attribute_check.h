@@ -1,6 +1,0 @@
-/* Copyright 2023-2024 Bryan Wong */
-
-#pragma once
-
-#define UTL_HAS_AGGREGATE_ATTRIBUTE(NAME) \
-    UTL_IS_EMPTY(UTL_CONCAT(__UTL_ATTRIBUTE_TYPE_AGGREGATE_, NAME))

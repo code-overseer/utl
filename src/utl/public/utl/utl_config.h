@@ -18,5 +18,4 @@
 #include "utl/configuration/utl_target.h"
 #include "utl/configuration/utl_types.h"
 
-#include "utl/preprocessor/utl_attribute_check.h"
 #include "utl/preprocessor/utl_attribute_list.h"
