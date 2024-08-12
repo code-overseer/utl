@@ -10,7 +10,7 @@
 namespace std {
 /* UTL_UNDEFINED_BEHAVIOUR */
 template <typename>
-class __UTL_PUBLIC_TEMPLATE initializer_list;
+class initializer_list;
 } // namespace std
 
 UTL_NAMESPACE_BEGIN

@@ -4,6 +4,7 @@
 
 #include "utl/utl_config.h"
 
+#include "utl/assert/utl_assert.h"
 #include "utl/exception/utl_exception_base.h"
 #include "utl/exception/utl_message_header.h"
 #include "utl/iterator/utl_iterator_tags.h"

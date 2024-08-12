@@ -4,6 +4,7 @@
 
 #include "utl/utl_config.h"
 
+#include "utl/assert/utl_assert.h"
 #include "utl/iterator/utl_iterator_traits.h"
 #include "utl/iterator/utl_legacy_bidirectional_iterator.h"
 #include "utl/iterator/utl_legacy_input_iterator.h"

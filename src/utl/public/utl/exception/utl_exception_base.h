@@ -4,8 +4,7 @@
 
 #include "utl/utl_config.h"
 
-#include "utl/preprocessor/utl_assertion.h"
-
+#include "utl/assert/utl_assert.h"
 #include "utl/type_traits/utl_constants.h"
 
 #include <exception>

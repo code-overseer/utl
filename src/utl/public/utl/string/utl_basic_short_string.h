@@ -8,6 +8,7 @@
 
 #include "utl/algorithm/utl_remove.h"
 #include "utl/algorithm/utl_remove_if.h"
+#include "utl/assert/utl_assert.h"
 #include "utl/bit/utl_bit_ceil.h"
 #include "utl/concepts/utl_convertible_to.h"
 #include "utl/concepts/utl_integral.h"

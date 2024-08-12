@@ -4,10 +4,9 @@
 
 #include "utl/utl_config.h"
 
-#include "utl/preprocessor/utl_assertion.h"
-
 #include "utl/memory/utl_allocator_fwd.h"
 
+#include "utl/assert/utl_assert.h"
 #include "utl/exception/utl_exception_base.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_is_complete.h"

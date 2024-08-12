@@ -4,6 +4,7 @@
 
 #include "utl/utl_config.h"
 
+#include "utl/assert/utl_assert.h"
 #include "utl/memory/utl_addressof.h"
 #include "utl/memory/utl_reference_counting_destroy.h"
 
