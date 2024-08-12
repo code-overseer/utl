@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_compiler.h"
 #include "utl/preprocessor/utl_msvc_builtins.h"
 #include "utl/preprocessor/utl_standard.h"
+
+#include "utl/configuration/utl_compiler.h"
 
 #ifdef __is_identifier
 #  define UTL_IS_RESERVED_IDENTIFIER(X) !__is_identifier(X)

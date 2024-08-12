@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_compiler.h"
+#include "utl/configuration/utl_compiler.h"
 
 #if UTL_COMPILER_CLANG
 

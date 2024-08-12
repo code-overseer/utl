@@ -94,8 +94,12 @@
 #  error "Minimum version for Clang not met"
 #endif
 
-#if __GNUC__
+#ifdef __GNUC__
 #  define UTL_COMPILER_GNU_BASED 1
+#endif
+
+#ifdef __clang__
+#  define UTL_COMPILER_CLANG_BASED 1
 #endif
 
 #if UTL_COMPILER_CLANG | UTL_COMPILER_GCC | UTL_COMPILER_ICC | UTL_COMPILER_ICX

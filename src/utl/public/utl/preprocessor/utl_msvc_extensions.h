@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_compiler.h"
 #include "utl/preprocessor/utl_concatenation.h"
 #include "utl/preprocessor/utl_is_empty.h"
+
+#include "utl/configuration/utl_compiler.h"
 
 #if UTL_COMPILER_MSVC
 #  define UTL_HAS_MSVC_KEYWORD(NAME) UTL_IS_EMPTY(UTL_CONCAT(__UTL_MSVC_KEYWORD, NAME))
