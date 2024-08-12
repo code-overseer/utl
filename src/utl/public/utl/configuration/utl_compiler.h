@@ -17,7 +17,26 @@
 #  else
 #    define UTL_COMPILER_TAG UTL_CONCAT(ICX, __INTEL_LLVM_COMPILER)
 #  endif
+#elif defined(__APPLE__)
+#  ifndef __clang__
+#    error "Unrecognized compiler for Apple platform"
+#  endif
+#  include "utl/configuration/utl_apple_clang.h"
 
+#  if __UTL_APPLE_CLANG_MAJOR == 0
+#    error Unrecognized AppleClang version, please update the version map in utl_apple_clang
+#  endif
+
+#  define UTL_COMPILER_CLANG 1
+#  define UTL_COMPILER_APPLE_CLANG 1
+#  define UTL_COMPILER_APPLE_CLANG_AT_LEAST(VERSION) __apple_build_version__ >= VERSION
+#  define UTL_COMPILER_CLANG_AT_LEAST(MAJOR, MINOR, PATCH) \
+      __UTL_APPLE_CLANG_MAJOR > MAJOR ||                   \
+          (__UTL_APPLE_CLANG_MAJOR == MAJOR &&             \
+              (__UTL_APPLE_CLANG_MINOR > MINOR ||          \
+                  (__UTL_APPLE_CLANG_MINOR == MINOR && __UTL_APPLE_CLANG_PATCH >= PATCH)))
+
+#  define UTL_COMPILER_TAG __UTL_COMPILER_TAG_CONCAT(AppleClang, __apple_build_version__, , )
 #elif defined(__clang__)
 #  define UTL_COMPILER_CLANG 1
 #  define UTL_COMPILER_CLANG_AT_LEAST(MAJOR, MINOR, PATCH) \
@@ -60,6 +79,10 @@
 #ifndef UTL_COMPILER_CLANG_AT_LEAST
 #  define UTL_COMPILER_CLANG_AT_LEAST(...) 0
 #endif /* ifndef UTL_COMPILER_CLANG_AT_LEAST */
+
+#ifndef UTL_COMPILER_APPLE_CLANG_AT_LEAST
+#  define UTL_COMPILER_APPLE_CLANG_AT_LEAST(...) 0
+#endif /* ifndef UTL_COMPILER_APPLE_CLANG_AT_LEAST */
 
 #ifndef UTL_COMPILER_ICX_AT_LEAST
 #  define UTL_COMPILER_ICX_AT_LEAST(...) 0
