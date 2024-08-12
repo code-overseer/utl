@@ -38,7 +38,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE make_unsigned {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned {
     using type UTL_NODEBUG = UTL_BUILTIN_make_unsigned(T);
 };
 
@@ -94,63 +94,63 @@ struct find_unsigned<T, Idx, true> :
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE make_unsigned {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned {
     using type UTL_NODEBUG = details::type_traits::find_unsigned_t<T>;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE make_unsigned<T const> {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned<T const> {
     using type UTL_NODEBUG = typename make_unsigned<T>::type const;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE make_unsigned<T volatile> {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned<T volatile> {
     using type UTL_NODEBUG = typename make_unsigned<T>::type volatile;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE make_unsigned<T const volatile> {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned<T const volatile> {
     using type UTL_NODEBUG = typename make_unsigned<T>::type const volatile;
 };
 template <>
-struct UTL_PUBLIC_TEMPLATE make_unsigned<bool> {};
+struct __UTL_PUBLIC_TEMPLATE make_unsigned<bool> {};
 template <>
-struct UTL_PUBLIC_TEMPLATE make_unsigned<unsigned char> {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned<unsigned char> {
     using type UTL_NODEBUG = unsigned char;
 };
 template <>
-struct UTL_PUBLIC_TEMPLATE make_unsigned<signed char> {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned<signed char> {
     using type UTL_NODEBUG = unsigned char;
 };
 template <>
-struct UTL_PUBLIC_TEMPLATE make_unsigned<unsigned short> {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned<unsigned short> {
     using type UTL_NODEBUG = unsigned short;
 };
 template <>
-struct UTL_PUBLIC_TEMPLATE make_unsigned<signed short> {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned<signed short> {
     using type UTL_NODEBUG = unsigned short;
 };
 template <>
-struct UTL_PUBLIC_TEMPLATE make_unsigned<unsigned int> {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned<unsigned int> {
     using type UTL_NODEBUG = unsigned int;
 };
 template <>
-struct UTL_PUBLIC_TEMPLATE make_unsigned<signed int> {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned<signed int> {
     using type UTL_NODEBUG = unsigned int;
 };
 template <>
-struct UTL_PUBLIC_TEMPLATE make_unsigned<unsigned long> {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned<unsigned long> {
     using type UTL_NODEBUG = unsigned long;
 };
 template <>
-struct UTL_PUBLIC_TEMPLATE make_unsigned<signed long> {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned<signed long> {
     using type UTL_NODEBUG = unsigned long;
 };
 
 #    ifdef UTL_SUPPORTS_INT128
 template <>
-struct UTL_PUBLIC_TEMPLATE make_unsigned<__uint128_t> {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned<__uint128_t> {
     using type UTL_NODEBUG = __uint128_t;
 };
 template <>
-struct UTL_PUBLIC_TEMPLATE make_unsigned<__int128_t> {
+struct __UTL_PUBLIC_TEMPLATE make_unsigned<__int128_t> {
     using type UTL_NODEBUG = __uint128_t;
 };
 #    endif

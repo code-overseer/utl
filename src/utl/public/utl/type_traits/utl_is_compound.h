@@ -36,7 +36,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_compound : bool_constant<UTL_BUILTIN_is_compound(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_compound : bool_constant<UTL_BUILTIN_is_compound(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -54,7 +54,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_compound : bool_constant<!is_fundamental<T>::value> {};
+struct __UTL_PUBLIC_TEMPLATE is_compound : bool_constant<!is_fundamental<T>::value> {};
 
 #    if UTL_CXX14
 template <typename T>

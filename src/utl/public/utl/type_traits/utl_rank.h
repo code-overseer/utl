@@ -41,7 +41,7 @@ UTL_PRAGMA_WARN("builtin array_rank is disabled by default and cannot be enabled
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE rank : size_constant<UTL_BUILTIN_array_rank(T)> {};
+struct __UTL_PUBLIC_TEMPLATE rank : size_constant<UTL_BUILTIN_array_rank(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -55,11 +55,11 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE rank : size_constant<0> {};
+struct __UTL_PUBLIC_TEMPLATE rank : size_constant<0> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE rank<T[]> : size_constant<rank<T>::value + 1> {};
+struct __UTL_PUBLIC_TEMPLATE rank<T[]> : size_constant<rank<T>::value + 1> {};
 template <typename T, size_t N>
-struct UTL_PUBLIC_TEMPLATE rank<T[N]> : size_constant<rank<T>::value + 1> {};
+struct __UTL_PUBLIC_TEMPLATE rank<T[N]> : size_constant<rank<T>::value + 1> {};
 
 #    if UTL_CXX14
 template <typename T>

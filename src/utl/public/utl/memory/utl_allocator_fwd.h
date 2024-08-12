@@ -7,18 +7,18 @@
 UTL_STD_NAMESPACE_BEGIN
 /* UTL_UNDEFINED_BEHAVIOUR */
 template <typename>
-class UTL_PUBLIC_TEMPLATE allocator;
+class __UTL_PUBLIC_TEMPLATE allocator;
 UTL_STD_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 template <typename>
-class UTL_PUBLIC_TEMPLATE allocator;
+class __UTL_PUBLIC_TEMPLATE allocator;
 
 template <typename>
-struct UTL_PUBLIC_TEMPLATE allocator_traits;
+struct __UTL_PUBLIC_TEMPLATE allocator_traits;
 
 template <typename pointer, typename size_type>
-struct UTL_PUBLIC_TEMPLATE allocation_result {
+struct __UTL_PUBLIC_TEMPLATE allocation_result {
     pointer ptr;
     size_type size;
 };

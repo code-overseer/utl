@@ -207,10 +207,10 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE pointer_traits : details::pointer_traits::impl<T> {};
+struct __UTL_PUBLIC_TEMPLATE pointer_traits : details::pointer_traits::impl<T> {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE pointer_traits<T*> {
+struct __UTL_PUBLIC_TEMPLATE pointer_traits<T*> {
     using pointer = T*;
     using element_type = T;
     using difference_type = details::pointer_traits::diff_type_t<T*>;

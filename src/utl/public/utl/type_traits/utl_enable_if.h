@@ -7,10 +7,10 @@
 UTL_NAMESPACE_BEGIN
 
 template <bool, typename = void>
-struct UTL_PUBLIC_TEMPLATE enable_if {};
+struct __UTL_PUBLIC_TEMPLATE enable_if {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE enable_if<true, T> {
+struct __UTL_PUBLIC_TEMPLATE enable_if<true, T> {
     using type UTL_NODEBUG = T;
 };
 

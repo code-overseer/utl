@@ -36,7 +36,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_floating_point : bool_constant<UTL_BUILTIN_is_floating_point(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_floating_point : bool_constant<UTL_BUILTIN_is_floating_point(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -50,20 +50,20 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_floating_point : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_floating_point : false_type {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_floating_point<float> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_floating_point<float> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_floating_point<double> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_floating_point<double> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_floating_point<long double> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_floating_point<long double> : true_type {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_floating_point<T const> : is_floating_point<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_floating_point<T const> : is_floating_point<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_floating_point<T volatile> : is_floating_point<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_floating_point<T volatile> : is_floating_point<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_floating_point<T const volatile> : is_floating_point<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_floating_point<T const volatile> : is_floating_point<T> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -83,24 +83,24 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 #  ifdef UTL_SUPPORTS_FLOAT16
 template <>
-struct UTL_PUBLIC_TEMPLATE is_floating_point<float16> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_floating_point<float16> : true_type {};
 #  endif // ifdef UTL_SUPPORTS_FLOAT16
 #  ifdef UTL_SUPPORTS_FLOAT32
 template <>
-struct UTL_PUBLIC_TEMPLATE is_floating_point<float32> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_floating_point<float32> : true_type {};
 #  endif // ifdef UTL_SUPPORTS_FLOAT32
 #  ifdef UTL_SUPPORTS_FLOAT64
 template <>
-struct UTL_PUBLIC_TEMPLATE is_floating_point<float64> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_floating_point<float64> : true_type {};
 #  endif // ifdef UTL_SUPPORTS_FLOAT64
 #  ifdef UTL_SUPPORTS_FLOAT128
 using std::float128;
 template <>
-struct UTL_PUBLIC_TEMPLATE is_floating_point<float128> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_floating_point<float128> : true_type {};
 #  endif // ifdef UTL_SUPPORTS_FLOAT128
 #  ifdef UTL_SUPPORTS_BFLOAT16
 template <>
-struct UTL_PUBLIC_TEMPLATE is_floating_point<bfloat16> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_floating_point<bfloat16> : true_type {};
 #  endif // ifdef UTL_SUPPORTS_BFLOAT16
 UTL_NAMESPACE_END
 #endif // if UTL_CXX23

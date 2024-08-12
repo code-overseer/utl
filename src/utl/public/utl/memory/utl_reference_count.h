@@ -22,7 +22,7 @@ UTL_NAMESPACE_BEGIN
  *           is provided in the form void destroy(reference_count<T>* ptr).
  */
 template <typename T>
-class UTL_PUBLIC_TEMPLATE reference_count {
+class __UTL_PUBLIC_TEMPLATE reference_count {
 protected:
     /**
      * Constructs the reference_count object with an initial count of 1.

@@ -311,7 +311,7 @@
 #  define __UTL_ATTRIBUTE_TYPE_CPP_LIKELY
 #else
 #  define UTL_LIKELY
-#endif /* UTL_HAS_CPP_ATTRIBUTE(likely) */
+#endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(unlikely) && UTL_CXX20
 #  define UTL_UNLIKELY [[unlikely]]
@@ -323,4 +323,4 @@
 #  define __UTL_ATTRIBUTE_TYPE_CPP_UNLIKELY
 #else
 #  define UTL_UNLIKELY
-#endif /* UTL_HAS_CPP_ATTRIBUTE(unlikely) */
+#endif

@@ -50,7 +50,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename CharType, size_t ShortSize, typename Traits, typename Alloc>
-class UTL_PUBLIC_TEMPLATE basic_short_string {
+class __UTL_PUBLIC_TEMPLATE basic_short_string {
     static_assert(ShortSize >= details::string::default_inline_size<CharType, Alloc>::value,
         "Inline size must be longer than the default value");
 
@@ -65,7 +65,7 @@ public:
     using reference = CharType&;
     using const_reference = CharType const&;
     using view_type = basic_string_view<value_type, traits_type>;
-    UTL_PUBLIC_TEMPLATE_DATA static constexpr size_type npos = -1;
+    __UTL_PUBLIC_TEMPLATE_DATA static constexpr size_type npos = -1;
 
     class iterator;
     class const_iterator;
@@ -115,7 +115,7 @@ private:
     using storage_type = compressed_pair<storage_union, allocator_type>;
 
 public:
-    class UTL_ABI_PUBLIC iterator : UTL_SCOPE contiguous_iterator_base<iterator, value_type> {
+    class __UTL_ABI_PUBLIC iterator : UTL_SCOPE contiguous_iterator_base<iterator, value_type> {
         using base_type = contiguous_iterator_base<iterator, value_type>;
 
     public:
@@ -141,7 +141,7 @@ public:
             : iterator(const_cast<pointer>(UTL_SCOPE to_address(other))) {}
     };
 
-    class UTL_ABI_PUBLIC const_iterator :
+    class __UTL_ABI_PUBLIC const_iterator :
         UTL_SCOPE contiguous_iterator_base<const_iterator, value_type const> {
         using base_type = contiguous_iterator_base<const_iterator, value_type const>;
 
@@ -190,7 +190,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_input_iterator(It))>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string(
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string(
         It first, It last, allocator_type const& a = allocator_type()) UTL_THROWS
         : basic_short_string(a) {
         assign(first, last);
@@ -212,7 +212,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE explicit UTL_CONSTEXPR_CXX14 basic_short_string(View const& view,
+    __UTL_ABI_PRIVATE explicit UTL_CONSTEXPR_CXX14 basic_short_string(View const& view,
         allocator_type const& a = allocator_type()) noexcept(!utl::with_exceptions &&
         is_nothrow_convertible<View, view_type>::value)
         : basic_short_string(a) {
@@ -221,7 +221,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string(View const& view, size_type pos, size_type n,
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string(View const& view, size_type pos, size_type n,
         allocator_type const& a = allocator_type()) noexcept(!utl::with_exceptions &&
         is_nothrow_convertible<View, view_type>::value)
         : basic_short_string(a) {
@@ -386,7 +386,7 @@ public:
     UTL_REQUIRES_CXX20(requires(Op op, char_pointer p, size_type s) {
         { op(p, s) } -> integral;
     })
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_WITH_TRY void resize_and_overwrite(
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_WITH_TRY void resize_and_overwrite(
         size_type new_size, Op operation) UTL_THROWS {
         reserve(new_size);
         UTL_TRY {
@@ -463,8 +463,7 @@ public:
     UTL_CONSTEXPR_CXX14 reference back() noexcept UTL_LIFETIMEBOUND {
         return data()[size() - 1];
     }
-    UTL_ATTRIBUTE(STRING_PURE) constexpr const_reference operator[](
-        size_type idx) const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTE(STRING_PURE) constexpr const_reference operator[](size_type idx) const noexcept UTL_LIFETIMEBOUND {
         return data()[idx];
     }
     UTL_ATTRIBUTE(STRING_PURE)
@@ -506,8 +505,8 @@ public:
         }
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& assign(
-        basic_short_string const& other) UTL_THROWS UTL_LIFETIMEBOUND {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& assign(basic_short_string const& other)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         return *this = other;
     }
 
@@ -529,8 +528,8 @@ public:
         return *this;
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& assign(
-        basic_short_string&& other) UTL_THROWS UTL_LIFETIMEBOUND {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& assign(basic_short_string&& other)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         return *this = move(other);
     }
 
@@ -551,8 +550,8 @@ public:
 
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_input_iterator(It) && !UTL_TRAIT_is_legacy_forward_iterator(It))>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& assign(
-        It begin, It end) UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& assign(It begin, It end)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         size_ = 0;
         while (begin != end) {
             push_back(*begin);
@@ -562,8 +561,8 @@ public:
 
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_forward_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_forward_iterator(It))>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX17 basic_short_string& assign(
-        It begin, It end) UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX17 basic_short_string& assign(It begin, It end)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         auto const diff = UTL_SCOPE distance(begin, end);
         if (diff < 0) UTL_ATTRIBUTE(UNLIKELY) {
             return *this;
@@ -586,17 +585,16 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& assign(
-        View const& view) UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& assign(View const& view)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
         return assign(v.data(), v.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& assign(
-        View const& view, size_type subidx, size_type subcount = npos)
-        UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& assign(View const& view, size_type subidx,
+        size_type subcount = npos) UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
         UTL_THROW_IF(subidx > v.size(),
             out_of_range(
@@ -648,8 +646,8 @@ public:
     }
 
     UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& insert(size_type pos,
-        basic_short_string const& str, size_type idx,
-        size_type count = npos) UTL_THROWS UTL_LIFETIMEBOUND {
+        basic_short_string const& str, size_type idx, size_type count = npos)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         UTL_THROW_IF(idx > str.size(),
             out_of_range(
                 UTL_MESSAGE_FORMAT(
@@ -665,15 +663,15 @@ public:
         return insert(pos - cbegin(), count, ch);
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator insert(
-        const_iterator pos, value_type ch) UTL_THROWS UTL_LIFETIMEBOUND {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, value_type ch)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         return insert(pos, 1, ch);
     }
 
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_input_iterator(It) && !UTL_TRAIT_is_legacy_forward_iterator(It))>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 iterator insert(
-        const_iterator pos, It first, It last) UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, It first, It last)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         auto const idx = pos - begin();
         while (first != last) {
             insert(pos, *first);
@@ -685,8 +683,8 @@ public:
 
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_forward_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_forward_iterator(It))>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 iterator insert(
-        const_iterator pos, It first, It last) UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, It first, It last)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         auto const length = UTL_SCOPE distance(first, last);
         if (length < 0) UTL_ATTRIBUTE(UNLIKELY) {
             return *this;
@@ -707,22 +705,22 @@ public:
         return iterator(data() + idx);
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator insert(
-        const_iterator pos, ::std::initializer_list<value_type> list) UTL_THROWS UTL_LIFETIMEBOUND {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos,
+        ::std::initializer_list<value_type> list) UTL_THROWS UTL_LIFETIMEBOUND {
         return insert(pos, list.begin(), list.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& insert(
-        size_type pos, View const& view) UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& insert(size_type pos, View const& view)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
         return insert(pos, v.data(), v.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& insert(size_type pos, View const& view,
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& insert(size_type pos, View const& view,
         size_type subidx, size_type subcount = npos) UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
         UTL_THROW_IF(subidx > v.size(),
@@ -749,13 +747,11 @@ public:
         return erase(pos, pos + 1);
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator erase(
-        const_iterator first, const_iterator last) noexcept UTL_LIFETIMEBOUND {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator erase(const_iterator first, const_iterator last) noexcept UTL_LIFETIMEBOUND {
         return erase(iterator(first), iterator(last));
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator erase(
-        iterator first, iterator last) noexcept UTL_LIFETIMEBOUND {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 iterator erase(iterator first, iterator last) noexcept UTL_LIFETIMEBOUND {
         auto const length = last - first;
         auto const src = last.operator->();
         auto const dst = first.operator->();
@@ -765,13 +761,13 @@ public:
         return iterator(dst + length);
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& append(
-        size_type count, value_type ch) UTL_THROWS UTL_LIFETIMEBOUND {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& append(size_type count, value_type ch)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         return insert(size(), count, ch);
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& append(
-        basic_short_string const& str) UTL_THROWS UTL_LIFETIMEBOUND {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& append(basic_short_string const& str)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         return insert(size(), str);
     }
 
@@ -780,8 +776,8 @@ public:
         return insert(size(), str, idx, count);
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& append(
-        const_char_pointer str) UTL_THROWS UTL_LIFETIMEBOUND {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& append(const_char_pointer str)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         return insert(size(), str);
     }
 
@@ -792,8 +788,8 @@ public:
 
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_input_iterator(It))>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& append(
-        It first, It last) UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& append(It first, It last)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         return insert(end(), first, last), *this;
     }
 
@@ -804,16 +800,15 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& append(
-        View const& view) UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& append(View const& view)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         return insert(size(), view);
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& append(
-        View const& view, size_type subidx, size_type subcount = npos)
-        UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& append(View const& view, size_type subidx,
+        size_type subcount = npos) UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
         UTL_THROW_IF(subidx > v.size(),
             out_of_range(
@@ -829,13 +824,13 @@ public:
         return append(str);
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(
-        value_type ch) UTL_THROWS UTL_LIFETIMEBOUND {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(value_type ch)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         return append(1, ch);
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(
-        const_char_pointer str) UTL_THROWS UTL_LIFETIMEBOUND {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(const_char_pointer str)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         return append(str);
     }
 
@@ -846,14 +841,13 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(
-        View const& view) UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(View const& view)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         return append(view);
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& replace(
-        size_type pos, size_type count, basic_short_string const& str)
-        UTL_THROWS UTL_LIFETIMEBOUND {
+    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& replace(size_type pos, size_type count,
+        basic_short_string const& str) UTL_THROWS UTL_LIFETIMEBOUND {
         return replace(pos, count, str.data(), str.size());
     }
 
@@ -863,8 +857,8 @@ public:
     }
 
     UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& replace(size_type pos, size_type count,
-        basic_short_string const& str, size_type subidx,
-        size_type subcount = npos) UTL_THROWS UTL_LIFETIMEBOUND {
+        basic_short_string const& str, size_type subidx, size_type subcount = npos)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         UTL_THROW_IF(subidx > str.size(),
             out_of_range(
                 UTL_MESSAGE_FORMAT(
@@ -944,8 +938,8 @@ public:
 
     template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_input_iterator(It))>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(const_iterator first, const_iterator last,
-        It in_first, It in_last) UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(const_iterator first,
+        const_iterator last, It in_first, It in_last) UTL_THROWS UTL_LIFETIMEBOUND {
         while (first != last && in_first != in_last) {
             const_cast<reference>(*first) = *in_first;
             ++first;
@@ -965,16 +959,16 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(
-        const_iterator first, const_iterator last, View const& view) UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(const_iterator first,
+        const_iterator last, View const& view) UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
         return replace(first, last, v.data(), v.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(const_iterator first, const_iterator last,
-        View const& view, size_type subidx, size_type subcount = npos)
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(const_iterator first,
+        const_iterator last, View const& view, size_type subidx, size_type subcount = npos)
         UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
         UTL_THROW_IF(subidx > v.size(),
@@ -988,7 +982,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(
         size_type idx, size_type count, View const& view) UTL_THROWS UTL_LIFETIMEBOUND {
         auto const first = cbegin() + idx;
         return replace(first, first + count, view);
@@ -996,7 +990,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(size_type idx, size_type count,
+    __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(size_type idx, size_type count,
         View const& view, size_type subidx, size_type subcount = npos)
         UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
@@ -1060,7 +1054,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ATTRIBUTES(NODISCARD, ABI_PRIVATE) constexpr size_type find(View const& view, size_type pos = 0) const
+    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) constexpr size_type find(View const& view, size_type pos = 0) const
         noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return find(view_type(view), pos);
     }
@@ -1092,7 +1086,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ATTRIBUTES(NODISCARD, ABI_PRIVATE) constexpr size_type rfind(View const& view,
+    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) constexpr size_type rfind(View const& view,
         size_type pos = npos) const noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return rfind(view_type(view), pos);
     }
@@ -1126,7 +1120,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ATTRIBUTES(NODISCARD, ABI_PRIVATE) constexpr size_type find_first_of(View const& view,
+    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) constexpr size_type find_first_of(View const& view,
         size_type pos = 0) const noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return find_first_of(view_type(view), pos);
     }
@@ -1161,7 +1155,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ATTRIBUTES(NODISCARD, ABI_PRIVATE) constexpr size_type find_first_not_of(View const& view,
+    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) constexpr size_type find_first_not_of(View const& view,
         size_type pos = 0) const noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return find_first_not_of(view_type(view), pos);
     }
@@ -1195,7 +1189,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ATTRIBUTES(NODISCARD, ABI_PRIVATE) constexpr size_type find_last_of(View const& view,
+    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) constexpr size_type find_last_of(View const& view,
         size_type pos = npos) const noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return find_last_of(view_type(view), pos);
     }
@@ -1229,7 +1223,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ATTRIBUTES(NODISCARD, ABI_PRIVATE) constexpr size_type find_last_not_of(View const& view,
+    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) constexpr size_type find_last_not_of(View const& view,
         size_type pos = npos) const UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_convertible(View,
         view_type)) {
         return find_last_not_of(view_type(view), pos);
@@ -1249,7 +1243,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(is_convertible<View, view_type>::value)>
-    UTL_ATTRIBUTES(NODISCARD, ABI_PRIVATE) UTL_CONSTEXPR_CXX14 int compare(View const& view) const
+    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) UTL_CONSTEXPR_CXX14 int compare(View const& view) const
         noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return compare(view_type(view));
     }
@@ -1286,7 +1280,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ATTRIBUTES(NODISCARD, ABI_PRIVATE)
+    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE)
     UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
         View const& view) const UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return compare(pos, count, view_type(view));
@@ -1316,7 +1310,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_REQUIRES_CXX11(
         is_convertible<View, view_type>::value)>
-    UTL_ATTRIBUTES(NODISCARD, PURE, ABI_PRIVATE)
+    UTL_ATTRIBUTES(NODISCARD, PURE, _ABI_PRIVATE)
     UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
         View const& view, size_type pos2, size_type count2 = npos) const UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_convertible(View,
         view_type)) {
@@ -1805,7 +1799,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ABI_PUBLIC constexpr typename basic_short_string<CharT, N, Traits, Alloc>::size_type
+__UTL_ABI_PUBLIC constexpr typename basic_short_string<CharT, N, Traits, Alloc>::size_type
     basic_short_string<CharT, N, Traits, Alloc>::npos;
 
 UTL_NAMESPACE_END

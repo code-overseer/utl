@@ -31,7 +31,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_pointer_interconvertible_base_of :
+struct __UTL_PUBLIC_TEMPLATE is_pointer_interconvertible_base_of :
     bool_constant<UTL_BUILTIN_is_pointer_interconvertible_base_of(T, U)> {};
 
 #    if UTL_CXX14
@@ -51,9 +51,9 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_pointer_interconvertible_base_of : undefined_trait<T, U> {};
+struct __UTL_PUBLIC_TEMPLATE is_pointer_interconvertible_base_of : undefined_trait<T, U> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pointer_interconvertible_base_of<T, T> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_pointer_interconvertible_base_of<T, T> : true_type {};
 
 #    if UTL_CXX14
 template <typename T, typename U>

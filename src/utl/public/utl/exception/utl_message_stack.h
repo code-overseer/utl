@@ -17,7 +17,7 @@ UTL_NAMESPACE_BEGIN
 
 namespace exceptions {
 
-class UTL_ABI_PUBLIC message_stack {
+class __UTL_ABI_PUBLIC message_stack {
 public:
     using size_type = size_t;
     using value_type = message_header;
@@ -72,7 +72,7 @@ public:
         return *this;
     }
 
-    class UTL_ABI_PUBLIC const_iterator {
+    class __UTL_ABI_PUBLIC const_iterator {
     public:
         using value_type = message_header const;
         using pointer = message_header const*;
@@ -111,8 +111,7 @@ public:
         message_header const* current_ = nullptr;
     };
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr message_header const&
-    top() const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr message_header const& top() const noexcept UTL_LIFETIMEBOUND {
         return *head_;
     }
 
@@ -120,23 +119,19 @@ public:
 
     UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr size_type size() const noexcept { return size_; }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator
-    begin() const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator begin() const noexcept UTL_LIFETIMEBOUND {
         return const_iterator(head_);
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator
-    end() const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator end() const noexcept UTL_LIFETIMEBOUND {
         return const_iterator();
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator
-    cbegin() const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator cbegin() const noexcept UTL_LIFETIMEBOUND {
         return const_iterator(head_);
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator
-    cend() const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator cend() const noexcept UTL_LIFETIMEBOUND {
         return const_iterator();
     }
 

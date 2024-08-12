@@ -102,7 +102,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename It>
-class UTL_PUBLIC_TEMPLATE reverse_iterator {
+class __UTL_PUBLIC_TEMPLATE reverse_iterator {
 private:
     static_assert(UTL_TRAIT_is_legacy_bidirectional_iterator(It), "Non-reversible iterator");
     using traits_type UTL_NODEBUG = iterator_traits<It>;

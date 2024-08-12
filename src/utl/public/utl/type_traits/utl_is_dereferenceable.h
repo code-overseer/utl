@@ -32,10 +32,11 @@ using is_nothrow UTL_NODEBUG = decltype(nothrow_impl<T>(0));
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_dereferenceable : details::dereferenceable::trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_dereferenceable : details::dereferenceable::trait<T> {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_dereferenceable : details::dereferenceable::is_nothrow<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_dereferenceable :
+    details::dereferenceable::is_nothrow<T> {};
 
 #if UTL_CXX14
 template <typename T>

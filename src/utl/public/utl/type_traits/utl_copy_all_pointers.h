@@ -7,11 +7,11 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE copy_all_pointers {
+struct __UTL_PUBLIC_TEMPLATE copy_all_pointers {
     using type UTL_NODEBUG = To;
 };
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE copy_all_pointers<From*, To> : copy_all_pointers<From, To*> {};
+struct __UTL_PUBLIC_TEMPLATE copy_all_pointers<From*, To> : copy_all_pointers<From, To*> {};
 
 template <typename From, typename To>
 using copy_all_pointers_t = typename copy_all_pointers<From, To>::type;

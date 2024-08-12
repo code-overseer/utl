@@ -22,7 +22,7 @@ concept indirectly_writable = requires(Out&& o, T&& t) {
 };
 
 template <typename OutIt, typename ValueType>
-struct UTL_PUBLIC_TEMPLATE is_indirectly_writable :
+struct __UTL_PUBLIC_TEMPLATE is_indirectly_writable :
     bool_constant<indirectly_writable<OutIt, ValueType>> {};
 
 template <typename OutIt, typename ValueType>
@@ -60,7 +60,7 @@ using implemented UTL_NODEBUG = decltype(UTL_SCOPE details::indirectly_writable:
 } // namespace details
 
 template <typename OutIt, typename ValueType>
-struct UTL_PUBLIC_TEMPLATE is_indirectly_writable :
+struct __UTL_PUBLIC_TEMPLATE is_indirectly_writable :
     UTL_SCOPE details::indirectly_writable::implemented<OutIt, ValueType> {};
 
 #  if UTL_CXX14

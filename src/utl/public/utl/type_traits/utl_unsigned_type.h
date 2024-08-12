@@ -12,10 +12,10 @@ template <size_t N>
 using unsigned_type_t = typename unsigned_type<N>::type;
 
 // clang-format off
-template <> struct UTL_PUBLIC_TEMPLATE unsigned_type<1> { using type UTL_NODEBUG = uint8_t; };
-template <> struct UTL_PUBLIC_TEMPLATE unsigned_type<2> { using type UTL_NODEBUG = uint16_t; };
-template <> struct UTL_PUBLIC_TEMPLATE unsigned_type<4> { using type UTL_NODEBUG = uint32_t; };
-template <> struct UTL_PUBLIC_TEMPLATE unsigned_type<8> { using type UTL_NODEBUG = uint64_t; };
+template <> struct __UTL_PUBLIC_TEMPLATE unsigned_type<1> { using type UTL_NODEBUG = uint8_t; };
+template <> struct __UTL_PUBLIC_TEMPLATE unsigned_type<2> { using type UTL_NODEBUG = uint16_t; };
+template <> struct __UTL_PUBLIC_TEMPLATE unsigned_type<4> { using type UTL_NODEBUG = uint32_t; };
+template <> struct __UTL_PUBLIC_TEMPLATE unsigned_type<8> { using type UTL_NODEBUG = uint64_t; };
 // clang-format on
 
 UTL_STD_NAMESPACE_END

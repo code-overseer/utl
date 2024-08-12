@@ -34,7 +34,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T0, typename T1>
-struct UTL_PUBLIC_TEMPLATE is_same : bool_constant<UTL_BUILTIN_is_same(T0, T1)> {};
+struct __UTL_PUBLIC_TEMPLATE is_same : bool_constant<UTL_BUILTIN_is_same(T0, T1)> {};
 
 #    if UTL_CXX14
 template <typename T0, typename T1>
@@ -48,10 +48,10 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename, typename>
-struct UTL_PUBLIC_TEMPLATE is_same : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_same : false_type {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_same<T, T> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_same<T, T> : true_type {};
 
 #    if UTL_CXX14
 template <typename T>

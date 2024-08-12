@@ -27,7 +27,7 @@ namespace exceptions {
  * on the stack. New elements are pushed onto the head. The class also provides methods
  * to manage memory allocation, access message details, and handle linked list operations.
  */
-class UTL_ABI_PUBLIC message_header final : reference_count<message_header> {
+class __UTL_ABI_PUBLIC message_header final : reference_count<message_header> {
 public:
     // Deleted new and delete operators to prevent direct allocation
     static void* operator new(size_t) = delete;

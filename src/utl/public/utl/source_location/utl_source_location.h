@@ -49,7 +49,7 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-class UTL_ABI_PUBLIC source_location {
+class __UTL_ABI_PUBLIC source_location {
 public:
     UTL_HIDE_FROM_ABI static UTL_SOURCE_LOCATION_CONSTEVAL source_location current(
         char const* file_name = UTL_BUILTIN_FILE(),
@@ -113,7 +113,7 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-class UTL_ABI_PUBLIC source_location {
+class __UTL_ABI_PUBLIC source_location {
 public:
     template <typename T = int>
     UTL_HIDE_FROM_ABI static source_location current() noexcept {

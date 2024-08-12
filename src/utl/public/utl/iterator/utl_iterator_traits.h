@@ -125,7 +125,7 @@ struct legacy_traits<Iter> : private UTL_SCOPE details::iterator_traits::impl_ta
 } // namespace details
 
 template <details::iterator_traits::simple_iter Iter>
-struct UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
+struct __UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
     private details::iterator_traits::impl_tag<Iter> {
     using difference_type = typename Iter::difference_type;
     using value_type = typename Iter::value_type;
@@ -135,7 +135,7 @@ struct UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
 };
 
 template <details::iterator_traits::non_pointer_iter Iter>
-struct UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
+struct __UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
     private details::iterator_traits::impl_tag<Iter> {
     using difference_type = typename Iter::difference_type;
     using value_type = typename Iter::value_type;
@@ -145,7 +145,7 @@ struct UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
 };
 
 template <object_type T>
-struct UTL_PUBLIC_TEMPLATE iterator_traits<T*> : private details::iterator_traits::impl_tag<T*> {
+struct __UTL_PUBLIC_TEMPLATE iterator_traits<T*> : private details::iterator_traits::impl_tag<T*> {
     using difference_type = pointer_traits<T*>::difference_type;
     using value_type = remove_cv_t<T>;
     using pointer = T*;
@@ -155,7 +155,8 @@ struct UTL_PUBLIC_TEMPLATE iterator_traits<T*> : private details::iterator_trait
 };
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE iterator_traits : private details::iterator_traits::legacy_traits<T> {};
+struct __UTL_PUBLIC_TEMPLATE iterator_traits :
+    private details::iterator_traits::legacy_traits<T> {};
 
 UTL_NAMESPACE_END
 
@@ -275,12 +276,12 @@ struct pointer_impl<T*, true> {
 } // namespace details
 
 template <typename Iter>
-struct UTL_PUBLIC_TEMPLATE iterator_traits :
+struct __UTL_PUBLIC_TEMPLATE iterator_traits :
     details::iterator_traits::traits<Iter>,
     private details::iterator_traits::impl_tag<Iter> {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE iterator_traits<T*> :
+struct __UTL_PUBLIC_TEMPLATE iterator_traits<T*> :
     details::iterator_traits::pointer_impl<T*>,
     private details::iterator_traits::impl_tag<T*> {};
 

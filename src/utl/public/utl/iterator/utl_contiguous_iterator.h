@@ -33,7 +33,7 @@ concept contiguous_iterator = UTL_SCOPE random_access_iterator<T> &&
     };
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_contiguous_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_contiguous_iterator :
     UTL_SCOPE bool_constant<contiguous_iterator<T>> {};
 
 template <typename T>
@@ -74,7 +74,7 @@ using implemented UTL_NODEBUG = decltype(UTL_SCOPE details::contiguous_iterator:
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_contiguous_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_contiguous_iterator :
     UTL_SCOPE details::contiguous_iterator::implemented<T> {};
 
 #  if UTL_CXX14

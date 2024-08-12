@@ -11,7 +11,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename Arg>
-struct UTL_PUBLIC_TEMPLATE is_subscriptable :
+struct __UTL_PUBLIC_TEMPLATE is_subscriptable :
     UTL_SCOPE bool_constant<UTL_SCOPE subscriptable_with<T, Arg>> {};
 
 #  if UTL_CXX14
@@ -41,7 +41,8 @@ using trait_t UTL_NODEBUG = decltype(UTL_SCOPE details::subscriptable::trait<T, 
 } // namespace details
 
 template <typename T, typename Arg>
-struct UTL_PUBLIC_TEMPLATE is_subscriptable : UTL_SCOPE details::subscriptable::trait_t<T, Arg> {};
+struct __UTL_PUBLIC_TEMPLATE is_subscriptable :
+    UTL_SCOPE details::subscriptable::trait_t<T, Arg> {};
 
 #  if UTL_CXX14
 template <typename T, typename Arg>

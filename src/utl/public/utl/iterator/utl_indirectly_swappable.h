@@ -24,7 +24,7 @@ concept indirectly_swappable =
     };
 
 template <typename L, typename R>
-struct UTL_PUBLIC_TEMPLATE is_indirectly_swappable : bool_constant<indirectly_swappable<L, R>> {};
+struct __UTL_PUBLIC_TEMPLATE is_indirectly_swappable : bool_constant<indirectly_swappable<L, R>> {};
 
 template <typename L, typename R>
 inline constexpr bool is_indirectly_swappable_v = indirectly_swappable<L, R>;
@@ -51,7 +51,8 @@ using trait = decltype(UTL_SCOPE details::indirectly_swappable::trait_impl<L, R>
 } // namespace details
 
 template <typename L, typename R = L>
-struct UTL_PUBLIC_TEMPLATE is_indirectly_swappable : details::indirectly_swappable::trait<L, R> {};
+struct __UTL_PUBLIC_TEMPLATE is_indirectly_swappable :
+    details::indirectly_swappable::trait<L, R> {};
 
 #  if UTL_CXX14
 template <typename L, typename R = L>

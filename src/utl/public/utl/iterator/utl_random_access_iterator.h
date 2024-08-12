@@ -31,7 +31,8 @@ concept random_access_iterator = bidirectional_iterator<T> &&
     };
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_random_access_iterator : bool_constant<random_access_iterator<T>> {};
+struct __UTL_PUBLIC_TEMPLATE is_random_access_iterator :
+    bool_constant<random_access_iterator<T>> {};
 
 template <typename T>
 inline constexpr bool is_random_access_iterator_v = random_access_iterator<T>;
@@ -82,7 +83,7 @@ using is_indexible UTL_NODEBUG =
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_random_access_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_random_access_iterator :
     conjunction<is_bidirectional_iterator<T>,
         details::iterator_concept::implements<random_access_iterator_tag, T>, is_totally_ordered<T>,
         is_sized_sentinel_for<T, T>, details::random_access_iterator::is_indexible<T>> {};

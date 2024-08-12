@@ -38,7 +38,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_cv {
+struct __UTL_PUBLIC_TEMPLATE remove_cv {
     using type UTL_NODEBUG = UTL_BUILTIN_remove_cv(T);
 };
 
@@ -52,21 +52,21 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_cv {
+struct __UTL_PUBLIC_TEMPLATE remove_cv {
     using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_cv<T volatile> {
-    using type UTL_NODEBUG = T;
-};
-
-template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_cv<T const> {
+struct __UTL_PUBLIC_TEMPLATE remove_cv<T volatile> {
     using type UTL_NODEBUG = T;
 };
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_cv<T const volatile> {
+struct __UTL_PUBLIC_TEMPLATE remove_cv<T const> {
+    using type UTL_NODEBUG = T;
+};
+
+template <typename T>
+struct __UTL_PUBLIC_TEMPLATE remove_cv<T const volatile> {
     using type UTL_NODEBUG = T;
 };
 

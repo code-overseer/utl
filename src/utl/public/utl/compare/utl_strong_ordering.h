@@ -13,7 +13,7 @@ UTL_NAMESPACE_BEGIN
 #define __UTL_ATTRIBUTE_COMPARE_API (NODISCARD)(CONST)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_COMPARE_API
 
-class UTL_ABI_PUBLIC strong_ordering :
+class __UTL_ABI_PUBLIC strong_ordering :
     details::compare::less_value<strong_ordering>,
     details::compare::equivalent_value<strong_ordering>,
     details::compare::greater_value<strong_ordering>,

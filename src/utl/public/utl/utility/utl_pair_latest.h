@@ -404,7 +404,7 @@ UTL_NAMESPACE_END
 namespace std {
 
 template <typename T0, typename T1, UTL_SCOPE common_with<T0> U0, UTL_SCOPE common_with<T1> U1>
-struct UTL_PUBLIC_TEMPLATE common_type<UTL_SCOPE pair<T0, T1>, UTL_SCOPE pair<U0, U1>> {
+struct __UTL_PUBLIC_TEMPLATE common_type<UTL_SCOPE pair<T0, T1>, UTL_SCOPE pair<U0, U1>> {
     using type UTL_NODEBUG =
         UTL_SCOPE pair<UTL_SCOPE common_type_t<T0, U0>, UTL_SCOPE common_type_t<T1, U1>>;
 };
@@ -415,7 +415,7 @@ requires requires {
     typename UTL_SCOPE common_reference<TQual<T0>, UQual<U0>>::type;
     typename UTL_SCOPE common_reference<TQual<T1>, UQual<U1>>::type;
 }
-struct UTL_PUBLIC_TEMPLATE
+struct __UTL_PUBLIC_TEMPLATE
     basic_common_reference<UTL_SCOPE pair<T0, T1>, UTL_SCOPE pair<U0, U1>, TQual, UQual> {
     using type UTL_NODEBUG = UTL_SCOPE pair<UTL_SCOPE common_reference_t<TQual<T0>, UQual<U0>>,
         UTL_SCOPE common_reference_t<TQual<T1>, UQual<U1>>>;

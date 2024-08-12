@@ -164,21 +164,21 @@ struct nothrow_disjunctable :
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_boolean_testable :
+struct __UTL_PUBLIC_TEMPLATE is_boolean_testable :
     conjunction<details::bool_testable::castable<T>, details::bool_testable::negatable<T>,
         details::bool_testable::conjunctable<T>, details::bool_testable::disjunctable<T>> {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_boolean_testable<bool> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_boolean_testable<bool> : true_type {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_boolean_testable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_boolean_testable :
     conjunction<is_boolean_testable<T>, details::bool_testable::nothrow_castable<T>,
         details::bool_testable::nothrow_negatable<T>,
         details::bool_testable::nothrow_conjunctable<T>,
         details::bool_testable::nothrow_disjunctable<T>> {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_boolean_testable<bool> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_boolean_testable<bool> : true_type {};
 
 #if UTL_CXX14
 template <typename T>

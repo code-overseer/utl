@@ -10,11 +10,11 @@
 
 UTL_NAMESPACE_BEGIN
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE has_member_pointer : UTL_SCOPE false_type {};
+struct __UTL_PUBLIC_TEMPLATE has_member_pointer : UTL_SCOPE false_type {};
 
 template <typename T>
 requires requires { typename T::pointer; }
-struct UTL_PUBLIC_TEMPLATE has_member_pointer<T> : UTL_SCOPE true_type {};
+struct __UTL_PUBLIC_TEMPLATE has_member_pointer<T> : UTL_SCOPE true_type {};
 
 UTL_NAMESPACE_END
 
@@ -34,7 +34,8 @@ struct has_member_pointer_impl<T, void_t<typename T::pointer>> : UTL_SCOPE true_
 } // namespace type_traits
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE has_member_pointer : type_traits::details::has_member_pointer_impl<T> {};
+struct __UTL_PUBLIC_TEMPLATE has_member_pointer :
+    type_traits::details::has_member_pointer_impl<T> {};
 
 UTL_NAMESPACE_END
 

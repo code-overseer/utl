@@ -18,7 +18,7 @@
 
 UTL_NAMESPACE_BEGIN
 template <typename T>
-class UTL_ABI_PUBLIC allocator {
+class __UTL_ABI_PUBLIC allocator {
 public:
     using value_type = T;
     using size_type = size_t;

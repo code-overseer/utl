@@ -13,32 +13,32 @@
 
 UTL_STD_NAMESPACE_BEGIN
 template <typename T0, typename T1>
-struct UTL_PUBLIC_TEMPLATE tuple_size<UTL_SCOPE pair<T0, T1>> :
+struct __UTL_PUBLIC_TEMPLATE tuple_size<UTL_SCOPE pair<T0, T1>> :
     UTL_SCOPE template_size<UTL_SCOPE pair<T0, T1>> {};
 
 template <size_t I, typename T0, typename T1>
-struct UTL_PUBLIC_TEMPLATE tuple_element<I, UTL_SCOPE pair<T0, T1>> :
+struct __UTL_PUBLIC_TEMPLATE tuple_element<I, UTL_SCOPE pair<T0, T1>> :
     UTL_SCOPE template_element<I, UTL_SCOPE pair<T0, T1>> {};
 UTL_STD_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pair : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_pair : false_type {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pair<T&&> : is_pair<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_pair<T&&> : is_pair<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pair<T&> : is_pair<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_pair<T&> : is_pair<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pair<T const> : is_pair<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_pair<T const> : is_pair<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pair<T volatile> : is_pair<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_pair<T volatile> : is_pair<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pair<T const volatile> : is_pair<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_pair<T const volatile> : is_pair<T> {};
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_pair<pair<T, U>> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_pair<pair<T, U>> : true_type {};
 
-struct UTL_ABI_PUBLIC piecewise_construct_t {
+struct __UTL_ABI_PUBLIC piecewise_construct_t {
     UTL_HIDE_FROM_ABI explicit constexpr piecewise_construct_t() noexcept = default;
 };
 

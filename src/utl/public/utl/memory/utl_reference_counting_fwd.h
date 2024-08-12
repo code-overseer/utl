@@ -7,11 +7,11 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-class UTL_PUBLIC_TEMPLATE atomic_reference_count;
+class __UTL_PUBLIC_TEMPLATE atomic_reference_count;
 template <typename T>
-class UTL_PUBLIC_TEMPLATE reference_count;
+class __UTL_PUBLIC_TEMPLATE reference_count;
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_reference_countable;
+struct __UTL_PUBLIC_TEMPLATE is_reference_countable;
 
 UTL_NAMESPACE_END

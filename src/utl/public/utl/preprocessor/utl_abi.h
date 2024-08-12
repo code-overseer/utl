@@ -17,39 +17,40 @@
 #  endif
 
 #  ifdef UTL_BUILDING_LIBRARY
-#    define UTL_ABI_PUBLIC __declspec(dllexport)
-#    define __UTL_ATTRIBUTE_ABI_PUBLIC (DLLEXPORT)
-#    define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PUBLIC
+#    define __UTL_ATTRIBUTE__ABI_PUBLIC (DLLEXPORT)
+#    define __UTL_ATTRIBUTE_TYPE_AGGREGATE__ABI_PUBLIC
+#    define __UTL_ABI_PUBLIC __declspec(dllexport)
 #  else
-#    define UTL_ABI_PUBLIC __declspec(dllimport)
-#    define __UTL_ATTRIBUTE_ABI_PUBLIC (DLLIMPORT)
-#    define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PUBLIC
+#    define __UTL_ATTRIBUTE__ABI_PUBLIC (DLLIMPORT)
+#    define __UTL_ATTRIBUTE_TYPE_AGGREGATE__ABI_PUBLIC
+#    define __UTL_ABI_PUBLIC __declspec(dllimport)
 #  endif
-#  define UTL_ABI_PRIVATE
-#  define __UTL_ATTRIBUTE_ABI_PRIVATE
-#  ifdef __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PRIVATE
-#    error '__UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PRIVATE' cannot be defined
+#  define __UTL_ABI_PRIVATE
+#  define __UTL_ATTRIBUTE__ABI_PRIVATE
+#  ifdef __UTL_ATTRIBUTE_TYPE_AGGREGATE__ABI_PRIVATE
+#    error '__UTL_ATTRIBUTE_TYPE_AGGREGATE__ABI_PRIVATE' cannot be defined
 #  endif
-#  define UTL_PUBLIC_TEMPLATE_DATA
+#  define __UTL_PUBLIC_TEMPLATE_DATA
 #else
 
 #  if !UTL_HAS_GNU_ATTRIBUTE(__visibility__) || !UTL_HAS_GNU_ATTRIBUTE(__visibility__)
 #    error "Unrecognized compiler"
 #  endif
 
-#  define UTL_ABI_PUBLIC __attribute__((__visibility__("default")))
-#  define UTL_ABI_PRIVATE __attribute__((__visibility__("hidden")))
-#  define __UTL_ATTRIBUTE_ABI_PUBLIC (VISIBILITY("default"))
-#  define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PUBLIC
-#  define __UTL_ATTRIBUTE_ABI_PRIVATE (VISIBILITY("hidden"))
-#  define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ABI_PRIVATE
-#  define UTL_PUBLIC_TEMPLATE_DATA __attribute__((__visibility__("default")))
+#  define __UTL_ATTRIBUTE__ABI_PUBLIC (VISIBILITY("default"))
+#  define __UTL_ATTRIBUTE_TYPE_AGGREGATE__ABI_PUBLIC
+#  define __UTL_ATTRIBUTE__ABI_PRIVATE (VISIBILITY("hidden"))
+#  define __UTL_ATTRIBUTE_TYPE_AGGREGATE__ABI_PRIVATE
+
+#  define __UTL_ABI_PUBLIC __attribute__((__visibility__("default")))
+#  define __UTL_ABI_PRIVATE __attribute__((__visibility__("hidden")))
+#  define __UTL_PUBLIC_TEMPLATE_DATA __attribute__((__visibility__("default")))
 
 #endif
 
 #if !UTL_HAS_ATTRIBUTE(TYPE_VISIBILITY)
 /* For GNU compilers that don't have type visibility we must keep the templates visible */
-#  define UTL_PUBLIC_TEMPLATE __attribute__((__visibility__("default")))
+#  define __UTL_PUBLIC_TEMPLATE __attribute__((__visibility__("default")))
 #  define __UTL_ATTRIBUTE_PUBLIC_TEMPLATE (VISIBILITY("default"))
 #  define __UTL_ATTRIBUTE_TYPE_AGGREGATE_PUBLIC_TEMPLATE
 #endif
@@ -74,16 +75,16 @@
 #endif
 
 #define UTL_HIDE_FROM_ABI \
-    UTL_ABI_PRIVATE __UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION __UTL_ABI_TAG(__UTL_ODR_SIGNATURE)
+    __UTL_ABI_PRIVATE __UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION __UTL_ABI_TAG(__UTL_ODR_SIGNATURE)
 #define __UTL_ATTRIBUTE_HIDE_FROM_ABI \
-    __UTL_ATTRIBUTE_ABI_PRIVATE(EXCLUDE_FROM_EXPLICIT_INSTANTIATION)(ABI_TAG(__UTL_ODR_SIGNATURE))
+    __UTL_ATTRIBUTE__ABI_PRIVATE(EXCLUDE_FROM_EXPLICIT_INSTANTIATION)(ABI_TAG(__UTL_ODR_SIGNATURE))
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_HIDE_FROM_ABI
 
 /* virtual functions must be linked to the same symbol */
-#define UTL_HIDE_FROM_ABI_VIRTUAL UTL_ABI_PRIVATE __UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
-#define __UTL_ATTRIBUTE_HIDE_FROM_ABI_VIRTUAL \
-    __UTL_ATTRIBUTE_ABI_PRIVATE(EXCLUDE_FROM_EXPLICIT_INSTANTIATION)
-#define __UTL_ATTRIBUTE_TYPE_AGGREGATE_HIDE_FROM_ABI_VIRTUAL
+#define __UTL_HIDE_FROM_ABI_VIRTUAL __UTL_ABI_PRIVATE __UTL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
+#define __UTL_ATTRIBUTE__HIDE_FROM_ABI_VIRTUAL \
+    __UTL_ATTRIBUTE__ABI_PRIVATE(EXCLUDE_FROM_EXPLICIT_INSTANTIATION)
+#define __UTL_ATTRIBUTE_TYPE_AGGREGATE__HIDE_FROM_ABI_VIRTUAL
 
 #if UTL_WITH_EXCEPTIONS
 #  define __UTL_ABI_EXCEPTION_TAG e

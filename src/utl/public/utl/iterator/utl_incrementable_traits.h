@@ -12,7 +12,7 @@ UTL_NAMESPACE_BEGIN
 template <typename>
 struct incrementable_traits;
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE incrementable_traits<T const> : incrementable_traits<T> {};
+struct __UTL_PUBLIC_TEMPLATE incrementable_traits<T const> : incrementable_traits<T> {};
 
 using ptrdiff_t = decltype((char*)0 - (char*)0);
 
@@ -45,20 +45,20 @@ concept subtractable = !with_difference_type<T> && requires(T const& a, T const&
 } // namespace details
 
 template <typename>
-struct UTL_PUBLIC_TEMPLATE incrementable_traits {};
+struct __UTL_PUBLIC_TEMPLATE incrementable_traits {};
 
 template <object_type T>
-struct UTL_PUBLIC_TEMPLATE incrementable_traits<T*> {
+struct __UTL_PUBLIC_TEMPLATE incrementable_traits<T*> {
     using difference_type = UTL_SCOPE ptrdiff_t;
 };
 
 template <details::incrementable::with_difference_type T>
-struct UTL_PUBLIC_TEMPLATE incrementable_traits<T> {
+struct __UTL_PUBLIC_TEMPLATE incrementable_traits<T> {
     using difference_type = typename T::difference_type;
 };
 
 template <details::incrementable::subtractable T>
-struct UTL_PUBLIC_TEMPLATE incrementable_traits<T> :
+struct __UTL_PUBLIC_TEMPLATE incrementable_traits<T> :
     details::incrementable::subtract_result_t<T> {};
 
 UTL_NAMESPACE_END
@@ -95,10 +95,11 @@ using traits UTL_NODEBUG = decltype(resolve_trait<T>(0));
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE incrementable_traits : details::incrementable::traits<T> {};
+struct __UTL_PUBLIC_TEMPLATE incrementable_traits : details::incrementable::traits<T> {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE incrementable_traits<T*> : details::incrementable::object_pointer<T> {};
+struct __UTL_PUBLIC_TEMPLATE incrementable_traits<T*> :
+    details::incrementable::object_pointer<T> {};
 
 UTL_NAMESPACE_END
 

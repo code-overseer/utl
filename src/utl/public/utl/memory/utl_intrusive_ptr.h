@@ -15,10 +15,10 @@
 
 UTL_NAMESPACE_BEGIN
 
-struct UTL_ABI_PUBLIC retain_object_t {
+struct __UTL_ABI_PUBLIC retain_object_t {
     explicit constexpr retain_object_t() noexcept = default;
 };
-struct UTL_ABI_PUBLIC adopt_object_t {
+struct __UTL_ABI_PUBLIC adopt_object_t {
     explicit constexpr adopt_object_t() noexcept = default;
 };
 
@@ -36,7 +36,7 @@ UTL_INLINE_CXX17 constexpr adopt_object_t adopt_object{};
  * @tparam T The type of the managed object.
  */
 template <typename T>
-class UTL_PUBLIC_TEMPLATE intrusive_ptr : private pointer_comparable<intrusive_ptr<T>> {
+class __UTL_PUBLIC_TEMPLATE intrusive_ptr : private pointer_comparable<intrusive_ptr<T>> {
     /**
      * Helper function to conditionally execute a function if the pointer is not null.
      *
@@ -257,7 +257,7 @@ private:
  *       incrementing/decrementing the reference count modifies the object.
  */
 template <typename T>
-class UTL_PUBLIC_TEMPLATE intrusive_ptr<T const> :
+class __UTL_PUBLIC_TEMPLATE intrusive_ptr<T const> :
     private intrusive_ptr<T>,
     private pointer_comparable<intrusive_ptr<T const>> {
     using base_type = intrusive_ptr<T>;

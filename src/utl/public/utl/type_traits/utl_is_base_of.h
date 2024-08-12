@@ -36,7 +36,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename Base, typename Derive>
-struct UTL_PUBLIC_TEMPLATE is_base_of : bool_constant<UTL_BUILTIN_is_base_of(Base, Derive)> {};
+struct __UTL_PUBLIC_TEMPLATE is_base_of : bool_constant<UTL_BUILTIN_is_base_of(Base, Derive)> {};
 
 #    if UTL_CXX14
 template <typename Base, typename Derive>
@@ -71,7 +71,7 @@ using is_unambiguous_public_inheritance UTL_NODEBUG =
 } // namespace type_traits
 
 template <typename Base, typename Derive>
-struct UTL_PUBLIC_TEMPLATE is_base_of :
+struct __UTL_PUBLIC_TEMPLATE is_base_of :
     type_traits::details::is_unambiguous_public_inheritance<Base, Derive> {};
 
 #    if UTL_CXX14

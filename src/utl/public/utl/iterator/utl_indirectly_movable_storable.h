@@ -24,7 +24,7 @@ concept indirectly_movable_storable = indirectly_movable<From, To>　&&
     assignable_from<iter_value_t<From>&, iter_rvalue_reference_t<From>>;
 
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE is_indirectly_movable_storable :
+struct __UTL_PUBLIC_TEMPLATE is_indirectly_movable_storable :
     bool_constant<indirectly_movable_storable<From, To>> {};
 
 template <typename From, typename To>
@@ -61,7 +61,7 @@ using trait UTL_NODEBUG =
 } // namespace details
 
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE is_indirectly_movable_storable :
+struct __UTL_PUBLIC_TEMPLATE is_indirectly_movable_storable :
     details::indirectly_movable_storable::trait<From, To> {};
 
 #  if UTL_CXX14

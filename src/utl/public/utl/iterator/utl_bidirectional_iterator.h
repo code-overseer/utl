@@ -23,7 +23,7 @@ concept bidirectional_iterator = UTL_SCOPE forward_iterator<T> &&
     };
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_bidirectional_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_bidirectional_iterator :
     UTL_SCOPE bool_constant<bidirectional_iterator<T>> {};
 
 template <typename T>
@@ -56,7 +56,7 @@ using is_reversible UTL_NODEBUG = decltype(reversible<T>(0));
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_bidirectional_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_bidirectional_iterator :
     UTL_SCOPE conjunction<UTL_SCOPE is_forward_iterator<T>,
         UTL_SCOPE details::iterator_concept::implements<UTL_SCOPE bidirectional_iterator_tag, T>,
         UTL_SCOPE details::bidirectional_iterator::is_reversible<T>> {};

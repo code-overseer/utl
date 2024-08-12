@@ -40,7 +40,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_volatile : bool_constant<UTL_BUILTIN_is_volatile(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_volatile : bool_constant<UTL_BUILTIN_is_volatile(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -54,11 +54,11 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_volatile : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_volatile : false_type {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_volatile<T volatile> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_volatile<T volatile> : true_type {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_volatile<T const volatile> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_volatile<T const volatile> : true_type {};
 
 #    if UTL_CXX14
 template <typename T>

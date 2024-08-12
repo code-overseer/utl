@@ -7,15 +7,15 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE copy_reference {
+struct __UTL_PUBLIC_TEMPLATE copy_reference {
     using type UTL_NODEBUG = To;
 };
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE copy_reference<From&&, To> {
+struct __UTL_PUBLIC_TEMPLATE copy_reference<From&&, To> {
     using type UTL_NODEBUG = To&&;
 };
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE copy_reference<From&, To> {
+struct __UTL_PUBLIC_TEMPLATE copy_reference<From&, To> {
     using type UTL_NODEBUG = To&;
 };
 

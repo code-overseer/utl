@@ -35,17 +35,17 @@ using nothrow_t UTL_NODEBUG = decltype(nothrow_check<T, U>(0));
 } // namespace details
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_inequality_comparable_with :
+struct __UTL_PUBLIC_TEMPLATE is_inequality_comparable_with :
     details::inequality_comparable::impl_t<T, U> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_inequality_comparable :
+struct __UTL_PUBLIC_TEMPLATE is_inequality_comparable :
     details::inequality_comparable::impl_t<T, T> {};
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_inequality_comparable_with :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_inequality_comparable_with :
     details::inequality_comparable::nothrow_t<T, U> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_inequality_comparable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_inequality_comparable :
     details::inequality_comparable::nothrow_t<T, T> {};
 
 #if UTL_CXX14

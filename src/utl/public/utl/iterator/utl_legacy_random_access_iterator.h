@@ -19,7 +19,7 @@ concept legacy_random_access_iterator =
     legacy_bidirectional_iterator<It> && UTL_SCOPE random_access_iterator<It>;
 
 template <typename It>
-struct UTL_PUBLIC_TEMPLATE is_legacy_random_access_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_legacy_random_access_iterator :
     bool_constant<legacy_random_access_iterator<It>> {};
 
 template <typename It>
@@ -54,7 +54,7 @@ using implemented UTL_NODEBUG =
 } // namespace details
 
 template <typename It>
-struct UTL_PUBLIC_TEMPLATE is_legacy_random_access_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_legacy_random_access_iterator :
     UTL_SCOPE details::legacy_random_access_iterator::implemented<It> {};
 
 #  if UTL_CXX14

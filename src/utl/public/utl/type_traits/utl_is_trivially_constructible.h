@@ -40,7 +40,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_trivially_constructible :
+struct __UTL_PUBLIC_TEMPLATE is_trivially_constructible :
     bool_constant<UTL_BUILTIN_is_trivially_constructible(T, Args...)> {};
 
 #    if UTL_CXX14
@@ -60,7 +60,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_trivially_constructible : undefined_trait<T, Args...> {};
+struct __UTL_PUBLIC_TEMPLATE is_trivially_constructible : undefined_trait<T, Args...> {};
 
 #    if UTL_CXX14
 template <typename T, typename... Args>

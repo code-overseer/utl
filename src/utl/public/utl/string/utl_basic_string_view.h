@@ -27,7 +27,7 @@
 
 UTL_NAMESPACE_BEGIN
 template <typename CharType, typename Traits>
-class UTL_PUBLIC_TEMPLATE basic_string_view {
+class __UTL_PUBLIC_TEMPLATE basic_string_view {
 public:
     using value_type = CharType;
     using size_type = size_t;
@@ -43,7 +43,7 @@ public:
     using const_reverse_iterator = UTL_SCOPE reverse_iterator<const_iterator>;
     using reverse_iterator = const_reverse_iterator;
 
-    class UTL_ABI_PUBLIC const_iterator :
+    class __UTL_ABI_PUBLIC const_iterator :
         UTL_SCOPE contiguous_iterator_base<const_iterator, value_type const> {
         using base_type = contiguous_iterator_base<const_iterator, value_type const>;
 
@@ -134,8 +134,7 @@ public:
     UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr const_reference back() const noexcept UTL_LIFETIMEBOUND {
         return data_[size_ - 1];
     }
-    UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr const_reference operator[](
-        size_type idx) const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr const_reference operator[](size_type idx) const noexcept UTL_LIFETIMEBOUND {
         return data_[idx];
     }
 

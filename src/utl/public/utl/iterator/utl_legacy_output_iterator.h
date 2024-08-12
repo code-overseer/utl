@@ -18,7 +18,7 @@ concept legacy_output_iterator =
     requires { typename UTL_SCOPE iterator_concept_t<It>; };
 
 template <typename It, typename ValueType>
-struct UTL_PUBLIC_TEMPLATE is_legacy_output_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_legacy_output_iterator :
     bool_constant<legacy_output_iterator<It, ValueType>> {};
 
 template <typename It, typename ValueType>
@@ -59,7 +59,7 @@ using implemented UTL_NODEBUG =
 } // namespace details
 
 template <typename It, typename ValueType>
-struct UTL_PUBLIC_TEMPLATE is_legacy_output_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_legacy_output_iterator :
     UTL_SCOPE details::legacy_output_iterator::implemented<It, ValueType> {};
 
 #  if UTL_CXX14

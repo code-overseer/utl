@@ -36,7 +36,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_abstract : bool_constant<UTL_BUILTIN_is_abstract(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_abstract : bool_constant<UTL_BUILTIN_is_abstract(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -54,7 +54,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_abstract : undefined_trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_abstract : undefined_trait<T> {};
 
 #    if UTL_CXX14
 template <typename T>

@@ -279,7 +279,7 @@ struct storage<T, Tail...> {
 
 template <typename... Types>
 class UTL_ATTRIBUTES(
-    PUBLIC_TEMPLATE, EMPTY_BASES) tuple : private details::tuple::storage<Types...> {
+    _PUBLIC_TEMPLATE, EMPTY_BASES) tuple : private details::tuple::storage<Types...> {
 private:
     template <size_t I, typename T>
     friend struct tuple_element_offset;

@@ -21,7 +21,7 @@ concept legacy_forward_iterator =
     };
 
 template <typename It>
-struct UTL_PUBLIC_TEMPLATE is_legacy_forward_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_legacy_forward_iterator :
     bool_constant<legacy_forward_iterator<It>> {};
 
 template <typename It>
@@ -63,7 +63,7 @@ using implemented UTL_NODEBUG = decltype(UTL_SCOPE details::legacy_forward_itera
 } // namespace details
 
 template <typename It>
-struct UTL_PUBLIC_TEMPLATE is_legacy_forward_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_legacy_forward_iterator :
     details::legacy_forward_iterator::implemented<It> {};
 
 #  if UTL_CXX14

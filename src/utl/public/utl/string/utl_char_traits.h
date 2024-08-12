@@ -17,7 +17,7 @@ UTL_NAMESPACE_BEGIN
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_CONST_API
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE char_traits {
+struct __UTL_PUBLIC_TEMPLATE char_traits {
     static_assert(is_string_char<T>::value, "Invalid character type");
     using char_type = T;
     using pointer = char_type*;

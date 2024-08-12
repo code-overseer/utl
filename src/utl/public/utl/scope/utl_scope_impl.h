@@ -18,7 +18,7 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace scope {
 template <typename Impl, typename F>
-class UTL_PUBLIC_TEMPLATE impl {
+class __UTL_PUBLIC_TEMPLATE impl {
     static_assert(UTL_TRAIT_is_invocable(F), "Callable F must be invocable");
 
 protected:

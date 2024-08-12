@@ -7,7 +7,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <template <typename...> class Variadic, typename... Types>
-struct UTL_PUBLIC_TEMPLATE variadic_proxy {
+struct __UTL_PUBLIC_TEMPLATE variadic_proxy {
     template <typename... UTypes>
     using apply UTL_NODEBUG = Variadic<Types..., UTypes...>;
 };

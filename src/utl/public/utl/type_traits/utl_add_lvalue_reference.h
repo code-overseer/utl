@@ -36,7 +36,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE add_lvalue_reference {
+struct __UTL_PUBLIC_TEMPLATE add_lvalue_reference {
     using type UTL_NODEBUG = UTL_BUILTIN_add_lvalue_reference(T);
 };
 
@@ -59,7 +59,7 @@ UTL_HIDE_FROM_ABI T impl(float) noexcept;
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE add_lvalue_reference {
+struct __UTL_PUBLIC_TEMPLATE add_lvalue_reference {
     using type UTL_NODEBUG = decltype(details::lvalue_reference::impl<T>(0));
 };
 

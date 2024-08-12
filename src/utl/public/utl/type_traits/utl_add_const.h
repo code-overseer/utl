@@ -32,7 +32,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE add_const {
+struct __UTL_PUBLIC_TEMPLATE add_const {
     using type UTL_NODEBUG = T const;
 };
 

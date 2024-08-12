@@ -33,7 +33,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary :
+struct __UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary :
     bool_constant<UTL_BUILTIN_reference_constructs_from_temporary(T, U)> {};
 
 #    if UTL_CXX14
@@ -54,7 +54,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary : false_type {};
+struct __UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary : false_type {};
 
 namespace details {
 namespace dangling {
@@ -98,11 +98,11 @@ struct constructs_from<T, U, decltype(init_ref<T>(make_type<U>()))> : constructs
 } // namespace details
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary<T&, U> :
+struct __UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary<T&, U> :
     details::dangling::constructs_from<T&, U> {};
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary<T&&, U> :
+struct __UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary<T&&, U> :
     details::dangling::constructs_from<T&&, U> {};
 
 #    if UTL_CXX14

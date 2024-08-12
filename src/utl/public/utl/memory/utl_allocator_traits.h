@@ -275,7 +275,7 @@ UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 result_type_t<T> reallocate_at_least(
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ALLOCATOR_API
 
 template <typename Alloc>
-struct UTL_PUBLIC_TEMPLATE allocator_traits {
+struct __UTL_PUBLIC_TEMPLATE allocator_traits {
     using allocator_type = Alloc;
     using value_type = typename allocator_type::value_type;
     using pointer = details::allocator::pointer_t<allocator_type>;

@@ -36,7 +36,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE has_virtual_destructor :
+struct __UTL_PUBLIC_TEMPLATE has_virtual_destructor :
     bool_constant<UTL_BUILTIN_has_virtual_destructor(T)> {};
 
 #    if UTL_CXX14
@@ -55,7 +55,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE has_virtual_destructor : undefined_trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE has_virtual_destructor : undefined_trait<T> {};
 
 #    if UTL_CXX14
 template <typename T>

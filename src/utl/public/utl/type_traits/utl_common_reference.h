@@ -57,7 +57,7 @@ UTL_HIDE_FROM_ABI empty_t basic_ref_test(float);
 } // namespace details
 
 template <typename T, typename U, template <typename> class TQual, template <typename> class UQual>
-struct UTL_PUBLIC_TEMPLATE basic_common_reference :
+struct __UTL_PUBLIC_TEMPLATE basic_common_reference :
     decltype(details::common_reference::basic_ref_test<T, U, TQual, UQual>(0)) {};
 
 template <typename T, typename U, template <typename> class TQual, template <typename> class UQual>
@@ -70,9 +70,9 @@ template <typename... Ts>
 using common_reference_t = typename common_reference<Ts...>::type;
 
 template <>
-struct UTL_PUBLIC_TEMPLATE common_reference<> {};
+struct __UTL_PUBLIC_TEMPLATE common_reference<> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE common_reference<T> {
+struct __UTL_PUBLIC_TEMPLATE common_reference<T> {
     using type UTL_NODEBUG = T;
 };
 
@@ -169,10 +169,10 @@ using impl_gt_2 = sfinae_gt_2<type_list<T, U, Vs...>>;
 } // namespace details
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE common_reference<T, U> : details::common_reference::impl<T, U> {};
+struct __UTL_PUBLIC_TEMPLATE common_reference<T, U> : details::common_reference::impl<T, U> {};
 
 template <typename T, typename U, typename... Vs>
-struct UTL_PUBLIC_TEMPLATE common_reference<T, U, Vs...> :
+struct __UTL_PUBLIC_TEMPLATE common_reference<T, U, Vs...> :
     details::common_reference::impl_gt_2<T, U, Vs...> {};
 
 UTL_NAMESPACE_END

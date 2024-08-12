@@ -40,7 +40,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_convertible :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_convertible :
     bool_constant<UTL_BUILTIN_is_nothrow_convertible(From, To)> {};
 
 #    if UTL_CXX14
@@ -77,7 +77,7 @@ using is_nothrow UTL_NODEBUG = decltype(nothrow_test<From, To>(0));
 } /* namespace details */
 
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_convertible :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_convertible :
     disjunction<bool_constant<UTL_TRAIT_is_void(From) && UTL_TRAIT_is_void(To)>,
         details::convertible::is_nothrow<From, To>> {};
 

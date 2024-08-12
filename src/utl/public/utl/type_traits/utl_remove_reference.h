@@ -38,7 +38,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_reference {
+struct __UTL_PUBLIC_TEMPLATE remove_reference {
     using type UTL_NODEBUG = UTL_BUILTIN_remove_reference(T);
 };
 
@@ -52,15 +52,15 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_reference {
+struct __UTL_PUBLIC_TEMPLATE remove_reference {
     using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_reference<T&> {
+struct __UTL_PUBLIC_TEMPLATE remove_reference<T&> {
     using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_reference<T&&> {
+struct __UTL_PUBLIC_TEMPLATE remove_reference<T&&> {
     using type UTL_NODEBUG = T;
 };
 

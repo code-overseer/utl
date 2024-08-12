@@ -25,7 +25,7 @@ UTL_NAMESPACE_BEGIN
  * @tparam T The type of the pointer's target.
  */
 template <typename T>
-class UTL_PUBLIC_TEMPLATE nonnull_ptr : private pointer_comparable<nonnull_ptr<T>> {
+class __UTL_PUBLIC_TEMPLATE nonnull_ptr : private pointer_comparable<nonnull_ptr<T>> {
 public:
     /**
      * Deleted default constructor to enforce initialization with a non-null pointer.

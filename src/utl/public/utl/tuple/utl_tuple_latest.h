@@ -61,13 +61,13 @@
 // TODO: if std is included or forward declared use std, else use UTL
 namespace std {
 template <typename... Ts, UTL_SCOPE common_with<Ts>... Us>
-struct UTL_PUBLIC_TEMPLATE common_type<UTL_SCOPE tuple<Ts...>, UTL_SCOPE tuple<Us...>> {
+struct __UTL_PUBLIC_TEMPLATE common_type<UTL_SCOPE tuple<Ts...>, UTL_SCOPE tuple<Us...>> {
     using type UTL_NODEBUG = UTL_SCOPE tuple<UTL_SCOPE common_type_t<Ts, Us>...>;
 };
 template <typename... Ts, typename... Us, template <typename> class TQual,
     template <typename> class UQual>
 requires (... && UTL_SCOPE common_reference_with<TQual<Ts>, UQual<Us>>)
-struct UTL_PUBLIC_TEMPLATE
+struct __UTL_PUBLIC_TEMPLATE
     basic_common_reference<UTL_SCOPE tuple<Ts...>, UTL_SCOPE tuple<Us...>, TQual, UQual> {
     using type UTL_NODEBUG = UTL_SCOPE tuple<UTL_SCOPE common_reference_t<TQual<Ts>, UQual<Us>>...>;
 };
@@ -315,7 +315,7 @@ public:
 
 template <typename... Types>
 class UTL_ATTRIBUTES(
-    PUBLIC_TEMPLATE, EMPTY_BASES) tuple : private details::tuple::storage<Types...> {
+    _PUBLIC_TEMPLATE, EMPTY_BASES) tuple : private details::tuple::storage<Types...> {
 private:
     template <size_t I, typename T>
     friend struct tuple_element_offset;

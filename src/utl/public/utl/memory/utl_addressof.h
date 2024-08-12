@@ -34,7 +34,7 @@ UTL_ATTRIBUTE(ADDRESSOF) inline constexpr UTL_ENABLE_IF_CXX11(T*, !is_object<T>:
 }
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_addressof_constexpr : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_addressof_constexpr : true_type {};
 
 UTL_NAMESPACE_END
 #else // ifdef UTL_BUILTIN_addressof
@@ -85,7 +85,7 @@ addressof(T& arg UTL_LIFETIMEBOUND) noexcept {
 }
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_addressof_constexpr :
+struct __UTL_PUBLIC_TEMPLATE is_addressof_constexpr :
     negation<details::addressof::has_overload<T>> {};
 
 UTL_NAMESPACE_END

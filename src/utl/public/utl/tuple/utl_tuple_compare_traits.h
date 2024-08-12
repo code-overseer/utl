@@ -220,11 +220,11 @@ using all_nothrow_three_way_comparable_with_test_t UTL_NODEBUG =
 } // namespace details
 
 template <typename T, typename U = T, typename Cat = std::partial_ordering>
-struct UTL_PUBLIC_TEMPLATE is_all_three_way_comparable_with :
+struct __UTL_PUBLIC_TEMPLATE is_all_three_way_comparable_with :
     details::compare_traits::all_three_way_comparable_with_test_t<T, U, Cat> {};
 
 template <typename T, typename U = T, typename Cat = std::partial_ordering>
-struct UTL_PUBLIC_TEMPLATE is_all_nothrow_three_way_comparable_with :
+struct __UTL_PUBLIC_TEMPLATE is_all_nothrow_three_way_comparable_with :
     details::compare_traits::all_nothrow_three_way_comparable_with_test_t<T, U, Cat> {};
 
 UTL_NAMESPACE_END
@@ -234,10 +234,10 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U = T, typename Cat = void, typename = void>
-struct UTL_PUBLIC_TEMPLATE is_all_three_way_comparable_with : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_all_three_way_comparable_with : false_type {};
 
 template <typename T, typename U = T, typename Cat = void, typename = void>
-struct UTL_PUBLIC_TEMPLATE is_all_nothrow_three_way_comparable_with : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_all_nothrow_three_way_comparable_with : false_type {};
 
 UTL_NAMESPACE_END
 

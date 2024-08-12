@@ -36,7 +36,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_destructible : bool_constant<UTL_BUILTIN_is_destructible(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_destructible : bool_constant<UTL_BUILTIN_is_destructible(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -63,20 +63,20 @@ using callable = decltype(callable_impl<T>(0));
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_destructible :
+struct __UTL_PUBLIC_TEMPLATE is_destructible :
     bool_constant<UTL_TRAIT_is_reference(T) ||
         (UTL_TRAIT_is_object(T) &&
             details::destructible::callable<remove_all_extents_t<T>>::value)> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_destructible<T const> : is_destructible<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_destructible<T const> : is_destructible<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_destructible<T volatile> : is_destructible<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_destructible<T volatile> : is_destructible<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_destructible<T const volatile> : is_destructible<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_destructible<T const volatile> : is_destructible<T> {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_destructible<void> : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_destructible<void> : false_type {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_destructible<T[]> : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_destructible<T[]> : false_type {};
 
 #    if UTL_CXX14
 template <typename T>

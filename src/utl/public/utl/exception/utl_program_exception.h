@@ -15,7 +15,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-class UTL_PUBLIC_TEMPLATE basic_exception;
+class __UTL_PUBLIC_TEMPLATE basic_exception;
 
 /**
  * @brief Specialization of basic_exception for void type, inheriting from exception.
@@ -25,7 +25,7 @@ class UTL_PUBLIC_TEMPLATE basic_exception;
  * formatted messages and source location tracking.
  */
 template <>
-class UTL_PUBLIC_TEMPLATE basic_exception<void> : public exception {
+class __UTL_PUBLIC_TEMPLATE basic_exception<void> : public exception {
 
 public:
     /**
@@ -53,7 +53,7 @@ public:
      *
      * @return The message string.
      */
-    UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI_VIRTUAL) char const* what() const noexcept UTL_ATTRIBUTE(
+    UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI_VIRTUAL) char const* what() const noexcept UTL_ATTRIBUTE(
         LIFETIMEBOUND) final {
         return messages_.top().message();
     }
@@ -102,7 +102,7 @@ private:
  * @tparam T The type of data to be associated with the exception.
  */
 template <typename T>
-class UTL_PUBLIC_TEMPLATE basic_exception : public basic_exception<void> {
+class __UTL_PUBLIC_TEMPLATE basic_exception : public basic_exception<void> {
     using base_type = basic_exception<void>;
 
 public:
@@ -179,7 +179,7 @@ private:
 
 namespace exceptions {
 template <typename Tag, typename Base = basic_exception<void>>
-class UTL_PUBLIC_TEMPLATE alias : public Base {
+class __UTL_PUBLIC_TEMPLATE alias : public Base {
     static_assert(UTL_TRAIT_is_base_of(basic_exception<void>, Base), "Invalid base argument");
 
 public:

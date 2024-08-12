@@ -19,7 +19,7 @@ UTL_NAMESPACE_BEGIN
 
 template <typename F>
 class
-    UTL_ATTRIBUTES(PUBLIC_TEMPLATE, NODISCARD) scope_fail : private details::scope::impl<scope_fail<F>, F> {
+    UTL_ATTRIBUTES(_PUBLIC_TEMPLATE, NODISCARD) scope_fail : private details::scope::impl<scope_fail<F>, F> {
     using base_type = details::scope::impl<scope_fail<F>, F>;
     using typename base_type::invalid_t;
     using typename base_type::is_movable;

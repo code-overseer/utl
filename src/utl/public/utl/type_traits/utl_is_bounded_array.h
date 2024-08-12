@@ -23,9 +23,9 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_bounded_array : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_bounded_array : false_type {};
 template <typename T, size_t N>
-struct UTL_PUBLIC_TEMPLATE is_bounded_array<T[N]> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_bounded_array<T[N]> : true_type {};
 
 #  if UTL_CXX14
 template <typename T>

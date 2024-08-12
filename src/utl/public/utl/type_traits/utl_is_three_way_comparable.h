@@ -48,17 +48,17 @@ using nothrow_t UTL_NODEBUG = decltype(nothrow_check<T, U, Cat>(0));
 } // namespace details
 
 template <typename T, typename U, typename Cat = UTL_SCOPE partial_ordering>
-struct UTL_PUBLIC_TEMPLATE is_three_way_comparable_with :
+struct __UTL_PUBLIC_TEMPLATE is_three_way_comparable_with :
     details::three_way_comparable::impl_t<T, U, Cat> {};
 template <typename T, typename Cat = UTL_SCOPE partial_ordering>
-struct UTL_PUBLIC_TEMPLATE is_three_way_comparable :
+struct __UTL_PUBLIC_TEMPLATE is_three_way_comparable :
     details::three_way_comparable::impl_t<T, T, Cat> {};
 
 template <typename T, typename U, typename Cat = UTL_SCOPE partial_ordering>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_three_way_comparable_with :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_three_way_comparable_with :
     details::three_way_comparable::nothrow_t<T, U, Cat> {};
 template <typename T, typename Cat = UTL_SCOPE partial_ordering>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_three_way_comparable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_three_way_comparable :
     details::three_way_comparable::nothrow_t<T, T, Cat> {};
 
 #if UTL_CXX14

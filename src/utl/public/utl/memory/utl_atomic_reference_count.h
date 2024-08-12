@@ -24,7 +24,7 @@ UTL_NAMESPACE_BEGIN
  *           is provided in the form void destroy(atomic_reference_count<T>* ptr).
  */
 template <typename T>
-class UTL_PUBLIC_TEMPLATE atomic_reference_count {
+class __UTL_PUBLIC_TEMPLATE atomic_reference_count {
 public:
     /**
      * The type of the value managed by atomic_reference_count.

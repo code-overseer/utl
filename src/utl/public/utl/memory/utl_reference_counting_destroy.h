@@ -40,7 +40,7 @@ namespace details {
 template <typename T>
 void destroy(T*) noexcept = delete;
 
-struct UTL_ABI_PUBLIC destroy_cpo_t {
+struct __UTL_ABI_PUBLIC destroy_cpo_t {
 private:
     template <typename T>
     UTL_HIDE_FROM_ABI static auto has_custom_destroy_impl(int) noexcept

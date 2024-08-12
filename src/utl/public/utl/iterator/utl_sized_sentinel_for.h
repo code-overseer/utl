@@ -26,7 +26,7 @@ concept sized_sentinel_for =
     };
 
 template <typename S, typename I>
-struct UTL_PUBLIC_TEMPLATE is_sized_sentinel_for : bool_constant<sized_sentinel_for<S, I>> {};
+struct __UTL_PUBLIC_TEMPLATE is_sized_sentinel_for : bool_constant<sized_sentinel_for<S, I>> {};
 
 template <typename S, typename I>
 inline constexpr bool is_sized_sentinel_for_v = sized_sentinel_for<S, I>;
@@ -85,7 +85,7 @@ using is_subtractible UTL_NODEBUG =
 } // namespace details
 
 template <typename S, typename I>
-struct UTL_PUBLIC_TEMPLATE is_sized_sentinel_for :
+struct __UTL_PUBLIC_TEMPLATE is_sized_sentinel_for :
     conjunction<is_sentinel_for<S, I>, details::sized_sentinel_for::is_disabled<S, I>,
         details::sized_sentinel_for::is_subtractible<S, I>> {};
 

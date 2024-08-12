@@ -16,9 +16,9 @@
 UTL_STD_NAMESPACE_BEGIN
 /* UTL_UNDEFINED_BEHAVIOUR */
 template <typename T, typename Alloc>
-struct UTL_PUBLIC_TEMPLATE uses_allocator;
+struct __UTL_PUBLIC_TEMPLATE uses_allocator;
 
-struct UTL_PUBLIC_TEMPLATE allocator_arg_t;
+struct __UTL_PUBLIC_TEMPLATE allocator_arg_t;
 UTL_STD_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
@@ -42,7 +42,7 @@ using impl UTL_NODEBUG = R;
 } // namespace uses_allocator
 } // namespace details
 
-struct UTL_ABI_PUBLIC allocator_arg_t {
+struct __UTL_ABI_PUBLIC allocator_arg_t {
     explicit constexpr allocator_arg_t() noexcept = default;
     template <UTL_CONCEPT_CXX20(same_as<::std::allocator_arg_t>) T UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_same(T, ::std::allocator_arg_t))>
@@ -60,28 +60,28 @@ UTL_INLINE_CXX17 constexpr allocator_arg_t allocator_arg{};
  * Specializing std will work on both utl and std, specializing utl will only work on utl
  */
 template <typename T, typename Alloc>
-struct UTL_PUBLIC_TEMPLATE uses_allocator : details::uses_allocator::impl<T, Alloc> {};
+struct __UTL_PUBLIC_TEMPLATE uses_allocator : details::uses_allocator::impl<T, Alloc> {};
 
 template <typename T, typename Alloc, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_constructible_with_allocator :
+struct __UTL_PUBLIC_TEMPLATE is_constructible_with_allocator :
     conjunction<uses_allocator<T, Alloc>,
         disjunction<is_constructible<T, allocator_arg_t, Alloc const&, Args...>,
             is_constructible<T, Args..., Alloc const&>>> {};
 
 template <typename T, typename Alloc, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_constructible_with_allocator :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_constructible_with_allocator :
     conjunction<uses_allocator<T, Alloc>,
         disjunction<is_nothrow_constructible<T, allocator_arg_t, Alloc const&, Args...>,
             is_nothrow_constructible<T, Args..., Alloc const&>>> {};
 
 template <typename T, typename Alloc, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_explicit_constructible_with_allocator :
+struct __UTL_PUBLIC_TEMPLATE is_explicit_constructible_with_allocator :
     conjunction<uses_allocator<T, Alloc>,
         disjunction<is_explicit_constructible<T, allocator_arg_t, Alloc const&, Args...>,
             is_explicit_constructible<T, Args..., Alloc const&>>> {};
 
 template <typename T, typename Alloc, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_implicit_constructible_with_allocator :
+struct __UTL_PUBLIC_TEMPLATE is_implicit_constructible_with_allocator :
     conjunction<uses_allocator<T, Alloc>,
         negation<is_explicit_constructible_with_allocator<T, Alloc, Args...>>,
         is_constructible_with_allocator<T, Alloc, Args...>> {};

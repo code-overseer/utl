@@ -19,7 +19,7 @@ template <typename It>
 concept legacy_iterator = input_or_output_iterator<It> && copyable<It>;
 
 template <typename It>
-struct UTL_PUBLIC_TEMPLATE is_legacy_iterator : bool_constant<legacy_iterator<It>> {};
+struct __UTL_PUBLIC_TEMPLATE is_legacy_iterator : bool_constant<legacy_iterator<It>> {};
 
 template <typename It>
 inline constexpr bool is_legacy_iterator_v = legacy_iterator<It>;
@@ -63,7 +63,7 @@ using implemented UTL_NODEBUG = UTL_SCOPE conjunction<UTL_SCOPE is_dereferenceab
 } // namespace details
 
 template <typename It>
-struct UTL_PUBLIC_TEMPLATE is_legacy_iterator : details::legacy_iterator::implemented<It> {};
+struct __UTL_PUBLIC_TEMPLATE is_legacy_iterator : details::legacy_iterator::implemented<It> {};
 
 #  if UTL_CXX14
 template <typename It>

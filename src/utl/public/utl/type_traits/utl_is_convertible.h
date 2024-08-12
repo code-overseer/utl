@@ -38,7 +38,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE is_convertible : bool_constant<UTL_BUILTIN_is_convertible(From, To)> {};
+struct __UTL_PUBLIC_TEMPLATE is_convertible :
+    bool_constant<UTL_BUILTIN_is_convertible(From, To)> {};
 
 #    if UTL_CXX14
 template <typename From, typename To>
@@ -71,7 +72,7 @@ using impl_t UTL_NODEBUG = decltype(conv_test<From, To>(0));
 } // namespace details
 
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE is_convertible :
+struct __UTL_PUBLIC_TEMPLATE is_convertible :
     disjunction<conjunction<is_void<From>, is_void<To>>, details::convertible::impl_t<From, To>> {};
 
 #    if UTL_CXX14

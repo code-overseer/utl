@@ -17,7 +17,7 @@ UTL_NAMESPACE_BEGIN
 
 #if UTL_CXX17
 template <typename F>
-class UTL_ATTRIBUTES(PUBLIC_TEMPLATE, NODISCARD) scope_success :
+class UTL_ATTRIBUTES(_PUBLIC_TEMPLATE, NODISCARD) scope_success :
     private details::scope::impl<scope_success<F>, F> {
     using base_type UTL_NODEBUG = details::scope::impl<scope_success<F>, F>;
     using typename base_type::invalid_t;

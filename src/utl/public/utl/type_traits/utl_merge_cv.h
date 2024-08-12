@@ -23,21 +23,21 @@ UTL_NAMESPACE_BEGIN
 template <typename Target, typename TypeList>
 struct merge_cv;
 template <typename Target, template <typename...> class TypeList>
-struct UTL_PUBLIC_TEMPLATE merge_cv<Target, TypeList<>> {
+struct __UTL_PUBLIC_TEMPLATE merge_cv<Target, TypeList<>> {
     using type UTL_NODEBUG = Target;
 };
 template <typename Target, template <typename...> class TypeList, typename U0, typename... Us>
-struct UTL_PUBLIC_TEMPLATE merge_cv<Target, TypeList<U0 const volatile, Us...>> {
+struct __UTL_PUBLIC_TEMPLATE merge_cv<Target, TypeList<U0 const volatile, Us...>> {
     using type UTL_NODEBUG = Target const volatile;
 };
 template <typename Target, template <typename...> class TypeList, typename U0, typename... Us>
-struct UTL_PUBLIC_TEMPLATE merge_cv<Target, TypeList<U0 const, Us...>> :
+struct __UTL_PUBLIC_TEMPLATE merge_cv<Target, TypeList<U0 const, Us...>> :
     merge_volatile<Target const, type_list<Us...>> {};
 template <typename Target, template <typename...> class TypeList, typename U0, typename... Us>
-struct UTL_PUBLIC_TEMPLATE merge_cv<Target, TypeList<U0 volatile, Us...>> :
+struct __UTL_PUBLIC_TEMPLATE merge_cv<Target, TypeList<U0 volatile, Us...>> :
     merge_const<Target volatile, type_list<Us...>> {};
 template <typename Target, template <typename...> class TypeList, typename U0, typename... Us>
-struct UTL_PUBLIC_TEMPLATE merge_cv<Target, TypeList<U0, Us...>> :
+struct __UTL_PUBLIC_TEMPLATE merge_cv<Target, TypeList<U0, Us...>> :
     merge_cv<Target, type_list<Us...>> {};
 template <typename Target, typename TypeList>
 using merge_cv_t = typename merge_cv<Target, TypeList>::type;

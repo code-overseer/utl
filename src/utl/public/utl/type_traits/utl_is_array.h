@@ -46,7 +46,7 @@ UTL_PRAGMA_WARN("builtin is_array is disabled by default and cannot be enabled")
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_array : bool_constant<UTL_BUILTIN_is_array(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_array : bool_constant<UTL_BUILTIN_is_array(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -60,13 +60,13 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_array : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_array : false_type {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_array<T[]> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_array<T[]> : true_type {};
 
 template <typename T, size_t N>
-struct UTL_PUBLIC_TEMPLATE is_array<T[N]> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_array<T[N]> : true_type {};
 
 #    if UTL_CXX14
 template <typename T>

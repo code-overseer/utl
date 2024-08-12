@@ -7,7 +7,7 @@
 
 UTL_NAMESPACE_BEGIN
 
-struct UTL_ABI_PUBLIC ignore_t {
+struct __UTL_ABI_PUBLIC ignore_t {
     UTL_HIDE_FROM_ABI explicit constexpr ignore_t() noexcept = default;
 #if UTL_CXX14
     template <typename T>

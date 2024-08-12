@@ -31,7 +31,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE has_unique_object_representations :
+struct __UTL_PUBLIC_TEMPLATE has_unique_object_representations :
     bool_constant<UTL_BUILTIN_has_unique_object_representations(T)> {};
 
 #    if UTL_CXX14

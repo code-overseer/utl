@@ -21,7 +21,7 @@ concept legacy_bidirectional_iterator =
     };
 
 template <typename It>
-struct UTL_PUBLIC_TEMPLATE is_legacy_bidirectional_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_legacy_bidirectional_iterator :
     bool_constant<legacy_bidirectional_iterator<It>> {};
 
 template <typename It>
@@ -62,7 +62,7 @@ using implemented UTL_NODEBUG =
 } // namespace details
 
 template <typename It>
-struct UTL_PUBLIC_TEMPLATE is_legacy_bidirectional_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_legacy_bidirectional_iterator :
     details::legacy_bidirectional_iterator::implemented<It> {};
 
 #  if UTL_CXX14

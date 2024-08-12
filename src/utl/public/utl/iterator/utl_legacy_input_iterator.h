@@ -21,7 +21,7 @@ concept legacy_input_iterator =
     legacy_iterator<It> && input_iterator<It> && equality_comparable<It>;
 
 template <typename It>
-struct UTL_PUBLIC_TEMPLATE is_legacy_input_iterator : bool_constant<legacy_input_iterator<It>> {};
+struct __UTL_PUBLIC_TEMPLATE is_legacy_input_iterator : bool_constant<legacy_input_iterator<It>> {};
 
 template <typename It>
 inline constexpr bool is_legacy_input_iterator_v = legacy_input_iterator<It>;
@@ -37,7 +37,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename It>
-struct UTL_PUBLIC_TEMPLATE is_legacy_input_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_legacy_input_iterator :
     conjunction<is_legacy_iterator<It>, is_equality_comparable<It>, is_inequality_comparable<It>> {
 };
 

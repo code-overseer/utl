@@ -26,7 +26,7 @@ using nothrow_trait_t UTL_NODEBUG =
 } // namespace details
 
 template <typename T, typename Arg>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_subscriptable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_subscriptable :
     UTL_SCOPE details::subscriptable::nothrow_trait_t<T, Arg> {};
 
 #  if UTL_CXX14
@@ -59,7 +59,7 @@ using nothrow_trait_t UTL_NODEBUG =
 } // namespace details
 
 template <typename T, typename Arg>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_subscriptable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_subscriptable :
     UTL_SCOPE details::subscriptable::nothrow_trait_t<T, Arg> {};
 
 #  if UTL_CXX14

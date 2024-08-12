@@ -36,7 +36,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE decay {
+struct __UTL_PUBLIC_TEMPLATE decay {
     using type UTL_NODEBUG = UTL_BUILTIN_decay(T);
 };
 
@@ -79,7 +79,7 @@ struct decay_impl<T[N]> {
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE decay : details::type_traits::decay_impl<remove_reference_t<T>> {};
+struct __UTL_PUBLIC_TEMPLATE decay : details::type_traits::decay_impl<remove_reference_t<T>> {};
 
 template <typename T>
 using decay_t = typename details::type_traits::decay_impl<remove_reference_t<T>>::type;

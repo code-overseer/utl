@@ -21,7 +21,7 @@ UTL_NAMESPACE_BEGIN
  * @tparam T The derived pointer-like type.
  */
 template <typename T>
-class UTL_PUBLIC_TEMPLATE pointer_comparable {
+class __UTL_PUBLIC_TEMPLATE pointer_comparable {
     using null_type UTL_NODEBUG = decltype(nullptr);
 
     UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) friend constexpr bool operator==(

@@ -313,7 +313,7 @@ struct offset_impl<I, storage<T0, Ts...>, enable_if_t<(I > 0)>> :
 } // namespace details
 
 template <>
-class UTL_ATTRIBUTES(PUBLIC_TEMPLATE, EMPTY_BASES) tuple<> : private details::tuple::storage<> {
+class UTL_ATTRIBUTES(_PUBLIC_TEMPLATE, EMPTY_BASES) tuple<> : private details::tuple::storage<> {
 public:
     using storage::storage;
     using storage::operator=;
@@ -344,7 +344,7 @@ template <size_t I, typename T>
 struct tuple_element_offset;
 
 template <size_t I, typename... Ts>
-struct UTL_PUBLIC_TEMPLATE tuple_element_offset<I, tuple<Ts...>> :
+struct __UTL_PUBLIC_TEMPLATE tuple_element_offset<I, tuple<Ts...>> :
     details::tuple::offset_impl<I, details::tuple::storage<Ts...>> {
     static_assert(UTL_TRAIT_is_base_of(details::tuple::storage<Ts...>, tuple<Ts...>),
         "invalid tuple implementation");

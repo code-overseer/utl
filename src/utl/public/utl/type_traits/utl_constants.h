@@ -10,7 +10,7 @@ UTL_NAMESPACE_BEGIN
 using size_t = decltype(sizeof(0));
 
 template <typename T, T N>
-struct UTL_PUBLIC_TEMPLATE integral_constant {
+struct __UTL_PUBLIC_TEMPLATE integral_constant {
     static constexpr T value = N;
     using value_type = T;
     using type = integral_constant;

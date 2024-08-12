@@ -21,7 +21,7 @@ namespace exceptions {
  *
  * Use `UTL_COMPILER_SUPPORTS_SOURCE_LOCATION` to check for source location intrinsic support
  */
-struct UTL_ABI_PUBLIC message_format {
+struct __UTL_ABI_PUBLIC message_format {
     /**
      * Internal use only to prevent assignment
      */

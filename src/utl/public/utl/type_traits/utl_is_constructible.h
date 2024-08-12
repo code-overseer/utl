@@ -40,7 +40,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_constructible :
+struct __UTL_PUBLIC_TEMPLATE is_constructible :
     bool_constant<UTL_BUILTIN_is_constructible(T, Args...)> {};
 
 #    if UTL_CXX14
@@ -72,7 +72,7 @@ using impl_t UTL_NODEBUG = decltype(impl<T, Args...>(0));
 } // namespace details
 
 template <typename T, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_constructible : details::constructible::impl_t<T, Args...> {};
+struct __UTL_PUBLIC_TEMPLATE is_constructible : details::constructible::impl_t<T, Args...> {};
 
 #    if UTL_CXX14
 template <typename T, typename... Args>

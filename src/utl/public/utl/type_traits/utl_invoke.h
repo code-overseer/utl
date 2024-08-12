@@ -174,13 +174,14 @@ using nothrow_t UTL_NODEBUG = decltype(resolve_nothrow<R, F, Args...>(0));
 } // namespace details
 
 template <typename R, typename F, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_invocable_r : details::invocable::impl_t<R, F, Args...> {};
+struct __UTL_PUBLIC_TEMPLATE is_invocable_r : details::invocable::impl_t<R, F, Args...> {};
 template <typename F, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_invocable : details::invocable::impl_t<void, F, Args...> {};
+struct __UTL_PUBLIC_TEMPLATE is_invocable : details::invocable::impl_t<void, F, Args...> {};
 template <typename R, typename F, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_invocable_r : details::invocable::nothrow_t<R, F, Args...> {};
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_invocable_r :
+    details::invocable::nothrow_t<R, F, Args...> {};
 template <typename F, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_invocable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_invocable :
     details::invocable::nothrow_t<void, F, Args...> {};
 
 #  if UTL_CXX14
@@ -217,7 +218,7 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 template <typename F, typename... Args>
-struct UTL_PUBLIC_TEMPLATE invoke_result :
+struct __UTL_PUBLIC_TEMPLATE invoke_result :
     enable_if<UTL_TRAIT_is_invocable(F, Args...),
         decltype(details::invocable::invoke(
             UTL_SCOPE declval<F>(), UTL_SCOPE declval<Args>()...))> {};

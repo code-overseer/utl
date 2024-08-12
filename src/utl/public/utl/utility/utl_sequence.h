@@ -29,7 +29,7 @@ UTL_NAMESPACE_BEGIN
 using size_t = decltype(sizeof(0));
 
 template <typename T, T... Is>
-struct UTL_PUBLIC_TEMPLATE integer_sequence {};
+struct __UTL_PUBLIC_TEMPLATE integer_sequence {};
 
 namespace details {
 namespace sequence {

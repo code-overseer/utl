@@ -37,9 +37,9 @@ template <typename... T>
 using common_type_t = typename common_type<T...>::type;
 
 template <>
-struct UTL_PUBLIC_TEMPLATE common_type<> {};
+struct __UTL_PUBLIC_TEMPLATE common_type<> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE common_type<T> : common_type<T, T> {};
+struct __UTL_PUBLIC_TEMPLATE common_type<T> : common_type<T, T> {};
 
 namespace details {
 namespace common_type {
@@ -94,10 +94,10 @@ using impl UTL_NODEBUG = R;
 } // namespace details
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE common_type<T, U> : details::common_type::impl<T, U> {};
+struct __UTL_PUBLIC_TEMPLATE common_type<T, U> : details::common_type::impl<T, U> {};
 
 template <typename T, typename U, typename... Vs>
-struct UTL_PUBLIC_TEMPLATE common_type<T, U, Vs...> :
+struct __UTL_PUBLIC_TEMPLATE common_type<T, U, Vs...> :
     details::common_type::impl_gt_2<T, U, Vs...> {};
 
 UTL_NAMESPACE_END

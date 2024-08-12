@@ -31,19 +31,19 @@ struct uses_allocator<UTL_SCOPE tuple<T...>, Alloc> : UTL_SCOPE true_type {};
 
 UTL_NAMESPACE_BEGIN
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_tuple : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_tuple : false_type {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_tuple<T&&> : is_tuple<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_tuple<T&&> : is_tuple<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_tuple<T&> : is_tuple<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_tuple<T&> : is_tuple<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_tuple<T const> : is_tuple<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_tuple<T const> : is_tuple<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_tuple<T volatile> : is_tuple<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_tuple<T volatile> : is_tuple<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_tuple<T const volatile> : is_tuple<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_tuple<T const volatile> : is_tuple<T> {};
 template <typename... T>
-struct UTL_PUBLIC_TEMPLATE is_tuple<tuple<T...>> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_tuple<tuple<T...>> : true_type {};
 
 template <typename T>
 using tuple_index_sequence = make_index_sequence<tuple_size<T>::value>;
@@ -77,30 +77,30 @@ using element_fallback = decltype(element_impl<I, T>(0));
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE tuple_size : details::tuple::size_fallback<T> {};
+struct __UTL_PUBLIC_TEMPLATE tuple_size : details::tuple::size_fallback<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE tuple_size<T const> : tuple_size<T> {};
+struct __UTL_PUBLIC_TEMPLATE tuple_size<T const> : tuple_size<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE tuple_size<T volatile> : tuple_size<T> {};
+struct __UTL_PUBLIC_TEMPLATE tuple_size<T volatile> : tuple_size<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE tuple_size<T const volatile> : tuple_size<T> {};
+struct __UTL_PUBLIC_TEMPLATE tuple_size<T const volatile> : tuple_size<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE tuple_size<T&&> : tuple_size<T> {};
+struct __UTL_PUBLIC_TEMPLATE tuple_size<T&&> : tuple_size<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE tuple_size<T&> : tuple_size<T> {};
+struct __UTL_PUBLIC_TEMPLATE tuple_size<T&> : tuple_size<T> {};
 
 template <size_t I, typename T>
-struct UTL_PUBLIC_TEMPLATE tuple_element : details::tuple::element_fallback<I, T> {};
+struct __UTL_PUBLIC_TEMPLATE tuple_element : details::tuple::element_fallback<I, T> {};
 template <size_t I, typename T>
-struct UTL_PUBLIC_TEMPLATE tuple_element<I, T const> : tuple_element<I, T> {};
+struct __UTL_PUBLIC_TEMPLATE tuple_element<I, T const> : tuple_element<I, T> {};
 template <size_t I, typename T>
-struct UTL_PUBLIC_TEMPLATE tuple_element<I, T volatile> : tuple_element<I, T> {};
+struct __UTL_PUBLIC_TEMPLATE tuple_element<I, T volatile> : tuple_element<I, T> {};
 template <size_t I, typename T>
-struct UTL_PUBLIC_TEMPLATE tuple_element<I, T const volatile> : tuple_element<I, T> {};
+struct __UTL_PUBLIC_TEMPLATE tuple_element<I, T const volatile> : tuple_element<I, T> {};
 template <size_t I, typename T>
-struct UTL_PUBLIC_TEMPLATE tuple_element<I, T&&> : tuple_element<I, T> {};
+struct __UTL_PUBLIC_TEMPLATE tuple_element<I, T&&> : tuple_element<I, T> {};
 template <size_t I, typename T>
-struct UTL_PUBLIC_TEMPLATE tuple_element<I, T&> : tuple_element<I, T> {};
+struct __UTL_PUBLIC_TEMPLATE tuple_element<I, T&> : tuple_element<I, T> {};
 
 namespace details {
 namespace tuple {

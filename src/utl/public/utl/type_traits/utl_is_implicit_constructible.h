@@ -37,11 +37,11 @@ using is_implicit UTL_NODEBUG = decltype(implicit_test<TTarget, TArgs...>(0));
 } // namespace details
 
 template <typename TTarget, typename... TArgs>
-struct UTL_PUBLIC_TEMPLATE is_implicit_constructible :
+struct __UTL_PUBLIC_TEMPLATE is_implicit_constructible :
     details::constructible::is_implicit<TTarget, TArgs...> {};
 
 template <typename TTarget, typename... TArgs>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_implicit_constructible :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_implicit_constructible :
     conjunction<is_implicit_constructible<TTarget, TArgs...>,
         is_nothrow_constructible<TTarget, TArgs...>> {};
 

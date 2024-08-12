@@ -24,7 +24,7 @@
 
 UTL_NAMESPACE_BEGIN
 template <typename CharType, typename Traits>
-class UTL_PUBLIC_TEMPLATE basic_zstring_view : private basic_string_view<CharType, Traits> {
+class __UTL_PUBLIC_TEMPLATE basic_zstring_view : private basic_string_view<CharType, Traits> {
     using base_type = basic_string_view<CharType, Traits>;
 
 public:

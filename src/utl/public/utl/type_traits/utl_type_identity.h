@@ -7,7 +7,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE type_identity {
+struct __UTL_PUBLIC_TEMPLATE type_identity {
     using type UTL_NODEBUG = T;
 };
 template <typename T>

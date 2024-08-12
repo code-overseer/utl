@@ -9,16 +9,16 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_boolean : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_boolean : false_type {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_boolean<bool> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_boolean<bool> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_boolean<bool const> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_boolean<bool const> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_boolean<bool volatile> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_boolean<bool volatile> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_boolean<bool const volatile> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_boolean<bool const volatile> : true_type {};
 
 #if UTL_CXX14
 template <typename T>

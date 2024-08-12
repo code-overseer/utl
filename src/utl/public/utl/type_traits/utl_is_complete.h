@@ -23,7 +23,7 @@ UTL_HIDE_FROM_ABI false_type is_complete(float);
 } // namespace type_traits
 
 template <typename T, typename R = decltype(type_traits::details::is_complete<T>(0))>
-struct UTL_PUBLIC_TEMPLATE is_complete : R {};
+struct __UTL_PUBLIC_TEMPLATE is_complete : R {};
 
 #if UTL_CXX14
 template <typename T, typename R = decltype(type_traits::details::is_complete<T>(0))>

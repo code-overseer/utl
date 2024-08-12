@@ -33,22 +33,22 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename L, typename R>
-struct UTL_PUBLIC_TEMPLATE is_swappable_with :
+struct __UTL_PUBLIC_TEMPLATE is_swappable_with :
     bool_constant<ranges::details::swap::invocable<L, R>> {};
 template <typename L, typename R>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable_with :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_swappable_with :
     bool_constant<ranges::details::swap::nothrow_invocable<L, R>> {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_swappable : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_swappable : false_type {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_swappable : false_type {};
 
 template <referenceable T>
-struct UTL_PUBLIC_TEMPLATE is_swappable<T> :
+struct __UTL_PUBLIC_TEMPLATE is_swappable<T> :
     bool_constant<ranges::details::swap::invocable<T&, T&>> {};
 template <referenceable T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable<T> :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_swappable<T> :
     bool_constant<ranges::details::swap::nothrow_invocable<T&, T&>> {};
 
 template <typename L, typename R>
@@ -96,15 +96,15 @@ using is_nothrow UTL_NODEBUG = decltype(nothrow_impl<L, R>(0));
 } // namespace details
 
 template <typename L, typename R>
-struct UTL_PUBLIC_TEMPLATE is_swappable_with : details::swappable::trait<L, R> {};
+struct __UTL_PUBLIC_TEMPLATE is_swappable_with : details::swappable::trait<L, R> {};
 template <typename L, typename R>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable_with : details::swappable::is_nothrow<L, R> {};
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_swappable_with : details::swappable::is_nothrow<L, R> {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_swappable :
+struct __UTL_PUBLIC_TEMPLATE is_swappable :
     conjunction<is_referenceable<T>, is_swappable_with<T&, T&>> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_swappable :
     conjunction<is_referenceable<T>, is_nothrow_swappable_with<T&, T&>> {};
 
 #    if UTL_CXX14

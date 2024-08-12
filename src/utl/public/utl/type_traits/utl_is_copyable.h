@@ -10,7 +10,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_copyable :
+struct __UTL_PUBLIC_TEMPLATE is_copyable :
     bool_constant<UTL_TRAIT_is_movable(T) && UTL_TRAIT_is_copy_constructible(T) &&
         UTL_TRAIT_is_copy_assignable(T)> {};
 

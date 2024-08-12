@@ -38,7 +38,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_rvalue_reference :
+struct __UTL_PUBLIC_TEMPLATE is_rvalue_reference :
     bool_constant<UTL_BUILTIN_is_rvalue_reference(T)> {};
 
 #    if UTL_CXX14
@@ -53,10 +53,10 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_rvalue_reference : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_rvalue_reference : false_type {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_rvalue_reference<T&&> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_rvalue_reference<T&&> : true_type {};
 
 #    if UTL_CXX14
 template <typename T>

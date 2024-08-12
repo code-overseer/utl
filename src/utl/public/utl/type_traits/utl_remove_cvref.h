@@ -27,7 +27,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_cvref {
+struct __UTL_PUBLIC_TEMPLATE remove_cvref {
     using type UTL_NODEBUG = UTL_BUILTIN_remove_cvref(T);
 };
 
@@ -44,7 +44,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_cvref : remove_cv<remove_reference_t<T>> {};
+struct __UTL_PUBLIC_TEMPLATE remove_cvref : remove_cv<remove_reference_t<T>> {};
 
 template <typename T>
 using remove_cvref_t = typename remove_cvref<T>::type;

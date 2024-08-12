@@ -40,7 +40,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_trivially_assignable :
+struct __UTL_PUBLIC_TEMPLATE is_trivially_assignable :
     bool_constant<UTL_BUILTIN_is_trivially_assignable(T, U)> {};
 
 #    if UTL_CXX14
@@ -59,7 +59,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_trivially_assignable : undefined_trait<T, U> {};
+struct __UTL_PUBLIC_TEMPLATE is_trivially_assignable : undefined_trait<T, U> {};
 
 #    if UTL_CXX14
 template <typename T, typename U>

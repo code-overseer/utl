@@ -23,7 +23,7 @@ concept input_or_output_iterator =
     UTL_SCOPE dereferenceable<T> && UTL_SCOPE weakly_incrementable<T>;
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_input_or_output_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_input_or_output_iterator :
     UTL_SCOPE bool_constant<input_or_output_iterator<T>> {};
 
 template <typename T>
@@ -54,7 +54,7 @@ using implemented UTL_NODEBUG = decltype(UTL_SCOPE details::input_or_output_iter
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_input_or_output_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_input_or_output_iterator :
     details::input_or_output_iterator::implemented<T> {};
 
 #  if UTL_CXX14

@@ -40,7 +40,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_destructible :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_destructible :
     bool_constant<UTL_BUILTIN_is_nothrow_destructible(T)> {};
 
 #    if UTL_CXX14
@@ -75,7 +75,7 @@ using nothrow_impl_t UTL_NODEBUG = decltype(nothrow_impl<T>(is_destructible<T>{}
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_destructible : details::destructible::nothrow_impl_t<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_destructible : details::destructible::nothrow_impl_t<T> {};
 
 #    if UTL_CXX14
 template <typename T>

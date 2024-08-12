@@ -7,11 +7,11 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE copy_volatile {
+struct __UTL_PUBLIC_TEMPLATE copy_volatile {
     using type UTL_NODEBUG = To;
 };
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE copy_volatile<From volatile, To> {
+struct __UTL_PUBLIC_TEMPLATE copy_volatile<From volatile, To> {
     using type UTL_NODEBUG = To volatile;
 };
 

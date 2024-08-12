@@ -32,7 +32,7 @@ concept weakly_incrementable = movable<T> && requires(T t) {
 };
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_weakly_incrementable : bool_constant<weakly_incrementable<T>> {};
+struct __UTL_PUBLIC_TEMPLATE is_weakly_incrementable : bool_constant<weakly_incrementable<T>> {};
 
 template <typename T>
 inline constexpr bool is_weakly_incrementable_v = weakly_incrementable<T>;
@@ -78,7 +78,7 @@ using trait UTL_NODEBUG = decltype(UTL_SCOPE details::weakly_incrementable::trai
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_weakly_incrementable : details::weakly_incrementable::trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_weakly_incrementable : details::weakly_incrementable::trait<T> {};
 
 #  if UTL_CXX14
 template <typename T>

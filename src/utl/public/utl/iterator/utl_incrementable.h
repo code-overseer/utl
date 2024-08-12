@@ -42,17 +42,17 @@ concept incrementable = UTL_SCOPE regular<T> && UTL_SCOPE weakly_incrementable<T
     details::incrementable::post_incrementable<T>;
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_incrementable : bool_constant<incrementable<T>> {};
+struct __UTL_PUBLIC_TEMPLATE is_incrementable : bool_constant<incrementable<T>> {};
 
 template <typename T>
 inline constexpr bool is_incrementable_v = incrementable<T>;
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_post_incrementable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_post_incrementable :
     bool_constant<details::incrementable::nothrow_post_incrementable<T>> {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_pre_incrementable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_pre_incrementable :
     bool_constant<details::incrementable::nothrow_pre_incrementable<T>> {};
 
 template <typename T>
@@ -113,15 +113,15 @@ using nothrow_pre_incrementable UTL_NODEBUG =
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_post_incrementable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_post_incrementable :
     details::incrementable::nothrow_post_incrementable<T> {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_pre_incrementable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_pre_incrementable :
     details::incrementable::nothrow_pre_incrementable<T> {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_incrementable :
+struct __UTL_PUBLIC_TEMPLATE is_incrementable :
     conjunction<is_copyable<T>, is_default_constructible<T>, is_equality_comparable<T>,
         is_weakly_incrementable<T>, details::incrementable::post_incrementable<T>> {};
 

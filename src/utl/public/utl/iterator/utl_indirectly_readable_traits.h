@@ -13,7 +13,7 @@ template <typename>
 struct indirectly_readable_traits;
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T const> : indirectly_readable_traits<T> {};
+struct __UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T const> : indirectly_readable_traits<T> {};
 
 UTL_NAMESPACE_END
 
@@ -54,26 +54,26 @@ struct traits {
 } // namespace details
 
 template <typename>
-struct UTL_PUBLIC_TEMPLATE indirectly_readable_traits {};
+struct __UTL_PUBLIC_TEMPLATE indirectly_readable_traits {};
 
 template <array_type T>
-struct UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T> :
+struct __UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T> :
     details::indirectly_readable::traits<UTL_SCOPE remove_extent_t<T>> {};
 
 template <object_type T>
-struct UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T*> :
+struct __UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T*> :
     details::indirectly_readable::traits<T> {};
 
 template <UTL_SCOPE details::indirectly_readable::with_member_object_value_type T>
-struct UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T> :
+struct __UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T> :
     details::indirectly_readable::traits<typename T::value_type> {};
 
 template <UTL_SCOPE details::indirectly_readable::with_member_object_element_type T>
-struct UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T> :
+struct __UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T> :
     details::indirectly_readable::traits<typename T::element_type> {};
 
 template <details::indirectly_readable::with_resolvable_conflict T>
-struct UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T> :
+struct __UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T> :
     details::indirectly_readable::traits<typename T::value_type> {};
 
 UTL_NAMESPACE_END
@@ -125,11 +125,11 @@ using impl UTL_NODEBUG = decltype(resolve<T>(0, 0));
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T*> :
+struct __UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T*> :
     details::indirectly_readable::object_value_type<T> {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE indirectly_readable_traits : details::indirectly_readable::impl<T> {};
+struct __UTL_PUBLIC_TEMPLATE indirectly_readable_traits : details::indirectly_readable::impl<T> {};
 
 UTL_NAMESPACE_END
 
