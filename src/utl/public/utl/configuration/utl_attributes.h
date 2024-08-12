@@ -4,11 +4,11 @@
 
 #include "utl/preprocessor/utl_attribute_check.h"
 #include "utl/preprocessor/utl_attribute_list.h"
-#include "utl/preprocessor/utl_msvc_extensions.h"
 
 #include "utl/configuration/utl_builtins.h"
 #include "utl/configuration/utl_compiler.h"
 #include "utl/configuration/utl_declspec.h"
+#include "utl/configuration/utl_keywords.h"
 
 #if UTL_HAS_CPP_ATTRIBUTE(nodiscard) && UTL_CXX17
 #  define UTL_NODISCARD [[nodiscard]]
@@ -26,7 +26,7 @@
 #  define UTL_NODISCARD __attribute__((__warn_unused_result__))
 #  define __UTL_ATTRIBUTE_NODISCARD __warn_unused_result__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_NODISCARD
-#elif UTL_HAS_SAL_ANNOTATION(_Check_return_)
+#elif UTL_HAS_KEYWORD(_Check_return_)
 #  define UTL_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_TYPE_MSVC_EXT_NODISCARD
