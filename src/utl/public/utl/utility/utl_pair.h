@@ -6,7 +6,7 @@
 
 #if UTL_USE_STDPAIR
 
-#  include "utl/preprocessor/utl_namespace.h"
+#  include "utl/configuration/utl_namespace.h"
 
 #  include <utility>
 

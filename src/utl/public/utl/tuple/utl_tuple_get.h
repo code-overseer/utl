@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_namespace.h"
+#include "utl/configuration/utl_namespace.h"
 
 #if !defined(UTL_TUPLE_PRIVATE_HEADER_GUARD)
 #  error "Private header accessed"

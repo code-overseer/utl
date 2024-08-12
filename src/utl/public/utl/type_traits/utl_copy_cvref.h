@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_namespace.h"
-
+#include "utl/configuration/utl_namespace.h"
 #include "utl/type_traits/utl_copy_cv.h"
 
 UTL_NAMESPACE_BEGIN
