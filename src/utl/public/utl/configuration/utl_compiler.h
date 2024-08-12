@@ -28,6 +28,7 @@
 #  endif
 
 #  define UTL_COMPILER_CLANG 1
+#  define UTL_COMPILER_APPLE_CLANG 1
 #  define UTL_COMPILER_APPLE_CLANG_AT_LEAST(VERSION) __apple_build_version__ >= VERSION
 #  define UTL_COMPILER_CLANG_AT_LEAST(MAJOR, MINOR, PATCH) \
       __UTL_APPLE_CLANG_MAJOR > MAJOR ||                   \
