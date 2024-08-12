@@ -4,11 +4,11 @@
 
 #include "utl/preprocessor/utl_attribute_check.h"
 #include "utl/preprocessor/utl_attribute_list.h"
-#include "utl/preprocessor/utl_declspec.h"
 #include "utl/preprocessor/utl_msvc_extensions.h"
 
 #include "utl/configuration/utl_builtins.h"
 #include "utl/configuration/utl_compiler.h"
+#include "utl/configuration/utl_declspec.h"
 
 #if UTL_HAS_CPP_ATTRIBUTE(nodiscard) && UTL_CXX17
 #  define UTL_NODISCARD [[nodiscard]]

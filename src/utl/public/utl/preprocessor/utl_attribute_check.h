@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_declspec.h"
+#include "utl/configuration/utl_declspec.h"
 
 #if defined(__cplusplus) && defined(__has_cpp_attribute)
 #  define UTL_HAS_CPP_ATTRIBUTE(NAME) __has_cpp_attribute(NAME)
