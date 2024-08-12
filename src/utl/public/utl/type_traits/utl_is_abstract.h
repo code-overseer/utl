@@ -27,16 +27,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_abstract)
+#  if __UTL_SHOULD_USE_BUILTIN(is_abstract)
 #    define UTL_BUILTIN_is_abstract(...) __is_abstract(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_abstract)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_abstract)
 
 #  ifdef UTL_BUILTIN_is_abstract
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_abstract : bool_constant<UTL_BUILTIN_is_abstract(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_abstract : bool_constant<UTL_BUILTIN_is_abstract(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -54,7 +54,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_abstract : undefined_trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_abstract : undefined_trait<T> {};
 
 #    if UTL_CXX14
 template <typename T>

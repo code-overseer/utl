@@ -29,16 +29,16 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(remove_cv)
+#  if __UTL_SHOULD_USE_BUILTIN(remove_cv)
 #    define UTL_BUILTIN_add_cv(...) __remove_cv(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(add_cv)
+#  endif // __UTL_SHOULD_USE_BUILTIN(add_cv)
 
 #  ifdef UTL_BUILTIN_remove_cv
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_cv {
+struct __UTL_PUBLIC_TEMPLATE remove_cv {
     using type UTL_NODEBUG = UTL_BUILTIN_remove_cv(T);
 };
 
@@ -52,21 +52,21 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_cv {
+struct __UTL_PUBLIC_TEMPLATE remove_cv {
     using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_cv<T volatile> {
-    using type UTL_NODEBUG = T;
-};
-
-template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_cv<T const> {
+struct __UTL_PUBLIC_TEMPLATE remove_cv<T volatile> {
     using type UTL_NODEBUG = T;
 };
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_cv<T const volatile> {
+struct __UTL_PUBLIC_TEMPLATE remove_cv<T const> {
+    using type UTL_NODEBUG = T;
+};
+
+template <typename T>
+struct __UTL_PUBLIC_TEMPLATE remove_cv<T const volatile> {
     using type UTL_NODEBUG = T;
 };
 

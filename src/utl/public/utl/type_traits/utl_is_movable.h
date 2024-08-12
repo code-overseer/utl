@@ -12,7 +12,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_movable :
+struct __UTL_PUBLIC_TEMPLATE is_movable :
     bool_constant<UTL_TRAIT_is_object(T) && UTL_TRAIT_is_move_constructible(T) &&
         UTL_TRAIT_is_assignable(T&, T) && UTL_TRAIT_is_swappable(T)> {};
 

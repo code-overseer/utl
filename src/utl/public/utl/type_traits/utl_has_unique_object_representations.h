@@ -20,10 +20,10 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(has_unique_object_representations)
+#  if __UTL_SHOULD_USE_BUILTIN(has_unique_object_representations)
 #    define UTL_BUILTIN_has_unique_object_representations(...) \
         __has_unique_object_representations(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(has_unique_object_representations)
+#  endif // __UTL_SHOULD_USE_BUILTIN(has_unique_object_representations)
 
 #  ifdef UTL_BUILTIN_has_unique_object_representations
 
@@ -31,7 +31,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE has_unique_object_representations :
+struct __UTL_PUBLIC_TEMPLATE has_unique_object_representations :
     bool_constant<UTL_BUILTIN_has_unique_object_representations(T)> {};
 
 #    if UTL_CXX14

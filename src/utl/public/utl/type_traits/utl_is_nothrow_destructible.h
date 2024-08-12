@@ -31,16 +31,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_nothrow_destructible)
+#  if __UTL_SHOULD_USE_BUILTIN(is_nothrow_destructible)
 #    define UTL_BUILTIN_is_nothrow_destructible(...) __is_nothrow_destructible(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_nothrow_constructible)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_nothrow_constructible)
 
 #  ifdef UTL_BUILTIN_is_nothrow_destructible
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_destructible :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_destructible :
     bool_constant<UTL_BUILTIN_is_nothrow_destructible(T)> {};
 
 #    if UTL_CXX14
@@ -62,11 +62,11 @@ namespace details {
 namespace destructible {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto nothrow_impl(true_type) noexcept
+__UTL_HIDE_FROM_ABI auto nothrow_impl(true_type) noexcept
     -> bool_constant<noexcept(declval<T&>().~T())>;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto nothrow_impl(false_type) noexcept -> false_type;
+__UTL_HIDE_FROM_ABI auto nothrow_impl(false_type) noexcept -> false_type;
 
 template <typename T>
 using nothrow_impl_t UTL_NODEBUG = decltype(nothrow_impl<T>(is_destructible<T>{}));
@@ -75,7 +75,7 @@ using nothrow_impl_t UTL_NODEBUG = decltype(nothrow_impl<T>(is_destructible<T>{}
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_destructible : details::destructible::nothrow_impl_t<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_destructible : details::destructible::nothrow_impl_t<T> {};
 
 #    if UTL_CXX14
 template <typename T>

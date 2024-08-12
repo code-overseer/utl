@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/concepts/utl_integral.h"
 #include "utl/string/utl_is_string_char.h"
@@ -16,7 +16,7 @@ template <typename T>
 concept saturatable = integral<T> && !string_char<T> && !is_boolean_v<T>;
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_saturatable : bool_constant<saturatable<T>> {};
+struct __UTL_PUBLIC_TEMPLATE is_saturatable : bool_constant<saturatable<T>> {};
 
 template <typename T>
 inline constexpr bool is_saturatable_v = saturatable<T>;
@@ -33,10 +33,10 @@ namespace details {
 namespace saturation {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
     -> UTL_SCOPE bool_constant<UTL_TRAIT_is_integral(T) &&
         !UTL_SCOPE disjunction<UTL_SCOPE is_string_char<T>, UTL_SCOPE is_boolean<T>>::value>;
 
@@ -47,7 +47,7 @@ using trait UTL_NODEBUG = decltype(UTL_SCOPE details::saturation::trait_impl<T>(
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_saturatable : details::saturation::trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_saturatable : details::saturation::trait<T> {};
 
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_saturatable_v = details::saturation::trait<T>::value;

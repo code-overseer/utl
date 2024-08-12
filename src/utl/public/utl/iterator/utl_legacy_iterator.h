@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_constants.h"
 
@@ -19,7 +19,7 @@ template <typename It>
 concept legacy_iterator = input_or_output_iterator<It> && copyable<It>;
 
 template <typename It>
-struct UTL_PUBLIC_TEMPLATE is_legacy_iterator : bool_constant<legacy_iterator<It>> {};
+struct __UTL_PUBLIC_TEMPLATE is_legacy_iterator : bool_constant<legacy_iterator<It>> {};
 
 template <typename It>
 inline constexpr bool is_legacy_iterator_v = legacy_iterator<It>;
@@ -40,17 +40,17 @@ namespace details {
 namespace legacy_iterator {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto post_incrementable(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto post_incrementable(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto post_incrementable(int) noexcept
+__UTL_HIDE_FROM_ABI auto post_incrementable(int) noexcept
     -> UTL_SCOPE is_referenceable<decltype(*static_cast<T& (*)()>(0)()++)>;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto pre_incrementable(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto pre_incrementable(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto pre_incrementable(int) noexcept
+__UTL_HIDE_FROM_ABI auto pre_incrementable(int) noexcept
     -> UTL_SCOPE is_same<T&, decltype(++static_cast<T& (*)()>(0)())>;
 
 template <typename T>
@@ -63,7 +63,7 @@ using implemented UTL_NODEBUG = UTL_SCOPE conjunction<UTL_SCOPE is_dereferenceab
 } // namespace details
 
 template <typename It>
-struct UTL_PUBLIC_TEMPLATE is_legacy_iterator : details::legacy_iterator::implemented<It> {};
+struct __UTL_PUBLIC_TEMPLATE is_legacy_iterator : details::legacy_iterator::implemented<It> {};
 
 #  if UTL_CXX14
 template <typename It>

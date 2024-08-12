@@ -2,25 +2,11 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_compiler.h"
-#include "utl/preprocessor/utl_msvc_builtins.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/configuration/utl_compiler.h"
+#include "utl/configuration/utl_msvc_builtins.h"
+#include "utl/configuration/utl_standard.h"
 
-#ifdef __is_identifier
-#  define UTL_IS_RESERVED_IDENTIFIER(X) !__is_identifier(X)
-#else
-#  define UTL_IS_RESERVED_IDENTIFIER(...) 0
-#endif
-
-#ifdef __has_builtin
-#  define UTL_HAS_BUILTIN(BUILTIN) __has_builtin(BUILTIN)
-#else
-#  define UTL_HAS_BUILTIN(...) 0
-#endif /* ifdef __has_builtin */
-
-#define UTL_SHOULD_USE_BUILTIN(BUILTIN)                                          \
-    (UTL_HAS_BUILTIN(__##BUILTIN) || UTL_IS_RESERVED_IDENTIFIER(__##BUILTIN)) && \
-        !UTL_DISABLE_BUILTIN_##BUILTIN
+#include "utl/preprocessor/utl_builtin_check.h"
 
 #if UTL_HAS_BUILTIN(__builtin_launder)
 #  define UTL_BUILTIN_launder(X) __builtin_launder(X)

@@ -26,7 +26,7 @@ using nothrow_trait_t UTL_NODEBUG =
 } // namespace details
 
 template <typename T, typename Arg>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_subscriptable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_subscriptable :
     UTL_SCOPE details::subscriptable::nothrow_trait_t<T, Arg> {};
 
 #  if UTL_CXX14
@@ -47,10 +47,10 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace subscriptable {
 template <typename T, typename Arg>
-UTL_HIDE_FROM_ABI auto nothrow_test(int) noexcept
+__UTL_HIDE_FROM_ABI auto nothrow_test(int) noexcept
     -> bool_constant<noexcept(UTL_SCOPE declval<T>()[UTL_SCOPE declval<Arg>()])>;
 template <typename T, typename Arg>
-UTL_HIDE_FROM_ABI auto nothrow_test(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto nothrow_test(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T, typename Arg>
 using nothrow_trait_t UTL_NODEBUG =
@@ -59,7 +59,7 @@ using nothrow_trait_t UTL_NODEBUG =
 } // namespace details
 
 template <typename T, typename Arg>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_subscriptable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_subscriptable :
     UTL_SCOPE details::subscriptable::nothrow_trait_t<T, Arg> {};
 
 #  if UTL_CXX14

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_iterator_traits_fwd.h"
 
@@ -16,7 +16,7 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace iter_value {
 template <UTL_SCOPE details::iterator_traits::is_specialized T>
-UTL_HIDE_FROM_ABI typename UTL_SCOPE iterator_traits<T>::value_type resolve(int) noexcept;
+__UTL_HIDE_FROM_ABI typename UTL_SCOPE iterator_traits<T>::value_type resolve(int) noexcept;
 } // namespace iter_value
 } // namespace details
 
@@ -31,7 +31,7 @@ namespace iter_value {
 
 template <typename T UTL_REQUIRES_CXX11(
     UTL_SCOPE details::iterator_traits::is_specialized<T>::value)>
-UTL_HIDE_FROM_ABI typename UTL_SCOPE iterator_traits<T>::value_type resolve(int) noexcept;
+__UTL_HIDE_FROM_ABI typename UTL_SCOPE iterator_traits<T>::value_type resolve(int) noexcept;
 } // namespace iter_value
 } // namespace details
 
@@ -45,7 +45,7 @@ namespace details {
 namespace iter_value {
 
 template <typename T>
-UTL_HIDE_FROM_ABI typename UTL_SCOPE indirectly_readable_traits<T>::value_type resolve(
+__UTL_HIDE_FROM_ABI typename UTL_SCOPE indirectly_readable_traits<T>::value_type resolve(
     float) noexcept;
 
 } // namespace iter_value

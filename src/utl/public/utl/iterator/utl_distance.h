@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_iterator_tags.h"
 #include "utl/iterator/utl_iterator_traits.h"
@@ -76,12 +76,12 @@ UTL_NODISCARD constexpr difference_t<It> impl(It const first, It const last,
 }
 
 template <typename It>
-UTL_HIDE_FROM_ABI auto nothrow_check(int) noexcept
+__UTL_HIDE_FROM_ABI auto nothrow_check(int) noexcept
     -> UTL_SCOPE bool_constant<noexcept(UTL_SCOPE details::distance::impl(
         UTL_SCOPE declval<It>(), UTL_SCOPE declval<It>(), category_t<It>{}))>;
 
 template <typename It>
-UTL_HIDE_FROM_ABI auto nothrow_check(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto nothrow_check(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename It>
 using is_nothrow UTL_NODEBUG = decltype(UTL_SCOPE details::distance::nothrow_check<It>(0));
@@ -90,7 +90,7 @@ using is_nothrow UTL_NODEBUG = decltype(UTL_SCOPE details::distance::nothrow_che
 } // namespace details
 
 template <UTL_CONCEPT_CXX20(input_iterator) It>
-UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) inline constexpr auto distance(It first, It last) noexcept(
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) inline constexpr auto distance(It first, It last) noexcept(
     details::distance::is_nothrow<It>::value) -> UTL_ENABLE_IF_CXX11(details::distance::difference_t<It>, UTL_TRAIT_is_legacy_input_iterator(It)) {
     return details::distance::impl(first, last, UTL_SCOPE details::distance::category_t<It>());
 }

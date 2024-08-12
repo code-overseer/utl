@@ -23,17 +23,17 @@ UTL_NAMESPACE_END
 #  include "utl/type_traits/utl_constants.h"
 #  include "utl/type_traits/utl_reference_binds_to_temporary.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(reference_constructs_from_temporary)
+#  if __UTL_SHOULD_USE_BUILTIN(reference_constructs_from_temporary)
 #    define UTL_BUILTIN_reference_constructs_from_temporary(...) \
         __reference_constructs_from_temporary(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(reference_constructs_from_temporary)
+#  endif // __UTL_SHOULD_USE_BUILTIN(reference_constructs_from_temporary)
 
 #  ifdef UTL_BUILTIN_reference_constructs_from_temporary
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary :
+struct __UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary :
     bool_constant<UTL_BUILTIN_reference_constructs_from_temporary(T, U)> {};
 
 #    if UTL_CXX14
@@ -54,7 +54,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary : false_type {};
+struct __UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary : false_type {};
 
 namespace details {
 namespace dangling {
@@ -64,14 +64,14 @@ namespace dangling {
  * @tparam T - reference only, first argument of reference_constructs_from_temporary
  */
 template <typename T>
-UTL_HIDE_FROM_ABI void init_ref(T ref) noexcept;
+__UTL_HIDE_FROM_ABI void init_ref(T ref) noexcept;
 
 /**
  * Creates a prvalue in unevaluated context
  * @tparam U - any type
  */
 template <typename U>
-UTL_HIDE_FROM_ABI remove_cv_t<U> make_type() noexcept;
+__UTL_HIDE_FROM_ABI remove_cv_t<U> make_type() noexcept;
 
 template <typename T, typename U>
 using constructs_from_impl UTL_NODEBUG =
@@ -98,11 +98,11 @@ struct constructs_from<T, U, decltype(init_ref<T>(make_type<U>()))> : constructs
 } // namespace details
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary<T&, U> :
+struct __UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary<T&, U> :
     details::dangling::constructs_from<T&, U> {};
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary<T&&, U> :
+struct __UTL_PUBLIC_TEMPLATE reference_constructs_from_temporary<T&&, U> :
     details::dangling::constructs_from<T&&, U> {};
 
 #    if UTL_CXX14

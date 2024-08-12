@@ -2,17 +2,17 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/string/utl_libc_common.h"
 #include "utl/utility/utl_signs.h"
 
 UTL_NAMESPACE_BEGIN
 
-#define __UTL_ATTRIBUTE_LIBC_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_LIBC_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_LIBC_PURE
 #define __UTL_ATTRIBUTE_LIBC_INLINE_PURE \
-    (PURE)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+    (PURE)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_LIBC_INLINE_PURE
 
 namespace libc {
@@ -23,7 +23,7 @@ namespace standard {
 #endif
 
 template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
-UTL_ATTRIBUTES(ALWAYS_INLINE,HIDE_FROM_ABI) inline T* memcpy(
+UTL_ATTRIBUTES(ALWAYS_INLINE,_HIDE_FROM_ABI) inline T* memcpy(
     T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
     return (T*)__builtin_memcpy(dst, src, byte_count<T>(count));
@@ -33,7 +33,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE,HIDE_FROM_ABI) inline T* memcpy(
 }
 
 template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
-UTL_ATTRIBUTES(ALWAYS_INLINE,HIDE_FROM_ABI) inline T* memmove(
+UTL_ATTRIBUTES(ALWAYS_INLINE,_HIDE_FROM_ABI) inline T* memmove(
     T* dst, T const* src, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
     return (T*)__builtin_memmove(dst, src, byte_count<T>(count));
@@ -49,7 +49,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE,HIDE_FROM_ABI) inline T* memmove(
 template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
     is_trivially_copyable<T>::value && exact_size<T, 1>::value)>
 UTL_REQUIRES_CXX20(exact_size<T, 1>)
-UTL_ATTRIBUTES(ALWAYS_INLINE, HIDE_FROM_ABI) inline T* memset(
+UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) inline T* memset(
     T* dst, T const value, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
     return (T*)__builtin_memset(dst, as_byte(value), byte_count<T>(count));

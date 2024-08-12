@@ -27,16 +27,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_enum)
+#  if __UTL_SHOULD_USE_BUILTIN(is_enum)
 #    define UTL_BUILTIN_is_enum(...) __is_enum(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_enum)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_enum)
 
 #  ifdef UTL_BUILTIN_is_enum
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_enum : bool_constant<UTL_BUILTIN_is_enum(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_enum : bool_constant<UTL_BUILTIN_is_enum(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -54,7 +54,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_enum : undefined_trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_enum : undefined_trait<T> {};
 
 #    if UTL_CXX14
 template <typename T>

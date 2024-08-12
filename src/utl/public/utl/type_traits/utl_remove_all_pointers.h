@@ -1,15 +1,15 @@
 
 
-#include "utl/preprocessor/utl_namespace.h"
+#include "utl/utl_config.h"
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_all_pointers {
+struct __UTL_PUBLIC_TEMPLATE remove_all_pointers {
     using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_all_pointers<T*> : remove_all_pointers<T> {};
+struct __UTL_PUBLIC_TEMPLATE remove_all_pointers<T*> : remove_all_pointers<T> {};
 
 template <typename T>
 using remove_all_pointers = typename remove_all_pointers<T>::type;

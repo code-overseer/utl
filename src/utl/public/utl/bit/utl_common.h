@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_is_same.h"
 #include "utl/type_traits/utl_is_unsigned.h"
@@ -55,7 +55,7 @@ concept bit_readable =
 namespace details {
 namespace bit {
 template <typename T>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD)
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD)
 UTL_CONSTEVAL int unsigned_width_diff() noexcept {
     return CHAR_BIT * ((int)sizeof(unsigned) - (int)sizeof(T));
 }

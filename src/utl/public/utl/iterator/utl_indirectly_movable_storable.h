@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_indirectly_movable.h"
 #include "utl/iterator/utl_indirectly_writable.h"
@@ -24,7 +24,7 @@ concept indirectly_movable_storable = indirectly_movable<From, To>　&&
     assignable_from<iter_value_t<From>&, iter_rvalue_reference_t<From>>;
 
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE is_indirectly_movable_storable :
+struct __UTL_PUBLIC_TEMPLATE is_indirectly_movable_storable :
     bool_constant<indirectly_movable_storable<From, To>> {};
 
 template <typename From, typename To>
@@ -42,9 +42,9 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace indirectly_movable_storable {
 template <typename From, typename To>
-UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename From, typename To>
-UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
     -> UTL_SCOPE conjunction<UTL_SCOPE is_indirectly_movable<From, To>,
         UTL_SCOPE is_indirectly_writable<To, UTL_SCOPE iter_value_t<From>>,
         UTL_SCOPE is_movable<UTL_SCOPE iter_value_t<From>>,
@@ -61,7 +61,7 @@ using trait UTL_NODEBUG =
 } // namespace details
 
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE is_indirectly_movable_storable :
+struct __UTL_PUBLIC_TEMPLATE is_indirectly_movable_storable :
     details::indirectly_movable_storable::trait<From, To> {};
 
 #  if UTL_CXX14

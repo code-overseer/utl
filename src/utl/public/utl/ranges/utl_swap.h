@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #if UTL_USE_STD_ranges_swap && UTL_CXX20
 
@@ -62,14 +62,14 @@ concept exchangable = !unqualified_swappable<T&, T&> && UTL_SCOPE move_construct
 struct function_t {
     template <typename L, typename R>
     requires unqualified_swappable<L, R>
-    UTL_ATTRIBUTES(ALWAYS_INLINE, HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 void operator()(L&& l, R&& r) const
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 void operator()(L&& l, R&& r) const
         noexcept(nothrow_unqualified_swappable<L, R>) {
         swap(l, r);
     }
 
     template <typename L, typename R, size_t N>
     requires unqualified_swappable_array<L, R, N>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void operator()(L (&l)[N], R (&r)[N]) const
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void operator()(L (&l)[N], R (&r)[N]) const
         noexcept(noexcept((*this)(*l, *r))) {
         for (decltype(N) i = 0; i < N; ++i) {
             (*this)(l[i], r[i]);
@@ -77,7 +77,7 @@ struct function_t {
     }
 
     template <exchangable T>
-    UTL_ATTRIBUTES(ALWAYS_INLINE, HIDE_FROM_ABI)
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI)
     UTL_CONSTEXPR_CXX14 void operator()(T& l, T& r) const noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_move_assignable(T)) {
         r = UTL_SCOPE exchange(l, UTL_SCOPE move(r));
@@ -131,22 +131,22 @@ template <typename T>
 void swap(T&, T&) = delete;
 
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto unqualified_swappable_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto unqualified_swappable_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto unqualified_swappable_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto unqualified_swappable_impl(int) noexcept
     -> UTL_SCOPE always_true_type<decltype(swap(UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>()))>;
 
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto nothrow_unqualified_swappable_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto nothrow_unqualified_swappable_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto nothrow_unqualified_swappable_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto nothrow_unqualified_swappable_impl(int) noexcept
     -> UTL_SCOPE bool_constant<noexcept(swap(UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>()))>;
 
 template <typename L, typename R, size_t N>
-UTL_HIDE_FROM_ABI auto unqualified_swappable_array_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto unqualified_swappable_array_impl(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename L, typename R, size_t N, typename F = function_t const&>
-UTL_HIDE_FROM_ABI auto unqualified_swappable_array_impl(int) noexcept -> UTL_SCOPE
+__UTL_HIDE_FROM_ABI auto unqualified_swappable_array_impl(int) noexcept -> UTL_SCOPE
     conjunction<UTL_SCOPE bool_constant<(UTL_SCOPE extent_v<L> == UTL_SCOPE extent_v<R>)>,
         UTL_SCOPE always_true_type<decltype(UTL_SCOPE declval<F>()(
             UTL_SCOPE declval<L&>(), UTL_SCOPE declval<R&>()))>>;
@@ -166,14 +166,14 @@ private:
     } first = {};
 
     template <typename L, typename R>
-    UTL_ATTRIBUTES(ALWAYS_INLINE, HIDE_FROM_ABI)
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI)
     UTL_CONSTEXPR_CXX14 UTL_SCOPE enable_if_t<unqualified_swappable<L, R>::value>
     dispatch(L&& l, R&& r, first_t) const noexcept(nothrow_unqualified_swappable<L, R>::value) {
         swap(UTL_SCOPE forward<L>(l), UTL_SCOPE forward<R>(r));
     }
 
     template <typename L, typename R, size_t N>
-    UTL_ATTRIBUTES(ALWAYS_INLINE, HIDE_FROM_ABI)
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI)
     UTL_CONSTEXPR_CXX14 UTL_SCOPE enable_if_t<unqualified_swappable_array<L, R, N>::value>
     dispatch(L (&l)[N], R (&r)[N], second_t) const noexcept(noexcept((*this)(*l, *r))) {
         for (decltype(N) i = 0; i < N; ++i) {
@@ -182,7 +182,7 @@ private:
     }
 
     template <typename T>
-    UTL_ATTRIBUTES(ALWAYS_INLINE, HIDE_FROM_ABI)
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI)
     UTL_CONSTEXPR_CXX14 UTL_SCOPE
         enable_if_t<UTL_TRAIT_is_move_constructible(T) && UTL_TRAIT_is_move_assignable(T)>
         dispatch(T& l, T& r, third_t) const noexcept(
@@ -192,7 +192,7 @@ private:
 
 public:
     template <typename L, typename R>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 auto operator()(L&& l, R&& r) const noexcept(
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 auto operator()(L&& l, R&& r) const noexcept(
         noexcept(this->dispatch(UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>(), function_t::first)))
         -> decltype(this->dispatch(
             UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>(), function_t::first)) {

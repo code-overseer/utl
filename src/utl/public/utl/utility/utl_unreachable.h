@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #if UTL_CXX23 && UTL_USE_STD_unreachable
 
@@ -23,7 +23,7 @@ UTL_PRAGMA_WARN(
 
 UTL_NAMESPACE_BEGIN
 
-UTL_ATTRIBUTES(NORETURN, HIDE_FROM_ABI) inline void unreachable() {
+UTL_ATTRIBUTES(NORETURN, _HIDE_FROM_ABI) inline void unreachable() {
     UTL_BUILTIN_unreachable();
 }
 

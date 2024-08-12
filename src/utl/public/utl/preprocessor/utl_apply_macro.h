@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_compiler.h"
+#include "utl/configuration/utl_compiler.h"
+#include "utl/configuration/utl_standard.h"
+
 #include "utl/preprocessor/utl_paste.h"
-#include "utl/preprocessor/utl_standard.h"
 
 #define UTL_EVAL1(...) UTL_PASTE(UTL_PASTE(UTL_PASTE(__VA_ARGS__)))
 #define UTL_EVAL2(...) UTL_EVAL1(UTL_EVAL1(UTL_EVAL1(__VA_ARGS__)))

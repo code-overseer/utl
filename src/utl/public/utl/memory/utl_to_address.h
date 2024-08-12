@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/memory/utl_pointer_traits.h"
 
@@ -37,9 +37,9 @@ namespace details {
 namespace pointer_traits {
 
 template <typename Ptr>
-UTL_HIDE_FROM_ABI auto has_to_address_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto has_to_address_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename Ptr>
-UTL_HIDE_FROM_ABI auto has_to_address_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto has_to_address_impl(int) noexcept
     -> UTL_SCOPE always_true_type<decltype(UTL_SCOPE pointer_traits<Ptr>::to_address(
         UTL_SCOPE declval<Ptr const&>()))>;
 
@@ -47,9 +47,9 @@ template <typename Ptr>
 using has_to_address UTL_NODEBUG = decltype(has_to_address_impl<Ptr>(0));
 
 template <typename Ptr>
-UTL_HIDE_FROM_ABI auto has_arrow_operator_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto has_arrow_operator_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename Ptr>
-UTL_HIDE_FROM_ABI auto has_arrow_operator_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto has_arrow_operator_impl(int) noexcept
     -> UTL_SCOPE always_true_type<decltype(UTL_SCOPE declval<Ptr const&>().operator->())>;
 
 template <typename Ptr>
@@ -68,7 +68,7 @@ namespace details {
 namespace pointer_traits {
 struct to_address_t {
     template <typename T>
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, CONST, ALWAYS_INLINE) inline constexpr T* operator()(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, CONST, ALWAYS_INLINE) inline constexpr T* operator()(
         T* ptr) const noexcept {
         static_assert(!UTL_TRAIT_is_function(T), "T cannot be a function");
         return ptr;
@@ -77,7 +77,7 @@ struct to_address_t {
     template <UTL_CONCEPT_CXX20(has_to_address) T UTL_REQUIRES_CXX11(
         !UTL_SCOPE is_pointer<T>::value && has_to_address<T>::value)>
     UTL_REQUIRES_CXX20(!UTL_SCOPE is_pointer<T>::value)
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) inline constexpr auto operator()(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) inline constexpr auto operator()(
         T const& ptr) const noexcept -> decltype(UTL_SCOPE pointer_traits<T>::to_address(ptr)) {
         return UTL_SCOPE pointer_traits<T>::to_address(ptr);
     }
@@ -86,7 +86,7 @@ struct to_address_t {
         !UTL_SCOPE is_pointer<T>::value && !has_to_address<T>::value &&
         has_arrow_operator<T>::value)>
     UTL_REQUIRES_CXX20(!UTL_SCOPE is_pointer<T>::value && !has_to_address<T>)
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) inline constexpr auto operator()(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) inline constexpr auto operator()(
         T const& ptr) const noexcept -> decltype(this->operator()(ptr.operator->())) {
         return this->operator()(ptr.operator->());
     }

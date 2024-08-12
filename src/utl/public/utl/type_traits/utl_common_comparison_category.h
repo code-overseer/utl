@@ -81,7 +81,7 @@ template <typename... Ts>
 using common_comparison_category_t = typename details::comparison_category::impl<Ts...>::type;
 
 template <typename... Ts>
-struct UTL_PUBLIC_TEMPLATE common_comparison_category :
+struct __UTL_PUBLIC_TEMPLATE common_comparison_category :
     details::comparison_category::impl<Ts...> {};
 
 UTL_NAMESPACE_END

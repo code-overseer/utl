@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
+
 #include "utl/type_traits/utl_is_array.h"
 
 #if UTL_CXX20

@@ -2,20 +2,19 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/utl_config.h"
 
 UTL_NAMESPACE_BEGIN
 
 using size_t = decltype(sizeof(0));
 
 template <typename T, T N>
-struct UTL_PUBLIC_TEMPLATE integral_constant {
+struct __UTL_PUBLIC_TEMPLATE integral_constant {
     static constexpr T value = N;
     using value_type = T;
     using type = integral_constant;
-    UTL_HIDE_FROM_ABI constexpr operator value_type() const noexcept { return N; }
-    UTL_HIDE_FROM_ABI constexpr value_type operator()() const noexcept { return N; }
+    __UTL_HIDE_FROM_ABI constexpr operator value_type() const noexcept { return N; }
+    __UTL_HIDE_FROM_ABI constexpr value_type operator()() const noexcept { return N; }
 };
 
 template <typename T, T N>

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_constants.h"
 
@@ -10,11 +10,11 @@
 
 UTL_NAMESPACE_BEGIN
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE has_member_type : false_type {};
+struct __UTL_PUBLIC_TEMPLATE has_member_type : false_type {};
 
 template <typename T>
 requires requires { typename T::type; }
-struct UTL_PUBLIC_TEMPLATE has_member_type<T> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE has_member_type<T> : true_type {};
 
 UTL_NAMESPACE_END
 
@@ -34,7 +34,7 @@ struct has_member_type_impl<T, void_t<typename T::type>> : true_type {};
 } // namespace type_traits
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE has_member_type : type_traits::details::has_member_type_impl<T> {};
+struct __UTL_PUBLIC_TEMPLATE has_member_type : type_traits::details::has_member_type_impl<T> {};
 
 UTL_NAMESPACE_END
 

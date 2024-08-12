@@ -32,9 +32,9 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_unbounded_array : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_unbounded_array : false_type {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_unbounded_array<T[]> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_unbounded_array<T[]> : true_type {};
 
 #  if UTL_CXX14
 template <typename T>

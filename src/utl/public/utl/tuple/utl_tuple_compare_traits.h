@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/utl_config.h"
 
 #include "utl/compare/utl_compare_traits.h"
 #include "utl/tuple/utl_tuple_get_element.h"
@@ -183,11 +182,11 @@ namespace details {
 namespace compare_traits {
 
 template <typename T, typename U, typename Cat, size_t... Is>
-UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(float, index_sequence<Is...>)
+__UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(float, index_sequence<Is...>)
     -> false_type;
 
 template <typename T, typename U, typename Cat, size_t... Is>
-UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(int, index_sequence<Is...>)
+__UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(int, index_sequence<Is...>)
     -> bool_constant<tuple_size<T>::value == tuple_size<U>::value &&
         conjunction<decltype(three_way_comparable_with_test<
             remove_cvref_t<decltype(UTL_SCOPE get_element<Is>(UTL_SCOPE declval<T>()))>,
@@ -195,11 +194,11 @@ UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(int, index_sequence<Is
             0))...>::value>;
 
 template <typename T, typename U, typename Cat, size_t... Is>
-UTL_HIDE_FROM_ABI auto all_nothrow_three_way_comparable_with_test(float, index_sequence<Is...>)
+__UTL_HIDE_FROM_ABI auto all_nothrow_three_way_comparable_with_test(float, index_sequence<Is...>)
     -> false_type;
 
 template <typename T, typename U, typename Cat, size_t... Is>
-UTL_HIDE_FROM_ABI auto all_nothrow_three_way_comparable_with_test(int, index_sequence<Is...>)
+__UTL_HIDE_FROM_ABI auto all_nothrow_three_way_comparable_with_test(int, index_sequence<Is...>)
     -> bool_constant<tuple_size<T>::value == tuple_size<U>::value &&
         UTL_SCOPE details::tuple::is_all_nothrow_gettable<T>::value &&
         UTL_SCOPE details::tuple::is_all_nothrow_gettable<U>::value &&
@@ -220,11 +219,11 @@ using all_nothrow_three_way_comparable_with_test_t UTL_NODEBUG =
 } // namespace details
 
 template <typename T, typename U = T, typename Cat = std::partial_ordering>
-struct UTL_PUBLIC_TEMPLATE is_all_three_way_comparable_with :
+struct __UTL_PUBLIC_TEMPLATE is_all_three_way_comparable_with :
     details::compare_traits::all_three_way_comparable_with_test_t<T, U, Cat> {};
 
 template <typename T, typename U = T, typename Cat = std::partial_ordering>
-struct UTL_PUBLIC_TEMPLATE is_all_nothrow_three_way_comparable_with :
+struct __UTL_PUBLIC_TEMPLATE is_all_nothrow_three_way_comparable_with :
     details::compare_traits::all_nothrow_three_way_comparable_with_test_t<T, U, Cat> {};
 
 UTL_NAMESPACE_END
@@ -234,10 +233,10 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U = T, typename Cat = void, typename = void>
-struct UTL_PUBLIC_TEMPLATE is_all_three_way_comparable_with : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_all_three_way_comparable_with : false_type {};
 
 template <typename T, typename U = T, typename Cat = void, typename = void>
-struct UTL_PUBLIC_TEMPLATE is_all_nothrow_three_way_comparable_with : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_all_nothrow_three_way_comparable_with : false_type {};
 
 UTL_NAMESPACE_END
 

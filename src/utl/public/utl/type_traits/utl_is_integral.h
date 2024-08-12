@@ -25,16 +25,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_integral)
+#  if __UTL_SHOULD_USE_BUILTIN(is_integral)
 #    define UTL_BUILTIN_is_integral(...) __is_integral(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_integral)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_integral)
 
 #  ifdef UTL_BUILTIN_is_integral
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_integral : bool_constant<UTL_BUILTIN_is_integral(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_integral : bool_constant<UTL_BUILTIN_is_integral(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -48,57 +48,57 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_integral : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral : false_type {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<bool> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<bool> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<char> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<char> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<signed char> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<signed char> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<unsigned char> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<unsigned char> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<wchar_t> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<wchar_t> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<char16_t> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<char16_t> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<char32_t> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<char32_t> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<short> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<short> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<unsigned short> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<unsigned short> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<int> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<int> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<unsigned int> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<unsigned int> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<long> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<long> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<unsigned long> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<unsigned long> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<long long> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<long long> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<unsigned long long> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<unsigned long long> : true_type {};
 
 #    if UTL_SUPPORTS_CHAR8_T
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<char8_t> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<char8_t> : true_type {};
 #    endif
 
 #    ifdef UTL_SUPPORTS_INT128
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<__int128_t> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<__int128_t> : true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_integral<__uint128_t> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<__uint128_t> : true_type {};
 #    endif
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_integral<T const> : is_integral<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<T const> : is_integral<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_integral<T volatile> : is_integral<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<T volatile> : is_integral<T> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_integral<T const volatile> : is_integral<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_integral<T const volatile> : is_integral<T> {};
 
 #    if UTL_CXX14
 template <typename T>

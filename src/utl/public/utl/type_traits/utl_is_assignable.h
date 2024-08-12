@@ -31,16 +31,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_assignable)
+#  if __UTL_SHOULD_USE_BUILTIN(is_assignable)
 #    define UTL_BUILTIN_is_assignable(...) __is_assignable(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_assignable)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_assignable)
 
 #  ifdef UTL_BUILTIN_is_assignable
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_assignable : bool_constant<UTL_BUILTIN_is_assignable(T, U)> {};
+struct __UTL_PUBLIC_TEMPLATE is_assignable : bool_constant<UTL_BUILTIN_is_assignable(T, U)> {};
 
 #    if UTL_CXX14
 template <typename T, typename U>
@@ -60,10 +60,10 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace assignable {
 template <typename T, typename U>
-UTL_HIDE_FROM_ABI auto impl(int) noexcept -> decltype((declval<T>() = declval<U>()), true_type);
+__UTL_HIDE_FROM_ABI auto impl(int) noexcept -> decltype((declval<T>() = declval<U>()), true_type);
 
 template <typename T, typename U>
-UTL_HIDE_FROM_ABI auto impl(float) noexcept -> false_type;
+__UTL_HIDE_FROM_ABI auto impl(float) noexcept -> false_type;
 
 template <typename T, typename U>
 using impl_t UTL_NODEBUG = decltype(impl<T, U>(0));
@@ -71,7 +71,7 @@ using impl_t UTL_NODEBUG = decltype(impl<T, U>(0));
 } // namespace details
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_assignable : details::assignable::impl_t<T, U> {};
+struct __UTL_PUBLIC_TEMPLATE is_assignable : details::assignable::impl_t<T, U> {};
 
 #    if UTL_CXX14
 template <typename T, typename U>

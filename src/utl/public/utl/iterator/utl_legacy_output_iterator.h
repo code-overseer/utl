@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_iterator_concept_t.h"
 #include "utl/type_traits/utl_constants.h"
@@ -18,7 +18,7 @@ concept legacy_output_iterator =
     requires { typename UTL_SCOPE iterator_concept_t<It>; };
 
 template <typename It, typename ValueType>
-struct UTL_PUBLIC_TEMPLATE is_legacy_output_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_legacy_output_iterator :
     bool_constant<legacy_output_iterator<It, ValueType>> {};
 
 template <typename It, typename ValueType>
@@ -40,10 +40,10 @@ namespace details {
 namespace legacy_output_iterator {
 
 template <typename It, typename ValueType>
-UTL_HIDE_FROM_ABI auto check(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto check(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename It, typename ValueType>
-UTL_HIDE_FROM_ABI auto check(
+__UTL_HIDE_FROM_ABI auto check(
     int) noexcept -> UTL_SCOPE conjunction<UTL_SCOPE is_legacy_iterator<It>,
     decltype((*UTL_SCOPE declval<It&>() = UTL_SCOPE declval<ValueType>(), UTL_SCOPE true_type{})),
     UTL_SCOPE is_same<decltype(++UTL_SCOPE declval<It&>()), It&>,
@@ -59,7 +59,7 @@ using implemented UTL_NODEBUG =
 } // namespace details
 
 template <typename It, typename ValueType>
-struct UTL_PUBLIC_TEMPLATE is_legacy_output_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_legacy_output_iterator :
     UTL_SCOPE details::legacy_output_iterator::implemented<It, ValueType> {};
 
 #  if UTL_CXX14

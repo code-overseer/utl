@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_iter_move.h"
 #include "utl/iterator/utl_iter_reference_t.h"
@@ -45,7 +45,7 @@ concept indirectly_readable =
     details::indirectly_readable::concept_impl<UTL_SCOPE remove_cvref_t<T>>;
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_indirectly_readable :
+struct __UTL_PUBLIC_TEMPLATE is_indirectly_readable :
     UTL_SCOPE bool_constant<indirectly_readable<T>> {};
 
 template <typename T>
@@ -60,9 +60,9 @@ namespace details {
 namespace indirectly_readable {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename T>
-UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
     -> UTL_SCOPE always_true_type<UTL_SCOPE iter_value_t<T>, UTL_SCOPE iter_reference_t<T>,
         UTL_SCOPE iter_rvalue_reference_t<T>>;
 

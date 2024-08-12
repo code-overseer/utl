@@ -25,16 +25,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_pointer)
+#  if __UTL_SHOULD_USE_BUILTIN(is_pointer)
 #    define UTL_BUILTIN_is_pointer(...) __is_pointer(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_pointer)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_pointer)
 
 #  ifdef UTL_BUILTIN_is_pointer
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pointer : bool_constant<UTL_BUILTIN_is_pointer(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_pointer : bool_constant<UTL_BUILTIN_is_pointer(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -48,19 +48,19 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pointer : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_pointer : false_type {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pointer<T*> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_pointer<T*> : true_type {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_pointer<T* const> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_pointer<T* const> : true_type {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_pointer<T* volatile> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_pointer<T* volatile> : true_type {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_pointer<T* const volatile> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_pointer<T* const volatile> : true_type {};
 
 #    if UTL_CXX14
 template <typename T>

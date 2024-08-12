@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/concepts/utl_totally_ordered.h"
 #include "utl/type_traits/utl_is_equality_comparable.h"
@@ -16,21 +16,21 @@ UTL_NAMESPACE_BEGIN
 
 #if UTL_CXX20
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_totally_ordered_with :
+struct __UTL_PUBLIC_TEMPLATE is_totally_ordered_with :
     UTL_SCOPE bool_constant<UTL_SCOPE totally_ordered_with<T, U>> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_totally_ordered :
+struct __UTL_PUBLIC_TEMPLATE is_totally_ordered :
     UTL_SCOPE bool_constant<UTL_SCOPE totally_ordered<T>> {};
 
 #else
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_totally_ordered_with :
+struct __UTL_PUBLIC_TEMPLATE is_totally_ordered_with :
     conjunction<is_equality_comparable_with<T, U>, is_inequality_comparable_with<T, U>,
         is_subordinate_comparable_with<T, U>, is_superordinate_comparable_with<T, U>,
         is_strict_subordinate_comparable_with<T, U>,
         is_strict_superordinate_comparable_with<T, U>> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_totally_ordered :
+struct __UTL_PUBLIC_TEMPLATE is_totally_ordered :
     conjunction<is_equality_comparable<T>, is_inequality_comparable<T>,
         is_subordinate_comparable<T>, is_superordinate_comparable<T>,
         is_strict_subordinate_comparable<T>, is_strict_superordinate_comparable<T>> {};

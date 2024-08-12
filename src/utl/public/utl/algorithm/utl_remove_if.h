@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/algorithm/utl_find_if.h"
 #include "utl/concepts/utl_predicate.h"
@@ -32,7 +32,7 @@ using requirement UTL_NODEBUG = UTL_SCOPE conjunction<UTL_SCOPE is_legacy_forwar
 
 template <UTL_CONCEPT_CXX20(forward_iterator) It,
     UTL_CONCEPT_CXX20(predicate<decltype(*UTL_SCOPE declval<It>())>) F>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD)
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD)
 UTL_CONSTEXPR_CXX14 auto remove_if(It first, It last, F&& f)
     -> UTL_ENABLE_IF_CXX11(It, details::remove_if::requirement<It, F>::value) {
     first = UTL_SCOPE find_if(first, last, f);

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/memory/utl_allocator_fwd.h"
 
@@ -12,16 +12,16 @@ UTL_NAMESPACE_BEGIN
 using size_t = decltype(sizeof(0));
 
 template <typename>
-struct UTL_PUBLIC_TEMPLATE char_traits;
+struct __UTL_PUBLIC_TEMPLATE char_traits;
 
 template <typename CharType, typename Traits = char_traits<CharType>>
-class UTL_PUBLIC_TEMPLATE basic_string_view;
+class __UTL_PUBLIC_TEMPLATE basic_string_view;
 template <typename CharType, typename Traits = char_traits<CharType>>
-class UTL_PUBLIC_TEMPLATE basic_zstring_view;
+class __UTL_PUBLIC_TEMPLATE basic_zstring_view;
 
 template <typename CharType, size_t ShortSize, typename Traits = char_traits<CharType>,
     typename Alloc = allocator<CharType>>
-class UTL_PUBLIC_TEMPLATE basic_short_string;
+class __UTL_PUBLIC_TEMPLATE basic_short_string;
 
 namespace details {
 namespace string {

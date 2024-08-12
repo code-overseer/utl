@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include "utl/utl_config.h"
+
 #include "utl/concepts/utl_lvalue_reference.h"
 #include "utl/concepts/utl_rvalue_reference.h"
-#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_is_reference.h"
 
 #if UTL_CXX20

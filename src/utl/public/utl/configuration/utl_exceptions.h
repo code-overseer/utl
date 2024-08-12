@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_compiler.h"
+#include "utl/configuration/utl_compiler.h"
 
 #ifndef _LIBCPP_HAS_NO_EXCEPTIONS
 #  if defined(__cpp_exceptions)

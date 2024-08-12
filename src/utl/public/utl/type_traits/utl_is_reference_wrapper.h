@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_constants.h"
 
@@ -18,13 +18,13 @@ template <typename>
 class reference_wrapper;
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_reference_wrapper : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_reference_wrapper : false_type {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_reference_wrapper<reference_wrapper<T>> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_reference_wrapper<reference_wrapper<T>> : true_type {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_reference_wrapper<::std::reference_wrapper<T>> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_reference_wrapper<::std::reference_wrapper<T>> : true_type {};
 
 #if UTL_CXX14
 template <typename T>

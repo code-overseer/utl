@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
-
-#include "utl/preprocessor/utl_assertion.h"
+#include "utl/utl_config.h"
 
 #include "utl/memory/utl_allocator_fwd.h"
 
+#include "utl/assert/utl_assert.h"
 #include "utl/exception/utl_exception_base.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_is_complete.h"
@@ -18,7 +17,7 @@
 
 UTL_NAMESPACE_BEGIN
 template <typename T>
-class UTL_ABI_PUBLIC allocator {
+class __UTL_ABI_PUBLIC allocator {
 public:
     using value_type = T;
     using size_type = size_t;
@@ -30,27 +29,27 @@ private:
     using result_type UTL_NODEBUG = allocation_result<pointer, size_t>;
 
 public:
-    UTL_HIDE_FROM_ABI constexpr allocator() noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr allocator(allocator const&) noexcept = default;
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 allocator& operator=(allocator const&) noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr allocator() noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr allocator(allocator const&) noexcept = default;
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 allocator& operator=(allocator const&) noexcept = default;
 
     template <typename U>
-    UTL_HIDE_FROM_ABI constexpr allocator(allocator<U> const&) noexcept {}
+    __UTL_HIDE_FROM_ABI constexpr allocator(allocator<U> const&) noexcept {}
     template <typename U>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 allocator& operator=(allocator<U> const&) noexcept {
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 allocator& operator=(allocator<U> const&) noexcept {
         return *this;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX20 pointer allocate(size_type count) UTL_THROWS;
+    UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX20 pointer allocate(size_type count) UTL_THROWS;
 
-    UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX20 result_type allocate_at_least(
+    UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX20 result_type allocate_at_least(
         size_type count) UTL_THROWS {
         return {allocate(count), count};
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void deallocate(pointer pointer, size_type count) noexcept;
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void deallocate(pointer pointer, size_type count) noexcept;
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~allocator() noexcept = default;
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~allocator() noexcept = default;
 };
 UTL_NAMESPACE_END
 
@@ -77,12 +76,12 @@ UTL_INLINE_CXX17 constexpr size_t default_new_alignment = UTL_DEFAULT_NEW_ALIGNM
 UTL_INLINE_CXX17 constexpr size_t default_new_alignment = alignof(max_align_t);
 #endif
 
-UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE, CONST) inline constexpr bool is_overaligned_for_new(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, CONST) inline constexpr bool is_overaligned_for_new(
     size_t alignment) noexcept {
     return alignment > default_new_alignment;
 }
 
-UTL_HIDE_FROM_ABI inline void deallocate(
+__UTL_HIDE_FROM_ABI inline void deallocate(
     void* pointer, size_t size, size_t alignment = default_new_alignment) noexcept {
     if (is_overaligned_for_new(alignment)) {
 #if UTL_SUPPORTS_ALIGNED_ALLOCATION
@@ -107,7 +106,7 @@ UTL_HIDE_FROM_ABI inline void deallocate(
     }
 }
 
-UTL_HIDE_FROM_ABI inline void* allocate(size_t size, size_t alignment = default_new_alignment) {
+__UTL_HIDE_FROM_ABI inline void* allocate(size_t size, size_t alignment = default_new_alignment) {
     if (is_overaligned_for_new(alignment)) {
 #if UTL_SUPPORTS_ALIGNED_ALLOCATION
         align_val_t const align_val = static_cast<align_val_t>(alignment);
@@ -124,12 +123,12 @@ UTL_HIDE_FROM_ABI inline void* allocate(size_t size, size_t alignment = default_
 
 namespace runtime {
 template <typename T>
-UTL_HIDE_FROM_ABI T* allocate(size_t count) {
+__UTL_HIDE_FROM_ABI T* allocate(size_t count) {
     return static_cast<T*>(details::allocate(count * sizeof(T), alignof(T)));
 }
 
 template <typename T>
-UTL_HIDE_FROM_ABI void deallocate(typename type_identity<T>::type* ptr, size_t count) noexcept {
+__UTL_HIDE_FROM_ABI void deallocate(typename type_identity<T>::type* ptr, size_t count) noexcept {
     details::deallocate(ptr, count * sizeof(T), alignof(T));
 }
 } // namespace runtime
@@ -140,7 +139,7 @@ template <typename T>
 inline constinit ::std::allocator<T> allocator_v = {};
 
 template <typename T>
-UTL_HIDE_FROM_ABI constexpr T* allocate(size_t count) {
+__UTL_HIDE_FROM_ABI constexpr T* allocate(size_t count) {
     if (UTL_BUILTIN_is_constant_evaluated()) {
         if constexpr (UTL_TRAIT_is_complete(::std::allocator<T>)) {
             return allocator_v<T>.allocate(count);
@@ -158,7 +157,7 @@ UTL_HIDE_FROM_ABI constexpr T* allocate(size_t count) {
 }
 
 template <typename T>
-UTL_HIDE_FROM_ABI constexpr void deallocate(
+__UTL_HIDE_FROM_ABI constexpr void deallocate(
     typename type_identity<T>::type* ptr, size_t count) noexcept {
     if (UTL_BUILTIN_is_constant_evaluated()) {
         if constexpr (UTL_TRAIT_is_complete(::std::allocator<T>)) {
@@ -178,7 +177,7 @@ UTL_HIDE_FROM_ABI constexpr void deallocate(
 #endif
 } // namespace compile_time
 template <typename T>
-UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void deallocate(
+__UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void deallocate(
     typename type_identity<T>::type* ptr, size_t count) noexcept {
     static_assert(sizeof(T) > 0, "Incomplete type cannot be deallocated");
 #if UTL_CXX20
@@ -189,7 +188,7 @@ UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void deallocate(
 }
 
 template <typename T>
-UTL_ATTRIBUTES(MALLOC, NODISCARD, HIDE_FROM_ABI)
+UTL_ATTRIBUTES(MALLOC, NODISCARD, _HIDE_FROM_ABI)
 UTL_CONSTEXPR_CXX20 T* allocate(size_t count) {
     static_assert(sizeof(T) > 0, "Incomplete type cannot be allocated");
 #if UTL_CXX20

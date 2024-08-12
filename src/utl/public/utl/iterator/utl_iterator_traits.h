@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_iterator_traits_fwd.h"
 
@@ -125,7 +125,7 @@ struct legacy_traits<Iter> : private UTL_SCOPE details::iterator_traits::impl_ta
 } // namespace details
 
 template <details::iterator_traits::simple_iter Iter>
-struct UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
+struct __UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
     private details::iterator_traits::impl_tag<Iter> {
     using difference_type = typename Iter::difference_type;
     using value_type = typename Iter::value_type;
@@ -135,7 +135,7 @@ struct UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
 };
 
 template <details::iterator_traits::non_pointer_iter Iter>
-struct UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
+struct __UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
     private details::iterator_traits::impl_tag<Iter> {
     using difference_type = typename Iter::difference_type;
     using value_type = typename Iter::value_type;
@@ -145,7 +145,7 @@ struct UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
 };
 
 template <object_type T>
-struct UTL_PUBLIC_TEMPLATE iterator_traits<T*> : private details::iterator_traits::impl_tag<T*> {
+struct __UTL_PUBLIC_TEMPLATE iterator_traits<T*> : private details::iterator_traits::impl_tag<T*> {
     using difference_type = pointer_traits<T*>::difference_type;
     using value_type = remove_cv_t<T>;
     using pointer = T*;
@@ -155,7 +155,8 @@ struct UTL_PUBLIC_TEMPLATE iterator_traits<T*> : private details::iterator_trait
 };
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE iterator_traits : private details::iterator_traits::legacy_traits<T> {};
+struct __UTL_PUBLIC_TEMPLATE iterator_traits :
+    private details::iterator_traits::legacy_traits<T> {};
 
 UTL_NAMESPACE_END
 
@@ -201,37 +202,37 @@ struct traits<Iter, true, false> {
 };
 
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto pointer_type(int) noexcept -> typename Iter::pointer;
+__UTL_HIDE_FROM_ABI auto pointer_type(int) noexcept -> typename Iter::pointer;
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto pointer_type(float) noexcept
+__UTL_HIDE_FROM_ABI auto pointer_type(float) noexcept
     -> decltype(UTL_SCOPE declval<Iter&>().operator->());
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto pointer_type(...) noexcept -> void;
+__UTL_HIDE_FROM_ABI auto pointer_type(...) noexcept -> void;
 
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto reference_type(int) noexcept -> typename Iter::reference;
+__UTL_HIDE_FROM_ABI auto reference_type(int) noexcept -> typename Iter::reference;
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto reference_type(float) noexcept -> UTL_SCOPE iter_reference_t<Iter>;
+__UTL_HIDE_FROM_ABI auto reference_type(float) noexcept -> UTL_SCOPE iter_reference_t<Iter>;
 
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto category_type(int, int) noexcept
+__UTL_HIDE_FROM_ABI auto category_type(int, int) noexcept
     -> UTL_SCOPE enable_if_t<UTL_TRAIT_is_legacy_random_access_iterator(Iter),
         UTL_SCOPE random_access_iterator_tag>;
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto category_type(int, float) noexcept
+__UTL_HIDE_FROM_ABI auto category_type(int, float) noexcept
     -> UTL_SCOPE enable_if_t<UTL_TRAIT_is_legacy_bidirectional_iterator(Iter),
         UTL_SCOPE bidirectional_iterator_tag>;
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto category_type(float, float) noexcept -> UTL_SCOPE
+__UTL_HIDE_FROM_ABI auto category_type(float, float) noexcept -> UTL_SCOPE
     enable_if_t<UTL_TRAIT_is_legacy_forward_iterator(Iter), UTL_SCOPE forward_iterator_tag>;
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto category_type(...) noexcept -> UTL_SCOPE input_iterator_tag;
+__UTL_HIDE_FROM_ABI auto category_type(...) noexcept -> UTL_SCOPE input_iterator_tag;
 
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto difference_type(int) noexcept ->
+__UTL_HIDE_FROM_ABI auto difference_type(int) noexcept ->
     typename UTL_SCOPE incrementable_traits<Iter>::difference_type;
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto difference_type(float) noexcept -> void;
+__UTL_HIDE_FROM_ABI auto difference_type(float) noexcept -> void;
 
 template <typename Iter, bool = UTL_TRAIT_is_legacy_input_iterator(Iter),
     bool = UTL_TRAIT_is_legacy_iterator(Iter)>
@@ -275,12 +276,12 @@ struct pointer_impl<T*, true> {
 } // namespace details
 
 template <typename Iter>
-struct UTL_PUBLIC_TEMPLATE iterator_traits :
+struct __UTL_PUBLIC_TEMPLATE iterator_traits :
     details::iterator_traits::traits<Iter>,
     private details::iterator_traits::impl_tag<Iter> {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE iterator_traits<T*> :
+struct __UTL_PUBLIC_TEMPLATE iterator_traits<T*> :
     details::iterator_traits::pointer_impl<T*>,
     private details::iterator_traits::impl_tag<T*> {};
 

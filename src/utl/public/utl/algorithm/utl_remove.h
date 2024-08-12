@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_iterator_traits_fwd.h"
 
@@ -19,10 +19,10 @@ namespace remove {
 template <typename T>
 struct equality_t : private equal_to<void> {
 
-    UTL_HIDE_FROM_ABI explicit constexpr equality_t(T const& value) noexcept : value(value) {}
+    __UTL_HIDE_FROM_ABI explicit constexpr equality_t(T const& value) noexcept : value(value) {}
 
     template <typename U>
-    UTL_HIDE_FROM_ABI constexpr bool operator()(U&& u) const
+    __UTL_HIDE_FROM_ABI constexpr bool operator()(U&& u) const
         noexcept(noexcept(equal_to<void>::operator()(UTL_SCOPE forward<U>(u), value))) {
         return equal_to<void>::operator()(UTL_SCOPE forward<U>(u), value);
     }
@@ -34,7 +34,7 @@ struct equality_t : private equal_to<void> {
 
 template <
     UTL_CONCEPT_CXX20(forward_iterator) It, typename T = typename iterator_traits<It>::value_type>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD) constexpr It remove(It first, It last, T const& val) {
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr It remove(It first, It last, T const& val) {
     static_assert(UTL_TRAIT_is_invocable(equal_to<void>, decltype(*first), T const&),
         "Arguments must be comparable");
     return UTL_SCOPE remove_if(first, last, details::remove::equality_t<T>{val});

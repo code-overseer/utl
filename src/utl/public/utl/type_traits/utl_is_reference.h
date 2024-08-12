@@ -29,16 +29,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_reference)
+#  if __UTL_SHOULD_USE_BUILTIN(is_reference)
 #    define UTL_BUILTIN_is_reference(...) __is_reference(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_reference)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_reference)
 
 #  ifdef UTL_BUILTIN_is_reference
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_reference : bool_constant<UTL_BUILTIN_is_reference(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_reference : bool_constant<UTL_BUILTIN_is_reference(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -52,13 +52,13 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_reference : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_reference : false_type {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_reference<T&> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_reference<T&> : true_type {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_reference<T&&> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_reference<T&&> : true_type {};
 
 #    if UTL_CXX14
 template <typename T>

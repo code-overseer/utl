@@ -2,8 +2,9 @@
 
 #pragma once
 
+#include "utl/utl_config.h"
+
 #include "utl/concepts/utl_relation.h"
-#include "utl/preprocessor/utl_config.h"
 
 #if UTL_CXX20
 UTL_NAMESPACE_BEGIN

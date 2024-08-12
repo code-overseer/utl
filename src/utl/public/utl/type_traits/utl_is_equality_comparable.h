@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_declval.h"
@@ -17,15 +17,15 @@ using result_t UTL_NODEBUG = decltype(UTL_SCOPE declval<T>() == UTL_SCOPE declva
 
 template <typename T, typename U UTL_REQUIRES_CXX11(UTL_TRAIT_is_boolean_testable(result_t<T, U>))>
 UTL_REQUIRES_CXX20(UTL_TRAIT_is_boolean_testable(result_t<T, U>))
-UTL_HIDE_FROM_ABI UTL_SCOPE true_type impl(int) noexcept;
+__UTL_HIDE_FROM_ABI UTL_SCOPE true_type impl(int) noexcept;
 template <typename T, typename U>
-UTL_HIDE_FROM_ABI UTL_SCOPE false_type impl(float) noexcept;
+__UTL_HIDE_FROM_ABI UTL_SCOPE false_type impl(float) noexcept;
 template <typename T, typename U UTL_REQUIRES_CXX11(
     UTL_TRAIT_is_nothrow_boolean_testable(result_t<T, U>))>
 UTL_REQUIRES_CXX20(UTL_TRAIT_is_nothrow_boolean_testable(result_t<T, U>))
-UTL_HIDE_FROM_ABI UTL_SCOPE true_type nothrow_check(int) noexcept;
+__UTL_HIDE_FROM_ABI UTL_SCOPE true_type nothrow_check(int) noexcept;
 template <typename T, typename U>
-UTL_HIDE_FROM_ABI UTL_SCOPE false_type nothrow_check(float) noexcept;
+__UTL_HIDE_FROM_ABI UTL_SCOPE false_type nothrow_check(float) noexcept;
 
 template <typename T, typename U>
 using impl_t UTL_NODEBUG = decltype(impl<T, U>(0));
@@ -35,16 +35,16 @@ using nothrow_t UTL_NODEBUG = decltype(nothrow_check<T, U>(0));
 } // namespace details
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_equality_comparable_with :
+struct __UTL_PUBLIC_TEMPLATE is_equality_comparable_with :
     details::equality_comparable::impl_t<T, U> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_equality_comparable : details::equality_comparable::impl_t<T, T> {};
+struct __UTL_PUBLIC_TEMPLATE is_equality_comparable : details::equality_comparable::impl_t<T, T> {};
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_equality_comparable_with :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_equality_comparable_with :
     details::equality_comparable::nothrow_t<T, U> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_equality_comparable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_equality_comparable :
     details::equality_comparable::nothrow_t<T, T> {};
 
 #if UTL_CXX14

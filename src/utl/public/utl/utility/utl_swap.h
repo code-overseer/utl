@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #if UTL_USE_STD_swap
 
@@ -24,7 +24,7 @@ UTL_NAMESPACE_BEGIN
 
 template <typename T>
 requires requires(T& l, T& r) { ranges::swap(l, r); }
-UTL_HIDE_FROM_ABI inline constexpr void swap(T& l, T& r) noexcept(noexcept(ranges::swap(l, r))) {
+__UTL_HIDE_FROM_ABI inline constexpr void swap(T& l, T& r) noexcept(noexcept(ranges::swap(l, r))) {
     ranges::swap(l, r);
 }
 
@@ -35,7 +35,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-UTL_HIDE_FROM_ABI inline constexpr auto swap(T& l, T& r) noexcept(noexcept(ranges::swap(l, r)))
+__UTL_HIDE_FROM_ABI inline constexpr auto swap(T& l, T& r) noexcept(noexcept(ranges::swap(l, r)))
     -> decltype(ranges::swap(l, r)) {
     ranges::swap(l, r);
 }

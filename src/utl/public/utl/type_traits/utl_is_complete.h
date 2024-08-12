@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_constants.h"
 
@@ -14,16 +13,16 @@ namespace details {
 using size_t = decltype(sizeof(0));
 
 template <typename T, size_t = sizeof(T)>
-UTL_HIDE_FROM_ABI true_type is_complete(int);
+__UTL_HIDE_FROM_ABI true_type is_complete(int);
 
 template <typename T>
-UTL_HIDE_FROM_ABI false_type is_complete(float);
+__UTL_HIDE_FROM_ABI false_type is_complete(float);
 
 } // namespace details
 } // namespace type_traits
 
 template <typename T, typename R = decltype(type_traits::details::is_complete<T>(0))>
-struct UTL_PUBLIC_TEMPLATE is_complete : R {};
+struct __UTL_PUBLIC_TEMPLATE is_complete : R {};
 
 #if UTL_CXX14
 template <typename T, typename R = decltype(type_traits::details::is_complete<T>(0))>

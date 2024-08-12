@@ -27,16 +27,16 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(remove_pointer)
+#  if __UTL_SHOULD_USE_BUILTIN(remove_pointer)
 #    define UTL_BUILTIN_remove_pointer(...) __remove_pointer(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(remove_pointer)
+#  endif // __UTL_SHOULD_USE_BUILTIN(remove_pointer)
 
 #  ifdef UTL_BUILTIN_remove_pointer
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_pointer {
+struct __UTL_PUBLIC_TEMPLATE remove_pointer {
     using type UTL_NODEBUG = UTL_BUILTIN_remove_pointer(T);
 };
 
@@ -50,23 +50,23 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_pointer {
+struct __UTL_PUBLIC_TEMPLATE remove_pointer {
     using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_pointer<T*> {
+struct __UTL_PUBLIC_TEMPLATE remove_pointer<T*> {
     using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_pointer<T* const> {
+struct __UTL_PUBLIC_TEMPLATE remove_pointer<T* const> {
     using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_pointer<T* volatile> {
+struct __UTL_PUBLIC_TEMPLATE remove_pointer<T* volatile> {
     using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_pointer<T* const volatile> {
+struct __UTL_PUBLIC_TEMPLATE remove_pointer<T* const volatile> {
     using type UTL_NODEBUG = T;
 };
 

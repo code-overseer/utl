@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/concepts/utl_constructible_as.h"
 #include "utl/exception/utl_exception_base.h"
@@ -15,7 +15,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-class UTL_PUBLIC_TEMPLATE basic_exception;
+class __UTL_PUBLIC_TEMPLATE basic_exception;
 
 /**
  * @brief Specialization of basic_exception for void type, inheriting from exception.
@@ -25,7 +25,7 @@ class UTL_PUBLIC_TEMPLATE basic_exception;
  * formatted messages and source location tracking.
  */
 template <>
-class UTL_PUBLIC_TEMPLATE basic_exception<void> : public exception {
+class __UTL_PUBLIC_TEMPLATE basic_exception<void> : public exception {
 
 public:
     /**
@@ -37,7 +37,7 @@ public:
      * @param fmt The message format object containing the format string and source location.
      * @param ... Variadic arguments for the message format.
      */
-    UTL_HIDE_FROM_ABI explicit basic_exception(exceptions::message_format fmt, ...)
+    __UTL_HIDE_FROM_ABI explicit basic_exception(exceptions::message_format fmt, ...)
         : location_(fmt.location) {
         va_list args;
         va_start(args, fmt);
@@ -53,7 +53,7 @@ public:
      *
      * @return The message string.
      */
-    UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI_VIRTUAL) char const* what() const noexcept UTL_ATTRIBUTE(
+    UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI_VIRTUAL) char const* what() const noexcept UTL_ATTRIBUTE(
         LIFETIMEBOUND) final {
         return messages_.top().message();
     }
@@ -67,7 +67,7 @@ public:
      * @param fmt The message format object containing the format string.
      * @param ... Variadic arguments for the message format.
      */
-    UTL_HIDE_FROM_ABI void emplace_message(exceptions::message_format fmt, ...) {
+    __UTL_HIDE_FROM_ABI void emplace_message(exceptions::message_format fmt, ...) {
         va_list args;
         va_start(args, fmt);
         messages_.emplace(UTL_SCOPE move(fmt), args);
@@ -81,7 +81,7 @@ public:
      *
      * @return The message stack.
      */
-    UTL_HIDE_FROM_ABI constexpr exceptions::message_stack const& messages() const {
+    __UTL_HIDE_FROM_ABI constexpr exceptions::message_stack const& messages() const {
         return messages_;
     }
 
@@ -102,7 +102,7 @@ private:
  * @tparam T The type of data to be associated with the exception.
  */
 template <typename T>
-class UTL_PUBLIC_TEMPLATE basic_exception : public basic_exception<void> {
+class __UTL_PUBLIC_TEMPLATE basic_exception : public basic_exception<void> {
     using base_type = basic_exception<void>;
 
 public:
@@ -120,8 +120,8 @@ public:
      */
     template <UTL_CONCEPT_CXX20(constructible_as<T>) U, typename... Args UTL_REQUIRES_CXX11(
         is_constructible<T, U>::value)>
-    UTL_HIDE_FROM_ABI basic_exception(U&& u, exceptions::message_format fmt, Args... args) noexcept(
-        UTL_TRAIT_is_nothrow_constructible(T, U))
+    __UTL_HIDE_FROM_ABI basic_exception(U&& u, exceptions::message_format fmt,
+        Args... args) noexcept(UTL_TRAIT_is_nothrow_constructible(T, U))
         : base_type(UTL_SCOPE move(fmt), args...)
         , data_(UTL_SCOPE forward<U>(u)) {}
 
@@ -132,7 +132,7 @@ public:
      *
      * @return The constant reference to the data.
      */
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) T const& data() const& noexcept UTL_ATTRIBUTE(
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) T const& data() const& noexcept UTL_ATTRIBUTE(
         LIFETIMEBOUND) {
         return data_;
     }
@@ -144,7 +144,7 @@ public:
      *
      * @return The constant rvalue reference to the data.
      */
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) T const&& data() const&& noexcept UTL_ATTRIBUTE(
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) T const&& data() const&& noexcept UTL_ATTRIBUTE(
         LIFETIMEBOUND) {
         return data_;
     }
@@ -156,7 +156,7 @@ public:
      *
      * @return The reference to the data.
      */
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) T& data() & noexcept UTL_ATTRIBUTE(
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) T& data() & noexcept UTL_ATTRIBUTE(
         LIFETIMEBOUND) {
         return data_;
     }
@@ -168,7 +168,7 @@ public:
      *
      * @return The rvalue reference to the data.
      */
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)T&& data() && noexcept UTL_ATTRIBUTE(
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI)T&& data() && noexcept UTL_ATTRIBUTE(
         LIFETIMEBOUND) {
         return data_;
     }
@@ -179,7 +179,7 @@ private:
 
 namespace exceptions {
 template <typename Tag, typename Base = basic_exception<void>>
-class UTL_PUBLIC_TEMPLATE alias : public Base {
+class __UTL_PUBLIC_TEMPLATE alias : public Base {
     static_assert(UTL_TRAIT_is_base_of(basic_exception<void>, Base), "Invalid base argument");
 
 public:

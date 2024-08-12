@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attributes.h"
+#include "utl/utl_config.h"
 
 #include "utl/compare/utl_compare_fwd.h"
 
@@ -10,10 +10,10 @@
 
 UTL_NAMESPACE_BEGIN
 
-#define __UTL_ATTRIBUTE_COMPARE_API (NODISCARD)(CONST)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_COMPARE_API (NODISCARD)(CONST)(ALWAYS_INLINE)__UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_COMPARE_API
 
-class UTL_ABI_PUBLIC partial_ordering :
+class __UTL_ABI_PUBLIC partial_ordering :
     details::compare::less_value<partial_ordering>,
     details::compare::equivalent_value<partial_ordering>,
     details::compare::greater_value<partial_ordering>,
@@ -38,14 +38,14 @@ public:
 
 #if UTL_CXX20
     template <same_as<std::partial_ordering> T>
-    UTL_HIDE_FROM_ABI constexpr partial_ordering(T p) noexcept
+    __UTL_HIDE_FROM_ABI constexpr partial_ordering(T p) noexcept
         : value(p == T::less           ? less
                   : p == T::equivalent ? equivalent
                   : p == T::greater    ? greater
                                        : unordered) {}
 
     template <same_as<std::partial_ordering> T>
-    UTL_HIDE_FROM_ABI constexpr operator T() noexcept {
+    __UTL_HIDE_FROM_ABI constexpr operator T() noexcept {
         return *this == less      ? T::less
             : *this == equivalent ? T::equivalent
             : *this == greater    ? T::greater
@@ -53,11 +53,12 @@ public:
     }
 #endif
 
-    UTL_HIDE_FROM_ABI constexpr partial_ordering(partial_ordering const&) noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr partial_ordering(partial_ordering&&) noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr partial_ordering& operator=(
+    __UTL_HIDE_FROM_ABI constexpr partial_ordering(partial_ordering const&) noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr partial_ordering(partial_ordering&&) noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr partial_ordering& operator=(
         partial_ordering const&) noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr partial_ordering& operator=(partial_ordering&&) noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr partial_ordering& operator=(
+        partial_ordering&&) noexcept = default;
 
     UTL_ATTRIBUTE(COMPARE_API) friend constexpr bool operator==(
         partial_ordering l, partial_ordering r) noexcept {
@@ -115,9 +116,9 @@ public:
 #endif
 
 private:
-    UTL_HIDE_FROM_ABI constexpr explicit partial_ordering(order_t value) noexcept
+    __UTL_HIDE_FROM_ABI constexpr explicit partial_ordering(order_t value) noexcept
         : value(value_t(value)) {}
-    UTL_HIDE_FROM_ABI constexpr explicit partial_ordering(unorder_t value) noexcept
+    __UTL_HIDE_FROM_ABI constexpr explicit partial_ordering(unorder_t value) noexcept
         : value(value_t(unorder_t::unordered)) {}
 
     value_t value;

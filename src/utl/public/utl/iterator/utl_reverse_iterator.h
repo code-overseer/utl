@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_iter_difference_t.h"
 #include "utl/iterator/utl_iter_move.h"
@@ -76,20 +76,20 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace reverse_iterator {
 template <typename T>
-UTL_HIDE_FROM_ABI auto get_concept(int) noexcept
+__UTL_HIDE_FROM_ABI auto get_concept(int) noexcept
     -> UTL_SCOPE enable_if_t<UTL_TRAIT_is_legacy_random_access_iterator(T),
         UTL_SCOPE random_access_iterator_tag>;
 template <typename T>
-UTL_HIDE_FROM_ABI auto get_concept(float) noexcept -> UTL_SCOPE bidirectional_iterator_tag;
+__UTL_HIDE_FROM_ABI auto get_concept(float) noexcept -> UTL_SCOPE bidirectional_iterator_tag;
 template <typename T>
 using concept_type_t UTL_NODEBUG = decltype(UTL_SCOPE details::reverse_iterator::get_concept<T>(0));
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto get_category(int) noexcept -> UTL_SCOPE enable_if_t<
+__UTL_HIDE_FROM_ABI auto get_category(int) noexcept -> UTL_SCOPE enable_if_t<
     UTL_SCOPE details::iterator_concept::implements<UTL_SCOPE random_access_iterator_tag, T>::value,
     UTL_SCOPE random_access_iterator_tag>;
 template <typename T>
-UTL_HIDE_FROM_ABI auto get_category(float) noexcept -> T;
+__UTL_HIDE_FROM_ABI auto get_category(float) noexcept -> T;
 
 template <typename T>
 using category_type_t UTL_NODEBUG =
@@ -102,7 +102,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename It>
-class UTL_PUBLIC_TEMPLATE reverse_iterator {
+class __UTL_PUBLIC_TEMPLATE reverse_iterator {
 private:
     static_assert(UTL_TRAIT_is_legacy_bidirectional_iterator(It), "Non-reversible iterator");
     using traits_type UTL_NODEBUG = iterator_traits<It>;
@@ -131,62 +131,62 @@ private:
 
     template <UTL_CONCEPT_CXX20(legacy_random_access_iterator) I UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_random_access_iterator(I))>
-    UTL_HIDE_FROM_ABI static constexpr auto subscript(I const& current,
+    __UTL_HIDE_FROM_ABI static constexpr auto subscript(I const& current,
         difference_type idx) noexcept(UTL_TRAIT_is_nothrow_subscriptable(I, difference_type))
         -> decltype(UTL_SCOPE declval<I const&>()[idx]) {
         return current[-idx - 1];
     }
 
-    UTL_HIDE_FROM_ABI static constexpr int subscript(
+    __UTL_HIDE_FROM_ABI static constexpr int subscript(
         iterator_type const&, inaccessible_t) noexcept {
         return 0;
     }
 
     template <typename I UTL_REQUIRES_CXX11(UTL_TRAIT_is_pointer(I))>
     UTL_REQUIRES_CXX20(is_pointer_v<I>)
-    UTL_HIDE_FROM_ABI static constexpr auto redirect(I current, int) noexcept -> I {
+    __UTL_HIDE_FROM_ABI static constexpr auto redirect(I current, int) noexcept -> I {
         return current - 1;
     }
 
     template <typename I, bool NoThrow = noexcept(UTL_SCOPE declval<I>().operator->())>
-    UTL_HIDE_FROM_ABI static constexpr auto redirect(I const& current, unsigned int) noexcept(
+    __UTL_HIDE_FROM_ABI static constexpr auto redirect(I const& current, unsigned int) noexcept(
         NoThrow) -> decltype(current.operator->()) {
         return UTL_SCOPE prev(current).operator->();
     }
 
     template <typename I>
-    UTL_HIDE_FROM_ABI static constexpr pointer redirect(I const&, unsigned short) noexcept {
+    __UTL_HIDE_FROM_ABI static constexpr pointer redirect(I const&, unsigned short) noexcept {
         return 0;
     }
 
 public:
-    UTL_HIDE_FROM_ABI constexpr reverse_iterator() noexcept(
+    __UTL_HIDE_FROM_ABI constexpr reverse_iterator() noexcept(
         UTL_TRAIT_is_nothrow_default_constructible(iterator_type))
         : current() {}
-    UTL_HIDE_FROM_ABI constexpr explicit reverse_iterator(iterator_type it) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr explicit reverse_iterator(iterator_type it) noexcept(
         UTL_TRAIT_is_nothrow_copy_constructible(iterator_type))
         : current(it) {}
-    UTL_HIDE_FROM_ABI constexpr reverse_iterator(reverse_iterator const&) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr reverse_iterator(reverse_iterator const&) noexcept(
         UTL_TRAIT_is_nothrow_copy_constructible(iterator_type)) = default;
-    UTL_HIDE_FROM_ABI constexpr reverse_iterator(reverse_iterator&&) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr reverse_iterator(reverse_iterator&&) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(iterator_type)) = default;
     template <typename U UTL_REQUIRES_CXX11(
         !UTL_TRAIT_is_same(U, iterator_type) && UTL_TRAIT_is_convertible(U const&, iterator_type))>
     UTL_REQUIRES_CXX20(!same_as<U, iterator_type> && convertible_to<U const&, iterator_type>)
-    UTL_HIDE_FROM_ABI constexpr reverse_iterator(reverse_iterator<U> const& it) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr reverse_iterator(reverse_iterator<U> const& it) noexcept(
         UTL_TRAIT_is_nothrow_convertible(U const&, iterator_type))
         : current(it.base()) {}
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reverse_iterator& operator=(reverse_iterator const&) noexcept(
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reverse_iterator& operator=(reverse_iterator const&) noexcept(
         UTL_TRAIT_is_nothrow_copy_assignable(iterator_type)) = default;
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reverse_iterator& operator=(reverse_iterator&&) noexcept(
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reverse_iterator& operator=(reverse_iterator&&) noexcept(
         UTL_TRAIT_is_nothrow_move_assignable(iterator_type)) = default;
     template <typename U UTL_REQUIRES_CXX11(!UTL_TRAIT_is_same(U, iterator_type) &&
         UTL_TRAIT_is_convertible(U const&, iterator_type) &&
         UTL_TRAIT_is_assignable(iterator_type&, U const&))>
     UTL_REQUIRES_CXX20(!same_as<U, iterator_type> && convertible_to<U const&, iterator_type> &&
         assignable_from<iterator_type&, U const&>)
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reverse_iterator&
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reverse_iterator&
     operator=(reverse_iterator<U> const& it) noexcept(
         UTL_TRAIT_is_nothrow_convertible(U const&, iterator_type) &&
         UTL_TRAIT_is_nothrow_assignable(iterator_type&, U const&)) {
@@ -194,19 +194,19 @@ public:
         return *this;
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, FLATTEN) constexpr auto operator[](offset_t idx) const noexcept(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, FLATTEN) constexpr auto operator[](offset_t idx) const noexcept(
         noexcept(subscript(this->current, idx))) -> decltype(subscript(this->current, idx)) {
         return subscript(this->current, idx);
     }
 
     void operator[](invalid_offset_t idx) const = delete;
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, FLATTEN) constexpr reference operator*() const
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, FLATTEN) constexpr reference operator*() const
         noexcept(noexcept(*UTL_SCOPE prev(this->current))) {
         return *UTL_SCOPE prev(this->current);
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, FLATTEN) constexpr pointer operator->() const
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, FLATTEN) constexpr pointer operator->() const
         noexcept(noexcept(redirect(this->current, 0u)))
         UTL_REQUIRES_CXX20(UTL_SCOPE is_pointer_v<iterator_type> ||
         requires(iterator_type const i) { i.operator->(); })
@@ -214,55 +214,55 @@ public:
         return redirect(this->current, 0u);
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN)
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, FLATTEN)
     UTL_CONSTEXPR_CXX14 reverse_iterator& operator++() noexcept(
         noexcept(--this->current)) {
         return --this->current, *this;
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN)
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, FLATTEN)
     UTL_CONSTEXPR_CXX14 reverse_iterator operator++(int) noexcept(
         noexcept(reverse_iterator(this->current--))) {
         return reverse_iterator(current--);
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN)
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, FLATTEN)
     UTL_CONSTEXPR_CXX14 reverse_iterator& operator--() noexcept(
         noexcept(++this->current)) {
         return ++this->current, *this;
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN)
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, FLATTEN)
     UTL_CONSTEXPR_CXX14 reverse_iterator operator--(int) noexcept(
         noexcept(reverse_iterator(this->current++))) {
         return reverse_iterator(this->current++);
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN, NODISCARD) constexpr reverse_iterator operator+(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, FLATTEN, NODISCARD) constexpr reverse_iterator operator+(
         difference_type n) const noexcept(noexcept(UTL_SCOPE prev(this->current))) {
         return reverse_iterator(UTL_SCOPE prev(this->current, n));
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN, NODISCARD) constexpr reverse_iterator operator-(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, FLATTEN, NODISCARD) constexpr reverse_iterator operator-(
         difference_type n) const noexcept(noexcept(UTL_SCOPE next(this->current))) {
         return reverse_iterator(UTL_SCOPE next(this->current, n));
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN)
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, FLATTEN)
     UTL_CONSTEXPR_CXX14 reverse_iterator& operator+=(difference_type n) noexcept(
         noexcept(UTL_SCOPE prev(this->current))) {
         current = UTL_SCOPE prev(this->current, n);
         return *this;
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, FLATTEN)
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, FLATTEN)
     UTL_CONSTEXPR_CXX14 reverse_iterator& operator-=(difference_type n) noexcept(
         noexcept(UTL_SCOPE next(this->current))) {
         current = UTL_SCOPE next(this->current, n);
         return *this;
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) friend constexpr UTL_SCOPE iter_rvalue_reference_t<iterator_type>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) friend constexpr UTL_SCOPE iter_rvalue_reference_t<iterator_type>
     iter_move(reverse_iterator const& it) noexcept(
         UTL_TRAIT_is_nothrow_copy_constructible(iterator_type) && noexcept(
             UTL_SCOPE ranges::iter_move(--UTL_SCOPE declval<iterator_type&>()))) {
@@ -271,7 +271,7 @@ public:
     }
 
     template <typename It2>
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) friend constexpr void
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) friend constexpr void
     iter_swap(reverse_iterator const& lhs, reverse_iterator<It2> const& rhs) noexcept(
         UTL_TRAIT_is_nothrow_copy_constructible(iterator_type) &&
         UTL_TRAIT_is_nothrow_copy_constructible(It2) && noexcept(UTL_SCOPE ranges::iter_swap(
@@ -281,7 +281,7 @@ public:
         UTL_SCOPE ranges::iter_swap(--l, --r);
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, PURE) constexpr iterator_type base() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, PURE) constexpr iterator_type base() const noexcept {
         return current;
     }
 
@@ -290,7 +290,7 @@ protected:
 };
 
 template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_bidirectional_iterator) It>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD) constexpr UTL_SCOPE reverse_iterator<It> make_reverse_iterator(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr UTL_SCOPE reverse_iterator<It> make_reverse_iterator(
     It it) noexcept(UTL_TRAIT_is_nothrow_constructible(UTL_SCOPE reverse_iterator<It>, It)) {
     static_assert(UTL_TRAIT_is_legacy_bidirectional_iterator(It),
         "Iterator type must be a bidirectional iterator");
@@ -303,14 +303,14 @@ explicit reverse_iterator(It) -> reverse_iterator<It>;
 #endif
 
 template <typename It>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr reverse_iterator<It> operator+(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr reverse_iterator<It> operator+(
     typename reverse_iterator<It>::difference_type n,
     reverse_iterator<It> it) noexcept(noexcept(it + n)) {
     return it + n;
 }
 
 template <typename It>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr reverse_iterator<It> operator-(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr reverse_iterator<It> operator-(
     typename reverse_iterator<It>::difference_type n,
     reverse_iterator<It> it) noexcept(noexcept(it - n)) {
     return it - n;
@@ -318,7 +318,7 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr reverse_iterat
 
 template <typename It1, typename It2>
 UTL_REQUIRES_CXX20(requires(It1 l, It2 r) { l == r; })
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator==(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_equality_comparable_with(decltype(l.base()), decltype(r.base()))) -> 
     UTL_ENABLE_IF_CXX11(bool, UTL_TRAIT_is_equality_comparable_with(decltype(l.base()), decltype(r.base()))) {
@@ -327,7 +327,7 @@ operator==(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexc
 
 template <typename It1, typename It2>
 UTL_REQUIRES_CXX20(requires(It1 l, It2 r) { l != r; })
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator!=(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_inequality_comparable_with(decltype(l.base()), decltype(r.base())))
     -> UTL_ENABLE_IF_CXX11(
@@ -337,7 +337,7 @@ operator!=(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexc
 
 template <typename It1, typename It2>
 UTL_REQUIRES_CXX20(requires(It1 l, It2 r) { l < r; })
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator<(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_strict_subordinate_comparable_with(decltype(l.base()), decltype(r.base())))
     -> UTL_ENABLE_IF_CXX11(bool,
@@ -347,7 +347,7 @@ operator<(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexce
 
 template <typename It1, typename It2>
 UTL_REQUIRES_CXX20(requires(It1 l, It2 r) { l > r; })
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator>(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_strict_superordinate_comparable_with(
         decltype(l.base()), decltype(r.base()))) -> UTL_ENABLE_IF_CXX11(bool,
@@ -357,7 +357,7 @@ operator>(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexce
 
 template <typename It1, typename It2>
 UTL_REQUIRES_CXX20(requires(It1 l, It2 r) { l <= r; })
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator<=(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_subordinate_comparable_with(decltype(l.base()), decltype(r.base())))
     -> UTL_ENABLE_IF_CXX11(
@@ -367,7 +367,7 @@ operator<=(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexc
 
 template <typename It1, typename It2>
 UTL_REQUIRES_CXX20(requires(It1 l, It2 r) { l >= r; })
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator>=(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_superordinate_comparable_with(decltype(l.base()), decltype(r.base())))
     -> UTL_ENABLE_IF_CXX11(
@@ -378,7 +378,7 @@ operator>=(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexc
 #if UTL_CXX20
 template <typename It1, typename It2>
 UTL_REQUIRES_CXX20(requires(It1 l, It2 r) { l <=> r; })
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator<=>(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_three_way_comparable_with(decltype(l.base()), decltype(r.base())))
     -> UTL_ENABLE_IF_CXX11(

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/concepts/utl_complete_type.h"
 #include "utl/concepts/utl_implicit_lifetime.h"
@@ -53,7 +53,7 @@ namespace lifetime {
  * @param p - pointer to memory location to entangle
  * @param n - size of implicit lifetime object
  */
-UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline void* entangle_storage(void* p, size_t n) noexcept {
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline void* entangle_storage(void* p, size_t n) noexcept {
 #if __UTL_ENTANGLE_MEMMOVE_IMPL
     /* UTL_UNDEFINED_BEHAVIOUR */
     // May be undefined behaviour if p points to a const object with automatic, static or
@@ -79,7 +79,7 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline void* entangle_storage(void* 
  * @tparam N - size of implicit lifetime object
  */
 template <size_t N>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline void* entangle_storage(void* p) noexcept {
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline void* entangle_storage(void* p) noexcept {
     using byte_type = unsigned char;
 #if __UTL_ENTANGLE_MEMMOVE_IMPL
     /* UTL_UNDEFINED_BEHAVIOUR */
@@ -119,7 +119,7 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline void* entangle_storage(void* 
  * @param p - pointer to storage location
  */
 template <typename T>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline T* collapse(void* p) noexcept {
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline T* collapse(void* p) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_launder)
     return __builtin_launder(reinterpret_cast<T*>(p));
 #else
@@ -140,7 +140,7 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline T* collapse(void* p) noexcept
  * @param n - size of the array
  */
 template <typename T>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline T* collapse_array(void* p, size_t n) noexcept {
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline T* collapse_array(void* p, size_t n) noexcept {
     if (n == 1) {
 #if UTL_HAS_BUILTIN(__builtin_launder)
         return *__builtin_launder(reinterpret_cast<T(*)[1]>(p));
@@ -167,7 +167,7 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline T* collapse_array(void* p, si
  * @param p - storage location in which to (re-)start the lifetime of type T
  */
 template <typename T>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline T* start_as(void* p) noexcept {
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline T* start_as(void* p) noexcept {
     auto bytes = entangle_storage<sizeof(T)>(p);
     return collapse(bytes);
 }
@@ -188,7 +188,7 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline T* start_as(void* p) noexcept
  * @param p - storage location in which to (re-)start the lifetime of type T[n]
  */
 template <typename T>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline T* start_as_array(void* p, size_t n) noexcept {
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline T* start_as_array(void* p, size_t n) noexcept {
     if (!n) {
         return reinterpret_cast<T*>(p);
     }
@@ -200,53 +200,53 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline T* start_as_array(void* p, si
 } // namespace details
 
 #undef UTL_START_LIFETIME_OPTIMIZE
-#undef UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API)
-#define UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) UTL_ATTRIBUTES(NODISCARD, ALWAYS_INLINE)
+#undef UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API)
+#define UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) UTL_ATTRIBUTES(NODISCARD, ALWAYS_INLINE)
 
 template <UTL_CONCEPT_CXX20(implicit_lifetime) T>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(
     T*, UTL_TRAIT_is_implicit_lifetime(T)) start_lifetime_as(void* p) noexcept {
     return details::lifetime::start_as<T>(p);
 }
 
 template <UTL_CONCEPT_CXX20(implicit_lifetime) T>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(
     T const*, UTL_TRAIT_is_implicit_lifetime(T)) start_lifetime_as(void const* p) noexcept {
     return details::lifetime::start_as<T const>(const_cast<void*>(p));
 }
 
 template <UTL_CONCEPT_CXX20(implicit_lifetime) T>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(
     T volatile*, UTL_TRAIT_is_implicit_lifetime(T)) start_lifetime_as(void volatile* p) noexcept {
     return details::lifetime::start_as<T volatile>(const_cast<void*>(p));
 }
 
 template <UTL_CONCEPT_CXX20(implicit_lifetime) T>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(T const volatile*,
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(T const volatile*,
     UTL_TRAIT_is_implicit_lifetime(T)) start_lifetime_as(void const volatile* p) noexcept {
     return details::lifetime::start_as<T const volatile>(const_cast<void*>(p));
 }
 
 template <UTL_CONCEPT_CXX20(complete_type) T>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(
     T*, UTL_TRAIT_is_complete(T)) start_lifetime_as_array(void* p, size_t n) noexcept {
     return details::lifetime::start_as_array<T>(const_cast<void*>(p), n);
 }
 
 template <UTL_CONCEPT_CXX20(complete_type) T>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(T const*, UTL_TRAIT_is_complete(T)) start_lifetime_as_array(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(T const*, UTL_TRAIT_is_complete(T)) start_lifetime_as_array(
     void const* p, size_t n) noexcept {
     return details::lifetime::collapse_as_array<T const>(const_cast<void*>(p), n);
 }
 
 template <UTL_CONCEPT_CXX20(complete_type) T>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(T volatile*, UTL_TRAIT_is_complete(T)) start_lifetime_as_array(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(T volatile*, UTL_TRAIT_is_complete(T)) start_lifetime_as_array(
     void volatile* p, size_t n) noexcept {
     return details::lifetime::start_as_array<T volatile>(const_cast<void*>(p), n);
 }
 
 template <UTL_CONCEPT_CXX20(complete_type) T>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(T const volatile*, UTL_TRAIT_is_complete(T)) start_lifetime_as_array(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline UTL_ENABLE_IF_CXX11(T const volatile*, UTL_TRAIT_is_complete(T)) start_lifetime_as_array(
     void const volatile* p, size_t n) noexcept {
     return details::lifetime::start_as_array<T const volatile>(const_cast<void*>(p), n);
 }

@@ -1,6 +1,6 @@
 // Copyright 2023-2024 Bryan Wong
 
-#include "utl/preprocessor/utl_namespace.h"
+#include "utl/utl_config.h"
 
 UTL_NAMESPACE_BEGIN
 

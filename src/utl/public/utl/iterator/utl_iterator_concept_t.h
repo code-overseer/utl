@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_iterator_traits_fwd.h"
 
@@ -102,16 +102,16 @@ struct has_member_iterator_category<T,
     UTL_SCOPE void_t<typename trait_type_t<T>::iterator_category>> : UTL_SCOPE true_type {};
 
 template <typename T UTL_REQUIRES_CXX11(has_member_iterator_concept<T>::value)>
-UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> typename trait_type_t<T>::iterator_concept;
+__UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> typename trait_type_t<T>::iterator_concept;
 
 template <typename T UTL_REQUIRES_CXX11(
     !has_member_iterator_concept<T>::value && has_member_iterator_category<T>::value)>
-UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> typename trait_type_t<T>::iterator_category;
+__UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> typename trait_type_t<T>::iterator_category;
 
 template <typename T UTL_REQUIRES_CXX11(!has_member_iterator_concept<T>::value &&
     !has_member_iterator_category<T>::value &&
     !UTL_SCOPE details::iterator_traits::is_specialized<T>::value)>
-UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> UTL_SCOPE random_access_iterator_tag;
+__UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> UTL_SCOPE random_access_iterator_tag;
 
 template <typename T>
 struct tag_type {

@@ -27,16 +27,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_scalar)
+#  if __UTL_SHOULD_USE_BUILTIN(is_scalar)
 #    define UTL_BUILTIN_is_scalar(...) __is_scalar(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_scalar)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_scalar)
 
 #  ifdef UTL_BUILTIN_is_scalar
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_scalar : bool_constant<UTL_BUILTIN_is_scalar(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_scalar : bool_constant<UTL_BUILTIN_is_scalar(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -58,7 +58,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_scalar :
+struct __UTL_PUBLIC_TEMPLATE is_scalar :
     bool_constant<UTL_TRAIT_is_arithmetic(T) || UTL_TRAIT_is_member_pointer(T) ||
         UTL_TRAIT_is_pointer(T) || UTL_TRAIT_is_null_pointer(T) || UTL_TRAIT_is_enum(T)> {};
 

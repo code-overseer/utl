@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include "utl/configuration/utl_compiler.h"
+#include "utl/configuration/utl_declspec.h"
+
 #include "utl/preprocessor/utl_apply_macro.h"
-#include "utl/preprocessor/utl_compiler.h"
 #include "utl/preprocessor/utl_concatenation.h"
-#include "utl/preprocessor/utl_declspec.h"
 #include "utl/preprocessor/utl_is_empty.h"
 #include "utl/preprocessor/utl_paste.h"
 

@@ -31,16 +31,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_nothrow_convertible)
+#  if __UTL_SHOULD_USE_BUILTIN(is_nothrow_convertible)
 #    define UTL_BUILTIN_is_nothrow_convertible(...) __is_nothrow_convertible(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_nothrow_convertible)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_nothrow_convertible)
 
 #  ifdef UTL_BUILTIN_is_nothrow_convertible
 
 UTL_NAMESPACE_BEGIN
 
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_convertible :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_convertible :
     bool_constant<UTL_BUILTIN_is_nothrow_convertible(From, To)> {};
 
 #    if UTL_CXX14
@@ -63,12 +63,12 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace convertible {
 template <typename T>
-UTL_HIDE_FROM_ABI void implicit_conv(T) noexcept;
+__UTL_HIDE_FROM_ABI void implicit_conv(T) noexcept;
 template <typename From, typename To>
-UTL_HIDE_FROM_ABI auto nothrow_test(int) noexcept
+__UTL_HIDE_FROM_ABI auto nothrow_test(int) noexcept
     -> bool_constant<noexcept(implicit_conv<To>(declval<From>()))>;
 template <typename, typename>
-UTL_HIDE_FROM_ABI auto nothrow_test(float) noexcept -> false_type;
+__UTL_HIDE_FROM_ABI auto nothrow_test(float) noexcept -> false_type;
 
 template <typename From, typename To>
 using is_nothrow UTL_NODEBUG = decltype(nothrow_test<From, To>(0));
@@ -77,7 +77,7 @@ using is_nothrow UTL_NODEBUG = decltype(nothrow_test<From, To>(0));
 } /* namespace details */
 
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_convertible :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_convertible :
     disjunction<bool_constant<UTL_TRAIT_is_void(From) && UTL_TRAIT_is_void(To)>,
         details::convertible::is_nothrow<From, To>> {};
 

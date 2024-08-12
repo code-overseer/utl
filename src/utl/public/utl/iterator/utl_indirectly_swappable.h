@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_indirectly_readable.h"
 #include "utl/iterator/utl_iter_swap.h"
@@ -24,7 +24,7 @@ concept indirectly_swappable =
     };
 
 template <typename L, typename R>
-struct UTL_PUBLIC_TEMPLATE is_indirectly_swappable : bool_constant<indirectly_swappable<L, R>> {};
+struct __UTL_PUBLIC_TEMPLATE is_indirectly_swappable : bool_constant<indirectly_swappable<L, R>> {};
 
 template <typename L, typename R>
 inline constexpr bool is_indirectly_swappable_v = indirectly_swappable<L, R>;
@@ -38,9 +38,9 @@ namespace details {
 namespace indirectly_swappable {
 
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept -> UTL_SCOPE
+__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept -> UTL_SCOPE
     conjunction<UTL_SCOPE is_indirectly_readable<L>, UTL_SCOPE is_indirectly_readable<R>,
         UTL_SCOPE is_invocable<decltype(UTL_SCOPE ranges::iter_swap), L const, R const>>;
 
@@ -51,7 +51,8 @@ using trait = decltype(UTL_SCOPE details::indirectly_swappable::trait_impl<L, R>
 } // namespace details
 
 template <typename L, typename R = L>
-struct UTL_PUBLIC_TEMPLATE is_indirectly_swappable : details::indirectly_swappable::trait<L, R> {};
+struct __UTL_PUBLIC_TEMPLATE is_indirectly_swappable :
+    details::indirectly_swappable::trait<L, R> {};
 
 #  if UTL_CXX14
 template <typename L, typename R = L>

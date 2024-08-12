@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/concepts/utl_constructible_as.h"
 #include "utl/exception.h"
@@ -19,7 +19,7 @@ UTL_NAMESPACE_BEGIN
 
 template <typename F>
 class
-    UTL_ATTRIBUTES(PUBLIC_TEMPLATE, NODISCARD) scope_fail : private details::scope::impl<scope_fail<F>, F> {
+    UTL_ATTRIBUTES(_PUBLIC_TEMPLATE, NODISCARD) scope_fail : private details::scope::impl<scope_fail<F>, F> {
     using base_type = details::scope::impl<scope_fail<F>, F>;
     using typename base_type::invalid_t;
     using typename base_type::is_movable;
@@ -29,26 +29,26 @@ class
 public:
     template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn
             UTL_REQUIRES_CXX11(UTL_TRAIT_is_constructible(F, Fn&&))>
-    UTL_HIDE_FROM_ABI explicit scope_fail(Fn&& func) noexcept(
+    __UTL_HIDE_FROM_ABI explicit scope_fail(Fn&& func) noexcept(
         UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
         : base_type(UTL_SCOPE forward<Fn>(func))
         , exceptions_(UTL_SCOPE uncaught_exceptions()) {}
     scope_fail(scope_fail const&) = delete;
-    UTL_HIDE_FROM_ABI scope_fail(move_t&& other) noexcept(
+    __UTL_HIDE_FROM_ABI scope_fail(move_t&& other) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(F))
         : base_type(UTL_SCOPE move(other))
         , exceptions_(other.exceptions_) {}
 
     using base_type::release;
 
-    UTL_HIDE_FROM_ABI ~scope_fail() noexcept {
+    __UTL_HIDE_FROM_ABI ~scope_fail() noexcept {
         if (!should_invoke()) {
             release();
         }
     }
 
 private:
-    UTL_HIDE_FROM_ABI bool should_invoke() const noexcept {
+    __UTL_HIDE_FROM_ABI bool should_invoke() const noexcept {
         return exceptions_ < UTL_SCOPE uncaught_exceptions();
     }
     int exceptions_;
@@ -58,7 +58,7 @@ template <typename Fn>
 explicit scope_fail(Fn&& f) -> scope_fail<decay_t<Fn>>;
 
 template <typename Fn>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) inline auto make_scope_fail(Fn&& f) noexcept(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline auto make_scope_fail(Fn&& f) noexcept(
     UTL_TRAIT_is_nothrow_constructible(scope_fail<decay_t<Fn>>, Fn))
     -> enable_if_t<UTL_TRAIT_is_constructible(scope_fail<decay_t<Fn>>, Fn),
         scope_fail<decay_t<Fn>>> {
@@ -68,9 +68,9 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) inline auto make_scope_fail(Fn&& f)
 namespace details {
 namespace scope {
 struct fail_factory_t {
-    UTL_HIDE_FROM_ABI constexpr explicit fail_factory_t() noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr explicit fail_factory_t() noexcept = default;
     template <typename Fn>
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) inline auto operator->*(Fn&& f) const
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline auto operator->*(Fn&& f) const
         noexcept(UTL_TRAIT_is_nothrow_constructible(scope_fail<decay_t<Fn>>, Fn))
             -> enable_if_t<UTL_TRAIT_is_constructible(scope_fail<decay_t<Fn>>, Fn),
                 scope_fail<decay_t<Fn>>> {

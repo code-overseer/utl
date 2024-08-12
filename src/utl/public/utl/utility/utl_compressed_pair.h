@@ -36,25 +36,25 @@ struct element {
     using reference UTL_NODEBUG = T&;
     using const_reference UTL_NODEBUG = T const&;
     using value_type UTL_NODEBUG = T;
-    UTL_HIDE_FROM_ABI constexpr element() noexcept(
+    __UTL_HIDE_FROM_ABI constexpr element() noexcept(
         is_nothrow_default_constructible<T>::value) = default;
-    UTL_HIDE_FROM_ABI constexpr element(default_initialize_t) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr element(default_initialize_t) noexcept(
         is_nothrow_default_constructible<T>::value)
         : element() {}
-    UTL_HIDE_FROM_ABI constexpr element(value_initialize_t) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr element(value_initialize_t) noexcept(
         is_nothrow_default_constructible<T>::value)
         : value() {}
     template <typename... Args>
-    UTL_HIDE_FROM_ABI constexpr element(Args&&... args) : value(forward<Args>(args)...) {}
+    __UTL_HIDE_FROM_ABI constexpr element(Args&&... args) : value(forward<Args>(args)...) {}
 
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr reference get() & noexcept { return value; }
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr const_reference get() const& noexcept {
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr reference get() & noexcept { return value; }
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr const_reference get() const& noexcept {
         return value;
     }
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr value_type&& get() && noexcept {
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr value_type&& get() && noexcept {
         return move(value);
     }
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr value_type const&& get() const&& noexcept {
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr value_type const&& get() const&& noexcept {
         return move(value);
     }
 
@@ -67,26 +67,26 @@ struct UTL_ATTRIBUTE(EMPTY_BASES) element<T, Idx, enable_if_t<optimizable<T>::va
     using const_reference UTL_NODEBUG = T const&;
     using value_type UTL_NODEBUG = T;
 
-    UTL_HIDE_FROM_ABI constexpr element() noexcept(
+    __UTL_HIDE_FROM_ABI constexpr element() noexcept(
         is_nothrow_default_constructible<T>::value) = default;
-    UTL_HIDE_FROM_ABI constexpr element(default_initialize_t) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr element(default_initialize_t) noexcept(
         is_nothrow_default_constructible<T>::value){};
-    UTL_HIDE_FROM_ABI constexpr element(value_initialize_t) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr element(value_initialize_t) noexcept(
         is_nothrow_default_constructible<T>::value)
         : value_type() {}
     template <typename... Args>
-    UTL_HIDE_FROM_ABI constexpr element(Args&&... args) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr element(Args&&... args) noexcept(
         is_nothrow_constructible<T, Args...>::value)
         : value_type(forward<Args>(args)...) {}
 
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr reference get() & noexcept { return *this; }
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr const_reference get() const& noexcept {
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr reference get() & noexcept { return *this; }
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr const_reference get() const& noexcept {
         return *this;
     }
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr value_type&& get() && noexcept {
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr value_type&& get() && noexcept {
         return move(*this);
     }
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr value_type const&& get() const&& noexcept {
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr value_type const&& get() const&& noexcept {
         return move(*this);
     }
 };
@@ -106,25 +106,25 @@ public:
     using first_type UTL_NODEBUG = T0;
     using second_type UTL_NODEBUG = T1;
 
-    UTL_HIDE_FROM_ABI constexpr compressed_pair() noexcept(
+    __UTL_HIDE_FROM_ABI constexpr compressed_pair() noexcept(
         is_nothrow_default_constructible<first_base>::value &&
         is_nothrow_default_constructible<second_base>::value) = default;
 
     template <typename U0, typename U1>
-    UTL_HIDE_FROM_ABI constexpr compressed_pair(U0&& first, U1&& second) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr compressed_pair(U0&& first, U1&& second) noexcept(
         is_nothrow_constructible<first_base, U0>::value &&
         is_nothrow_constructible<second_base, U1>::value)
         : first_base(forward<U0>(first))
         , second_base(forward<U1>(second)) {}
 
 #define __UTL_DEFINE_GETTERS(NAME)                                                     \
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)                                    \
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI)                                   \
     constexpr NAME##_type& NAME()& noexcept { return NAME##_base::get(); }             \
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)                                    \
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI)                                   \
     constexpr NAME##_type const& NAME() const& noexcept { return NAME##_base::get(); } \
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)                                    \
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI)                                   \
     constexpr NAME##_type&& NAME()&& noexcept { return NAME##_base::get(); }           \
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI)                                    \
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI)                                   \
     constexpr NAME##_type const&& NAME() const&& noexcept { return NAME##_base::get(); }
 
     __UTL_DEFINE_GETTERS(first);

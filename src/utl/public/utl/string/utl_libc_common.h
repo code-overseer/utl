@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/string/utl_is_string_char.h"
 #include "utl/type_traits/utl_enable_if.h"
@@ -15,7 +15,7 @@
 #include <cstring>
 
 UTL_NAMESPACE_BEGIN
-#define __UTL_ATTRIBUTE_LIBC_API (CONST)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_LIBC_API (CONST)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_LIBC_API
 namespace libc {
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #if UTL_COMPILER_CLANG_AT_LEAST(16, 0, 0) | UTL_COMPILER_GCC_AT_LEAST(13, 1, 0) | \
     UTL_COMPILER_MSVC_AT_LEAST(1937) | UTL_COMPILER_ICX_AT_LEAST(20230200)
@@ -49,9 +49,9 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-class UTL_ABI_PUBLIC source_location {
+class __UTL_ABI_PUBLIC source_location {
 public:
-    UTL_HIDE_FROM_ABI static UTL_SOURCE_LOCATION_CONSTEVAL source_location current(
+    __UTL_HIDE_FROM_ABI static UTL_SOURCE_LOCATION_CONSTEVAL source_location current(
         char const* file_name = UTL_BUILTIN_FILE(),
         char const* function_name = __UTL_LOCATION_FUNCTION(), unsigned line = UTL_BUILTIN_LINE(),
         unsigned column = __UTL_LOCATION_COLUMN()) noexcept {
@@ -63,25 +63,25 @@ public:
         return location;
     }
 
-    UTL_HIDE_FROM_ABI constexpr source_location() noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr source_location() noexcept = default;
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr char const* file_name() const noexcept {
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr char const* file_name() const noexcept {
         return file_name_;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr char const* function_name() const noexcept {
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr char const* function_name() const noexcept {
         return function_name_;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr unsigned line() const noexcept { return line_; }
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr unsigned line() const noexcept { return line_; }
 
 #  ifdef UTL_BUILTIN_COLUMN
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr unsigned column() const noexcept {
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr unsigned column() const noexcept {
         return column_;
     }
 #  else
     template <typename T = int>
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr unsigned column() const noexcept {
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr unsigned column() const noexcept {
 #    if UTL_COMPILER_GCC
         static_assert(
             always_false<T>(), "This function is currently unimplemented, please update to C++20");
@@ -113,17 +113,17 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-class UTL_ABI_PUBLIC source_location {
+class __UTL_ABI_PUBLIC source_location {
 public:
     template <typename T = int>
-    UTL_HIDE_FROM_ABI static source_location current() noexcept {
+    __UTL_HIDE_FROM_ABI static source_location current() noexcept {
         static_assert(always_false<T>(),
             "This function is currently unimplemented, please update the compiler or update to "
             "C++20");
         return source_location{};
     }
 
-    UTL_HIDE_FROM_ABI static constexpr source_location UTL_current(
+    __UTL_HIDE_FROM_ABI static constexpr source_location UTL_current(
         char const* file_name, char const* function_name, unsigned line) noexcept {
         source_location location;
         location.file_name_ = file_name;
@@ -133,20 +133,20 @@ public:
         return location;
     }
 
-    UTL_HIDE_FROM_ABI constexpr source_location() noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr source_location() noexcept = default;
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr char const* file_name() const noexcept {
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr char const* file_name() const noexcept {
         return file_name_;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr char const* function_name() const noexcept {
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr char const* function_name() const noexcept {
         return function_name_;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr unsigned line() const noexcept { return line_; }
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr unsigned line() const noexcept { return line_; }
 
     template <typename T = int>
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr unsigned column() const noexcept {
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr unsigned column() const noexcept {
 #  if UTL_COMPILER_GCC
         static_assert(
             always_false<T>(), "This function is currently unimplemented, please update to C++20");

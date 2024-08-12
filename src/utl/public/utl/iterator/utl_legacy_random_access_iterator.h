@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_legacy_bidirectional_iterator.h"
 #include "utl/type_traits/utl_constants.h"
@@ -19,7 +19,7 @@ concept legacy_random_access_iterator =
     legacy_bidirectional_iterator<It> && UTL_SCOPE random_access_iterator<It>;
 
 template <typename It>
-struct UTL_PUBLIC_TEMPLATE is_legacy_random_access_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_legacy_random_access_iterator :
     bool_constant<legacy_random_access_iterator<It>> {};
 
 template <typename It>
@@ -39,10 +39,10 @@ namespace details {
 namespace legacy_random_access_iterator {
 
 template <typename It>
-UTL_HIDE_FROM_ABI auto check(float) -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto check(float) -> UTL_SCOPE false_type;
 
 template <typename It>
-UTL_HIDE_FROM_ABI auto check(
+__UTL_HIDE_FROM_ABI auto check(
     int) -> UTL_SCOPE conjunction<UTL_SCOPE is_legacy_bidirectional_iterator<It>,
     UTL_SCOPE is_totally_ordered<It>, UTL_SCOPE details::random_access_iterator::is_indexible<It>>;
 
@@ -54,7 +54,7 @@ using implemented UTL_NODEBUG =
 } // namespace details
 
 template <typename It>
-struct UTL_PUBLIC_TEMPLATE is_legacy_random_access_iterator :
+struct __UTL_PUBLIC_TEMPLATE is_legacy_random_access_iterator :
     UTL_SCOPE details::legacy_random_access_iterator::implemented<It> {};
 
 #  if UTL_CXX14

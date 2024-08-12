@@ -33,16 +33,16 @@ UTL_NAMESPACE_END
 #    define UTL_DISABLE_BUILTIN_remove_extent 0
 #  endif
 
-#  if UTL_SHOULD_USE_BUILTIN(remove_extent)
+#  if __UTL_SHOULD_USE_BUILTIN(remove_extent)
 #    define UTL_BUILTIN_remove_extent(...) __remove_extent(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(remove_extent)
+#  endif // __UTL_SHOULD_USE_BUILTIN(remove_extent)
 
 #  ifdef UTL_BUILTIN_remove_extent
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_extent {
+struct __UTL_PUBLIC_TEMPLATE remove_extent {
     using type UTL_NODEBUG = UTL_BUILTIN_remove_extent(T);
 };
 
@@ -56,15 +56,15 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_extent {
+struct __UTL_PUBLIC_TEMPLATE remove_extent {
     using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_extent<T[]> {
+struct __UTL_PUBLIC_TEMPLATE remove_extent<T[]> {
     using type UTL_NODEBUG = T;
 };
 template <typename T, size_t N>
-struct UTL_PUBLIC_TEMPLATE remove_extent<T[N]> {
+struct __UTL_PUBLIC_TEMPLATE remove_extent<T[N]> {
     using type UTL_NODEBUG = T;
 };
 template <typename T>

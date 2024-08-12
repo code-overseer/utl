@@ -36,7 +36,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_default_constructible :
+struct __UTL_PUBLIC_TEMPLATE is_default_constructible :
     bool_constant<UTL_BUILTIN_is_constructible(T)> {};
 
 #    if UTL_CXX14
@@ -53,7 +53,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_default_constructible : is_constructible<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_default_constructible : is_constructible<T> {};
 
 #    if UTL_CXX14
 template <typename T>

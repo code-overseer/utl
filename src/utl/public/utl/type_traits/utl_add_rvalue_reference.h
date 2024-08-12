@@ -29,16 +29,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(add_rvalue_reference)
+#  if __UTL_SHOULD_USE_BUILTIN(add_rvalue_reference)
 #    define UTL_BUILTIN_add_rvalue_reference(...) __add_rvalue_reference(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(add_rvalue_reference)
+#  endif // __UTL_SHOULD_USE_BUILTIN(add_rvalue_reference)
 
 #  ifdef UTL_BUILTIN_add_rvalue_reference
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE add_rvalue_reference {
+struct __UTL_PUBLIC_TEMPLATE add_rvalue_reference {
     using type UTL_NODEBUG = UTL_BUILTIN_add_rvalue_reference(T);
 };
 
@@ -54,14 +54,14 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace rvalue_reference {
 template <typename T>
-UTL_HIDE_FROM_ABI T&& impl(int) noexcept;
+__UTL_HIDE_FROM_ABI T&& impl(int) noexcept;
 template <typename T>
-UTL_HIDE_FROM_ABI T impl(float) noexcept;
+__UTL_HIDE_FROM_ABI T impl(float) noexcept;
 } // namespace rvalue_reference
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE add_rvalue_reference {
+struct __UTL_PUBLIC_TEMPLATE add_rvalue_reference {
     using type UTL_NODEBUG = decltype(details::rvalue_reference::impl<T>(0));
 };
 

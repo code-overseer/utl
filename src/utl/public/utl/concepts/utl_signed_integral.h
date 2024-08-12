@@ -2,8 +2,9 @@
 
 #pragma once
 
+#include "utl/utl_config.h"
+
 #include "utl/concepts/utl_integral.h"
-#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_is_signed.h"
 
 #if UTL_CXX20

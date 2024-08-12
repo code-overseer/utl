@@ -27,16 +27,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_object)
+#  if __UTL_SHOULD_USE_BUILTIN(is_object)
 #    define UTL_BUILTIN_is_object(...) __is_object(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_object)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_object)
 
 #  ifdef UTL_BUILTIN_is_object
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_object : bool_constant<UTL_BUILTIN_is_object(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_object : bool_constant<UTL_BUILTIN_is_object(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -57,7 +57,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_object :
+struct __UTL_PUBLIC_TEMPLATE is_object :
     bool_constant<is_scalar<T>::value || is_array<T>::value || is_union<T>::value ||
         is_class<T>::value> {};
 

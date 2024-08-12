@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_iter_reference_t.h"
 #include "utl/type_traits/utl_constants.h"
@@ -22,7 +22,7 @@ concept indirectly_writable = requires(Out&& o, T&& t) {
 };
 
 template <typename OutIt, typename ValueType>
-struct UTL_PUBLIC_TEMPLATE is_indirectly_writable :
+struct __UTL_PUBLIC_TEMPLATE is_indirectly_writable :
     bool_constant<indirectly_writable<OutIt, ValueType>> {};
 
 template <typename OutIt, typename ValueType>
@@ -41,10 +41,10 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace indirectly_writable {
 template <typename Out, typename T>
-UTL_HIDE_FROM_ABI auto check(float) -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto check(float) -> UTL_SCOPE false_type;
 
 template <typename Out, typename T>
-UTL_HIDE_FROM_ABI auto check(int)
+__UTL_HIDE_FROM_ABI auto check(int)
     -> UTL_SCOPE conjunction<UTL_SCOPE is_assignable<decltype(*UTL_SCOPE declval<Out&>()), T>,
         UTL_SCOPE is_assignable<decltype(*UTL_SCOPE declval<Out>()), T>,
         decltype((const_cast<const UTL_SCOPE iter_reference_t<Out>&&>(*UTL_SCOPE declval<Out&>()),
@@ -60,7 +60,7 @@ using implemented UTL_NODEBUG = decltype(UTL_SCOPE details::indirectly_writable:
 } // namespace details
 
 template <typename OutIt, typename ValueType>
-struct UTL_PUBLIC_TEMPLATE is_indirectly_writable :
+struct __UTL_PUBLIC_TEMPLATE is_indirectly_writable :
     UTL_SCOPE details::indirectly_writable::implemented<OutIt, ValueType> {};
 
 #  if UTL_CXX14

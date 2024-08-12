@@ -11,7 +11,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename Arg>
-struct UTL_PUBLIC_TEMPLATE is_subscriptable :
+struct __UTL_PUBLIC_TEMPLATE is_subscriptable :
     UTL_SCOPE bool_constant<UTL_SCOPE subscriptable_with<T, Arg>> {};
 
 #  if UTL_CXX14
@@ -30,10 +30,10 @@ namespace details {
 namespace subscriptable {
 
 template <typename T, typename Arg>
-UTL_HIDE_FROM_ABI auto trait(int) noexcept
+__UTL_HIDE_FROM_ABI auto trait(int) noexcept
     -> decltype(UTL_SCOPE declval<T>()[UTL_SCOPE declval<Arg>()], UTL_SCOPE true_type{});
 template <typename T, typename Arg>
-UTL_HIDE_FROM_ABI auto trait(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T, typename Arg>
 using trait_t UTL_NODEBUG = decltype(UTL_SCOPE details::subscriptable::trait<T, Arg>(0));
@@ -41,7 +41,8 @@ using trait_t UTL_NODEBUG = decltype(UTL_SCOPE details::subscriptable::trait<T, 
 } // namespace details
 
 template <typename T, typename Arg>
-struct UTL_PUBLIC_TEMPLATE is_subscriptable : UTL_SCOPE details::subscriptable::trait_t<T, Arg> {};
+struct __UTL_PUBLIC_TEMPLATE is_subscriptable :
+    UTL_SCOPE details::subscriptable::trait_t<T, Arg> {};
 
 #  if UTL_CXX14
 template <typename T, typename Arg>

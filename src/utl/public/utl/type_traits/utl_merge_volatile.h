@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_namespace.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_template_list.h"
 
@@ -21,15 +21,15 @@ UTL_NAMESPACE_BEGIN
 template <typename Target, typename TypeList>
 struct merge_volatile;
 template <typename Target, template <typename...> class TypeList>
-struct UTL_PUBLIC_TEMPLATE merge_volatile<Target, TypeList<>> {
+struct __UTL_PUBLIC_TEMPLATE merge_volatile<Target, TypeList<>> {
     using type UTL_NODEBUG = Target;
 };
 template <typename Target, template <typename...> class TypeList, typename U0, typename... Us>
-struct UTL_PUBLIC_TEMPLATE merge_volatile<Target, TypeList<U0 volatile, Us...>> {
+struct __UTL_PUBLIC_TEMPLATE merge_volatile<Target, TypeList<U0 volatile, Us...>> {
     using type UTL_NODEBUG = Target volatile;
 };
 template <typename Target, template <typename...> class TypeList, typename U0, typename... Us>
-struct UTL_PUBLIC_TEMPLATE merge_volatile<Target, TypeList<U0, Us...>> :
+struct __UTL_PUBLIC_TEMPLATE merge_volatile<Target, TypeList<U0, Us...>> :
     merge_volatile<Target, type_list<Us...>> {};
 template <typename Target, typename TypeList>
 using merge_volatile_t = typename merge_volatile<Target, TypeList>::type;

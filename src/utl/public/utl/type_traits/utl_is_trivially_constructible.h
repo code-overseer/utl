@@ -31,16 +31,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_trivially_constructible)
+#  if __UTL_SHOULD_USE_BUILTIN(is_trivially_constructible)
 #    define UTL_BUILTIN_is_trivially_constructible(...) __is_trivially_constructible(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_trivially_constructible)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_trivially_constructible)
 
 #  ifdef UTL_BUILTIN_is_trivially_constructible
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_trivially_constructible :
+struct __UTL_PUBLIC_TEMPLATE is_trivially_constructible :
     bool_constant<UTL_BUILTIN_is_trivially_constructible(T, Args...)> {};
 
 #    if UTL_CXX14
@@ -60,7 +60,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_trivially_constructible : undefined_trait<T, Args...> {};
+struct __UTL_PUBLIC_TEMPLATE is_trivially_constructible : undefined_trait<T, Args...> {};
 
 #    if UTL_CXX14
 template <typename T, typename... Args>
