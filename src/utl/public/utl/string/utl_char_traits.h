@@ -11,9 +11,9 @@
 #include <cwchar>
 
 UTL_NAMESPACE_BEGIN
-#define __UTL_ATTRIBUTE_PURE_API (PURE)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_PURE_API (PURE)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_PURE_API
-#define __UTL_ATTRIBUTE_CONST_API (CONST)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_CONST_API (CONST)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_CONST_API
 
 template <typename T>
@@ -44,17 +44,17 @@ struct __UTL_PUBLIC_TEMPLATE char_traits {
         return libc::strnchr(str, ch, libc::element_count_t(length));
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr char_type* move(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr char_type* move(
         char_type* s1, char_type const* s2, size_t length) noexcept {
         return libc::memmove(s1, s2, libc::element_count_t(length));
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr char_type* copy(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr char_type* copy(
         char_type* UTL_RESTRICT dst, char_type const* UTL_RESTRICT src, size_t length) noexcept {
         return libc::memcpy(dst, src, libc::element_count_t(length));
     }
 
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr char_type* assign(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr char_type* assign(
         char_type* str, size_t length, char_type ch) noexcept {
         return libc::strnset(str, ch, libc::element_count_t(length));
     }

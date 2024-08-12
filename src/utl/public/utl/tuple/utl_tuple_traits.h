@@ -54,20 +54,20 @@ struct invalid_size_t {};
 
 template <typename T UTL_REQUIRES_CXX11(sizeof(::std::tuple_size<T>))>
 UTL_REQUIRES_CXX20(sizeof(::std::tuple_size<T>) > 0)
-UTL_HIDE_FROM_ABI auto size_impl(int) noexcept -> ::std::tuple_size<T>;
+__UTL_HIDE_FROM_ABI auto size_impl(int) noexcept -> ::std::tuple_size<T>;
 
 template <typename T UTL_REQUIRES_CXX11(is_same<remove_cvref_t<T>, T>::value)>
 UTL_REQUIRES_CXX20(is_same<remove_cvref_t<T>, T>::value)
-UTL_HIDE_FROM_ABI auto size_impl(...) noexcept -> invalid_size_t;
+__UTL_HIDE_FROM_ABI auto size_impl(...) noexcept -> invalid_size_t;
 
 struct invalid_element_t {};
 
 template <size_t I, typename T UTL_REQUIRES_CXX11(sizeof(::std::tuple_element<I, T>))>
 UTL_REQUIRES_CXX20(sizeof(::std::tuple_element<I, T>) > 0)
-UTL_HIDE_FROM_ABI auto element_impl(int) noexcept -> ::std::tuple_element<I, T>;
+__UTL_HIDE_FROM_ABI auto element_impl(int) noexcept -> ::std::tuple_element<I, T>;
 
 template <size_t I, typename T>
-UTL_HIDE_FROM_ABI auto element_impl(...) noexcept -> invalid_element_t;
+__UTL_HIDE_FROM_ABI auto element_impl(...) noexcept -> invalid_element_t;
 
 template <typename T>
 using size_fallback = decltype(size_impl<T>(0));
@@ -105,9 +105,9 @@ struct __UTL_PUBLIC_TEMPLATE tuple_element<I, T&> : tuple_element<I, T> {};
 namespace details {
 namespace tuple {
 template <size_t, typename T>
-UTL_HIDE_FROM_ABI auto has_element_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto has_element_impl(float) noexcept -> UTL_SCOPE false_type;
 template <size_t I, typename T>
-UTL_HIDE_FROM_ABI auto has_element_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto has_element_impl(int) noexcept
     -> UTL_SCOPE bool_constant<(I < tuple_size<T>::value) &&
         UTL_TRAIT_is_convertible(decltype(UTL_SCOPE get_element<I>(UTL_SCOPE declval<T>())),
             UTL_SCOPE tuple_element_t<I, T> const&)>;
@@ -115,20 +115,20 @@ template <size_t I, typename T>
 using has_element_trait UTL_NODEBUG = decltype(has_element_impl<I, T>(0));
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto has_all_elements_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto has_all_elements_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename T, size_t... Is>
-UTL_HIDE_FROM_ABI auto has_all_elements_impl(UTL_SCOPE index_sequence<Is...>) noexcept
+__UTL_HIDE_FROM_ABI auto has_all_elements_impl(UTL_SCOPE index_sequence<Is...>) noexcept
     -> UTL_SCOPE conjunction<UTL_SCOPE always_true_type<tuple_element_t<Is, T>>...>;
 template <typename T>
-UTL_HIDE_FROM_ABI auto has_all_elements_impl(int) noexcept -> decltype(has_all_elements_impl<T>(
+__UTL_HIDE_FROM_ABI auto has_all_elements_impl(int) noexcept -> decltype(has_all_elements_impl<T>(
     UTL_SCOPE make_index_sequence<UTL_SCOPE tuple_size<T>::value>{}));
 template <typename T>
 using has_all_elements_trait UTL_NODEBUG = decltype(has_all_elements_impl<T>(0));
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto is_tuple_like_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto is_tuple_like_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename T>
-UTL_HIDE_FROM_ABI auto is_tuple_like_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto is_tuple_like_impl(int) noexcept
     -> conjunction<bool_constant<!is_reference<T>::value>,
         always_true_type<decltype(tuple_size<T>::value)>, has_all_elements_trait<T>>;
 template <typename T>

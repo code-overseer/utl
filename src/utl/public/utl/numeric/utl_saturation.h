@@ -33,10 +33,10 @@ namespace details {
 namespace saturation {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
     -> UTL_SCOPE bool_constant<UTL_TRAIT_is_integral(T) &&
         !UTL_SCOPE disjunction<UTL_SCOPE is_string_char<T>, UTL_SCOPE is_boolean<T>>::value>;
 

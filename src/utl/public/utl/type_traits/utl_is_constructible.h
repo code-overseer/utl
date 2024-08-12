@@ -61,10 +61,10 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace constructible {
 template <typename T, typename... Args>
-UTL_HIDE_FROM_ABI auto impl(int) noexcept -> decltype((T(declval<Args>()...), true_type));
+__UTL_HIDE_FROM_ABI auto impl(int) noexcept -> decltype((T(declval<Args>()...), true_type));
 
 template <typename T, typename... Args>
-UTL_HIDE_FROM_ABI auto impl(float) noexcept -> false_type;
+__UTL_HIDE_FROM_ABI auto impl(float) noexcept -> false_type;
 
 template <typename T, typename... Args>
 using impl_t UTL_NODEBUG = decltype(impl<T, Args...>(0));

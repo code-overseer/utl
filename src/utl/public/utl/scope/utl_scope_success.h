@@ -28,26 +28,26 @@ class UTL_ATTRIBUTES(_PUBLIC_TEMPLATE, NODISCARD) scope_success :
 public:
     template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn
             UTL_REQUIRES_CXX11(UTL_TRAIT_is_constructible(F, Fn&&))>
-    UTL_HIDE_FROM_ABI explicit scope_success(Fn&& func) noexcept(
+    __UTL_HIDE_FROM_ABI explicit scope_success(Fn&& func) noexcept(
         UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
         : base_type(UTL_SCOPE forward<Fn>(func))
         , exceptions_(uncaught_exceptions()) {}
     scope_success(scope_success const&) = delete;
-    UTL_HIDE_FROM_ABI scope_success(move_t&& other) noexcept(
+    __UTL_HIDE_FROM_ABI scope_success(move_t&& other) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(F))
         : base_type(UTL_SCOPE move(other))
         , exceptions_(other.exceptions_) {}
 
     using base_type::release;
 
-    UTL_HIDE_FROM_ABI ~scope_success() noexcept {
+    __UTL_HIDE_FROM_ABI ~scope_success() noexcept {
         if (!should_invoke()) {
             release();
         }
     }
 
 private:
-    UTL_HIDE_FROM_ABI bool should_invoke() const noexcept {
+    __UTL_HIDE_FROM_ABI bool should_invoke() const noexcept {
         return exceptions_ >= uncaught_exceptions();
     }
     int exceptions_;
@@ -57,7 +57,7 @@ template <typename Fn>
 explicit scope_success(Fn&& f) -> scope_success<decay_t<Fn>>;
 
 template <typename Fn>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) auto make_scope_success(Fn&& f) noexcept(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) auto make_scope_success(Fn&& f) noexcept(
     UTL_TRAIT_is_nothrow_constructible(scope_success<decay_t<Fn>>, Fn))
     -> enable_if_t<UTL_TRAIT_is_constructible(scope_success<decay_t<Fn>>, Fn),
         scope_success<decay_t<Fn>>> {
@@ -67,9 +67,9 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) auto make_scope_success(Fn&& f) noe
 namespace details {
 namespace scope {
 struct success_factory_t {
-    UTL_HIDE_FROM_ABI constexpr explicit success_factory_t() noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr explicit success_factory_t() noexcept = default;
     template <typename Fn>
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) auto operator->*(Fn&& f) const
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) auto operator->*(Fn&& f) const
         noexcept(UTL_TRAIT_is_nothrow_constructible(scope_success<decay_t<Fn>>, Fn))
             -> enable_if_t<UTL_TRAIT_is_constructible(scope_success<decay_t<Fn>>, Fn),
                 scope_success<decay_t<Fn>>> {

@@ -69,14 +69,14 @@ namespace details {
 namespace sized_sentinel_for {
 
 template <typename S, typename I>
-UTL_HIDE_FROM_ABI auto subtractible(int) noexcept -> UTL_SCOPE conjunction<
+__UTL_HIDE_FROM_ABI auto subtractible(int) noexcept -> UTL_SCOPE conjunction<
     UTL_SCOPE is_same<decltype(UTL_SCOPE declval<S const&>() - UTL_SCOPE declval<I const&>()),
         UTL_SCOPE iter_difference_t<I>>,
     UTL_SCOPE is_same<decltype(UTL_SCOPE declval<I const&>() - UTL_SCOPE declval<S const&>()),
         UTL_SCOPE iter_difference_t<I>>>;
 
 template <typename S, typename I>
-UTL_HIDE_FROM_ABI auto subtractible(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto subtractible(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename S, typename I>
 using is_subtractible UTL_NODEBUG =

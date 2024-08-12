@@ -62,11 +62,11 @@ namespace details {
 namespace destructible {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto nothrow_impl(true_type) noexcept
+__UTL_HIDE_FROM_ABI auto nothrow_impl(true_type) noexcept
     -> bool_constant<noexcept(declval<T&>().~T())>;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto nothrow_impl(false_type) noexcept -> false_type;
+__UTL_HIDE_FROM_ABI auto nothrow_impl(false_type) noexcept -> false_type;
 
 template <typename T>
 using nothrow_impl_t UTL_NODEBUG = decltype(nothrow_impl<T>(is_destructible<T>{}));

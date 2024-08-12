@@ -53,9 +53,9 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace destructible {
 template <typename>
-UTL_HIDE_FROM_ABI auto callable_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto callable_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename T>
-UTL_HIDE_FROM_ABI auto callable_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto callable_impl(int) noexcept
     -> UTL_SCOPE always_true_type<decltype(declval<T&>().~T())>;
 template <typename T>
 using callable = decltype(callable_impl<T>(0));

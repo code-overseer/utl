@@ -52,9 +52,9 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace lvalue_reference {
 template <typename T>
-UTL_HIDE_FROM_ABI T& impl(int) noexcept;
+__UTL_HIDE_FROM_ABI T& impl(int) noexcept;
 template <typename T>
-UTL_HIDE_FROM_ABI T impl(float) noexcept;
+__UTL_HIDE_FROM_ABI T impl(float) noexcept;
 } // namespace lvalue_reference
 } // namespace details
 

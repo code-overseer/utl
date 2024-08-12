@@ -48,10 +48,10 @@ struct empty_t {};
 
 template <typename T, typename U, template <typename> class TQual, template <typename> class UQual,
     size_t = sizeof(::std::basic_common_reference<T, U, TQual, UQual>)>
-UTL_HIDE_FROM_ABI ::std::basic_common_reference<T, U, TQual, UQual> basic_ref_test(int);
+__UTL_HIDE_FROM_ABI ::std::basic_common_reference<T, U, TQual, UQual> basic_ref_test(int);
 
 template <typename T, typename U, template <typename> class TQual, template <typename> class UQual>
-UTL_HIDE_FROM_ABI empty_t basic_ref_test(float);
+__UTL_HIDE_FROM_ABI empty_t basic_ref_test(float);
 
 } // namespace common_reference
 } // namespace details

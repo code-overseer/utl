@@ -34,9 +34,9 @@ namespace details {
 namespace indirectly_movable {
 
 template <typename From, typename To>
-UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename From, typename To>
-UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
     -> UTL_SCOPE conjunction<UTL_SCOPE is_indirectly_readable<From>,
         UTL_SCOPE is_indirectly_writable<To, UTL_SCOPE iter_rvalue_reference_t<From>>>;
 

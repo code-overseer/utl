@@ -13,13 +13,13 @@ UTL_NAMESPACE_BEGIN
 using size_t = decltype(sizeof(0));
 
 template <auto V>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr integral_constant<size_t, V>
+UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr integral_constant<size_t, V>
 as_index_constant() noexcept {
     return {};
 }
 
 template <auto V>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr integral_constant<decltype(V), V>
+UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr integral_constant<decltype(V), V>
 as_integral_constant() noexcept {
     return {};
 }

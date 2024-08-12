@@ -52,7 +52,7 @@ namespace details {
 namespace random_access_iterator {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto indexible(int) noexcept -> UTL_SCOPE
+__UTL_HIDE_FROM_ABI auto indexible(int) noexcept -> UTL_SCOPE
     conjunction<UTL_SCOPE is_same<decltype(UTL_SCOPE declval<T&>() +=
                                       UTL_SCOPE declval<UTL_SCOPE iter_difference_t<T>>()),
                     T&>,
@@ -73,7 +73,7 @@ UTL_HIDE_FROM_ABI auto indexible(int) noexcept -> UTL_SCOPE
             UTL_SCOPE iter_reference_t<T>>>;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto indexible(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto indexible(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
 using is_indexible UTL_NODEBUG =

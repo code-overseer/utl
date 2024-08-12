@@ -12,7 +12,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <UTL_CONCEPT_CXX20(UTL_SCOPE bidirectional_iterator) It>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD) constexpr auto
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr auto
 prev(It it, typename UTL_SCOPE iterator_traits<It>::difference_type n = 1) noexcept(
     noexcept(UTL_SCOPE advance(it))) -> UTL_ENABLE_IF_CXX11(It, UTL_TRAIT_is_legacy_bidirectional_iterator(It)) {
     return UTL_SCOPE advance(it, -n), it;

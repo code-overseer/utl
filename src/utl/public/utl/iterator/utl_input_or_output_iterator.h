@@ -40,10 +40,10 @@ namespace details {
 namespace input_or_output_iterator {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto check(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto check(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto check(int) noexcept
+__UTL_HIDE_FROM_ABI auto check(int) noexcept
     -> UTL_SCOPE conjunction<UTL_SCOPE is_referenceable<decltype(*static_cast<T (*)()>(0)())>,
         UTL_SCOPE is_weakly_incrementable<T>>;
 

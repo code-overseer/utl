@@ -46,13 +46,14 @@ namespace details {
 namespace legacy_bidirectional_iterator {
 
 template <typename It>
-UTL_HIDE_FROM_ABI auto check(float) -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto check(float) -> UTL_SCOPE false_type;
 
 template <typename It>
-UTL_HIDE_FROM_ABI auto check(int) -> UTL_SCOPE conjunction<UTL_SCOPE is_legacy_forward_iterator<It>,
-    UTL_SCOPE is_same<decltype(--static_cast<It (*)()>(0)()), It&>,
-    UTL_SCOPE is_convertible<decltype(static_cast<It (*)()>(0)()--), It const&>,
-    UTL_SCOPE is_same<decltype(*static_cast<It (*)()>(0)()--), UTL_SCOPE iter_reference_t<It>>>;
+__UTL_HIDE_FROM_ABI auto check(int)
+    -> UTL_SCOPE conjunction<UTL_SCOPE is_legacy_forward_iterator<It>,
+        UTL_SCOPE is_same<decltype(--static_cast<It (*)()>(0)()), It&>,
+        UTL_SCOPE is_convertible<decltype(static_cast<It (*)()>(0)()--), It const&>,
+        UTL_SCOPE is_same<decltype(*static_cast<It (*)()>(0)()--), UTL_SCOPE iter_reference_t<It>>>;
 
 template <typename It>
 using implemented UTL_NODEBUG =

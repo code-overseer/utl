@@ -32,7 +32,7 @@ UTL_NAMESPACE_BEGIN
 
 template <UTL_CONCEPT_CXX20(forward_iterator) It,
     UTL_CONCEPT_CXX20(predicate<decltype(*UTL_SCOPE declval<It>())>) F>
-UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 auto find_if(It first, It last, F&& f)
+__UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 auto find_if(It first, It last, F&& f)
     -> UTL_ENABLE_IF_CXX11(It, details::find_if::requirement<It, F>::value) {
     for (; first != last; ++first) {
         if (f(*first)) {

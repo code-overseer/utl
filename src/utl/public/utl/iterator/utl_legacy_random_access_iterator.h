@@ -39,10 +39,10 @@ namespace details {
 namespace legacy_random_access_iterator {
 
 template <typename It>
-UTL_HIDE_FROM_ABI auto check(float) -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto check(float) -> UTL_SCOPE false_type;
 
 template <typename It>
-UTL_HIDE_FROM_ABI auto check(
+__UTL_HIDE_FROM_ABI auto check(
     int) -> UTL_SCOPE conjunction<UTL_SCOPE is_legacy_bidirectional_iterator<It>,
     UTL_SCOPE is_totally_ordered<It>, UTL_SCOPE details::random_access_iterator::is_indexible<It>>;
 

@@ -35,7 +35,7 @@ private:
 protected:
     template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_constructible(F, Fn&&))>
-    UTL_HIDE_FROM_ABI constexpr impl(Fn&& func) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr impl(Fn&& func) noexcept(
         UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
         : callable_(UTL_SCOPE forward<Fn>(func))
         , released_(false) {}
@@ -43,13 +43,13 @@ protected:
     impl& operator=(impl const& other) = delete;
     impl(not_move_t&& other) = delete;
     impl& operator=(impl&& other) = delete;
-    UTL_HIDE_FROM_ABI constexpr impl(move_t&& other) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr impl(move_t&& other) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(F))
         : impl(is_movable{}, UTL_SCOPE move(other)) {}
 
-    UTL_HIDE_FROM_ABI void release() noexcept { released_ = true; }
+    __UTL_HIDE_FROM_ABI void release() noexcept { released_ = true; }
 
-    UTL_HIDE_FROM_ABI ~impl() noexcept(noexcept(callable_())) {
+    __UTL_HIDE_FROM_ABI ~impl() noexcept(noexcept(callable_())) {
         if (!released_) {
             callable_();
         }
@@ -58,12 +58,12 @@ protected:
 private:
     template <UTL_CONCEPT_CXX20(same_as<invalid_t>) T UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_same(T, invalid_t))>
-    UTL_HIDE_FROM_ABI impl(false_type, T&& other) noexcept;
+    __UTL_HIDE_FROM_ABI impl(false_type, T&& other) noexcept;
 
     template <UTL_CONCEPT_CXX20(same_as<impl>) T = impl UTL_REQUIRES_CXX11(
         is_movable::value && UTL_TRAIT_is_same(T, impl))>
     UTL_REQUIRES_CXX20(is_movable::value)
-    UTL_HIDE_FROM_ABI constexpr impl(true_type, T&& other) noexcept
+    __UTL_HIDE_FROM_ABI constexpr impl(true_type, T&& other) noexcept
         : callable_(UTL_SCOPE move(other.callable_))
         , released_(other.released_) {
         other.release();

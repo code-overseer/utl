@@ -64,14 +64,14 @@ namespace dangling {
  * @tparam T - reference only, first argument of reference_constructs_from_temporary
  */
 template <typename T>
-UTL_HIDE_FROM_ABI void init_ref(T ref) noexcept;
+__UTL_HIDE_FROM_ABI void init_ref(T ref) noexcept;
 
 /**
  * Creates a prvalue in unevaluated context
  * @tparam U - any type
  */
 template <typename U>
-UTL_HIDE_FROM_ABI remove_cv_t<U> make_type() noexcept;
+__UTL_HIDE_FROM_ABI remove_cv_t<U> make_type() noexcept;
 
 template <typename T, typename U>
 using constructs_from_impl UTL_NODEBUG =

@@ -24,10 +24,10 @@ namespace add_sat {
 namespace runtime {
 
 template <typename T UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(8, T))>
-UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
+__UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
 template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<8>) T
         UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(8, T))>
-UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
+__UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
     static constexpr auto max = UTL_NUMERIC_maximum(T);
     static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
     __asm("adds    %x[left], %x[left], %x[right]\n\t"
@@ -41,10 +41,10 @@ UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
 }
 
 template <typename T UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(4, T))>
-UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
+__UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
 template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<4>) T
         UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(4, T))>
-UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
+__UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
     static constexpr auto max = UTL_NUMERIC_maximum(T);
     static constexpr int shift = sizeof(l) * CHAR_BIT - 1;
     __asm("adds    %w[left], %w[left], %w[right]\n\t"
@@ -58,10 +58,10 @@ UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
 }
 
 template <typename T UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(2, T))>
-UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
+__UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
 template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T
         UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(2, T))>
-UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
+__UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
     using w_type = int32_t;
     static constexpr auto max = UTL_NUMERIC_maximum(w_type);
     static constexpr int ls = 2 * CHAR_BIT;
@@ -79,10 +79,10 @@ UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
 }
 
 template <typename T UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(1, T))>
-UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
+__UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
 template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T
         UTL_REQUIRES_CXX11( UTL_TRAIT_is_sized_signed_integral(1, T))>
-UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
+__UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
     using w_type = int32_t;
     static constexpr auto max = UTL_NUMERIC_maximum(w_type);
     static constexpr int ls = 3 * CHAR_BIT;
@@ -112,29 +112,29 @@ namespace add_sat {
 namespace runtime {
 
 template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_is_sized_signed_integral(4, T))>
-UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
+__UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
 template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<4>) T UTL_REQUIRES_CXX11(
     UTL_TRAIT_is_sized_signed_integral(4, T))>
-UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
+__UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
     __asm("qadd    %[left], %[left], %[right]" : [left] "+r"(l) : [right] "r"(r) : "cc");
     return l;
 }
 
 template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_is_sized_signed_integral(2, T))>
-UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
+__UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
 
 template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<2>) T UTL_REQUIRES_CXX11(
     UTL_TRAIT_is_sized_signed_integral(2, T))>
-UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
+__UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
     __asm("qadd16    %[left], %[left], %[right]" : [left] "+r"(l) : [right] "r"(r) : "cc");
     return l;
 }
 
 template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_is_sized_signed_integral(1, T))>
-UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
+__UTL_HIDE_FROM_ABI auto has_overload_impl(int) noexcept -> UTL_SCOPE true_type;
 template <UTL_CONCEPT_CXX20(UTL_SCOPE sized_signed_integral<1>) T UTL_REQUIRES_CXX11(
     UTL_TRAIT_is_sized_signed_integral(1, T))>
-UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
+__UTL_HIDE_FROM_ABI T impl(T l, T r) noexcept {
     __asm("qadd8    %[left], %[left], %[right]" : [left] "+r"(l) : [right] "r"(r) : "cc");
     return l;
 }
@@ -156,22 +156,22 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace add_sat {
 namespace runtime {
-UTL_HIDE_FROM_ABI
+__UTL_HIDE_FROM_ABI
 int64_t impl(int64_t l, int64_t r) noexcept {
     return vqaddd_s64(l, r);
 }
 
-UTL_HIDE_FROM_ABI
+__UTL_HIDE_FROM_ABI
 int32_t impl(int32_t l, int32_t r) noexcept {
     return vqadds_s32(l, r);
 }
 
-UTL_HIDE_FROM_ABI
+__UTL_HIDE_FROM_ABI
 int16_t impl(int16_t l, int16_t r) noexcept {
     return vqaddh_s16(l, r);
 }
 
-UTL_HIDE_FROM_ABI
+__UTL_HIDE_FROM_ABI
 int8_t impl(int8_t l, int8_t r) noexcept {
     return vqaddb_s8(l, r);
 }

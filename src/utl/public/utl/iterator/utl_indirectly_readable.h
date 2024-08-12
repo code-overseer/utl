@@ -60,9 +60,9 @@ namespace details {
 namespace indirectly_readable {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename T>
-UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
     -> UTL_SCOPE always_true_type<UTL_SCOPE iter_value_t<T>, UTL_SCOPE iter_reference_t<T>,
         UTL_SCOPE iter_rvalue_reference_t<T>>;
 

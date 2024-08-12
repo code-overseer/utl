@@ -46,10 +46,10 @@ namespace details {
 namespace legacy_forward_iterator {
 
 template <typename It>
-UTL_HIDE_FROM_ABI auto check(float) -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto check(float) -> UTL_SCOPE false_type;
 
 template <typename It>
-UTL_HIDE_FROM_ABI auto check(int) -> UTL_SCOPE conjunction<UTL_SCOPE is_legacy_input_iterator<It>,
+__UTL_HIDE_FROM_ABI auto check(int) -> UTL_SCOPE conjunction<UTL_SCOPE is_legacy_input_iterator<It>,
     UTL_SCOPE is_default_constructible<It>, UTL_SCOPE is_reference<UTL_SCOPE iter_reference_t<It>>,
     UTL_SCOPE is_same<UTL_SCOPE remove_cvref_t<UTL_SCOPE iter_reference_t<It>>,
         typename UTL_SCOPE indirectly_readable_traits<It>::value_type>,

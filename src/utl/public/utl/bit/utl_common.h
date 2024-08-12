@@ -55,7 +55,7 @@ concept bit_readable =
 namespace details {
 namespace bit {
 template <typename T>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, NODISCARD)
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD)
 UTL_CONSTEVAL int unsigned_width_diff() noexcept {
     return CHAR_BIT * ((int)sizeof(unsigned) - (int)sizeof(T));
 }

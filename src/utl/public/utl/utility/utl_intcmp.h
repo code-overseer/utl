@@ -41,42 +41,42 @@ UTL_NAMESPACE_BEGIN
 
 template <typename L, typename R>
 UTL_ATTRIBUTES(NODISCARD, CONST,
-    HIDE_FROM_ABI) constexpr enable_if_t<is_signed<L>::value == is_signed<R>::value, bool>
+    _HIDE_FROM_ABI) constexpr enable_if_t<is_signed<L>::value == is_signed<R>::value, bool>
 cmp_equal(L l, R r) noexcept {
     return l == r;
 }
 
 template <typename L, typename R>
 UTL_ATTRIBUTES(NODISCARD, CONST,
-    HIDE_FROM_ABI) constexpr enable_if_t<is_signed<L>::value && is_unsigned<R>::value, bool>
+    _HIDE_FROM_ABI) constexpr enable_if_t<is_signed<L>::value && is_unsigned<R>::value, bool>
 cmp_equal(L l, R r) noexcept {
     return l >= 0 && to_unsigned(l) == r;
 }
 
 template <typename L, typename R>
 UTL_ATTRIBUTES(NODISCARD, CONST,
-    HIDE_FROM_ABI) constexpr enable_if_t<is_unsigned<L>::value && is_signed<R>::value, bool>
+    _HIDE_FROM_ABI) constexpr enable_if_t<is_unsigned<L>::value && is_signed<R>::value, bool>
 cmp_equal(L l, R r) noexcept {
     return r >= 0 && to_unsigned(r) == l;
 }
 
 template <typename L, typename R>
 UTL_ATTRIBUTES(NODISCARD, CONST,
-    HIDE_FROM_ABI) constexpr enable_if_t<is_signed<L>::value == is_signed<R>::value, bool>
+    _HIDE_FROM_ABI) constexpr enable_if_t<is_signed<L>::value == is_signed<R>::value, bool>
 cmp_less(L l, R r) noexcept {
     return l < r;
 }
 
 template <typename L, typename R>
 UTL_ATTRIBUTES(NODISCARD, CONST,
-    HIDE_FROM_ABI) constexpr enable_if_t<is_signed<L>::value && is_unsigned<R>::value, bool>
+    _HIDE_FROM_ABI) constexpr enable_if_t<is_signed<L>::value && is_unsigned<R>::value, bool>
 cmp_less(L l, R r) noexcept {
     return l < 0 || to_unsigned(l) < r;
 }
 
 template <typename L, typename R>
 UTL_ATTRIBUTES(NODISCARD, CONST,
-    HIDE_FROM_ABI) constexpr enable_if_t<is_unsigned<L>::value && is_signed<R>::value, bool>
+    _HIDE_FROM_ABI) constexpr enable_if_t<is_unsigned<L>::value && is_signed<R>::value, bool>
 cmp_less(L l, R r) noexcept {
     return r >= 0 && l < to_unsigned(r);
 }
@@ -89,7 +89,7 @@ UTL_NAMESPACE_BEGIN
 
 template <typename L, typename R>
 UTL_ATTRIBUTES(NODISCARD, CONST,
-    HIDE_FROM_ABI) constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool>
+    _HIDE_FROM_ABI) constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool>
 cmp_equal(L l, R r) noexcept {
     if constexpr (is_signed<L>::value == is_signed<R>::value) {
         return l == r;
@@ -102,7 +102,7 @@ cmp_equal(L l, R r) noexcept {
 
 template <typename L, typename R>
 UTL_ATTRIBUTES(NODISCARD, CONST,
-    HIDE_FROM_ABI) constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool>
+    _HIDE_FROM_ABI) constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool>
 cmp_less(L l, R r) noexcept {
     if constexpr (is_signed<L>::value == is_signed<R>::value) {
         return l < r;
@@ -122,7 +122,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <integral L, integral R>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr bool cmp_equal(L l, R r) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr bool cmp_equal(L l, R r) noexcept {
     if constexpr (is_signed<L>::value == is_signed<R>::value) {
         return l == r;
     } else if constexpr (is_signed<L>::value) {
@@ -133,7 +133,7 @@ UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr bool cmp_equal(L l, R 
 }
 
 template <integral L, integral R>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr bool cmp_less(L l, R r) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr bool cmp_less(L l, R r) noexcept {
     if constexpr (is_signed<L>::value == is_signed<R>::value) {
         return l < r;
     } else if constexpr (is_signed<L>::value) {
@@ -153,35 +153,35 @@ UTL_NAMESPACE_BEGIN
 
 template <typename L, typename R>
 UTL_ATTRIBUTES(NODISCARD, CONST,
-    HIDE_FROM_ABI) constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool>
+    _HIDE_FROM_ABI) constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool>
 cmp_not_equal(L l, R r) noexcept {
     return !cmp_equal(l, r);
 }
 
 template <typename L, typename R>
 UTL_ATTRIBUTES(NODISCARD, CONST,
-    HIDE_FROM_ABI) constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool>
+    _HIDE_FROM_ABI) constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool>
 cmp_greater(L l, R r) noexcept {
     return cmp_less(r, l);
 }
 
 template <typename L, typename R>
 UTL_ATTRIBUTES(NODISCARD, CONST,
-    HIDE_FROM_ABI) constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool>
+    _HIDE_FROM_ABI) constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool>
 cmp_less_equal(L l, R r) noexcept {
     return !cmp_less(r, l);
 }
 
 template <typename L, typename R>
 UTL_ATTRIBUTES(NODISCARD, CONST,
-    HIDE_FROM_ABI) constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool>
+    _HIDE_FROM_ABI) constexpr enable_if_t<is_integral<L>::value && is_integral<R>::value, bool>
 cmp_greater_equal(L l, R r) noexcept {
     return !cmp_less(l, r);
 }
 
 template <typename R, typename T>
 UTL_ATTRIBUTES(NODISCARD, CONST,
-    HIDE_FROM_ABI) constexpr enable_if_t<is_integral<T>::value && is_integral<R>::value, bool>
+    _HIDE_FROM_ABI) constexpr enable_if_t<is_integral<T>::value && is_integral<R>::value, bool>
 in_range(T t) noexcept {
     return cmp_greater_equal(t, UTL_NUMERIC_minimum(R)) &&
         cmp_less_equal(t, UTL_NUMERIC_maximum(R));
@@ -196,27 +196,27 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <integral L, integral R>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr bool cmp_not_equal(L l, R r) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr bool cmp_not_equal(L l, R r) noexcept {
     return !cmp_equal(l, r);
 }
 
 template <integral L, integral R>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr bool cmp_greater(L l, R r) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr bool cmp_greater(L l, R r) noexcept {
     return cmp_less(r, l);
 }
 
 template <integral L, integral R>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr bool cmp_less_equal(L l, R r) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr bool cmp_less_equal(L l, R r) noexcept {
     return !cmp_less(r, l);
 }
 
 template <integral L, integral R>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr bool cmp_greater_equal(L l, R r) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr bool cmp_greater_equal(L l, R r) noexcept {
     return !cmp_less(l, r);
 }
 
 template <integral R, integral T>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr bool in_range(T t) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr bool in_range(T t) noexcept {
     return cmp_greater_equal(t, UTL_NUMERIC_minimum(R)) &&
         cmp_less_equal(t, UTL_NUMERIC_maximum(R));
 }

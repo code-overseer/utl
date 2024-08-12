@@ -15,18 +15,19 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace constructible {
 template <typename T, typename THead, typename TMid, typename... TTail>
-UTL_HIDE_FROM_ABI auto explicit_test(int) noexcept -> decltype((
+__UTL_HIDE_FROM_ABI auto explicit_test(int) noexcept -> decltype((
     implicit_conv<T>({declval<THead>(), declval<TMid>(), declval<TTail>()...}), false_type{}));
 template <typename T, typename THead, typename TMid, typename... TTail>
-UTL_HIDE_FROM_ABI auto explicit_test(float) noexcept -> is_constructible<T, THead, TMid, TTail...>;
+__UTL_HIDE_FROM_ABI auto explicit_test(float) noexcept
+    -> is_constructible<T, THead, TMid, TTail...>;
 template <typename T, typename THead>
-UTL_HIDE_FROM_ABI auto explicit_test(int) noexcept
+__UTL_HIDE_FROM_ABI auto explicit_test(int) noexcept
     -> conjunction<negation<is_convertible<THead, T>>, is_constructible<T, THead>>;
 template <typename T>
-UTL_HIDE_FROM_ABI auto explicit_test(int) noexcept
+__UTL_HIDE_FROM_ABI auto explicit_test(int) noexcept
     -> conjunction<negation<decltype(implicit_test<T>(0))>, is_default_constructible<T>>;
 template <typename T, typename...>
-UTL_HIDE_FROM_ABI auto explicit_test(...) noexcept -> false_type;
+__UTL_HIDE_FROM_ABI auto explicit_test(...) noexcept -> false_type;
 
 template <typename TTarget, typename... TArgs>
 using is_explicit UTL_NODEBUG = decltype(explicit_test<TTarget, TArgs...>(0));

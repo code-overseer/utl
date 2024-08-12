@@ -73,17 +73,17 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace swappable {
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
     -> UTL_SCOPE always_true_type<decltype(UTL_SCOPE ranges::swap(
                                       UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>())),
         decltype(UTL_SCOPE ranges::swap(UTL_SCOPE declval<R>(), UTL_SCOPE declval<L>()))>;
 
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto nothrow_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto nothrow_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto nothrow_impl(int) noexcept
+__UTL_HIDE_FROM_ABI auto nothrow_impl(int) noexcept
     -> UTL_SCOPE bool_constant<noexcept(UTL_SCOPE ranges::swap(
                                    UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>())) &&
         noexcept(UTL_SCOPE ranges::swap(UTL_SCOPE declval<R>(), UTL_SCOPE declval<L>()))>;

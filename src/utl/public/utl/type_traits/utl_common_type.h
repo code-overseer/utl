@@ -82,10 +82,10 @@ template <typename T, typename U, typename... Vs>
 using impl_gt_2 = sfinae_gt_2<type_list<T, U, Vs...>>;
 
 template <typename T, typename U, size_t = sizeof(::std::common_type<T, U>)>
-UTL_HIDE_FROM_ABI ::std::common_type<T, U> resolve_common_type(int);
+__UTL_HIDE_FROM_ABI ::std::common_type<T, U> resolve_common_type(int);
 
 template <typename T, typename U>
-UTL_HIDE_FROM_ABI impl_0<T, U> resolve_common_type(float);
+__UTL_HIDE_FROM_ABI impl_0<T, U> resolve_common_type(float);
 
 template <typename T, typename U, typename R = decltype(resolve_common_type<T, U>(0))>
 using impl UTL_NODEBUG = R;

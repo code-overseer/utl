@@ -54,7 +54,7 @@ public:
      *
      * @return The constant reference to the source location.
      */
-    UTL_ATTRIBUTES(NODISCARD, CONST) UTL_HIDE_FROM_ABI constexpr UTL_SCOPE source_location const&
+    UTL_ATTRIBUTES(NODISCARD, CONST) __UTL_HIDE_FROM_ABI constexpr UTL_SCOPE source_location const&
     location() const noexcept UTL_LIFETIMEBOUND {
         return location_;
     }
@@ -66,7 +66,7 @@ public:
      *
      * @return The constant pointer to the message string.
      */
-    UTL_ATTRIBUTES(NODISCARD, PURE) UTL_HIDE_FROM_ABI char const* message() const noexcept UTL_ATTRIBUTE(
+    UTL_ATTRIBUTES(NODISCARD, PURE) __UTL_HIDE_FROM_ABI char const* message() const noexcept UTL_ATTRIBUTE(
         LIFETIMEBOUND) {
         return reinterpret_cast<char const*>(this) + sizeof(*this);
     }
@@ -78,7 +78,7 @@ public:
      *
      * @return The size of the message string.
      */
-    UTL_ATTRIBUTES(NODISCARD, PURE) UTL_HIDE_FROM_ABI constexpr size_t size() const noexcept {
+    UTL_ATTRIBUTES(NODISCARD, PURE) __UTL_HIDE_FROM_ABI constexpr size_t size() const noexcept {
         return size_;
     }
 
@@ -140,7 +140,7 @@ private:
      * @param location The source location of the message header.
      * @param size The size of the message header.
      */
-    UTL_HIDE_FROM_ABI constexpr message_header(source_location&& location, size_t size) noexcept
+    __UTL_HIDE_FROM_ABI constexpr message_header(source_location&& location, size_t size) noexcept
         : location_(UTL_SCOPE move(location))
         , size_(size) {}
 
@@ -153,7 +153,7 @@ private:
      * @param h The current message header.
      * @param value The next message header to be set.
      */
-    UTL_HIDE_FROM_ABI friend void set_next(message_header& h, message_header* value) noexcept {
+    __UTL_HIDE_FROM_ABI friend void set_next(message_header& h, message_header* value) noexcept {
         if (value != nullptr) {
             value->prev_ = UTL_SCOPE addressof(h);
         }
@@ -169,7 +169,7 @@ private:
      * @param h The current message header.
      * @return A pointer to the next message header.
      */
-    UTL_ATTRIBUTES(NODISCARD, PURE) UTL_HIDE_FROM_ABI friend message_header* next(
+    UTL_ATTRIBUTES(NODISCARD, PURE) __UTL_HIDE_FROM_ABI friend message_header* next(
         message_header const& h) noexcept {
         return h.next_;
     }

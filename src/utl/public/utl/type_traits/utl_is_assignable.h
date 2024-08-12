@@ -60,10 +60,10 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace assignable {
 template <typename T, typename U>
-UTL_HIDE_FROM_ABI auto impl(int) noexcept -> decltype((declval<T>() = declval<U>()), true_type);
+__UTL_HIDE_FROM_ABI auto impl(int) noexcept -> decltype((declval<T>() = declval<U>()), true_type);
 
 template <typename T, typename U>
-UTL_HIDE_FROM_ABI auto impl(float) noexcept -> false_type;
+__UTL_HIDE_FROM_ABI auto impl(float) noexcept -> false_type;
 
 template <typename T, typename U>
 using impl_t UTL_NODEBUG = decltype(impl<T, U>(0));

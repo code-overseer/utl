@@ -40,17 +40,17 @@ namespace details {
 namespace legacy_iterator {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto post_incrementable(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto post_incrementable(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto post_incrementable(int) noexcept
+__UTL_HIDE_FROM_ABI auto post_incrementable(int) noexcept
     -> UTL_SCOPE is_referenceable<decltype(*static_cast<T& (*)()>(0)()++)>;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto pre_incrementable(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto pre_incrementable(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto pre_incrementable(int) noexcept
+__UTL_HIDE_FROM_ABI auto pre_incrementable(int) noexcept
     -> UTL_SCOPE is_same<T&, decltype(++static_cast<T& (*)()>(0)())>;
 
 template <typename T>

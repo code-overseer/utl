@@ -27,14 +27,14 @@ namespace details {
 namespace uses_allocator {
 
 template <typename T, typename Alloc, size_t = sizeof(::std::uses_allocator<T, Alloc>)>
-UTL_HIDE_FROM_ABI ::std::uses_allocator<T, Alloc> resolver(int) noexcept;
+__UTL_HIDE_FROM_ABI ::std::uses_allocator<T, Alloc> resolver(int) noexcept;
 
 template <typename T, typename Alloc,
     typename R = is_convertible<Alloc, typename T::allocator_type>>
-UTL_HIDE_FROM_ABI R resolver(float) noexcept;
+__UTL_HIDE_FROM_ABI R resolver(float) noexcept;
 
 template <typename T, typename Alloc>
-UTL_HIDE_FROM_ABI false_type resolver(...) noexcept;
+__UTL_HIDE_FROM_ABI false_type resolver(...) noexcept;
 
 template <typename T, typename Alloc, typename R = decltype(resolver<T, Alloc>(0))>
 using impl UTL_NODEBUG = R;
@@ -46,10 +46,10 @@ struct __UTL_ABI_PUBLIC allocator_arg_t {
     explicit constexpr allocator_arg_t() noexcept = default;
     template <UTL_CONCEPT_CXX20(same_as<::std::allocator_arg_t>) T UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_same(T, ::std::allocator_arg_t))>
-    UTL_HIDE_FROM_ABI constexpr allocator_arg_t(T) noexcept {}
+    __UTL_HIDE_FROM_ABI constexpr allocator_arg_t(T) noexcept {}
     template <UTL_CONCEPT_CXX20(same_as<::std::allocator_arg_t>) T UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_same(T, ::std::allocator_arg_t))>
-    UTL_HIDE_FROM_ABI constexpr operator T() const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr operator T() const noexcept {
         return {};
     }
 };

@@ -30,16 +30,16 @@ private:
     static constexpr auto header_size = sizeof(message_header);
 
 public:
-    UTL_HIDE_FROM_ABI constexpr message_stack() noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr message_stack(message_stack&& other) noexcept
+    __UTL_HIDE_FROM_ABI constexpr message_stack() noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr message_stack(message_stack&& other) noexcept
         : head_(UTL_SCOPE exchange(other.head_, nullptr))
         , tail_(UTL_SCOPE exchange(other.tail_, nullptr))
         , size_(UTL_SCOPE exchange(other.size_, 0)) {}
-    UTL_HIDE_FROM_ABI constexpr message_stack(message_stack const& other) noexcept
+    __UTL_HIDE_FROM_ABI constexpr message_stack(message_stack const& other) noexcept
         : head_(other.tail_ ? (increment(*other.tail_), other.head_) : other.head_)
         , tail_(other.tail_)
         , size_(other.size_) {}
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 message_stack& operator=(message_stack const& other) noexcept {
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 message_stack& operator=(message_stack const& other) noexcept {
         if (UTL_SCOPE addressof(other) == this) {
             return *this;
         }
@@ -57,7 +57,7 @@ public:
         return *this;
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 message_stack& operator=(message_stack&& other) noexcept {
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 message_stack& operator=(message_stack&& other) noexcept {
         if (UTL_SCOPE addressof(other) == this) {
             return *this;
         }
@@ -79,63 +79,65 @@ public:
         using reference = message_header const&;
         using iterator_concept = UTL_SCOPE forward_iterator_tag;
 
-        UTL_HIDE_FROM_ABI const_iterator operator++(int) noexcept {
+        __UTL_HIDE_FROM_ABI const_iterator operator++(int) noexcept {
             auto prev = *this;
             current_ = next(*current_);
             return prev;
         }
-        UTL_HIDE_FROM_ABI const_iterator& operator++() noexcept {
+        __UTL_HIDE_FROM_ABI const_iterator& operator++() noexcept {
             current_ = next(*current_);
             return *this;
         }
 
-        UTL_HIDE_FROM_ABI constexpr const_iterator() noexcept = default;
-        UTL_HIDE_FROM_ABI constexpr message_header const& operator*() const noexcept {
+        __UTL_HIDE_FROM_ABI constexpr const_iterator() noexcept = default;
+        __UTL_HIDE_FROM_ABI constexpr message_header const& operator*() const noexcept {
             return *current_;
         }
-        UTL_HIDE_FROM_ABI constexpr message_header const* operator->() const noexcept {
+        __UTL_HIDE_FROM_ABI constexpr message_header const* operator->() const noexcept {
             return current_;
         }
 
-        UTL_HIDE_FROM_ABI constexpr bool operator==(const_iterator other) const noexcept {
+        __UTL_HIDE_FROM_ABI constexpr bool operator==(const_iterator other) const noexcept {
             return current_ == other.current_;
         }
 
-        UTL_HIDE_FROM_ABI constexpr bool operator!=(const_iterator other) const noexcept {
+        __UTL_HIDE_FROM_ABI constexpr bool operator!=(const_iterator other) const noexcept {
             return current_ != other.current_;
         }
 
     private:
         friend message_stack;
-        UTL_HIDE_FROM_ABI constexpr const_iterator(message_header const* p) : current_(p) {}
+        __UTL_HIDE_FROM_ABI constexpr const_iterator(message_header const* p) : current_(p) {}
         message_header const* current_ = nullptr;
     };
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr message_header const& top() const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr message_header const& top() const noexcept UTL_LIFETIMEBOUND {
         return *head_;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr bool empty() const noexcept { return size() == 0; }
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr bool empty() const noexcept {
+        return size() == 0;
+    }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr size_type size() const noexcept { return size_; }
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr size_type size() const noexcept { return size_; }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator begin() const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr const_iterator begin() const noexcept UTL_LIFETIMEBOUND {
         return const_iterator(head_);
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator end() const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr const_iterator end() const noexcept UTL_LIFETIMEBOUND {
         return const_iterator();
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator cbegin() const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr const_iterator cbegin() const noexcept UTL_LIFETIMEBOUND {
         return const_iterator(head_);
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, HIDE_FROM_ABI) constexpr const_iterator cend() const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) constexpr const_iterator cend() const noexcept UTL_LIFETIMEBOUND {
         return const_iterator();
     }
 
-    UTL_HIDE_FROM_ABI void emplace(message_format fmt, ...) UTL_THROWS {
+    __UTL_HIDE_FROM_ABI void emplace(message_format fmt, ...) UTL_THROWS {
         va_list args;
         va_start(args, fmt);
         auto header = message_header::create(UTL_SCOPE move(fmt), args);
@@ -151,7 +153,7 @@ public:
         ++size_;
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~message_stack() noexcept {
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~message_stack() noexcept {
         if (tail_ != nullptr) {
             decrement(*tail_);
         }

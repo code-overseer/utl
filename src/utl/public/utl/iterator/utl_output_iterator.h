@@ -33,10 +33,10 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace output_iterator {
 template <typename Out, typename T>
-UTL_HIDE_FROM_ABI auto check(float) -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto check(float) -> UTL_SCOPE false_type;
 
 template <typename Out, typename T>
-UTL_HIDE_FROM_ABI auto check(int)
+__UTL_HIDE_FROM_ABI auto check(int)
     -> UTL_SCOPE conjunction<UTL_SCOPE is_input_or_output_iterator<Out>,
         UTL_SCOPE is_indirectly_writable<Out, T>,
         UTL_SCOPE is_assignable<decltype(*UTL_SCOPE declval<Out&>()++), T>>;

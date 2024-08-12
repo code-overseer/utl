@@ -40,10 +40,10 @@ namespace details {
 namespace legacy_output_iterator {
 
 template <typename It, typename ValueType>
-UTL_HIDE_FROM_ABI auto check(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto check(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename It, typename ValueType>
-UTL_HIDE_FROM_ABI auto check(
+__UTL_HIDE_FROM_ABI auto check(
     int) noexcept -> UTL_SCOPE conjunction<UTL_SCOPE is_legacy_iterator<It>,
     decltype((*UTL_SCOPE declval<It&>() = UTL_SCOPE declval<ValueType>(), UTL_SCOPE true_type{})),
     UTL_SCOPE is_same<decltype(++UTL_SCOPE declval<It&>()), It&>,

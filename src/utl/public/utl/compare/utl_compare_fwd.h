@@ -42,7 +42,7 @@ enum class unorder_t : value_t {
     unordered = 2
 };
 struct __UTL_ABI_PUBLIC zero_t {
-    UTL_HIDE_FROM_ABI UTL_CONSTEVAL zero_t(zero_t*) noexcept {}
+    __UTL_HIDE_FROM_ABI UTL_CONSTEVAL zero_t(zero_t*) noexcept {}
 };
 template <typename T>
 struct less_value {

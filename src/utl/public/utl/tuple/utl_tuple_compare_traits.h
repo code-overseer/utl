@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "utl/compare/utl_compare_traits.h"
 #include "utl/configuration/utl_namespace.h"
 #include "utl/configuration/utl_standard.h"
+
+#include "utl/compare/utl_compare_traits.h"
 #include "utl/tuple/utl_tuple_get_element.h"
 #include "utl/tuple/utl_tuple_traits.h"
 #include "utl/type_traits/utl_is_boolean_testable.h"
@@ -182,11 +183,11 @@ namespace details {
 namespace compare_traits {
 
 template <typename T, typename U, typename Cat, size_t... Is>
-UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(float, index_sequence<Is...>)
+__UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(float, index_sequence<Is...>)
     -> false_type;
 
 template <typename T, typename U, typename Cat, size_t... Is>
-UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(int, index_sequence<Is...>)
+__UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(int, index_sequence<Is...>)
     -> bool_constant<tuple_size<T>::value == tuple_size<U>::value &&
         conjunction<decltype(three_way_comparable_with_test<
             remove_cvref_t<decltype(UTL_SCOPE get_element<Is>(UTL_SCOPE declval<T>()))>,
@@ -194,11 +195,11 @@ UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(int, index_sequence<Is
             0))...>::value>;
 
 template <typename T, typename U, typename Cat, size_t... Is>
-UTL_HIDE_FROM_ABI auto all_nothrow_three_way_comparable_with_test(float, index_sequence<Is...>)
+__UTL_HIDE_FROM_ABI auto all_nothrow_three_way_comparable_with_test(float, index_sequence<Is...>)
     -> false_type;
 
 template <typename T, typename U, typename Cat, size_t... Is>
-UTL_HIDE_FROM_ABI auto all_nothrow_three_way_comparable_with_test(int, index_sequence<Is...>)
+__UTL_HIDE_FROM_ABI auto all_nothrow_three_way_comparable_with_test(int, index_sequence<Is...>)
     -> bool_constant<tuple_size<T>::value == tuple_size<U>::value &&
         UTL_SCOPE details::tuple::is_all_nothrow_gettable<T>::value &&
         UTL_SCOPE details::tuple::is_all_nothrow_gettable<U>::value &&

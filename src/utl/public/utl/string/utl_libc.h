@@ -9,21 +9,21 @@
 #include "utl/utility/utl_constant_p.h"
 
 UTL_NAMESPACE_BEGIN
-#define __UTL_ATTRIBUTE_LIBC_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_LIBC_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_LIBC_PURE
 
 namespace libc {
 
 namespace unsafe {
 template <typename T>
-UTL_HIDE_FROM_ABI constexpr T* memcpy(
+__UTL_HIDE_FROM_ABI constexpr T* memcpy(
     T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count) noexcept {
     return UTL_CONSTANT_P(src + count != dst) ? compile_time::memcpy(dst, src, count)
                                               : runtime::memcpy(dst, src, count);
 }
 
 template <typename T>
-UTL_HIDE_FROM_ABI constexpr T* memmove(T* dst, T const* src, element_count_t count) noexcept {
+__UTL_HIDE_FROM_ABI constexpr T* memmove(T* dst, T const* src, element_count_t count) noexcept {
     return UTL_CONSTANT_P(src + count != dst) ? compile_time::memmove(dst, src, count)
                                               : runtime::memmove(dst, src, count);
 }
@@ -35,7 +35,7 @@ UTL_ATTRIBUTE(LIBC_PURE) constexpr int memcmp(T const* lhs, U const* rhs, elemen
 }
 
 template <typename T>
-UTL_HIDE_FROM_ABI constexpr T* memset(T* dst, T const src, element_count_t count) noexcept {
+__UTL_HIDE_FROM_ABI constexpr T* memset(T* dst, T const src, element_count_t count) noexcept {
     return UTL_CONSTANT_P(src != *(dst + count - 1)) ? compile_time::memset(dst, src, count)
                                                      : runtime::memset(dst, src, count);
 }
@@ -43,14 +43,14 @@ UTL_HIDE_FROM_ABI constexpr T* memset(T* dst, T const src, element_count_t count
 
 template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
     is_trivially_copyable<T>::value)>
-UTL_HIDE_FROM_ABI constexpr T* memcpy(
+__UTL_HIDE_FROM_ABI constexpr T* memcpy(
     T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count) noexcept {
     return unsafe::memcpy(dst, src, count);
 }
 
 template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
     is_trivially_copyable<T>::value)>
-UTL_HIDE_FROM_ABI constexpr T* memmove(T* dst, T const* src, element_count_t count) noexcept {
+__UTL_HIDE_FROM_ABI constexpr T* memmove(T* dst, T const* src, element_count_t count) noexcept {
     return unsafe::memmove(dst, src, count);
 }
 
@@ -64,7 +64,7 @@ UTL_ATTRIBUTE(LIBC_PURE) constexpr T* memchr(T const* str, U value, size_t bytes
 template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
     is_trivially_copyable<T>::value && exact_size<T, 1>::value)>
 UTL_REQUIRES_CXX20(exact_size<T, 1>)
-UTL_HIDE_FROM_ABI constexpr T* memset(T* dst, T const src, element_count_t count) noexcept {
+__UTL_HIDE_FROM_ABI constexpr T* memset(T* dst, T const src, element_count_t count) noexcept {
     return unsafe::memset(dst, src, count);
 }
 
@@ -100,7 +100,7 @@ UTL_ATTRIBUTE(LIBC_PURE) constexpr int strncmp(
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
-UTL_HIDE_FROM_ABI constexpr T* strnset(T* dst, T const val, element_count_t max_len) noexcept {
+__UTL_HIDE_FROM_ABI constexpr T* strnset(T* dst, T const val, element_count_t max_len) noexcept {
     return UTL_CONSTANT_P((dst + max_len, val)) ? compile_time::strnset(dst, val, max_len)
                                                 : runtime::strnset(dst, val, max_len);
 }

@@ -56,11 +56,11 @@ UTL_REQUIRES_CXX20(requires {
 using get_type_t = decltype(UTL_SCOPE get_element<I>(UTL_SCOPE declval<T>()));
 
 template <template <typename...> class Target, typename T, size_t... Is>
-UTL_HIDE_FROM_ABI Target<decltype(decl_element<Is, T>())...> rebind_references_impl(
+__UTL_HIDE_FROM_ABI Target<decltype(decl_element<Is, T>())...> rebind_references_impl(
     T&&, UTL_SCOPE index_sequence<Is...>) noexcept;
 
 template <template <typename...> class Target, typename T, size_t... Is>
-UTL_HIDE_FROM_ABI Target<UTL_SCOPE tuple_element_t<Is, T>...> rebind_elements_impl(
+__UTL_HIDE_FROM_ABI Target<UTL_SCOPE tuple_element_t<Is, T>...> rebind_elements_impl(
     T&&, UTL_SCOPE index_sequence<Is...>) noexcept;
 
 /**
@@ -111,11 +111,11 @@ struct rebind_elements {
 
 template <typename...>
 struct invalid_swap_t {
-    UTL_HIDE_FROM_ABI inline constexpr void swap(invalid_swap_t& other) const noexcept {}
-    UTL_HIDE_FROM_ABI inline constexpr void swap(invalid_swap_t const& other) const noexcept {}
+    __UTL_HIDE_FROM_ABI inline constexpr void swap(invalid_swap_t& other) const noexcept {}
+    __UTL_HIDE_FROM_ABI inline constexpr void swap(invalid_swap_t const& other) const noexcept {}
 
 private:
-    UTL_HIDE_FROM_ABI ~invalid_swap_t() = default;
+    __UTL_HIDE_FROM_ABI ~invalid_swap_t() = default;
 };
 
 template <typename...>
@@ -124,15 +124,15 @@ template <size_t I, typename T, typename = void>
 struct offset_impl;
 struct invalid_t {
 private:
-    UTL_HIDE_FROM_ABI ~invalid_t() = default;
+    __UTL_HIDE_FROM_ABI ~invalid_t() = default;
 };
 
 template <>
 struct storage<> {
-    UTL_HIDE_FROM_ABI constexpr storage() noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr storage& operator=(storage const&) noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr storage& operator=(storage&&) noexcept = default;
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(storage<>& other) noexcept {}
+    __UTL_HIDE_FROM_ABI constexpr storage() noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr storage& operator=(storage const&) noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr storage& operator=(storage&&) noexcept = default;
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(storage<>& other) noexcept {}
 };
 
 template <typename T>
@@ -145,36 +145,37 @@ public:
     using move_construct_t UTL_NODEBUG =
         conditional_t<UTL_TRAIT_is_move_constructible(T), invalid_t, storage>;
 
-    UTL_HIDE_FROM_ABI constexpr storage() noexcept(
+    __UTL_HIDE_FROM_ABI constexpr storage() noexcept(
         UTL_TRAIT_is_nothrow_default_constructible(T)) = default;
-    UTL_HIDE_FROM_ABI constexpr storage(storage const&) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr storage(storage const&) noexcept(
         UTL_TRAIT_is_nothrow_copy_constructible(T)) = default;
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 storage& operator=(storage const&) noexcept(
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 storage& operator=(storage const&) noexcept(
         UTL_TRAIT_is_nothrow_copy_assignable(T)) = default;
 
 #if UTL_ENFORCE_NONMOVABILIITY
-    UTL_HIDE_FROM_ABI constexpr storage(move_construct_t&&) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr storage(move_construct_t&&) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(T)) = delete;
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 storage& operator=(move_assign_t&&) noexcept(
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 storage& operator=(move_assign_t&&) noexcept(
         UTL_TRAIT_is_nothrow_move_assignable(T)) = delete;
 #else
-    UTL_HIDE_FROM_ABI constexpr storage(storage&&) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr storage(storage&&) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(T)) = default;
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 storage& operator=(storage&&) noexcept(
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 storage& operator=(storage&&) noexcept(
         UTL_TRAIT_is_nothrow_move_assignable(T)) = default;
 #endif
 
     template <UTL_CONCEPT_CXX20(constructible_as<T>) U UTL_REQUIRES_CXX11(
         !UTL_SCOPE is_same<U, storage>::value && UTL_SCOPE is_constructible<T, U>::value)>
     UTL_REQUIRES_CXX20(!same_as<remove_reference_t<U>, storage>)
-    UTL_HIDE_FROM_ABI constexpr storage(U&& head) noexcept(UTL_TRAIT_is_nothrow_constructible(T, U))
+    __UTL_HIDE_FROM_ABI constexpr storage(U&& head) noexcept(
+        UTL_TRAIT_is_nothrow_constructible(T, U))
         : head(UTL_SCOPE forward<U>(head)) {}
 
     template <UTL_CONCEPT_CXX20(allocator_usable_with<T>) Alloc UTL_REQUIRES_CXX11(
         conjunction<UTL_SCOPE uses_allocator<T, Alloc>,
             UTL_SCOPE is_constructible<T, allocator_arg_t, Alloc const&>>::value)>
     UTL_REQUIRES_CXX20(constructible_from<T, allocator_arg_t, Alloc const&>)
-    UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, allocator_arg_t, Alloc const&))
         : head(allocator_arg, alloc) {}
 
@@ -184,14 +185,14 @@ public:
             UTL_SCOPE is_constructible<T, Alloc const&>>::value)>
     UTL_REQUIRES_CXX20(!constructible_from<T, allocator_arg_t, Alloc const&> &&
         constructible_from<T, Alloc const&>)
-    UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, Alloc const&))
         : head(alloc) {}
 
     template <UTL_CONCEPT_CXX20(allocator_type) Alloc UTL_REQUIRES_CXX11(
         !UTL_TRAIT_uses_allocator(T, Alloc))>
     UTL_REQUIRES_CXX20(constructible_from<T>)
-    UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T))
         : head() {}
 
@@ -199,7 +200,7 @@ public:
         typename U UTL_REQUIRES_CXX11(conjunction<UTL_SCOPE uses_allocator<T, Alloc>,
             UTL_SCOPE is_constructible<T, allocator_arg_t, Alloc const&, U>>::value)>
     UTL_REQUIRES_CXX20(constructible_from<T, allocator_arg_t, Alloc const&, U>)
-    UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc, U&& u) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc, U&& u) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, allocator_arg_t, Alloc const&, U))
         : head(allocator_arg, alloc, UTL_SCOPE forward<U>(u)) {}
 
@@ -209,50 +210,50 @@ public:
             UTL_SCOPE is_constructible<T, U, Alloc const&>>::value)>
     UTL_REQUIRES_CXX20(!constructible_from<T, allocator_arg_t, Alloc const&, U> &&
         constructible_from<T, U, Alloc const&>)
-    UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc, U&& u) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc, U&& u) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, U, Alloc const&))
         : head(UTL_SCOPE forward<U>(u), alloc) {}
 
     template <UTL_CONCEPT_CXX20(allocator_usable_with<T>) Alloc, typename U UTL_REQUIRES_CXX11(
         !UTL_TRAIT_uses_allocator(T, Alloc))>
     UTL_REQUIRES_CXX20(constructible_from<T, U>)
-    UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc, U&& u) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc, U&& u) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, U))
         : head(UTL_SCOPE forward<U>(u)) {}
 
     template <typename U = T>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(storage<U>& other) noexcept(
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(storage<U>& other) noexcept(
         UTL_TRAIT_is_nothrow_swappable_with(T&, U&)) {
         UTL_SCOPE ranges::swap(head, other.head);
     }
 
     template <typename U = T>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(storage<U> const& other) noexcept(
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(storage<U> const& other) noexcept(
         UTL_TRAIT_is_nothrow_swappable_with(T&, U const&)) {
         UTL_SCOPE ranges::swap(head, other.head);
     }
 
     template <typename U = T>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(storage<U>& other) const
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(storage<U>& other) const
         noexcept(UTL_TRAIT_is_nothrow_swappable_with(T const&, U&)) {
         UTL_SCOPE ranges::swap(head, other.head);
     }
 
     template <typename U = T>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(storage<U> const& other) const
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(storage<U> const& other) const
         noexcept(UTL_TRAIT_is_nothrow_swappable_with(T const&, U const&)) {
         UTL_SCOPE ranges::swap(head, other.head);
     }
 
     template <typename U>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 storage& assign(U&& other) noexcept(
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 storage& assign(U&& other) noexcept(
         UTL_TRAIT_is_nothrow_assignable(T&, U)) {
         head = UTL_SCOPE forward<U>(other);
         return *this;
     }
 
     template <typename U>
-    UTL_HIDE_FROM_ABI constexpr storage const& assign(U&& other) const
+    __UTL_HIDE_FROM_ABI constexpr storage const& assign(U&& other) const
         noexcept(UTL_TRAIT_is_nothrow_assignable(T const&, U)) {
         head = UTL_SCOPE forward<U>(other);
         return *this;
@@ -260,27 +261,27 @@ public:
 
     template <size_t I>
     UTL_REQUIRES_CXX20(I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_LIFETIMEBOUND
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_LIFETIMEBOUND
     -> UTL_ENABLE_IF_CXX11(T&&, I == 0) {
         return UTL_SCOPE move(head);
     }
 
     template <size_t I>
     UTL_REQUIRES_CXX20(I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 auto get() & noexcept UTL_LIFETIMEBOUND
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 auto get() & noexcept UTL_LIFETIMEBOUND
     -> UTL_ENABLE_IF_CXX11(T&, I == 0) {
         return head;
     }
 
     template <size_t I>
     UTL_REQUIRES_CXX20(I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get() const&& noexcept UTL_LIFETIMEBOUND -> UTL_ENABLE_IF_CXX11(T const&&, I == 0) {
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr auto get() const&& noexcept UTL_LIFETIMEBOUND -> UTL_ENABLE_IF_CXX11(T const&&, I == 0) {
         return UTL_SCOPE move(head);
     }
 
     template <size_t I>
     UTL_REQUIRES_CXX20(I == 0)
-    UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr auto get() const& noexcept UTL_LIFETIMEBOUND -> UTL_ENABLE_IF_CXX11(T const&, I == 0) {
+    UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr auto get() const& noexcept UTL_LIFETIMEBOUND -> UTL_ENABLE_IF_CXX11(T const&, I == 0) {
         return head;
     }
 
@@ -288,12 +289,12 @@ public:
 };
 
 template <typename T>
-UTL_HIDE_FROM_ABI constexpr size_t head_offset() noexcept {
+__UTL_HIDE_FROM_ABI constexpr size_t head_offset() noexcept {
     return offsetof(T, head);
 }
 
 template <typename T>
-UTL_HIDE_FROM_ABI constexpr size_t tail_offset() noexcept {
+__UTL_HIDE_FROM_ABI constexpr size_t tail_offset() noexcept {
     return offsetof(T, tail);
 }
 
@@ -317,25 +318,25 @@ class UTL_ATTRIBUTES(_PUBLIC_TEMPLATE, EMPTY_BASES) tuple<> : private details::t
 public:
     using storage::storage;
     using storage::operator=;
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(tuple const& other) const noexcept {}
-    UTL_HIDE_FROM_ABI friend inline UTL_CONSTEXPR_CXX14 void swap(tuple const&, tuple const&) noexcept {}
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(tuple const& other) const noexcept {}
+    __UTL_HIDE_FROM_ABI friend inline UTL_CONSTEXPR_CXX14 void swap(tuple const&, tuple const&) noexcept {}
 };
 
 template <typename... Ts>
-UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI, ALWAYS_INLINE) constexpr tuple<unwrap_reference_t<decay_t<Ts>>...>
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI, ALWAYS_INLINE) constexpr tuple<unwrap_reference_t<decay_t<Ts>>...>
 make_tuple(Ts&&... ts) noexcept(
     UTL_TRAIT_is_nothrow_constructible(tuple<unwrap_reference_t<decay_t<Ts>>...>, Ts...)) {
     return tuple<unwrap_reference_t<decay_t<Ts>>...>{UTL_SCOPE forward<Ts>(ts)...};
 }
 
 template <typename... Args>
-UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) constexpr tuple<Args&...> tie(
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr tuple<Args&...> tie(
     Args&... args UTL_LIFETIMEBOUND) noexcept {
     return {args...};
 }
 
 template <typename... Args>
-UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) constexpr tuple<Args&&...> forward_as_tuple(
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr tuple<Args&&...> forward_as_tuple(
     Args&&... args UTL_LIFETIMEBOUND) noexcept {
     return {UTL_SCOPE forward<Args>(args)...};
 }

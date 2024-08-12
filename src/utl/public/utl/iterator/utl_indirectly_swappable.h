@@ -38,9 +38,9 @@ namespace details {
 namespace indirectly_swappable {
 
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept -> UTL_SCOPE
+__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept -> UTL_SCOPE
     conjunction<UTL_SCOPE is_indirectly_readable<L>, UTL_SCOPE is_indirectly_readable<R>,
         UTL_SCOPE is_invocable<decltype(UTL_SCOPE ranges::iter_swap), L const, R const>>;
 

@@ -56,12 +56,12 @@ UTL_NAMESPACE_BEGIN
 namespace type_traits {
 namespace details {
 template <typename Base, typename Derive>
-UTL_HIDE_FROM_ABI auto unambiguous_public_inheritance(int) noexcept
+__UTL_HIDE_FROM_ABI auto unambiguous_public_inheritance(int) noexcept
     -> decltype(((true_type(*)(Base const volatile*))0)(
         static_cast<Derive const volatile*>((Base const volatile*)0)));
 
 template <typename Base, typename Derive>
-UTL_HIDE_FROM_ABI auto unambiguous_public_inheritance(float) noexcept
+__UTL_HIDE_FROM_ABI auto unambiguous_public_inheritance(float) noexcept
     -> undefined_trait<Base, Derive>;
 
 template <typename Base, typename Derive>

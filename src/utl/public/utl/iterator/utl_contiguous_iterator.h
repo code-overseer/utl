@@ -55,7 +55,7 @@ namespace details {
 namespace contiguous_iterator {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto check(
+__UTL_HIDE_FROM_ABI auto check(
     int) noexcept -> UTL_SCOPE conjunction<UTL_SCOPE is_random_access_iterator<T>,
     UTL_SCOPE details::iterator_concept::implements<UTL_SCOPE contiguous_iterator_tag, T>,
     UTL_SCOPE is_lvalue_reference<UTL_SCOPE iter_reference_t<T>>,
@@ -65,7 +65,7 @@ UTL_HIDE_FROM_ABI auto check(
         UTL_SCOPE add_pointer_t<UTL_SCOPE iter_reference_t<T>>>>;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto check(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto check(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
 using implemented UTL_NODEBUG = decltype(UTL_SCOPE details::contiguous_iterator::check<T>(0));

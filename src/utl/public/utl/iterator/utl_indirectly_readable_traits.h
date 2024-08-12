@@ -105,18 +105,19 @@ struct object_value_type<T, true, true> {
 
 struct empty_trait {};
 template <typename T>
-UTL_HIDE_FROM_ABI auto resolve(int, int) noexcept -> UTL_SCOPE
+__UTL_HIDE_FROM_ABI auto resolve(int, int) noexcept -> UTL_SCOPE
     enable_if_t<UTL_TRAIT_is_array(T), object_value_type<UTL_SCOPE remove_extent_t<T>>>;
 template <typename T>
-UTL_HIDE_FROM_ABI auto resolve(int, int) noexcept -> object_value_type<typename T::value_type,
+__UTL_HIDE_FROM_ABI auto resolve(int, int) noexcept -> object_value_type<typename T::value_type,
     UTL_TRAIT_is_same(UTL_SCOPE remove_cv_t<typename T::value_type>,
         UTL_SCOPE remove_cv_t<typename T::element_type>)>;
 template <typename T>
-UTL_HIDE_FROM_ABI auto resolve(int, float) noexcept -> object_value_type<typename T::value_type>;
+__UTL_HIDE_FROM_ABI auto resolve(int, float) noexcept -> object_value_type<typename T::value_type>;
 template <typename T>
-UTL_HIDE_FROM_ABI auto resolve(int, float) noexcept -> object_value_type<typename T::element_type>;
+__UTL_HIDE_FROM_ABI auto resolve(int, float) noexcept
+    -> object_value_type<typename T::element_type>;
 template <typename T>
-UTL_HIDE_FROM_ABI auto resolve(...) -> empty_trait;
+__UTL_HIDE_FROM_ABI auto resolve(...) -> empty_trait;
 
 template <typename T>
 using impl UTL_NODEBUG = decltype(resolve<T>(0, 0));

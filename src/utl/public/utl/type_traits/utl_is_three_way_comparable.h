@@ -21,22 +21,22 @@ template <typename T, typename U>
 using result_t UTL_NODEBUG = decltype(UTL_SCOPE declval<T>() <=> UTL_SCOPE declval<U>());
 
 template <typename T, typename U UTL_REQUIRES_CXX11((sizeof(result_t<T, U>) > 0))>
-UTL_HIDE_FROM_ABI UTL_SCOPE true_type possible(int) noexcept;
+__UTL_HIDE_FROM_ABI UTL_SCOPE true_type possible(int) noexcept;
 template <typename T, typename U, typename Cat UTL_REQUIRES_CXX11( UTL_TRAIT_is_convertible(result_t<T, U>, Cat))>
-UTL_HIDE_FROM_ABI UTL_SCOPE true_type impl(int) noexcept;
+__UTL_HIDE_FROM_ABI UTL_SCOPE true_type impl(int) noexcept;
 template <typename T, typename U, typename Cat UTL_REQUIRES_CXX11( UTL_TRAIT_is_nothrow_convertible(result_t<T, U>, Cat))>
-UTL_HIDE_FROM_ABI UTL_SCOPE true_type nothrow_check(int) noexcept;
+__UTL_HIDE_FROM_ABI UTL_SCOPE true_type nothrow_check(int) noexcept;
 
 #endif // UTL_CXX20
 
 template <typename T, typename U>
-UTL_HIDE_FROM_ABI UTL_SCOPE false_type possible(float) noexcept;
+__UTL_HIDE_FROM_ABI UTL_SCOPE false_type possible(float) noexcept;
 
 template <typename T, typename U>
-UTL_HIDE_FROM_ABI UTL_SCOPE false_type impl(float) noexcept;
+__UTL_HIDE_FROM_ABI UTL_SCOPE false_type impl(float) noexcept;
 
 template <typename T, typename U>
-UTL_HIDE_FROM_ABI UTL_SCOPE false_type nothrow_check(float) noexcept;
+__UTL_HIDE_FROM_ABI UTL_SCOPE false_type nothrow_check(float) noexcept;
 
 template <typename T, typename U>
 using possible_t UTL_NODEBUG = decltype(possible<T, U>(0));

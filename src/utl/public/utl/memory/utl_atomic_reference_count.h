@@ -35,8 +35,8 @@ protected:
     /**
      * Constructs the reference_count object with an initial count of 1.
      */
-    UTL_HIDE_FROM_ABI constexpr atomic_reference_count() noexcept : count_(1) {}
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~atomic_reference_count() noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr atomic_reference_count() noexcept : count_(1) {}
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~atomic_reference_count() noexcept = default;
 
     /**
      * Copy and move operations are deleted to enforce non-copyability and non-movability
@@ -52,7 +52,7 @@ private:
      *
      * @param obj The object of type T to increment the count for.
      */
-    UTL_HIDE_FROM_ABI friend void increment(T& obj) noexcept {
+    __UTL_HIDE_FROM_ABI friend void increment(T& obj) noexcept {
         static_assert(UTL_TRAIT_is_base_of(atomic_reference_count, T), "Invalid type relation");
         ((atomic_reference_count&)obj).count_.fetch_add(1, UTL_SCOPE memory_order_relaxed);
     }
@@ -62,7 +62,7 @@ private:
      *
      * @param obj The object of type T to decrement the count for.
      */
-    UTL_HIDE_FROM_ABI friend void decrement(T& obj) noexcept {
+    __UTL_HIDE_FROM_ABI friend void decrement(T& obj) noexcept {
         static_assert(UTL_TRAIT_is_base_of(atomic_reference_count, T), "Invalid type relation");
         int const result =
             ((atomic_reference_count&)obj).count_.fetch_sub(1, UTL_SCOPE memory_order_acq_rel);

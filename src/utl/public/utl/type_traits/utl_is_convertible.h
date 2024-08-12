@@ -59,12 +59,12 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace convertible {
 template <typename T>
-UTL_HIDE_FROM_ABI void implicit_conv(T) noexcept;
+__UTL_HIDE_FROM_ABI void implicit_conv(T) noexcept;
 
 template <typename From, typename To, typename = decltype(implicit_conv<To>(declval<From>()))>
-UTL_HIDE_FROM_ABI auto conv_test(int) noexcept -> true_type;
+__UTL_HIDE_FROM_ABI auto conv_test(int) noexcept -> true_type;
 template <typename, typename>
-UTL_HIDE_FROM_ABI auto conv_test(float) noexcept -> false_type;
+__UTL_HIDE_FROM_ABI auto conv_test(float) noexcept -> false_type;
 
 template <typename From, typename To>
 using impl_t UTL_NODEBUG = decltype(conv_test<From, To>(0));

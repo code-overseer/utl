@@ -6,7 +6,7 @@
 
 #include "utl/type_traits/utl_enable_if.h"
 
-#define __UTL_ATTRIBUTE_ADDRESSOF (CONST)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_ADDRESSOF (CONST)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_ADDRESSOF
 
 UTL_NAMESPACE_BEGIN
@@ -50,21 +50,21 @@ namespace details {
 namespace addressof {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto has_global_overload(int) -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto has_global_overload(int) -> UTL_SCOPE false_type;
 template <typename T>
-UTL_HIDE_FROM_ABI auto has_global_overload(float)
+__UTL_HIDE_FROM_ABI auto has_global_overload(float)
     -> UTL_SCOPE always_true_type<decltype(operator&(UTL_SCOPE declval<T&>()))>;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto has_member_overload(int) -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto has_member_overload(int) -> UTL_SCOPE false_type;
 template <typename T>
-UTL_HIDE_FROM_ABI auto has_member_overload(float)
+__UTL_HIDE_FROM_ABI auto has_member_overload(float)
     -> UTL_SCOPE always_true_type<decltype(UTL_SCOPE declval<T&>().operator&())>;
 template <typename T>
-UTL_HIDE_FROM_ABI auto not_addressible(int) noexcept
+__UTL_HIDE_FROM_ABI auto not_addressible(int) noexcept
     -> UTL_SCOPE always_false_type<decltype(&UTL_SCOPE declval<T&>())>;
 template <typename T>
-UTL_HIDE_FROM_ABI auto not_addressible(float) noexcept -> UTL_SCOPE true_type;
+__UTL_HIDE_FROM_ABI auto not_addressible(float) noexcept -> UTL_SCOPE true_type;
 
 template <typename T>
 using has_overload UTL_NODEBUG = UTL_SCOPE disjunction<decltype(not_addressible<T>(0)),

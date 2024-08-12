@@ -202,37 +202,37 @@ struct traits<Iter, true, false> {
 };
 
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto pointer_type(int) noexcept -> typename Iter::pointer;
+__UTL_HIDE_FROM_ABI auto pointer_type(int) noexcept -> typename Iter::pointer;
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto pointer_type(float) noexcept
+__UTL_HIDE_FROM_ABI auto pointer_type(float) noexcept
     -> decltype(UTL_SCOPE declval<Iter&>().operator->());
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto pointer_type(...) noexcept -> void;
+__UTL_HIDE_FROM_ABI auto pointer_type(...) noexcept -> void;
 
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto reference_type(int) noexcept -> typename Iter::reference;
+__UTL_HIDE_FROM_ABI auto reference_type(int) noexcept -> typename Iter::reference;
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto reference_type(float) noexcept -> UTL_SCOPE iter_reference_t<Iter>;
+__UTL_HIDE_FROM_ABI auto reference_type(float) noexcept -> UTL_SCOPE iter_reference_t<Iter>;
 
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto category_type(int, int) noexcept
+__UTL_HIDE_FROM_ABI auto category_type(int, int) noexcept
     -> UTL_SCOPE enable_if_t<UTL_TRAIT_is_legacy_random_access_iterator(Iter),
         UTL_SCOPE random_access_iterator_tag>;
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto category_type(int, float) noexcept
+__UTL_HIDE_FROM_ABI auto category_type(int, float) noexcept
     -> UTL_SCOPE enable_if_t<UTL_TRAIT_is_legacy_bidirectional_iterator(Iter),
         UTL_SCOPE bidirectional_iterator_tag>;
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto category_type(float, float) noexcept -> UTL_SCOPE
+__UTL_HIDE_FROM_ABI auto category_type(float, float) noexcept -> UTL_SCOPE
     enable_if_t<UTL_TRAIT_is_legacy_forward_iterator(Iter), UTL_SCOPE forward_iterator_tag>;
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto category_type(...) noexcept -> UTL_SCOPE input_iterator_tag;
+__UTL_HIDE_FROM_ABI auto category_type(...) noexcept -> UTL_SCOPE input_iterator_tag;
 
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto difference_type(int) noexcept ->
+__UTL_HIDE_FROM_ABI auto difference_type(int) noexcept ->
     typename UTL_SCOPE incrementable_traits<Iter>::difference_type;
 template <typename Iter>
-UTL_HIDE_FROM_ABI auto difference_type(float) noexcept -> void;
+__UTL_HIDE_FROM_ABI auto difference_type(float) noexcept -> void;
 
 template <typename Iter, bool = UTL_TRAIT_is_legacy_input_iterator(Iter),
     bool = UTL_TRAIT_is_legacy_iterator(Iter)>

@@ -9,7 +9,7 @@
 
 UTL_NAMESPACE_BEGIN
 
-#define __UTL_ATTRIBUTE_COMPARE_API (NODISCARD)(CONST)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_COMPARE_API (NODISCARD)(CONST)(ALWAYS_INLINE)__UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_COMPARE_API
 
 class __UTL_ABI_PUBLIC weak_ordering :
@@ -30,26 +30,26 @@ public:
     using details::compare::equivalent_value<weak_ordering>::equivalent;
     using details::compare::greater_value<weak_ordering>::greater;
 
-    UTL_HIDE_FROM_ABI constexpr operator partial_ordering() const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr operator partial_ordering() const noexcept {
         return partial_ordering(order_t(value));
     }
 
 #if UTL_CXX20
     template <same_as<std::weak_ordering> T>
-    UTL_HIDE_FROM_ABI constexpr weak_ordering(T p) noexcept
+    __UTL_HIDE_FROM_ABI constexpr weak_ordering(T p) noexcept
         : value(p == T::less           ? less
                   : p == T::equivalent ? equivalent
                                        : greater) {}
 
     template <same_as<std::weak_ordering> T>
-    UTL_HIDE_FROM_ABI constexpr operator T() noexcept {
+    __UTL_HIDE_FROM_ABI constexpr operator T() noexcept {
         return *this == less ? T::less : *this == equivalent ? T::equivalent : T::greater;
     }
 #endif
-    UTL_HIDE_FROM_ABI constexpr weak_ordering(weak_ordering const&) noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr weak_ordering(weak_ordering&&) noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr weak_ordering& operator=(weak_ordering const&) noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr weak_ordering& operator=(weak_ordering&&) noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr weak_ordering(weak_ordering const&) noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr weak_ordering(weak_ordering&&) noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr weak_ordering& operator=(weak_ordering const&) noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr weak_ordering& operator=(weak_ordering&&) noexcept = default;
 
     UTL_ATTRIBUTE(COMPARE_API) friend constexpr bool operator==(weak_ordering l, weak_ordering r) noexcept {
         return l.value == r.value;
@@ -96,7 +96,7 @@ public:
 #endif
 
 private:
-    UTL_HIDE_FROM_ABI constexpr explicit weak_ordering(order_t value) noexcept
+    __UTL_HIDE_FROM_ABI constexpr explicit weak_ordering(order_t value) noexcept
         : value(value_t(value)) {}
 
     value_t value;

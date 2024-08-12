@@ -42,12 +42,12 @@ namespace details {
 namespace bidirectional_iterator {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto reversible(int) noexcept
+__UTL_HIDE_FROM_ABI auto reversible(int) noexcept
     -> UTL_SCOPE conjunction<UTL_SCOPE is_same<decltype(--static_cast<T (*)()>(0)()), T&>,
         UTL_SCOPE is_same<decltype(static_cast<T (*)()>(0)()--), T>>;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto reversible(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto reversible(float) noexcept -> UTL_SCOPE false_type;
 
 template <typename T>
 using is_reversible UTL_NODEBUG = decltype(reversible<T>(0));
