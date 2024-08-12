@@ -1,8 +1,7 @@
 /* Copyright 2023-2024 Bryan Wong */
 
-#include "utl/preprocessor/utl_target.h"
-
 #include "utl/configuration/utl_compiler.h"
+#include "utl/configuration/utl_target.h"
 
 #if UTL_COMPILER_MSVC && !UTL_COMPILER_MSVC_AT_LEAST(1925)
 #  define UTL_PRAGMA(ARG) __pragma(ARG)

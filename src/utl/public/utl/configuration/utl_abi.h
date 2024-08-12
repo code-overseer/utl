@@ -3,13 +3,13 @@
 #pragma once
 
 #include "utl/preprocessor/utl_concatenation.h"
-#include "utl/preprocessor/utl_target.h"
 #include "utl/preprocessor/utl_to_string.h"
 
 #include "utl/configuration/utl_attributes.h"
 #include "utl/configuration/utl_compiler.h"
 #include "utl/configuration/utl_exceptions.h"
 #include "utl/configuration/utl_standard.h"
+#include "utl/configuration/utl_target.h"
 
 #if UTL_COMPILER_MSVC
 
