@@ -3,10 +3,10 @@
 #pragma once
 
 #include "utl/preprocessor/utl_builtin_check.h"
-#include "utl/preprocessor/utl_standard.h"
 
 #include "utl/configuration/utl_compiler.h"
 #include "utl/configuration/utl_msvc_builtins.h"
+#include "utl/configuration/utl_standard.h"
 
 #if UTL_HAS_BUILTIN(__builtin_launder)
 #  define UTL_BUILTIN_launder(X) __builtin_launder(X)

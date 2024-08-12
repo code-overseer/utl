@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_standard.h"
-
 #include "utl/configuration/utl_compiler.h"
+#include "utl/configuration/utl_standard.h"
 
 #ifdef __is_identifier
 #  define UTL_IS_RESERVED_IDENTIFIER(X) !__is_identifier(X)

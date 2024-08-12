@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_standard.h"
-
 #include "utl/configuration/utl_namespace.h"
+#include "utl/configuration/utl_standard.h"
 #include "utl/type_traits/utl_constants.h"
 
 UTL_NAMESPACE_BEGIN

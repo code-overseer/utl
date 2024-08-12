@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_standard.h"
-
 #include "utl/compare/utl_compare_traits.h"
 #include "utl/configuration/utl_namespace.h"
+#include "utl/configuration/utl_standard.h"
 #include "utl/tuple/utl_tuple_get_element.h"
 #include "utl/tuple/utl_tuple_traits.h"
 #include "utl/type_traits/utl_is_boolean_testable.h"
