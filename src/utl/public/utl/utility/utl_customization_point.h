@@ -34,7 +34,7 @@ namespace details {
 namespace customization_point {
 template <typename T>
 struct __UTL_PUBLIC_TEMPLATE constant {
-    static constexpr T value = {};
+    static constexpr T value{};
 };
 
 template <typename T>
