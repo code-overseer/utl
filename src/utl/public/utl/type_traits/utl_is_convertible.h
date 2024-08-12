@@ -91,7 +91,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_convertible
 #  define UTL_TRAIT_is_convertible(...) UTL_BUILTIN_is_convertible(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_convertible(...) UTL_SCOPE is_convertible_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_convertible(...) __UTL is_convertible_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_convertible(...) UTL_SCOPE is_convertible<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_convertible(...) __UTL is_convertible<__VA_ARGS__>::value
 #endif

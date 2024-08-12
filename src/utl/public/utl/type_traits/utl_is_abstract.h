@@ -70,7 +70,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_abstract
 #  define UTL_TRAIT_is_abstract(...) UTL_BUILTIN_is_abstract(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_abstract(...) UTL_SCOPE is_abstract_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_abstract(...) __UTL is_abstract_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_abstract(...) UTL_SCOPE is_abstract<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_abstract(...) __UTL is_abstract<__VA_ARGS__>::value
 #endif

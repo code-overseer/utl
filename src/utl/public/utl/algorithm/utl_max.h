@@ -31,7 +31,7 @@ namespace details {
 namespace algorithm {
 template <typename T>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr T const& max(T* output, T* current, T* end) {
-    return current == end ? *output : max(UTL_SCOPE max(*output, *current), current + 1, end);
+    return current == end ? *output : max(__UTL max(*output, *current), current + 1, end);
 }
 template <typename T, typename F>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr T const& max(T* output, T* current, F&& compare, T* end) {
@@ -51,7 +51,7 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr T max(std::initializer_list<
 template <typename T, typename F>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr T max(std::initializer_list<T> list, F comp) noexcept(
     noexcept(comp(*list.begin(), *list.begin()))) {
-    return max(list.begin(), list.begin() + 1, UTL_SCOPE move(comp), list.end());
+    return max(list.begin(), list.begin() + 1, __UTL move(comp), list.end());
 }
 
 UTL_NAMESPACE_END

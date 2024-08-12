@@ -54,7 +54,7 @@ public:
      *
      * @return The constant reference to the source location.
      */
-    UTL_ATTRIBUTES(NODISCARD, CONST) __UTL_HIDE_FROM_ABI constexpr UTL_SCOPE source_location const&
+    UTL_ATTRIBUTES(NODISCARD, CONST) __UTL_HIDE_FROM_ABI constexpr __UTL source_location const&
     location() const noexcept UTL_LIFETIMEBOUND {
         return location_;
     }
@@ -111,7 +111,7 @@ public:
             // restart lifetime (null operation)
             auto raw_bytes = ::new (ptr) unsigned char[count * header_size];
             // start lifetime of header
-            auto header = ::new (raw_bytes) message_header(UTL_SCOPE move(fmt.location), str_size);
+            auto header = ::new (raw_bytes) message_header(__UTL move(fmt.location), str_size);
             // start lifetime of string (null operation)
             auto str = ::new (raw_bytes + header_size) char[buffer_size];
             vsnprintf(str, buffer_size, fmt.format, args2);
@@ -127,7 +127,7 @@ public:
     }
 
 private:
-    UTL_SCOPE source_location location_;
+    __UTL source_location location_;
     message_header* next_ = nullptr;
     message_header* prev_ = nullptr;
     size_t size_ = 0;
@@ -141,7 +141,7 @@ private:
      * @param size The size of the message header.
      */
     __UTL_HIDE_FROM_ABI constexpr message_header(source_location&& location, size_t size) noexcept
-        : location_(UTL_SCOPE move(location))
+        : location_(__UTL move(location))
         , size_(size) {}
 
     /**
@@ -155,7 +155,7 @@ private:
      */
     __UTL_HIDE_FROM_ABI friend void set_next(message_header& h, message_header* value) noexcept {
         if (value != nullptr) {
-            value->prev_ = UTL_SCOPE addressof(h);
+            value->prev_ = __UTL addressof(h);
         }
 
         h.next_ = value;

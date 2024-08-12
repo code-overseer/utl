@@ -69,7 +69,7 @@ public:
 } // namespace details
 
 inline namespace cpo {
-UTL_DEFINE_CUSTOMIZATION_POINT(UTL_SCOPE reference_counting::details::destroy_cpo_t, destroy);
+UTL_DEFINE_CUSTOMIZATION_POINT(__UTL reference_counting::details::destroy_cpo_t, destroy);
 }
 
 } // namespace reference_counting

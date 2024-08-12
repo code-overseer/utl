@@ -10,7 +10,7 @@ namespace details {
 namespace bit {
 template <typename T>
 UTL_ATTRIBUTES(NODISCARD, CONST) inline constexpr T bit_log2(T x) noexcept {
-    return CHAR_BIT * sizeof(T) - 1 - UTL_SCOPE countl_zero(x);
+    return CHAR_BIT * sizeof(T) - 1 - __UTL countl_zero(x);
 }
 } // namespace bit
 } // namespace details

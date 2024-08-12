@@ -89,7 +89,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_assignable
 #  define UTL_TRAIT_is_assignable(...) UTL_BUILTIN_is_assignable(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_assignable(...) UTL_SCOPE is_assignable_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_assignable(...) __UTL is_assignable_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_assignable(...) UTL_SCOPE is_assignable<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_assignable(...) __UTL is_assignable<__VA_ARGS__>::value
 #endif

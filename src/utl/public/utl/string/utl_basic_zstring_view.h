@@ -60,7 +60,7 @@ public:
         UTL_TRAIT_is_contiguous_iterator(It) && UTL_TRAIT_is_sized_sentinel_for(E, It))>
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_zstring_view(It begin, E end)
         UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_dereferenceable(It)&& noexcept(end - begin))
-        : basic_zstring_view(UTL_SCOPE to_address(begin), end - begin) {}
+        : basic_zstring_view(__UTL to_address(begin), end - begin) {}
 
     __UTL_HIDE_FROM_ABI explicit UTL_CONSTEXPR_CXX14 basic_zstring_view(base_type other) UTL_THROWS
         : basic_zstring_view(other.data(), other.size()) {}
@@ -113,7 +113,7 @@ public:
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_zstring_view::copy` operation failed, "
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
                 pos, size()));
-        auto const copied = UTL_SCOPE numeric::min(count, size() - pos);
+        auto const copied = __UTL numeric::min(count, size() - pos);
         traits_type::copy(dest, data() + pos, copied);
         return copied;
     }
@@ -121,7 +121,7 @@ public:
     __UTL_HIDE_FROM_ABI constexpr base_type substr(
         size_type pos = 0, size_type count = npos) const UTL_THROWS {
         return pos >= size() ? substr_throw(UTL_SOURCE_LOCATION(), pos, size())
-                             : base_type(data() + pos, UTL_SCOPE numeric::min(count, size() - pos));
+                             : base_type(data() + pos, __UTL numeric::min(count, size() - pos));
     }
 
     using base_type::compare;
@@ -137,7 +137,7 @@ public:
 
 private:
     UTL_ATTRIBUTES(NORETURN, NOINLINE, _HIDE_FROM_ABI) static basic_zstring_view substr_throw(
-        UTL_SCOPE source_location src, size_t pos, size_t size) UTL_THROWS {
+        __UTL source_location src, size_t pos, size_t size) UTL_THROWS {
         exceptions::message_format format = {"[UTL] `basic_zstring_view::substr` operation failed, "
                                              "Reason=[index out of range], pos=[%zu], size=[%zu]",
             src};

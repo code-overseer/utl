@@ -20,13 +20,12 @@ struct impl_tag {};
 #if UTL_CXX20
 
 template <typename T>
-concept is_specialized = !UTL_TRAIT_is_base_of(impl_tag<T>, UTL_SCOPE iterator_traits<T>);
+concept is_specialized = !UTL_TRAIT_is_base_of(impl_tag<T>, __UTL iterator_traits<T>);
 
 #else
 
 template <typename T>
-using is_specialized =
-    bool_constant<!UTL_TRAIT_is_base_of(impl_tag<T>, UTL_SCOPE iterator_traits<T>)>;
+using is_specialized = bool_constant<!UTL_TRAIT_is_base_of(impl_tag<T>, __UTL iterator_traits<T>)>;
 
 #endif
 } // namespace iterator_traits

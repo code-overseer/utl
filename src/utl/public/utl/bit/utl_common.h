@@ -38,9 +38,9 @@ template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_bit_readable_v = UTL_TRAIT_is_unsigned(T) && !UTL_TRAIT_is_same(bool, T) &&
     !UTL_TRAIT_is_same(char, T) && !UTL_TRAIT_is_same(char16_t, T) &&
     !UTL_TRAIT_is_same(char32_t, T) && !UTL_TRAIT_is_same(wchar_t, T) && !__UTL_IS_TYPE_CHAR8(T);
-#  define UTL_TRAIT_is_bit_readable(...) UTL_SCOPE is_bit_readable_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_bit_readable(...) __UTL is_bit_readable_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_bit_readable(...) UTL_SCOPE is_bit_readable<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_bit_readable(...) __UTL is_bit_readable<__VA_ARGS__>::value
 #endif
 
 #if UTL_CXX20

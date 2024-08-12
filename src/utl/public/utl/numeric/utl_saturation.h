@@ -23,7 +23,7 @@ inline constexpr bool is_saturatable_v = saturatable<T>;
 
 UTL_NAMESPACE_END
 
-#  define UTL_TRAIT_is_saturatable(...) UTL_SCOPE saturatable<T>
+#  define UTL_TRAIT_is_saturatable(...) __UTL saturatable<T>
 
 #else
 
@@ -33,15 +33,14 @@ namespace details {
 namespace saturation {
 
 template <typename T>
-__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> __UTL false_type;
 
 template <typename T>
-__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
-    -> UTL_SCOPE bool_constant<UTL_TRAIT_is_integral(T) &&
-        !UTL_SCOPE disjunction<UTL_SCOPE is_string_char<T>, UTL_SCOPE is_boolean<T>>::value>;
+__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept -> __UTL bool_constant<UTL_TRAIT_is_integral(T) &&
+    !__UTL disjunction<__UTL is_string_char<T>, __UTL is_boolean<T>>::value>;
 
 template <typename T>
-using trait UTL_NODEBUG = decltype(UTL_SCOPE details::saturation::trait_impl<T>(0));
+using trait UTL_NODEBUG = decltype(__UTL details::saturation::trait_impl<T>(0));
 
 } // namespace saturation
 } // namespace details
@@ -54,6 +53,6 @@ UTL_INLINE_CXX17 constexpr bool is_saturatable_v = details::saturation::trait<T>
 
 UTL_NAMESPACE_END
 
-#  define UTL_TRAIT_is_saturatable(...) UTL_SCOPE details::saturation::trait<T>::value
+#  define UTL_TRAIT_is_saturatable(...) __UTL details::saturation::trait<T>::value
 
 #endif

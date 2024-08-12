@@ -70,7 +70,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_union
 #  define UTL_TRAIT_is_union(...) UTL_BUILTIN_is_union(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_union(...) UTL_SCOPE is_union_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_union(...) __UTL is_union_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_union(...) UTL_SCOPE is_union<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_union(...) __UTL is_union<__VA_ARGS__>::value
 #endif

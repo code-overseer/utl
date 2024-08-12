@@ -46,24 +46,24 @@ namespace details {
 namespace reverse_iterator {
 template <typename T>
 struct concept_type {
-    using type UTL_NODEBUG = UTL_SCOPE bidirectional_iterator_tag;
+    using type UTL_NODEBUG = __UTL bidirectional_iterator_tag;
 };
 template <typename T>
 using concept_type_t UTL_NODEBUG = typename concept_type<T>::type;
-template <UTL_SCOPE random_access_iterator T>
+template <__UTL random_access_iterator T>
 struct concept_type<T> {
-    using type UTL_NODEBUG = UTL_SCOPE random_access_iterator_tag;
+    using type UTL_NODEBUG = __UTL random_access_iterator_tag;
 };
 
 template <typename T>
 struct category_type {
-    using type UTL_NODEBUG = typename UTL_SCOPE iterator_traits<T>::iterator_category;
+    using type UTL_NODEBUG = typename __UTL iterator_traits<T>::iterator_category;
 };
 template <typename T>
 using category_type_t UTL_NODEBUG = typename concept_type<T>::type;
-template <UTL_SCOPE details::iterator_concept::implements<UTL_SCOPE random_access_iterator_tag> T>
+template <__UTL details::iterator_concept::implements<__UTL random_access_iterator_tag> T>
 struct category_type<T> {
-    using type UTL_NODEBUG = UTL_SCOPE random_access_iterator_tag;
+    using type UTL_NODEBUG = __UTL random_access_iterator_tag;
 };
 
 } // namespace reverse_iterator
@@ -76,24 +76,22 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace reverse_iterator {
 template <typename T>
-__UTL_HIDE_FROM_ABI auto get_concept(int) noexcept
-    -> UTL_SCOPE enable_if_t<UTL_TRAIT_is_legacy_random_access_iterator(T),
-        UTL_SCOPE random_access_iterator_tag>;
+__UTL_HIDE_FROM_ABI auto get_concept(int) noexcept -> __UTL
+    enable_if_t<UTL_TRAIT_is_legacy_random_access_iterator(T), __UTL random_access_iterator_tag>;
 template <typename T>
-__UTL_HIDE_FROM_ABI auto get_concept(float) noexcept -> UTL_SCOPE bidirectional_iterator_tag;
+__UTL_HIDE_FROM_ABI auto get_concept(float) noexcept -> __UTL bidirectional_iterator_tag;
 template <typename T>
-using concept_type_t UTL_NODEBUG = decltype(UTL_SCOPE details::reverse_iterator::get_concept<T>(0));
+using concept_type_t UTL_NODEBUG = decltype(__UTL details::reverse_iterator::get_concept<T>(0));
 
 template <typename T>
-__UTL_HIDE_FROM_ABI auto get_category(int) noexcept -> UTL_SCOPE enable_if_t<
-    UTL_SCOPE details::iterator_concept::implements<UTL_SCOPE random_access_iterator_tag, T>::value,
-    UTL_SCOPE random_access_iterator_tag>;
+__UTL_HIDE_FROM_ABI auto get_category(int) noexcept -> __UTL enable_if_t<
+    __UTL details::iterator_concept::implements<__UTL random_access_iterator_tag, T>::value,
+    __UTL random_access_iterator_tag>;
 template <typename T>
 __UTL_HIDE_FROM_ABI auto get_category(float) noexcept -> T;
 
 template <typename T>
-using category_type_t UTL_NODEBUG =
-    decltype(UTL_SCOPE details::reverse_iterator::get_category<T>(0));
+using category_type_t UTL_NODEBUG = decltype(__UTL details::reverse_iterator::get_category<T>(0));
 } // namespace reverse_iterator
 } // namespace details
 UTL_NAMESPACE_END
@@ -123,17 +121,17 @@ private:
     };
 
     using offset_t UTL_NODEBUG =
-        UTL_SCOPE conditional_t<UTL_TRAIT_is_base_of(random_access_iterator_tag, iterator_concept),
+        __UTL conditional_t<UTL_TRAIT_is_base_of(random_access_iterator_tag, iterator_concept),
             difference_type, inaccessible_t>;
     using invalid_offset_t UTL_NODEBUG =
-        UTL_SCOPE conditional_t<!UTL_TRAIT_is_base_of(random_access_iterator_tag, iterator_concept),
+        __UTL conditional_t<!UTL_TRAIT_is_base_of(random_access_iterator_tag, iterator_concept),
             difference_type, inaccessible_t>;
 
     template <UTL_CONCEPT_CXX20(legacy_random_access_iterator) I UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_random_access_iterator(I))>
     __UTL_HIDE_FROM_ABI static constexpr auto subscript(I const& current,
         difference_type idx) noexcept(UTL_TRAIT_is_nothrow_subscriptable(I, difference_type))
-        -> decltype(UTL_SCOPE declval<I const&>()[idx]) {
+        -> decltype(__UTL declval<I const&>()[idx]) {
         return current[-idx - 1];
     }
 
@@ -148,10 +146,10 @@ private:
         return current - 1;
     }
 
-    template <typename I, bool NoThrow = noexcept(UTL_SCOPE declval<I>().operator->())>
+    template <typename I, bool NoThrow = noexcept(__UTL declval<I>().operator->())>
     __UTL_HIDE_FROM_ABI static constexpr auto redirect(I const& current, unsigned int) noexcept(
         NoThrow) -> decltype(current.operator->()) {
-        return UTL_SCOPE prev(current).operator->();
+        return __UTL prev(current).operator->();
     }
 
     template <typename I>
@@ -202,13 +200,13 @@ public:
     void operator[](invalid_offset_t idx) const = delete;
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, FLATTEN) constexpr reference operator*() const
-        noexcept(noexcept(*UTL_SCOPE prev(this->current))) {
-        return *UTL_SCOPE prev(this->current);
+        noexcept(noexcept(*__UTL prev(this->current))) {
+        return *__UTL prev(this->current);
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, FLATTEN) constexpr pointer operator->() const
         noexcept(noexcept(redirect(this->current, 0u)))
-        UTL_REQUIRES_CXX20(UTL_SCOPE is_pointer_v<iterator_type> ||
+        UTL_REQUIRES_CXX20(__UTL is_pointer_v<iterator_type> ||
         requires(iterator_type const i) { i.operator->(); })
     {
         return redirect(this->current, 0u);
@@ -239,46 +237,45 @@ public:
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, FLATTEN, NODISCARD) constexpr reverse_iterator operator+(
-        difference_type n) const noexcept(noexcept(UTL_SCOPE prev(this->current))) {
-        return reverse_iterator(UTL_SCOPE prev(this->current, n));
+        difference_type n) const noexcept(noexcept(__UTL prev(this->current))) {
+        return reverse_iterator(__UTL prev(this->current, n));
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, FLATTEN, NODISCARD) constexpr reverse_iterator operator-(
-        difference_type n) const noexcept(noexcept(UTL_SCOPE next(this->current))) {
-        return reverse_iterator(UTL_SCOPE next(this->current, n));
+        difference_type n) const noexcept(noexcept(__UTL next(this->current))) {
+        return reverse_iterator(__UTL next(this->current, n));
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, FLATTEN)
     UTL_CONSTEXPR_CXX14 reverse_iterator& operator+=(difference_type n) noexcept(
-        noexcept(UTL_SCOPE prev(this->current))) {
-        current = UTL_SCOPE prev(this->current, n);
+        noexcept(__UTL prev(this->current))) {
+        current = __UTL prev(this->current, n);
         return *this;
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, FLATTEN)
     UTL_CONSTEXPR_CXX14 reverse_iterator& operator-=(difference_type n) noexcept(
-        noexcept(UTL_SCOPE next(this->current))) {
-        current = UTL_SCOPE next(this->current, n);
+        noexcept(__UTL next(this->current))) {
+        current = __UTL next(this->current, n);
         return *this;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) friend constexpr UTL_SCOPE iter_rvalue_reference_t<iterator_type>
-    iter_move(reverse_iterator const& it) noexcept(
-        UTL_TRAIT_is_nothrow_copy_constructible(iterator_type) && noexcept(
-            UTL_SCOPE ranges::iter_move(--UTL_SCOPE declval<iterator_type&>()))) {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) friend constexpr __UTL iter_rvalue_reference_t<iterator_type>
+    iter_move(reverse_iterator const& it) noexcept(UTL_TRAIT_is_nothrow_copy_constructible(
+        iterator_type) && noexcept(__UTL ranges::iter_move(--__UTL declval<iterator_type&>()))) {
         auto output = it.base();
-        return UTL_SCOPE ranges::iter_move(output--);
+        return __UTL ranges::iter_move(output--);
     }
 
     template <typename It2>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) friend constexpr void
     iter_swap(reverse_iterator const& lhs, reverse_iterator<It2> const& rhs) noexcept(
         UTL_TRAIT_is_nothrow_copy_constructible(iterator_type) &&
-        UTL_TRAIT_is_nothrow_copy_constructible(It2) && noexcept(UTL_SCOPE ranges::iter_swap(
-            --UTL_SCOPE declval<iterator_type&>(), --UTL_SCOPE declval<It2&>()))) {
+        UTL_TRAIT_is_nothrow_copy_constructible(It2) && noexcept(
+            __UTL ranges::iter_swap(--__UTL declval<iterator_type&>(), --__UTL declval<It2&>()))) {
         auto l = lhs.base();
         auto r = rhs.base();
-        UTL_SCOPE ranges::iter_swap(--l, --r);
+        __UTL ranges::iter_swap(--l, --r);
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, PURE) constexpr iterator_type base() const noexcept {
@@ -289,16 +286,16 @@ protected:
     iterator_type current;
 };
 
-template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_bidirectional_iterator) It>
-UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr UTL_SCOPE reverse_iterator<It> make_reverse_iterator(
-    It it) noexcept(UTL_TRAIT_is_nothrow_constructible(UTL_SCOPE reverse_iterator<It>, It)) {
+template <UTL_CONCEPT_CXX20(__UTL legacy_bidirectional_iterator) It>
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr __UTL reverse_iterator<It> make_reverse_iterator(
+    It it) noexcept(UTL_TRAIT_is_nothrow_constructible(__UTL reverse_iterator<It>, It)) {
     static_assert(UTL_TRAIT_is_legacy_bidirectional_iterator(It),
         "Iterator type must be a bidirectional iterator");
-    return UTL_SCOPE reverse_iterator<It>(it);
+    return __UTL reverse_iterator<It>(it);
 }
 
 #if UTL_CXX17
-template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_bidirectional_iterator) It>
+template <UTL_CONCEPT_CXX20(__UTL legacy_bidirectional_iterator) It>
 explicit reverse_iterator(It) -> reverse_iterator<It>;
 #endif
 
@@ -398,8 +395,8 @@ UTL_INLINE_CXX17 constexpr bool disable_sized_sentinel_for<reverse_iterator<It1>
 namespace details {
 namespace sized_sentinel_for {
 template <typename It1, typename It2>
-struct is_disabled<UTL_SCOPE reverse_iterator<It1>, UTL_SCOPE reverse_iterator<It2>> :
-    UTL_SCOPE negation<UTL_SCOPE is_sized_sentinel_for<It1, It2>> {};
+struct is_disabled<__UTL reverse_iterator<It1>, __UTL reverse_iterator<It2>> :
+    __UTL negation<__UTL is_sized_sentinel_for<It1, It2>> {};
 } // namespace sized_sentinel_for
 } // namespace details
 #endif

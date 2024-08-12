@@ -75,8 +75,8 @@ UTL_NAMESPACE_END
 
 #if UTL_CXX14
 #  define UTL_TRAIT_is_trivially_copy_constructible(...) \
-      UTL_SCOPE is_trivially_copy_constructible_v<__VA_ARGS__>
+      __UTL is_trivially_copy_constructible_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_trivially_copy_constructible(...) \
-      UTL_SCOPE is_trivially_copy_constructible<__VA_ARGS__>::value
+      __UTL is_trivially_copy_constructible<__VA_ARGS__>::value
 #endif

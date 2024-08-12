@@ -76,8 +76,8 @@ UTL_NAMESPACE_END
 
 #if UTL_CXX14
 #  define UTL_TRAIT_is_trivially_copy_assignable(...) \
-      UTL_SCOPE is_trivially_copy_assignable_v<__VA_ARGS__>
+      __UTL is_trivially_copy_assignable_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_trivially_copy_assignable(...) \
-      UTL_SCOPE is_trivially_copy_assignable<__VA_ARGS__>::value
+      __UTL is_trivially_copy_assignable<__VA_ARGS__>::value
 #endif

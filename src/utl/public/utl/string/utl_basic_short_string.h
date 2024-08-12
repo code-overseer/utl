@@ -98,7 +98,7 @@ private:
 
         __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 heap_type& operator=(
             allocation_result<pointer, size_type>&& other) noexcept {
-            data_ = UTL_SCOPE move(other.ptr);
+            data_ = __UTL move(other.ptr);
             capacity_ = other.size;
             return *this;
         }
@@ -116,7 +116,7 @@ private:
     using storage_type = compressed_pair<storage_union, allocator_type>;
 
 public:
-    class __UTL_ABI_PUBLIC iterator : UTL_SCOPE contiguous_iterator_base<iterator, value_type> {
+    class __UTL_ABI_PUBLIC iterator : __UTL contiguous_iterator_base<iterator, value_type> {
         using base_type = contiguous_iterator_base<iterator, value_type>;
 
     public:
@@ -139,11 +139,11 @@ public:
         __UTL_HIDE_FROM_ABI constexpr iterator(char_pointer data) noexcept : base_type(data) {}
         template <typename It>
         __UTL_HIDE_FROM_ABI constexpr iterator(It other) noexcept
-            : iterator(const_cast<pointer>(UTL_SCOPE to_address(other))) {}
+            : iterator(const_cast<pointer>(__UTL to_address(other))) {}
     };
 
     class __UTL_ABI_PUBLIC const_iterator :
-        UTL_SCOPE contiguous_iterator_base<const_iterator, value_type const> {
+        __UTL contiguous_iterator_base<const_iterator, value_type const> {
         using base_type = contiguous_iterator_base<const_iterator, value_type const>;
 
     public:
@@ -169,11 +169,11 @@ public:
         __UTL_HIDE_FROM_ABI constexpr const_iterator(char_pointer data) noexcept
             : base_type(data) {}
         __UTL_HIDE_FROM_ABI constexpr const_iterator(iterator other) noexcept
-            : base_type(UTL_SCOPE to_address(other)) {}
+            : base_type(__UTL to_address(other)) {}
     };
 
-    using reverse_iterator = UTL_SCOPE reverse_iterator<iterator>;
-    using const_reverse_iterator = UTL_SCOPE reverse_iterator<const_iterator>;
+    using reverse_iterator = __UTL reverse_iterator<iterator>;
+    using const_reverse_iterator = __UTL reverse_iterator<const_iterator>;
 
     basic_short_string(decltype(nullptr)) = delete;
     __UTL_HIDE_FROM_ABI constexpr basic_short_string() noexcept(noexcept(allocator_type()))
@@ -191,7 +191,7 @@ public:
         assign(str, len);
     }
 
-    template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(__UTL legacy_input_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_input_iterator(It))>
     __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string(
         It first, It last, allocator_type const& a = allocator_type()) UTL_THROWS
@@ -264,7 +264,7 @@ public:
 
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& operator=(
         basic_short_string const& other) UTL_THROWS {
-        if (this != UTL_SCOPE addressof(other)) {
+        if (this != __UTL addressof(other)) {
             destroy();
             storage_.first() = other.storage_.first();
             alloc_traits::assign(allocator_ref(), other.allocator_ref());
@@ -283,7 +283,7 @@ public:
         : storage_(other.storage_)
         , size_(other.size_)
         , is_heap_(other.is_heap_) {
-        UTL_SCOPE move(other).reset_to_short();
+        __UTL move(other).reset_to_short();
     }
 
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string(basic_short_string&& other, size_type pos,
@@ -302,7 +302,7 @@ public:
 
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string(basic_short_string&& other, size_type pos,
         allocator_type const& alloc = allocator_type()) UTL_THROWS
-        : basic_short_string(UTL_SCOPE move(other), pos, other.size(), alloc) {}
+        : basic_short_string(__UTL move(other), pos, other.size(), alloc) {}
 
     // TODO: container-compatible-ranges ctor
 
@@ -331,11 +331,11 @@ public:
 
     UTL_ATTRIBUTE(STRING_PURE)
     UTL_CONSTEXPR_CXX14 char_pointer data() noexcept UTL_LIFETIMEBOUND {
-        return !is_heap_ ? get_short().data_ : UTL_SCOPE to_address(get_heap().data_);
+        return !is_heap_ ? get_short().data_ : __UTL to_address(get_heap().data_);
     }
 
     UTL_ATTRIBUTE(STRING_PURE) constexpr const_char_pointer data() const noexcept UTL_LIFETIMEBOUND {
-        return !is_heap_ ? get_short().data_ : UTL_SCOPE to_address(get_heap().data_);
+        return !is_heap_ ? get_short().data_ : __UTL to_address(get_heap().data_);
     }
 
     UTL_ATTRIBUTE(STRING_PURE) constexpr const_pointer c_str() const noexcept UTL_LIFETIMEBOUND {
@@ -380,13 +380,13 @@ public:
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void resize(size_type new_size, value_type ch)
         UTL_THROWS {
         reserve(new_size);
-        traits_type::assign(data() + size(), UTL_SCOPE numeric::max(new_size, size()) - size(), ch);
+        traits_type::assign(data() + size(), __UTL numeric::max(new_size, size()) - size(), ch);
         data()[new_size] = value_type();
         size_ = new_size;
     }
 
     template <typename Op UTL_REQUIRES_CXX11(
-        is_integral<decltype(UTL_SCOPE declval<Op>()(char_pointer{}, size_type{}))>::value)>
+        is_integral<decltype(__UTL declval<Op>()(char_pointer{}, size_type{}))>::value)>
     UTL_REQUIRES_CXX20(requires(Op op, char_pointer p, size_type s) {
         { op(p, s) } -> integral;
     })
@@ -552,7 +552,7 @@ public:
         assign(str, traits_type::length(str));
     }
 
-    template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(__UTL legacy_input_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_input_iterator(It) && !UTL_TRAIT_is_legacy_forward_iterator(It))>
     __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& assign(It begin, It end)
         UTL_THROWS UTL_LIFETIMEBOUND {
@@ -563,11 +563,11 @@ public:
         }
     }
 
-    template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_forward_iterator) It UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(__UTL legacy_forward_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_forward_iterator(It))>
     __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX17 basic_short_string& assign(It begin, It end)
         UTL_THROWS UTL_LIFETIMEBOUND {
-        auto const diff = UTL_SCOPE distance(begin, end);
+        auto const diff = __UTL distance(begin, end);
         if (diff < 0) UTL_ATTRIBUTE(UNLIKELY) {
             return *this;
         }
@@ -658,7 +658,7 @@ public:
                     "[UTL] `basic_short_string::insert` operation failed, "
                     "Reason=[argument substring index out of range], idx=[%zu], size=[%zu]"),
                 idx, str.size()));
-        auto const copy_size = UTL_SCOPE numeric::min(str.size() - idx, count);
+        auto const copy_size = __UTL numeric::min(str.size() - idx, count);
         return insert(pos, str.data() + idx, copy_size);
     }
 
@@ -672,7 +672,7 @@ public:
         return insert(pos, 1, ch);
     }
 
-    template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(__UTL legacy_input_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_input_iterator(It) && !UTL_TRAIT_is_legacy_forward_iterator(It))>
     __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, It first, It last)
         UTL_THROWS UTL_LIFETIMEBOUND {
@@ -685,11 +685,11 @@ public:
         return iterator(begin() + idx);
     }
 
-    template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_forward_iterator) It UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(__UTL legacy_forward_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_forward_iterator(It))>
     __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 iterator insert(const_iterator pos, It first, It last)
         UTL_THROWS UTL_LIFETIMEBOUND {
-        auto const length = UTL_SCOPE distance(first, last);
+        auto const length = __UTL distance(first, last);
         if (length < 0) UTL_ATTRIBUTE(UNLIKELY) {
             return *this;
         }
@@ -738,7 +738,7 @@ public:
 
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_short_string& erase(
         size_type idx = 0, size_type count = npos) UTL_THROWS UTL_LIFETIMEBOUND {
-        auto const length = UTL_SCOPE numeric::min(size() - idx, count);
+        auto const length = __UTL numeric::min(size() - idx, count);
         auto const first = begin() + idx;
         return erase(first, first + length), *this;
     }
@@ -790,7 +790,7 @@ public:
         return insert(size(), str, count);
     }
 
-    template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(__UTL legacy_input_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_input_iterator(It))>
     __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& append(It first, It last)
         UTL_THROWS UTL_LIFETIMEBOUND {
@@ -940,7 +940,7 @@ public:
         return *this;
     }
 
-    template <UTL_CONCEPT_CXX20(UTL_SCOPE legacy_input_iterator) It UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(__UTL legacy_input_iterator) It UTL_REQUIRES_CXX11(
         UTL_TRAIT_is_legacy_input_iterator(It))>
     __UTL_ABI_PRIVATE UTL_CONSTEXPR_CXX14 basic_short_string& replace(const_iterator first,
         const_iterator last, It in_first, It in_last) UTL_THROWS UTL_LIFETIMEBOUND {
@@ -1014,7 +1014,7 @@ public:
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
                 pos, size()));
 
-        auto const copied = UTL_SCOPE numeric::min(count, size() - pos);
+        auto const copied = __UTL numeric::min(count, size() - pos);
         traits_type::copy(dst, data(), copied);
         return copied;
     }
@@ -1267,7 +1267,7 @@ public:
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
                 pos, size()));
         return details::string::compare<traits_type>(
-            data() + pos, UTL_SCOPE numeric::min(count, size() - pos), str, str_len);
+            data() + pos, __UTL numeric::min(count, size() - pos), str, str_len);
     }
 
     UTL_ATTRIBUTE(STRING_PURE)
@@ -1369,7 +1369,7 @@ public:
 
     UTL_ATTRIBUTE(STRING_PURE) constexpr basic_short_string substr(
         size_type pos = 0, size_type count = npos) const&& {
-        return basic_short_string(UTL_SCOPE move(*this), pos, count);
+        return basic_short_string(__UTL move(*this), pos, count);
     }
 
 private:
@@ -1392,9 +1392,9 @@ private:
         size_type new_capacity) UTL_THROWS {
         UTL_ASSERT(!is_heap_);
         auto const result = alloc_traits::allocate_at_least(allocator_ref(), new_capacity + 1);
-        heap_type new_heap{UTL_SCOPE move(result.ptr), result.size};
-        traits_type::copy(UTL_SCOPE to_address(new_heap.data_), data(), size());
-        UTL_SCOPE construct_at(UTL_SCOPE addressof(get_heap()), new_heap);
+        heap_type new_heap{__UTL move(result.ptr), result.size};
+        traits_type::copy(__UTL to_address(new_heap.data_), data(), size());
+        __UTL construct_at(__UTL addressof(get_heap()), new_heap);
         is_heap_ = true;
     }
 
@@ -1447,7 +1447,7 @@ private:
         if (is_heap_) {
             size_ = 0;
             is_heap_ = false;
-            ::new (UTL_SCOPE addressof(get_short())) short_type;
+            ::new (__UTL addressof(get_short())) short_type;
         }
     }
 
@@ -1459,15 +1459,15 @@ private:
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void move_assign(basic_short_string& other, true_type) noexcept {
         destroy();
         storage_.first() = other.storage_.first();
-        alloc_traits::assign(allocator_ref(), UTL_SCOPE move(other.allocator_ref()));
+        alloc_traits::assign(allocator_ref(), __UTL move(other.allocator_ref()));
         size_ = other.size_;
         is_heap_ = other.is_heap_;
 
-        UTL_SCOPE move(other).reset_to_short();
+        __UTL move(other).reset_to_short();
     }
 
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void inline_substring(size_type pos, size_type count) noexcept {
-        auto const new_size = UTL_SCOPE numeric::min(this->size() - pos, count);
+        auto const new_size = __UTL numeric::min(this->size() - pos, count);
         traits_type::move(this->data(), this->data() + pos, new_size);
         this->resize(new_size);
     }
@@ -1486,7 +1486,7 @@ private:
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void on_move_construct_with_alloc(
         basic_short_string& other, size_type pos, size_type count, false_type) noexcept {
         inline_substring(pos, count);
-        UTL_SCOPE move(other).reset_to_short();
+        __UTL move(other).reset_to_short();
     }
 
     UTL_ATTRIBUTE(STRING_CONST)
@@ -1519,7 +1519,7 @@ private:
 template <typename CharT, size_t N, typename Traits, typename Alloc, typename U>
 __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 typename basic_short_string<CharT, N, Traits, Alloc>::size_type erase(
     basic_short_string<CharT, N, Traits, Alloc>& c, U const& value) {
-    auto const it = UTL_SCOPE remove(c.begin(), c.end(), value);
+    auto const it = __UTL remove(c.begin(), c.end(), value);
     auto const result = c.end() - it;
     c.erase(it, c.end());
     return result;
@@ -1529,7 +1529,7 @@ template <typename CharT, size_t N, typename Traits, typename Alloc, typename Pr
 __UTL_HIDE_FROM_ABI
     UTL_CONSTEXPR_CXX14 typename basic_short_string<CharT, N, Traits, Alloc>::size_type
 erase_if(basic_short_string<CharT, N, Traits, Alloc>& c, Pred const& pred) {
-    auto const it = UTL_SCOPE remove_if(c.begin(), c.end(), pred);
+    auto const it = __UTL remove_if(c.begin(), c.end(), pred);
     auto const result = c.end() - it;
     c.erase(it, c.end());
     return result;
@@ -1615,59 +1615,59 @@ template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
     basic_short_string<CharT, N, Traits, Alloc>&& l,
     basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
-    return UTL_SCOPE move(l.append(r));
+    return __UTL move(l.append(r));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
     basic_short_string<CharT, N, Traits, Alloc>&& l,
     basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
-    return UTL_SCOPE move(l.append(r));
+    return __UTL move(l.append(r));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
     basic_short_string<CharT, N, Traits, Alloc>&& l, CharT const* r) UTL_THROWS {
-    return UTL_SCOPE move(l.append(r));
+    return __UTL move(l.append(r));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
     basic_short_string<CharT, N, Traits, Alloc>&& l, CharT r) UTL_THROWS {
-    return UTL_SCOPE move(l.append(r));
+    return __UTL move(l.append(r));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
     basic_short_string<CharT, N, Traits, Alloc>&& l,
     type_identity_t<basic_string_view<CharT, Traits>> r) UTL_THROWS {
-    return UTL_SCOPE move(l.append(r));
+    return __UTL move(l.append(r));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
     basic_short_string<CharT, N, Traits, Alloc> const& l,
     basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
-    return UTL_SCOPE move(r.insert(0, l));
+    return __UTL move(r.insert(0, l));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
     CharT const* l, basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
-    return UTL_SCOPE move(r.insert(0, l));
+    return __UTL move(r.insert(0, l));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
     CharT l, basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
-    return UTL_SCOPE move(r.insert(0, l));
+    return __UTL move(r.insert(0, l));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
 UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
     type_identity_t<basic_string_view<CharT, Traits>> l,
     basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
-    return UTL_SCOPE move(r.insert(0, l));
+    return __UTL move(r.insert(0, l));
 }
 
 UTL_NAMESPACE_END

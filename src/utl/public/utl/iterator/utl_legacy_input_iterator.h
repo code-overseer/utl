@@ -51,8 +51,7 @@ UTL_NAMESPACE_END
 #endif // UTL_CXX20
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_legacy_input_iterator(...) UTL_SCOPE is_legacy_input_iterator_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_legacy_input_iterator(...) __UTL is_legacy_input_iterator_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_legacy_input_iterator(...) \
-      UTL_SCOPE is_legacy_input_iterator<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_legacy_input_iterator(...) __UTL is_legacy_input_iterator<__VA_ARGS__>::value
 #endif

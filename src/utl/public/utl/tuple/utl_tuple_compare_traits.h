@@ -22,13 +22,13 @@ template <typename T>
 using const_ref_t UTL_NODEBUG = remove_reference_t<T> const&;
 template <typename T>
 using sequence_t UTL_NODEBUG =
-    conditional_t<UTL_SCOPE is_tuple_like<T>::value, tuple_index_sequence<T>, void>;
+    conditional_t<__UTL is_tuple_like<T>::value, tuple_index_sequence<T>, void>;
 
 template <typename T, typename U = T, typename Seq = sequence_t<T>, typename = void>
 struct all_have_eq_impl : false_type {};
 template <typename T, typename U, size_t... Is>
 struct all_have_eq_impl<T, U, index_sequence<Is...>,
-    enable_if_t<conjunction<UTL_SCOPE is_tuple_like<T>, UTL_SCOPE is_tuple_like<U>,
+    enable_if_t<conjunction<__UTL is_tuple_like<T>, __UTL is_tuple_like<U>,
         bool_constant<tuple_size<T>::value == tuple_size<U>::value>,
         is_equality_comparable_with<const_ref_t<tuple_element_t<Is, T>>,
             const_ref_t<tuple_element_t<Is, U>>>...>::value> // enable_if_t
@@ -38,7 +38,7 @@ template <typename T, typename U = T, typename Seq = sequence_t<T>, typename = v
 struct all_have_neq_impl : false_type {};
 template <typename T, typename U, size_t... Is>
 struct all_have_neq_impl<T, U, index_sequence<Is...>,
-    enable_if_t<conjunction<UTL_SCOPE is_tuple_like<T>, UTL_SCOPE is_tuple_like<U>,
+    enable_if_t<conjunction<__UTL is_tuple_like<T>, __UTL is_tuple_like<U>,
         bool_constant<tuple_size<T>::value == tuple_size<U>::value>,
         is_inequality_comparable_with<const_ref_t<tuple_element_t<Is, T>>,
             const_ref_t<tuple_element_t<Is, U>>>...>::value> // enable_if_t
@@ -48,7 +48,7 @@ template <typename T, typename U = T, typename Seq = sequence_t<T>, typename = v
 struct all_have_lt_impl : false_type {};
 template <typename T, typename U, size_t... Is>
 struct all_have_lt_impl<T, U, index_sequence<Is...>,
-    enable_if_t<conjunction<UTL_SCOPE is_tuple_like<T>, UTL_SCOPE is_tuple_like<U>,
+    enable_if_t<conjunction<__UTL is_tuple_like<T>, __UTL is_tuple_like<U>,
         bool_constant<tuple_size<T>::value == tuple_size<U>::value>,
         is_strict_subordinate_comparable_with<const_ref_t<tuple_element_t<Is, T>>,
             const_ref_t<tuple_element_t<Is, U>>>...>::value> // enable_if_t
@@ -58,7 +58,7 @@ template <typename T, typename U = T, typename Seq = sequence_t<T>, typename = v
 struct all_have_gt_impl : false_type {};
 template <typename T, typename U, size_t... Is>
 struct all_have_gt_impl<T, U, index_sequence<Is...>,
-    enable_if_t<conjunction<UTL_SCOPE is_tuple_like<T>, UTL_SCOPE is_tuple_like<U>,
+    enable_if_t<conjunction<__UTL is_tuple_like<T>, __UTL is_tuple_like<U>,
         bool_constant<tuple_size<T>::value == tuple_size<U>::value>,
         is_strict_superordinate_comparable_with<const_ref_t<tuple_element_t<Is, T>>,
             const_ref_t<tuple_element_t<Is, U>>>...>::value> // enable_if_t
@@ -68,7 +68,7 @@ template <typename T, typename U = T, typename Seq = sequence_t<T>, typename = v
 struct all_have_lteq_impl : false_type {};
 template <typename T, typename U, size_t... Is>
 struct all_have_lteq_impl<T, U, index_sequence<Is...>,
-    enable_if_t<conjunction<UTL_SCOPE is_tuple_like<T>, UTL_SCOPE is_tuple_like<U>,
+    enable_if_t<conjunction<__UTL is_tuple_like<T>, __UTL is_tuple_like<U>,
         bool_constant<tuple_size<T>::value == tuple_size<U>::value>,
         is_subordinate_comparable_with<const_ref_t<tuple_element_t<Is, T>>,
             const_ref_t<tuple_element_t<Is, U>>>...>::value> // enable_if_t
@@ -78,7 +78,7 @@ template <typename T, typename U = T, typename Seq = sequence_t<T>, typename = v
 struct all_have_gteq_impl : false_type {};
 template <typename T, typename U, size_t... Is>
 struct all_have_gteq_impl<T, U, index_sequence<Is...>,
-    enable_if_t<conjunction<UTL_SCOPE is_tuple_like<T>, UTL_SCOPE is_tuple_like<U>,
+    enable_if_t<conjunction<__UTL is_tuple_like<T>, __UTL is_tuple_like<U>,
         bool_constant<tuple_size<T>::value == tuple_size<U>::value>,
         is_superordinate_comparable_with<const_ref_t<tuple_element_t<Is, T>>,
             const_ref_t<tuple_element_t<Is, U>>>...>::value> // enable_if_t
@@ -103,8 +103,8 @@ template <typename T, typename U, typename Seq = sequence_t<T>, typename = void>
 struct all_have_nothrow_eq_impl;
 template <typename T, typename U, size_t... Is>
 struct all_have_nothrow_eq_impl<T, U, index_sequence<Is...>,
-    enable_if_t<conjunction<all_have_eq<T, U>, UTL_SCOPE details::tuple::is_all_nothrow_gettable<T>,
-        UTL_SCOPE details::tuple::is_all_nothrow_gettable<U>,
+    enable_if_t<conjunction<all_have_eq<T, U>, __UTL details::tuple::is_all_nothrow_gettable<T>,
+        __UTL details::tuple::is_all_nothrow_gettable<U>,
         is_nothrow_equality_comparable_with<tuple_element_t<Is, T>,
             tuple_element_t<Is, U>>...>::value>> : true_type {};
 
@@ -112,18 +112,17 @@ template <typename T, typename U, typename Seq = sequence_t<T>, typename = void>
 struct all_have_nothrow_neq_impl;
 template <typename T, typename U, size_t... Is>
 struct all_have_nothrow_neq_impl<T, U, index_sequence<Is...>,
-    enable_if_t<
-        conjunction<all_have_neq<T, U>, UTL_SCOPE details::tuple::is_all_nothrow_gettable<T>,
-            UTL_SCOPE details::tuple::is_all_nothrow_gettable<U>,
-            is_nothrow_inequality_comparable_with<tuple_element_t<Is, T>,
-                tuple_element_t<Is, U>>...>::value>> : true_type {};
+    enable_if_t<conjunction<all_have_neq<T, U>, __UTL details::tuple::is_all_nothrow_gettable<T>,
+        __UTL details::tuple::is_all_nothrow_gettable<U>,
+        is_nothrow_inequality_comparable_with<tuple_element_t<Is, T>,
+            tuple_element_t<Is, U>>...>::value>> : true_type {};
 
 template <typename T, typename U, typename Seq = sequence_t<T>, typename = void>
 struct all_have_nothrow_lt_impl;
 template <typename T, typename U, size_t... Is>
 struct all_have_nothrow_lt_impl<T, U, index_sequence<Is...>,
-    enable_if_t<conjunction<all_have_lt<T, U>, UTL_SCOPE details::tuple::is_all_nothrow_gettable<T>,
-        UTL_SCOPE details::tuple::is_all_nothrow_gettable<U>,
+    enable_if_t<conjunction<all_have_lt<T, U>, __UTL details::tuple::is_all_nothrow_gettable<T>,
+        __UTL details::tuple::is_all_nothrow_gettable<U>,
         is_nothrow_strict_subordinate_comparable_with<tuple_element_t<Is, T>,
             tuple_element_t<Is, U>>...>::value>> : true_type {};
 
@@ -131,8 +130,8 @@ template <typename T, typename U, typename Seq = sequence_t<T>, typename = void>
 struct all_have_nothrow_gt_impl;
 template <typename T, typename U, size_t... Is>
 struct all_have_nothrow_gt_impl<T, U, index_sequence<Is...>,
-    enable_if_t<conjunction<all_have_gt<T, U>, UTL_SCOPE details::tuple::is_all_nothrow_gettable<T>,
-        UTL_SCOPE details::tuple::is_all_nothrow_gettable<U>,
+    enable_if_t<conjunction<all_have_gt<T, U>, __UTL details::tuple::is_all_nothrow_gettable<T>,
+        __UTL details::tuple::is_all_nothrow_gettable<U>,
         is_nothrow_strict_superordinate_comparable_with<tuple_element_t<Is, T>,
             tuple_element_t<Is, U>>...>::value>> : true_type {};
 
@@ -140,21 +139,19 @@ template <typename T, typename U, typename Seq = sequence_t<T>, typename = void>
 struct all_have_nothrow_lteq_impl;
 template <typename T, typename U, size_t... Is>
 struct all_have_nothrow_lteq_impl<T, U, index_sequence<Is...>,
-    enable_if_t<
-        conjunction<all_have_lteq<T, U>, UTL_SCOPE details::tuple::is_all_nothrow_gettable<T>,
-            UTL_SCOPE details::tuple::is_all_nothrow_gettable<U>,
-            is_nothrow_subordinate_comparable_with<tuple_element_t<Is, T>,
-                tuple_element_t<Is, U>>...>::value>> : true_type {};
+    enable_if_t<conjunction<all_have_lteq<T, U>, __UTL details::tuple::is_all_nothrow_gettable<T>,
+        __UTL details::tuple::is_all_nothrow_gettable<U>,
+        is_nothrow_subordinate_comparable_with<tuple_element_t<Is, T>,
+            tuple_element_t<Is, U>>...>::value>> : true_type {};
 
 template <typename T, typename U, typename Seq = sequence_t<T>, typename = void>
 struct all_have_nothrow_gteq_impl;
 template <typename T, typename U, size_t... Is>
 struct all_have_nothrow_gteq_impl<T, U, index_sequence<Is...>,
-    enable_if_t<
-        conjunction<all_have_gteq<T, U>, UTL_SCOPE details::tuple::is_all_nothrow_gettable<T>,
-            UTL_SCOPE details::tuple::is_all_nothrow_gettable<U>,
-            is_nothrow_superordinate_comparable_with<tuple_element_t<Is, T>,
-                tuple_element_t<Is, U>>...>::value>> : true_type {};
+    enable_if_t<conjunction<all_have_gteq<T, U>, __UTL details::tuple::is_all_nothrow_gettable<T>,
+        __UTL details::tuple::is_all_nothrow_gettable<U>,
+        is_nothrow_superordinate_comparable_with<tuple_element_t<Is, T>,
+            tuple_element_t<Is, U>>...>::value>> : true_type {};
 } // namespace details
 
 template <typename T, typename U = T>
@@ -186,26 +183,24 @@ __UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(float, index_sequenc
     -> false_type;
 
 template <typename T, typename U, typename Cat, size_t... Is>
-__UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(int, index_sequence<Is...>)
-    -> bool_constant<tuple_size<T>::value == tuple_size<U>::value &&
-        conjunction<decltype(three_way_comparable_with_test<
-            remove_cvref_t<decltype(UTL_SCOPE get_element<Is>(UTL_SCOPE declval<T>()))>,
-            remove_cvref_t<decltype(UTL_SCOPE get_element<Is>(UTL_SCOPE declval<U>()))>, Cat>(
-            0))...>::value>;
+__UTL_HIDE_FROM_ABI auto all_three_way_comparable_with_test(
+    int, index_sequence<Is...>) -> bool_constant<tuple_size<T>::value == tuple_size<U>::value &&
+    conjunction<decltype(three_way_comparable_with_test<
+        remove_cvref_t<decltype(__UTL get_element<Is>(__UTL declval<T>()))>,
+        remove_cvref_t<decltype(__UTL get_element<Is>(__UTL declval<U>()))>, Cat>(0))...>::value>;
 
 template <typename T, typename U, typename Cat, size_t... Is>
 __UTL_HIDE_FROM_ABI auto all_nothrow_three_way_comparable_with_test(float, index_sequence<Is...>)
     -> false_type;
 
 template <typename T, typename U, typename Cat, size_t... Is>
-__UTL_HIDE_FROM_ABI auto all_nothrow_three_way_comparable_with_test(int, index_sequence<Is...>)
-    -> bool_constant<tuple_size<T>::value == tuple_size<U>::value &&
-        UTL_SCOPE details::tuple::is_all_nothrow_gettable<T>::value &&
-        UTL_SCOPE details::tuple::is_all_nothrow_gettable<U>::value &&
-        conjunction<decltype(nothrow_three_way_comparable_with_test<
-            remove_cvref_t<decltype(UTL_SCOPE get_element<Is>(UTL_SCOPE declval<T>()))>,
-            remove_cvref_t<decltype(UTL_SCOPE get_element<Is>(UTL_SCOPE declval<U>()))>, Cat>(
-            0))...>::value>;
+__UTL_HIDE_FROM_ABI auto all_nothrow_three_way_comparable_with_test(
+    int, index_sequence<Is...>) -> bool_constant<tuple_size<T>::value == tuple_size<U>::value &&
+    __UTL details::tuple::is_all_nothrow_gettable<T>::value &&
+    __UTL details::tuple::is_all_nothrow_gettable<U>::value &&
+    conjunction<decltype(nothrow_three_way_comparable_with_test<
+        remove_cvref_t<decltype(__UTL get_element<Is>(__UTL declval<T>()))>,
+        remove_cvref_t<decltype(__UTL get_element<Is>(__UTL declval<U>()))>, Cat>(0))...>::value>;
 
 template <typename T, typename U, typename Cat, size_t N = tuple_size<T>::value>
 using all_three_way_comparable_with_test_t UTL_NODEBUG =

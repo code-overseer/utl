@@ -72,7 +72,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_final
 #  define UTL_TRAIT_is_final(...) UTL_BUILTIN_is_final(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_final(...) UTL_SCOPE is_final_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_final(...) __UTL is_final_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_final(...) UTL_SCOPE is_final<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_final(...) __UTL is_final<__VA_ARGS__>::value
 #endif

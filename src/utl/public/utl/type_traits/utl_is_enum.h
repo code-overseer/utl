@@ -70,7 +70,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_enum
 #  define UTL_TRAIT_is_enum(...) UTL_BUILTIN_is_enum(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_enum(...) UTL_SCOPE is_enum_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_enum(...) __UTL is_enum_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_enum(...) UTL_SCOPE is_enum<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_enum(...) __UTL is_enum<__VA_ARGS__>::value
 #endif

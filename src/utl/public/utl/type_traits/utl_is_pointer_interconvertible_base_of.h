@@ -72,8 +72,8 @@ UTL_NAMESPACE_END
       UTL_BUILTIN_is_pointer_interconvertible_base_of(__VA_ARGS__)
 #elif UTL_CXX14
 #  define UTL_TRAIT_is_pointer_interconvertible_base_of(...) \
-      UTL_SCOPE is_pointer_interconvertible_base_of_v<__VA_ARGS__>
+      __UTL is_pointer_interconvertible_base_of_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_pointer_interconvertible_base_of(...) \
-      UTL_SCOPE is_pointer_interconvertible_base_of<__VA_ARGS__>::value
+      __UTL is_pointer_interconvertible_base_of<__VA_ARGS__>::value
 #endif

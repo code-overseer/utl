@@ -21,11 +21,9 @@ namespace function_info {
 template <typename F, typename = void>
 struct function_type;
 template <typename F>
-struct function_type<F*, enable_if_t<UTL_SCOPE is_function<F>::value>> :
-    UTL_SCOPE function_type<F> {};
+struct function_type<F*, enable_if_t<__UTL is_function<F>::value>> : __UTL function_type<F> {};
 template <typename F>
-struct function_type<F&, enable_if_t<UTL_SCOPE is_function<F>::value>> :
-    UTL_SCOPE function_type<F> {};
+struct function_type<F&, enable_if_t<__UTL is_function<F>::value>> : __UTL function_type<F> {};
 } // namespace function_info
 } // namespace details
 
@@ -587,15 +585,13 @@ UTL_NAMESPACE_END
 
 namespace std {
 template <typename F>
-struct tuple_size<UTL_SCOPE function_type<F>> :
-    UTL_SCOPE template_size<UTL_SCOPE function_type<F>> {};
+struct tuple_size<__UTL function_type<F>> : __UTL template_size<__UTL function_type<F>> {};
 template <typename F>
-struct tuple_size<UTL_SCOPE function_traits<F>> :
-    UTL_SCOPE template_size<UTL_SCOPE function_traits<F>> {};
+struct tuple_size<__UTL function_traits<F>> : __UTL template_size<__UTL function_traits<F>> {};
 template <size_t I, typename F>
-struct tuple_element<I, UTL_SCOPE function_type<F>> :
-    UTL_SCOPE template_element<I, UTL_SCOPE function_type<F>> {};
+struct tuple_element<I, __UTL function_type<F>> :
+    __UTL template_element<I, __UTL function_type<F>> {};
 template <size_t I, typename F>
-struct tuple_element<I, UTL_SCOPE function_traits<F>> :
-    UTL_SCOPE template_element<I, UTL_SCOPE function_traits<F>> {};
+struct tuple_element<I, __UTL function_traits<F>> :
+    __UTL template_element<I, __UTL function_traits<F>> {};
 } // namespace std

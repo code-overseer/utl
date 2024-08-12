@@ -49,9 +49,8 @@ template <typename, typename, typename = void>
 struct common_type_impl {};
 
 template <typename... Ts, typename... Us>
-struct common_type_impl<UTL_SCOPE tuple<Ts...>, UTL_SCOPE tuple<Us...>,
-    void_t<common_type_t<Ts, Us>...>> {
-    using type UTL_NODEBUG = UTL_SCOPE tuple<common_type_t<Ts, Us>...>;
+struct common_type_impl<__UTL tuple<Ts...>, __UTL tuple<Us...>, void_t<common_type_t<Ts, Us>...>> {
+    using type UTL_NODEBUG = __UTL tuple<common_type_t<Ts, Us>...>;
 };
 
 template <typename, typename, template <typename> class TQual, template <typename> class UQual,
@@ -60,9 +59,9 @@ struct basic_ref_impl {};
 
 template <typename... Ts, typename... Us, template <typename> class TQual,
     template <typename> class UQual>
-struct basic_ref_impl<UTL_SCOPE tuple<Ts...>, UTL_SCOPE tuple<Us...>, TQual, UQual,
+struct basic_ref_impl<__UTL tuple<Ts...>, __UTL tuple<Us...>, TQual, UQual,
     void_t<common_reference_t<TQual<Ts>, UQual<Us>>...>> {
-    using type UTL_NODEBUG = UTL_SCOPE tuple<common_reference_t<TQual<Ts>, UQual<Us>>...>;
+    using type UTL_NODEBUG = __UTL tuple<common_reference_t<TQual<Ts>, UQual<Us>>...>;
 };
 } // namespace tuple
 } // namespace details
@@ -72,13 +71,12 @@ UTL_NAMESPACE_END
 // TODO: if std is included or forward declared use std, else use UTL
 namespace std {
 template <typename... Ts, typename... Us>
-struct common_type<UTL_SCOPE tuple<Ts...>, UTL_SCOPE tuple<Us...>> :
-    UTL_SCOPE details::tuple::common_type_impl<UTL_SCOPE tuple<Ts...>, UTL_SCOPE tuple<Us...>> {};
+struct common_type<__UTL tuple<Ts...>, __UTL tuple<Us...>> :
+    __UTL details::tuple::common_type_impl<__UTL tuple<Ts...>, __UTL tuple<Us...>> {};
 template <typename... Ts, typename... Us, template <typename> class TQual,
     template <typename> class UQual>
-struct basic_common_reference<UTL_SCOPE tuple<Ts...>, UTL_SCOPE tuple<Us...>, TQual, UQual> :
-    UTL_SCOPE details::tuple::basic_ref_impl<UTL_SCOPE tuple<Ts...>, UTL_SCOPE tuple<Us...>, TQual,
-        UQual> {};
+struct basic_common_reference<__UTL tuple<Ts...>, __UTL tuple<Us...>, TQual, UQual> :
+    __UTL details::tuple::basic_ref_impl<__UTL tuple<Ts...>, __UTL tuple<Us...>, TQual, UQual> {};
 } // namespace std
 
 UTL_NAMESPACE_BEGIN
@@ -118,89 +116,86 @@ struct storage<T, Tail...> {
         enable_if_t<sizeof...(UTail) == sizeof...(Tail), int> = 1>
     __UTL_HIDE_FROM_ABI constexpr storage(UHead&& other_head, UTail&&... other_tail) noexcept(
         traits::template is_nothrow_constructible<UHead, UTail...>::value)
-        : head(UTL_SCOPE forward<UHead>(other_head))
-        , tail(UTL_SCOPE forward<UTail>(other_tail)...) {}
+        : head(__UTL forward<UHead>(other_head))
+        , tail(__UTL forward<UTail>(other_tail)...) {}
 
     template <typename Alloc,
-        enable_if_t<conjunction<UTL_SCOPE uses_allocator<T, Alloc>,
-                        UTL_SCOPE is_constructible<T, allocator_arg_t, Alloc const&>>::value,
+        enable_if_t<conjunction<__UTL uses_allocator<T, Alloc>,
+                        __UTL is_constructible<T, allocator_arg_t, Alloc const&>>::value,
             int> = 0>
     __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
-        conjunction<UTL_SCOPE is_nothrow_constructible<T, allocator_arg_t, Alloc const&>,
-            UTL_SCOPE is_nothrow_constructible<tail_type, allocator_arg_t, Alloc const&>>::value)
+        conjunction<__UTL is_nothrow_constructible<T, allocator_arg_t, Alloc const&>,
+            __UTL is_nothrow_constructible<tail_type, allocator_arg_t, Alloc const&>>::value)
         : head(allocator_arg, alloc)
         , tail(allocator_arg, alloc) {}
 
     template <typename Alloc,
-        enable_if_t<conjunction<UTL_SCOPE uses_allocator<T, Alloc>,
-                        negation<UTL_SCOPE is_constructible<T, allocator_arg_t, Alloc const&>>,
-                        UTL_SCOPE is_constructible<T, Alloc const&>>::value,
+        enable_if_t<conjunction<__UTL uses_allocator<T, Alloc>,
+                        negation<__UTL is_constructible<T, allocator_arg_t, Alloc const&>>,
+                        __UTL is_constructible<T, Alloc const&>>::value,
             int> = 1>
     __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
-        conjunction<UTL_SCOPE is_nothrow_constructible<T, Alloc const&>,
-            UTL_SCOPE is_nothrow_constructible<tail_type, allocator_arg_t, Alloc const&>>::value)
+        conjunction<__UTL is_nothrow_constructible<T, Alloc const&>,
+            __UTL is_nothrow_constructible<tail_type, allocator_arg_t, Alloc const&>>::value)
         : head(alloc)
         , tail(allocator_arg, alloc) {}
 
-    template <typename Alloc, enable_if_t<!UTL_SCOPE uses_allocator<T, Alloc>::value, int> = 2>
+    template <typename Alloc, enable_if_t<!__UTL uses_allocator<T, Alloc>::value, int> = 2>
     __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
-        conjunction<UTL_SCOPE is_nothrow_constructible<T>,
-            UTL_SCOPE is_nothrow_constructible<tail_type, allocator_arg_t, Alloc const&>>::value)
+        conjunction<__UTL is_nothrow_constructible<T>,
+            __UTL is_nothrow_constructible<tail_type, allocator_arg_t, Alloc const&>>::value)
         : head()
         , tail(allocator_arg, alloc) {}
 
     template <typename Alloc, typename UHead, typename... UTail,
-        enable_if_t<conjunction<UTL_SCOPE uses_allocator<T, Alloc>,
-                        UTL_SCOPE is_constructible<T, allocator_arg_t, Alloc const&, UHead>>::value,
+        enable_if_t<conjunction<__UTL uses_allocator<T, Alloc>,
+                        __UTL is_constructible<T, allocator_arg_t, Alloc const&, UHead>>::value,
             int> = 0>
     __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc, UHead&& other_head,
-        UTail&&... other_tail) noexcept(conjunction<UTL_SCOPE is_nothrow_constructible<T,
+        UTail&&... other_tail) noexcept(conjunction<__UTL is_nothrow_constructible<T,
                                                         allocator_arg_t, Alloc const&, UHead>,
-        UTL_SCOPE
-            is_nothrow_constructible<tail_type, allocator_arg_t, Alloc const&, UTail...>>::value)
-        : head(allocator_arg, alloc, UTL_SCOPE forward<UHead>(other_head))
-        , tail(allocator_arg, alloc, UTL_SCOPE forward<UTail>(other_tail)...) {}
+        __UTL is_nothrow_constructible<tail_type, allocator_arg_t, Alloc const&, UTail...>>::value)
+        : head(allocator_arg, alloc, __UTL forward<UHead>(other_head))
+        , tail(allocator_arg, alloc, __UTL forward<UTail>(other_tail)...) {}
 
     template <typename Alloc, typename UHead, typename... UTail,
-        enable_if_t<conjunction<UTL_SCOPE uses_allocator<T, Alloc>,
-                        negation<UTL_SCOPE is_constructible<T, allocator_arg_t, Alloc const&>>,
-                        UTL_SCOPE is_constructible<T, UHead, Alloc const&>>::value,
+        enable_if_t<conjunction<__UTL uses_allocator<T, Alloc>,
+                        negation<__UTL is_constructible<T, allocator_arg_t, Alloc const&>>,
+                        __UTL is_constructible<T, UHead, Alloc const&>>::value,
             int> = 1>
     __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc, UHead&& other_head,
-        UTail&&... other_tail) noexcept(conjunction<UTL_SCOPE is_nothrow_constructible<T, UHead,
+        UTail&&... other_tail) noexcept(conjunction<__UTL is_nothrow_constructible<T, UHead,
                                                         Alloc const&>,
-        UTL_SCOPE
-            is_nothrow_constructible<tail_type, allocator_arg_t, Alloc const&, UTail...>>::value)
-        : head(UTL_SCOPE forward<UHead>(other_head), alloc)
-        , tail(allocator_arg, alloc, UTL_SCOPE forward<UTail>(other_tail)...) {}
+        __UTL is_nothrow_constructible<tail_type, allocator_arg_t, Alloc const&, UTail...>>::value)
+        : head(__UTL forward<UHead>(other_head), alloc)
+        , tail(allocator_arg, alloc, __UTL forward<UTail>(other_tail)...) {}
 
     template <typename Alloc, typename UHead, typename... UTail,
-        enable_if_t<!UTL_SCOPE uses_allocator<T, Alloc>::value, int> = 2>
+        enable_if_t<!__UTL uses_allocator<T, Alloc>::value, int> = 2>
     __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc, UHead&& other_head,
-        UTail&&... other_tail) noexcept(conjunction<UTL_SCOPE is_nothrow_constructible<T>,
-        UTL_SCOPE
-            is_nothrow_constructible<tail_type, allocator_arg_t, Alloc const&, UTail...>>::value)
-        : head(UTL_SCOPE forward<UHead>(other_head))
-        , tail(allocator_arg, alloc, UTL_SCOPE forward<UTail>(other_tail)...) {}
+        UTail&&... other_tail) noexcept(conjunction<__UTL is_nothrow_constructible<T>,
+        __UTL is_nothrow_constructible<tail_type, allocator_arg_t, Alloc const&, UTail...>>::value)
+        : head(__UTL forward<UHead>(other_head))
+        , tail(allocator_arg, alloc, __UTL forward<UTail>(other_tail)...) {}
 
     template <typename... Us>
     UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX14 void swap(storage<Us&...>& other) noexcept(
         traits::template is_nothrow_swappable_with<Us&...>::value) {
-        UTL_SCOPE ranges::swap(head, other.head);
+        __UTL ranges::swap(head, other.head);
         tail.swap(other.tail);
     }
 
     template <typename... Us>
     UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX14 void swap(storage<Us...> const& other) const
         noexcept(traits::template is_nothrow_const_swappable_with<Us const&...>::value) {
-        UTL_SCOPE ranges::swap(head, other.head);
+        __UTL ranges::swap(head, other.head);
         tail.swap(other.tail);
     }
 
     template <typename... Us>
     UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX14 void swap(storage<Us...>& other) const
         noexcept(traits::template is_nothrow_const_swappable_with<Us&...>::value) {
-        UTL_SCOPE ranges::swap(head, other.head);
+        __UTL ranges::swap(head, other.head);
         tail.swap(other.tail);
     }
 
@@ -208,8 +203,8 @@ struct storage<T, Tail...> {
     UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX14 storage&
     assign(UHead&& other_head, UTail&&... other_tail) noexcept(
         traits::template is_nothrow_assignable<UHead, UTail...>::value) {
-        head = UTL_SCOPE forward<UHead>(other_head);
-        tail.assign(UTL_SCOPE forward<UTail>(other_tail)...);
+        head = __UTL forward<UHead>(other_head);
+        tail.assign(__UTL forward<UTail>(other_tail)...);
         return *this;
     }
 
@@ -217,8 +212,8 @@ struct storage<T, Tail...> {
     UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) inline constexpr storage const& assign(
         UHead&& other_head, UTail&&... other_tail) const
         noexcept(traits::template is_nothrow_const_assignable<UHead, UTail...>::value) {
-        head = UTL_SCOPE forward<UHead>(other_head);
-        tail.assign(UTL_SCOPE forward<UTail>(other_tail)...);
+        head = __UTL forward<UHead>(other_head);
+        tail.assign(__UTL forward<UTail>(other_tail)...);
         return *this;
     }
 
@@ -226,7 +221,7 @@ struct storage<T, Tail...> {
     UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI)
     UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_LIFETIMEBOUND
     -> enable_if_t<!I, T&&> {
-        return UTL_SCOPE move(head);
+        return __UTL move(head);
     }
 
     template <size_t I>
@@ -238,7 +233,7 @@ struct storage<T, Tail...> {
 
     template <size_t I>
     UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr auto get() const&& noexcept UTL_LIFETIMEBOUND -> enable_if_t<!I, T const&&> {
-        return UTL_SCOPE move(head);
+        return __UTL move(head);
     }
 
     template <size_t I>
@@ -252,7 +247,7 @@ struct storage<T, Tail...> {
 
     template <size_t I>
     UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN, _HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_LIFETIMEBOUND -> result_type_t<I>&& {
-        return UTL_SCOPE move(tail).template get<I - 1>();
+        return __UTL move(tail).template get<I - 1>();
     }
 
     template <size_t I>
@@ -262,7 +257,7 @@ struct storage<T, Tail...> {
 
     template <size_t I>
     UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN, _HIDE_FROM_ABI) inline constexpr auto get() const&& noexcept UTL_LIFETIMEBOUND -> result_type_t<I> const&& {
-        return UTL_SCOPE move(tail).template get<I - 1>();
+        return __UTL move(tail).template get<I - 1>();
     }
 
     template <size_t I>
@@ -303,7 +298,7 @@ private:
         conjunction<details::tuple::is_all_nothrow_gettable<TupleLike, sizeof...(Is)>,
             typename traits::template is_nothrow_constructible<
                 details::tuple::get_type_t<Is, TupleLike>...>>::value)
-        : base_type(UTL_SCOPE get_element<Is>(UTL_SCOPE forward<TupleLike>(other))...) {}
+        : base_type(__UTL get_element<Is>(__UTL forward<TupleLike>(other))...) {}
 
     template <typename Alloc, typename TupleLike, size_t... Is>
     __UTL_HIDE_FROM_ABI constexpr tuple(allocator_arg_t, Alloc const& alloc, TupleLike&& other,
@@ -312,16 +307,15 @@ private:
                                              sizeof...(Is)>,
         typename traits::template is_nothrow_constructible_with_allocator<Alloc,
             details::tuple::get_type_t<Is, TupleLike>...>>::value)
-        : base_type(allocator_arg, alloc,
-              UTL_SCOPE get_element<Is>(UTL_SCOPE forward<TupleLike>(other))...) {}
+        : base_type(
+              allocator_arg, alloc, __UTL get_element<Is>(__UTL forward<TupleLike>(other))...) {}
 
     template <typename TupleLike, size_t... Is>
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 tuple& assign(TupleLike&& other, index_sequence<Is...>) noexcept(
         conjunction<details::tuple::is_all_nothrow_gettable<TupleLike, sizeof...(Is)>,
             typename traits::template is_nothrow_assignable<
                 details::tuple::get_type_t<Is, TupleLike>...>>::value) {
-        return (tuple&)base_type::assign(
-            UTL_SCOPE get_element<Is>(UTL_SCOPE forward<TupleLike>(other))...);
+        return (tuple&)base_type::assign(__UTL get_element<Is>(__UTL forward<TupleLike>(other))...);
     }
 
     template <typename TupleLike, size_t... Is>
@@ -331,7 +325,7 @@ private:
             typename traits::template is_nothrow_const_assignable<
                 details::tuple::get_type_t<Is, TupleLike>...>>::value) {
         return (tuple const&)base_type::assign(
-            UTL_SCOPE get_element<Is>(UTL_SCOPE forward<TupleLike>(other))...);
+            __UTL get_element<Is>(__UTL forward<TupleLike>(other))...);
     }
 
 public:
@@ -445,7 +439,7 @@ public:
     __UTL_HIDE_FROM_ABI constexpr tuple(UHead&& head, UTail&&... tail) noexcept(
         conjunction<bool_constant<sizeof...(Types) == sizeof...(UTail) + 1>,
             typename traits::template is_nothrow_constructible<UHead, UTail...>>::value)
-        : base_type(UTL_SCOPE forward<UHead>(head), UTL_SCOPE forward<UTail>(tail)...) {}
+        : base_type(__UTL forward<UHead>(head), __UTL forward<UTail>(tail)...) {}
 
     template <typename UHead, typename... UTail,
         enable_if_t<conjunction<bool_constant<sizeof...(Types) == sizeof...(UTail) + 1>,
@@ -455,7 +449,7 @@ public:
             int> = 1>
     __UTL_HIDE_FROM_ABI explicit constexpr tuple(UHead&& head, UTail&&... tail) noexcept(
         traits::template is_nothrow_constructible<UHead, UTail...>::value)
-        : base_type(UTL_SCOPE forward<UHead>(head), UTL_SCOPE forward<UTail>(tail)...) {}
+        : base_type(__UTL forward<UHead>(head), __UTL forward<UTail>(tail)...) {}
 
     template <typename UHead, typename... UTail,
         enable_if_t<conjunction<bool_constant<sizeof...(Types) == sizeof...(UTail) + 1>,
@@ -646,7 +640,7 @@ public:
         conjunction<details::tuple::is_all_nothrow_gettable<TupleLike, sizeof...(Types)>,
             details::tuple::rebind_references_t<traits::template is_nothrow_constructible,
                 TupleLike, sizeof...(Types)>>::value)
-        : tuple(UTL_SCOPE forward<TupleLike>(p), index_sequence_for<Types...>{}) {}
+        : tuple(__UTL forward<TupleLike>(p), index_sequence_for<Types...>{}) {}
 
     template <typename TupleLike,
         enable_if_t<
@@ -661,7 +655,7 @@ public:
         conjunction<details::tuple::is_all_nothrow_gettable<TupleLike, sizeof...(Types)>,
             details::tuple::rebind_references_t<traits::template is_nothrow_constructible,
                 TupleLike, sizeof...(Types)>>::value)
-        : tuple(UTL_SCOPE forward<TupleLike>(p), index_sequence_for<Types...>{}) {}
+        : tuple(__UTL forward<TupleLike>(p), index_sequence_for<Types...>{}) {}
 
     template <typename TupleLike,
         enable_if_t<
@@ -736,7 +730,7 @@ public:
     __UTL_HIDE_FROM_ABI constexpr tuple(allocator_arg_t, Alloc const& alloc,
         UTypes&&... args) noexcept(traits::template is_nothrow_constructible_with_allocator<Alloc,
         UTypes...>::value)
-        : base_type(allocator_arg, alloc, UTL_SCOPE forward<UTypes>(args)...) {}
+        : base_type(allocator_arg, alloc, __UTL forward<UTypes>(args)...) {}
 
     template <typename Alloc, typename... UTypes,
         enable_if_t<conjunction<bool_constant<sizeof...(Types) == sizeof...(UTypes)>,
@@ -748,7 +742,7 @@ public:
     __UTL_HIDE_FROM_ABI explicit constexpr tuple(allocator_arg_t, Alloc const& alloc,
         UTypes&&... args) noexcept(traits::template is_nothrow_constructible_with_allocator<Alloc,
         UTypes...>::value)
-        : base_type(allocator_arg, alloc, UTL_SCOPE forward<UTypes>(args)...) {}
+        : base_type(allocator_arg, alloc, __UTL forward<UTypes>(args)...) {}
 
     template <typename Alloc, typename... UTypes,
         enable_if_t<
@@ -1193,8 +1187,8 @@ template <size_t I, typename T, typename U>
 __UTL_HIDE_FROM_ABI constexpr enable_if_t<(I < tuple_size<T>::value), bool> less(
     T const& l, U const& r) noexcept(conjunction<compare_ops::all_have_nothrow_eq<T, U>,
     compare_ops::all_have_nothrow_lt<T, U>>::value) {
-    return (UTL_SCOPE get_element<I - 1>(l) == UTL_SCOPE get_element<I - 1>(r)) &&
-        ((UTL_SCOPE get_element<I>(l) < UTL_SCOPE get_element<I>(r)) || less<I + 1>(l, r));
+    return (__UTL get_element<I - 1>(l) == __UTL get_element<I - 1>(r)) &&
+        ((__UTL get_element<I>(l) < __UTL get_element<I>(r)) || less<I + 1>(l, r));
 }
 
 template <typename T, typename U>
@@ -1203,7 +1197,7 @@ __UTL_HIDE_FROM_ABI constexpr bool less(T const& l, U const& r) noexcept(
         compare_ops::all_have_nothrow_lt<T, U>>::value) {
     static_assert(compare_ops::all_have_eq<T, U>::value, "All elements must be comparable");
     static_assert(compare_ops::all_have_lt<T, U>::value, "All elements must be comparable");
-    return (UTL_SCOPE get_element<0>(l) < UTL_SCOPE get_element<0>(r)) || less<1>(l, r);
+    return (__UTL get_element<0>(l) < __UTL get_element<0>(r)) || less<1>(l, r);
 }
 
 template <size_t I, typename T, typename U>
@@ -1215,7 +1209,7 @@ UTL_ATTRIBUTES(CONST, _HIDE_FROM_ABI) constexpr enable_if_t<(I == tuple_size<T>:
 template <size_t I, typename T, typename U>
 __UTL_HIDE_FROM_ABI constexpr enable_if_t<(I < tuple_size<T>::value), bool> equals(
     T const& l, U const& r) noexcept(compare_ops::all_have_nothrow_eq<T, U>::value) {
-    return (UTL_SCOPE get_element<I>(l) == UTL_SCOPE get_element<I>(r)) && equals<I + 1>(l, r);
+    return (__UTL get_element<I>(l) == __UTL get_element<I>(r)) && equals<I + 1>(l, r);
 }
 
 template <typename T, typename U>

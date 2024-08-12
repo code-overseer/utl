@@ -41,11 +41,11 @@ public:
     static constexpr size_type npos = details::string::npos;
     class const_iterator;
     using iterator = const_iterator;
-    using const_reverse_iterator = UTL_SCOPE reverse_iterator<const_iterator>;
+    using const_reverse_iterator = __UTL reverse_iterator<const_iterator>;
     using reverse_iterator = const_reverse_iterator;
 
     class __UTL_ABI_PUBLIC const_iterator :
-        UTL_SCOPE contiguous_iterator_base<const_iterator, value_type const> {
+        __UTL contiguous_iterator_base<const_iterator, value_type const> {
         using base_type = contiguous_iterator_base<const_iterator, value_type const>;
 
     public:
@@ -87,7 +87,7 @@ public:
         UTL_TRAIT_is_contiguous_iterator(It) && UTL_TRAIT_is_sized_sentinel_for(E, It))>
     __UTL_HIDE_FROM_ABI constexpr basic_string_view(It begin, E end) noexcept(
         UTL_TRAIT_is_nothrow_dereferenceable(It) && noexcept(end - begin))
-        : data_(UTL_SCOPE to_address(begin))
+        : data_(__UTL to_address(begin))
         , size_(end - begin) {}
 
     // TODO: ranges ctor
@@ -149,18 +149,18 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void remove_prefix(size_type n) noexcept {
-        n = UTL_SCOPE numeric::min(n, size());
+        n = __UTL numeric::min(n, size());
         data_ += n;
         size_ -= n;
     }
 
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void remove_suffix(size_type n) noexcept {
-        n = UTL_SCOPE numeric::min(n, size());
+        n = __UTL numeric::min(n, size());
         size_ -= n;
     }
 
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(basic_string_view& other) noexcept {
-        other = UTL_SCOPE exchange(*this, other);
+        other = __UTL exchange(*this, other);
     }
 
     __UTL_HIDE_FROM_ABI friend UTL_CONSTEXPR_CXX14 void swap(
@@ -175,7 +175,7 @@ public:
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_string_view::copy` operation failed, "
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
                 pos, size()));
-        auto const copied = UTL_SCOPE numeric::min(count, size() - pos);
+        auto const copied = __UTL numeric::min(count, size() - pos);
         traits_type::copy(dest, data() + pos, copied);
         return copied;
     }
@@ -184,7 +184,7 @@ public:
         size_type pos = 0, size_type count = npos) const UTL_THROWS {
         return pos >= size()
             ? substr_throw(UTL_SOURCE_LOCATION(), pos, size())
-            : basic_string_view(data() + pos, UTL_SCOPE numeric::min(count, size() - pos));
+            : basic_string_view(data() + pos, __UTL numeric::min(count, size() - pos));
     }
 
     UTL_ATTRIBUTE(STRING_PURE) constexpr int compare(basic_string_view other) const noexcept {
@@ -377,7 +377,7 @@ public:
 
 private:
     UTL_ATTRIBUTES(NORETURN, NOINLINE, _HIDE_FROM_ABI) static basic_string_view substr_throw(
-        UTL_SCOPE source_location src, size_t pos, size_t size) UTL_THROWS {
+        __UTL source_location src, size_t pos, size_t size) UTL_THROWS {
         exceptions::message_format format = {"[UTL] `basic_string_view::substr` operation failed, "
                                              "Reason=[index out of range], pos=[%zu], size=[%zu]",
             src};

@@ -15,8 +15,8 @@ UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace iter_value {
-template <UTL_SCOPE details::iterator_traits::is_specialized T>
-__UTL_HIDE_FROM_ABI typename UTL_SCOPE iterator_traits<T>::value_type resolve(int) noexcept;
+template <__UTL details::iterator_traits::is_specialized T>
+__UTL_HIDE_FROM_ABI typename __UTL iterator_traits<T>::value_type resolve(int) noexcept;
 } // namespace iter_value
 } // namespace details
 
@@ -29,9 +29,8 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace iter_value {
 
-template <typename T UTL_REQUIRES_CXX11(
-    UTL_SCOPE details::iterator_traits::is_specialized<T>::value)>
-__UTL_HIDE_FROM_ABI typename UTL_SCOPE iterator_traits<T>::value_type resolve(int) noexcept;
+template <typename T UTL_REQUIRES_CXX11(__UTL details::iterator_traits::is_specialized<T>::value)>
+__UTL_HIDE_FROM_ABI typename __UTL iterator_traits<T>::value_type resolve(int) noexcept;
 } // namespace iter_value
 } // namespace details
 
@@ -45,13 +44,13 @@ namespace details {
 namespace iter_value {
 
 template <typename T>
-__UTL_HIDE_FROM_ABI typename UTL_SCOPE indirectly_readable_traits<T>::value_type resolve(
+__UTL_HIDE_FROM_ABI typename __UTL indirectly_readable_traits<T>::value_type resolve(
     float) noexcept;
 
 } // namespace iter_value
 } // namespace details
 
 template <typename T>
-using iter_value_t = decltype(details::iter_value::resolve<UTL_SCOPE remove_cvref_t<T>>(0));
+using iter_value_t = decltype(details::iter_value::resolve<__UTL remove_cvref_t<T>>(0));
 
 UTL_NAMESPACE_END

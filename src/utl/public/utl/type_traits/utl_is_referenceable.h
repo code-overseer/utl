@@ -32,7 +32,7 @@ UTL_INLINE_CXX17 constexpr bool is_referenceable_v =
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_referenceable(...) UTL_SCOPE is_referenceable_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_referenceable(...) __UTL is_referenceable_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_referenceable(...) UTL_SCOPE is_referenceable<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_referenceable(...) __UTL is_referenceable<__VA_ARGS__>::value
 #endif

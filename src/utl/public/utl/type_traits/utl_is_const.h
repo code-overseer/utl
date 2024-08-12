@@ -76,7 +76,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_const
 #  define UTL_TRAIT_is_const(...) UTL_BUILTIN_is_const(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_const(...) UTL_SCOPE is_const_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_const(...) __UTL is_const_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_const(...) UTL_SCOPE is_const<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_const(...) __UTL is_const<__VA_ARGS__>::value
 #endif

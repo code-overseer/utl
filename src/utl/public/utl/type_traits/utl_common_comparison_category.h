@@ -28,20 +28,20 @@ struct impl {
 };
 
 template <typename... Ts>
-struct impl<UTL_SCOPE partial_ordering, Ts...> {
-    using type UTL_NODEBUG = UTL_SCOPE partial_ordering;
+struct impl<__UTL partial_ordering, Ts...> {
+    using type UTL_NODEBUG = __UTL partial_ordering;
 };
 template <typename... Ts>
 struct impl<::std::partial_ordering, Ts...> {
-    using type UTL_NODEBUG = UTL_SCOPE partial_ordering;
+    using type UTL_NODEBUG = __UTL partial_ordering;
 };
 template <typename... Ts>
-struct impl<UTL_SCOPE strong_ordering, Ts...> : impl<Ts...> {};
+struct impl<__UTL strong_ordering, Ts...> : impl<Ts...> {};
 template <typename... Ts>
 struct impl<::std::strong_ordering, Ts...> : impl<Ts...> {};
 template <>
 struct impl<> {
-    using type UTL_NODEBUG = UTL_SCOPE strong_ordering;
+    using type UTL_NODEBUG = __UTL strong_ordering;
 };
 
 template <typename... Ts>
@@ -50,27 +50,27 @@ struct weak_branch {
 };
 template <>
 struct weak_branch<> {
-    using type UTL_NODEBUG = UTL_SCOPE weak_ordering;
+    using type UTL_NODEBUG = __UTL weak_ordering;
 };
 template <typename... Ts>
-struct weak_branch<UTL_SCOPE partial_ordering, Ts...> {
-    using type UTL_NODEBUG = UTL_SCOPE partial_ordering;
+struct weak_branch<__UTL partial_ordering, Ts...> {
+    using type UTL_NODEBUG = __UTL partial_ordering;
 };
 template <typename... Ts>
 struct weak_branch<::std::partial_ordering, Ts...> {
-    using type UTL_NODEBUG = UTL_SCOPE partial_ordering;
+    using type UTL_NODEBUG = __UTL partial_ordering;
 };
 template <typename... Ts>
-struct weak_branch<UTL_SCOPE weak_ordering, Ts...> : weak_branch<Ts...> {};
+struct weak_branch<__UTL weak_ordering, Ts...> : weak_branch<Ts...> {};
 template <typename... Ts>
 struct weak_branch<::std::weak_ordering, Ts...> : weak_branch<Ts...> {};
 template <typename... Ts>
-struct weak_branch<UTL_SCOPE strong_ordering, Ts...> : weak_branch<Ts...> {};
+struct weak_branch<__UTL strong_ordering, Ts...> : weak_branch<Ts...> {};
 template <typename... Ts>
 struct weak_branch<::std::strong_ordering, Ts...> : weak_branch<Ts...> {};
 
 template <typename... Ts>
-struct impl<UTL_SCOPE weak_ordering, Ts...> : weak_branch<Ts...> {};
+struct impl<__UTL weak_ordering, Ts...> : weak_branch<Ts...> {};
 template <typename... Ts>
 struct impl<::std::weak_ordering, Ts...> : weak_branch<Ts...> {};
 

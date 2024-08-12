@@ -37,7 +37,7 @@ protected:
         UTL_TRAIT_is_constructible(F, Fn&&))>
     __UTL_HIDE_FROM_ABI constexpr impl(Fn&& func) noexcept(
         UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
-        : callable_(UTL_SCOPE forward<Fn>(func))
+        : callable_(__UTL forward<Fn>(func))
         , released_(false) {}
     impl(impl const& other) = delete;
     impl& operator=(impl const& other) = delete;
@@ -45,7 +45,7 @@ protected:
     impl& operator=(impl&& other) = delete;
     __UTL_HIDE_FROM_ABI constexpr impl(move_t&& other) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(F))
-        : impl(is_movable{}, UTL_SCOPE move(other)) {}
+        : impl(is_movable{}, __UTL move(other)) {}
 
     __UTL_HIDE_FROM_ABI void release() noexcept { released_ = true; }
 
@@ -64,7 +64,7 @@ private:
         is_movable::value && UTL_TRAIT_is_same(T, impl))>
     UTL_REQUIRES_CXX20(is_movable::value)
     __UTL_HIDE_FROM_ABI constexpr impl(true_type, T&& other) noexcept
-        : callable_(UTL_SCOPE move(other.callable_))
+        : callable_(__UTL move(other.callable_))
         , released_(other.released_) {
         other.release();
     }

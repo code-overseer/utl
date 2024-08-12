@@ -25,7 +25,7 @@ UTL_INLINE_CXX17 constexpr bool is_movable_v = UTL_TRAIT_is_object(T) && UTL_TRA
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_movable(...) UTL_SCOPE is_movable_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_movable(...) __UTL is_movable_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_movable(...) UTL_SCOPE is_movable<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_movable(...) __UTL is_movable<__VA_ARGS__>::value
 #endif

@@ -22,7 +22,7 @@ namespace add_sat {
 namespace compile_time {
 template <typename T>
 class signed_impl {
-    using value_type = UTL_SCOPE remove_cv_t<T>;
+    using value_type = __UTL remove_cv_t<T>;
     static constexpr value_type max = UTL_NUMERIC_maximum(value_type);
     static constexpr value_type shift = CHAR_BIT * sizeof(value_type) - 1;
 
@@ -47,7 +47,7 @@ private:
 
     __UTL_HIDE_FROM_ABI
     static constexpr value_type evaluate(value_type left, value_type right) noexcept {
-        return UTL_SCOPE to_signed(UTL_SCOPE to_unsigned(left) + UTL_SCOPE to_unsigned(right));
+        return __UTL to_signed(__UTL to_unsigned(left) + __UTL to_unsigned(right));
     }
 
     __UTL_HIDE_FROM_ABI
@@ -113,14 +113,14 @@ namespace details {
 namespace add_sat {
 namespace runtime {
 template <typename T>
-__UTL_HIDE_FROM_ABI auto has_overload_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto has_overload_impl(float) noexcept -> __UTL false_type;
 template <typename T>
-using has_overload = decltype(UTL_SCOPE details::add_sat::runtime::has_overload_impl<T>(0));
+using has_overload = decltype(__UTL details::add_sat::runtime::has_overload_impl<T>(0));
 
 template <UTL_CONCEPT_CXX20(signed_integral) T UTL_REQUIRES_CXX11(
     UTL_TRAIT_is_signed(T) && UTL_TRAIT_is_integral(T) && !has_overload<T>::value)>
 __UTL_HIDE_FROM_ABI T impl(T left, T right) noexcept {
-    return UTL_SCOPE details::add_sat::compile_time::impl(left, right);
+    return __UTL details::add_sat::compile_time::impl(left, right);
 }
 
 } // namespace runtime
@@ -128,9 +128,8 @@ __UTL_HIDE_FROM_ABI T impl(T left, T right) noexcept {
 template <UTL_CONCEPT_CXX20(signed_integral) T UTL_REQUIRES_CXX11(
     UTL_TRAIT_is_signed(T) && UTL_TRAIT_is_integral(T) && !runtime::has_overload<T>::value)>
 __UTL_HIDE_FROM_ABI constexpr T impl(T left, T right) noexcept {
-    return UTL_CONSTANT_P(left == right)
-        ? UTL_SCOPE details::add_sat::compile_time::impl(left, right)
-        : UTL_SCOPE details::add_sat::runtime::impl(left, right);
+    return UTL_CONSTANT_P(left == right) ? __UTL details::add_sat::compile_time::impl(left, right)
+                                         : __UTL details::add_sat::runtime::impl(left, right);
 }
 
 template <typename T>
@@ -140,7 +139,7 @@ __UTL_HIDE_FROM_ABI constexpr T saturate(T result, T left) noexcept {
 
 template <UTL_CONCEPT_CXX20(unsigned_integral) T UTL_REQUIRES_CXX11(UTL_TRAIT_is_unsigned(T))>
 __UTL_HIDE_FROM_ABI constexpr T impl(T left, T right) noexcept {
-    return UTL_SCOPE details::add_sat::saturate(left + right, left);
+    return __UTL details::add_sat::saturate(left + right, left);
 }
 
 } // namespace add_sat
@@ -148,7 +147,7 @@ __UTL_HIDE_FROM_ABI constexpr T impl(T left, T right) noexcept {
 
 template <UTL_CONCEPT_CXX20(saturatable) T UTL_REQUIRES_CXX11(UTL_TRAIT_is_saturatable(T))>
 UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI, FLATTEN) constexpr T add_sat(T left, T right) noexcept {
-    return UTL_SCOPE details::add_sat::impl(left, right);
+    return __UTL details::add_sat::impl(left, right);
 }
 
 UTL_NAMESPACE_END

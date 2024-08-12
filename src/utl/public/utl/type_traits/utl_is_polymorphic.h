@@ -70,7 +70,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_polymorphic
 #  define UTL_TRAIT_is_polymorphic(...) UTL_BUILTIN_is_polymorphic(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_polymorphic(...) UTL_SCOPE is_polymorphic_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_polymorphic(...) __UTL is_polymorphic_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_polymorphic(...) UTL_SCOPE is_polymorphic<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_polymorphic(...) __UTL is_polymorphic<__VA_ARGS__>::value
 #endif

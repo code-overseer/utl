@@ -79,9 +79,8 @@ UTL_NAMESPACE_END
 #  define UTL_TRAIT_is_member_function_pointer(...) \
       UTL_BUILTIN_is_member_function_pointer(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_member_function_pointer(...) \
-      UTL_SCOPE is_member_function_pointer_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_member_function_pointer(...) __UTL is_member_function_pointer_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_member_function_pointer(...) \
-      UTL_SCOPE is_member_function_pointer<__VA_ARGS__>::value
+      __UTL is_member_function_pointer<__VA_ARGS__>::value
 #endif

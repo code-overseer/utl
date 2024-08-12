@@ -17,10 +17,10 @@ UTL_NAMESPACE_BEGIN
 template <typename L, typename R = L>
 concept indirectly_swappable =
     indirectly_readable<L> && indirectly_readable<R> && requires(L const l, R const r) {
-        UTL_SCOPE ranges::iter_swap(l, l);
-        UTL_SCOPE ranges::iter_swap(l, r);
-        UTL_SCOPE ranges::iter_swap(r, l);
-        UTL_SCOPE ranges::iter_swap(r, r);
+        __UTL ranges::iter_swap(l, l);
+        __UTL ranges::iter_swap(l, r);
+        __UTL ranges::iter_swap(r, l);
+        __UTL ranges::iter_swap(r, r);
     };
 
 template <typename L, typename R>
@@ -38,14 +38,14 @@ namespace details {
 namespace indirectly_swappable {
 
 template <typename L, typename R>
-__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> __UTL false_type;
 template <typename L, typename R>
-__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept -> UTL_SCOPE
-    conjunction<UTL_SCOPE is_indirectly_readable<L>, UTL_SCOPE is_indirectly_readable<R>,
-        UTL_SCOPE is_invocable<decltype(UTL_SCOPE ranges::iter_swap), L const, R const>>;
+__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
+    -> __UTL conjunction<__UTL is_indirectly_readable<L>, __UTL is_indirectly_readable<R>,
+        __UTL is_invocable<decltype(__UTL ranges::iter_swap), L const, R const>>;
 
 template <typename L, typename R>
-using trait = decltype(UTL_SCOPE details::indirectly_swappable::trait_impl<L, R>(0));
+using trait = decltype(__UTL details::indirectly_swappable::trait_impl<L, R>(0));
 
 } // namespace indirectly_swappable
 } // namespace details

@@ -73,7 +73,7 @@ UTL_NAMESPACE_END
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_copy_constructible(TYPE) UTL_SCOPE is_copy_constructible_v<TYPE>
+#  define UTL_TRAIT_is_copy_constructible(TYPE) __UTL is_copy_constructible_v<TYPE>
 #else
-#  define UTL_TRAIT_is_copy_constructible(TYPE) UTL_SCOPE is_copy_constructible<TYPE>::value
+#  define UTL_TRAIT_is_copy_constructible(TYPE) __UTL is_copy_constructible<TYPE>::value
 #endif

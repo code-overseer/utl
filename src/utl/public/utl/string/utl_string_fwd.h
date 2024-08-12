@@ -53,7 +53,7 @@ public:
 };
 
 template <>
-struct default_inline_size<char, UTL_SCOPE allocator<char>> {
+struct default_inline_size<char, __UTL allocator<char>> {
 private:
     static constexpr size_t bytes = 24;
 
@@ -62,7 +62,7 @@ public:
 };
 
 template <typename CharType>
-struct default_inline_size<CharType, UTL_SCOPE allocator<CharType>> {
+struct default_inline_size<CharType, __UTL allocator<CharType>> {
 private:
     static constexpr size_t bytes = 32;
 
@@ -72,8 +72,8 @@ public:
 
 #ifdef UTL_SUPPORTS_CHAR8_T
 template <>
-struct default_inline_size<char8_t, UTL_SCOPE allocator<char8_t>> :
-    default_inline_size<char, UTL_SCOPE allocator<char>> {};
+struct default_inline_size<char8_t, __UTL allocator<char8_t>> :
+    default_inline_size<char, __UTL allocator<char>> {};
 #endif
 
 template <typename CharType, typename Traits, typename Alloc>

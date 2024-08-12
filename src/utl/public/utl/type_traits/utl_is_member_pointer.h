@@ -75,7 +75,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_member_pointer
 #  define UTL_TRAIT_is_member_pointer(...) UTL_BUILTIN_is_member_pointer(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_member_pointer(...) UTL_SCOPE is_member_pointer_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_member_pointer(...) __UTL is_member_pointer_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_member_pointer(...) UTL_SCOPE is_member_pointer<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_member_pointer(...) __UTL is_member_pointer<__VA_ARGS__>::value
 #endif

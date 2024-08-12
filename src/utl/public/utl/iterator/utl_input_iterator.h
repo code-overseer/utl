@@ -16,12 +16,11 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-concept input_iterator =
-    UTL_SCOPE input_or_output_iterator<T> && UTL_SCOPE indirectly_readable<T> &&
-    UTL_SCOPE details::iterator_concept::implements<T, UTL_SCOPE input_iterator_tag>;
+concept input_iterator = __UTL input_or_output_iterator<T> && __UTL indirectly_readable<T> &&
+    __UTL details::iterator_concept::implements<T, __UTL input_iterator_tag>;
 
 template <typename T>
-struct __UTL_PUBLIC_TEMPLATE is_input_iterator : UTL_SCOPE bool_constant<input_iterator<T>> {};
+struct __UTL_PUBLIC_TEMPLATE is_input_iterator : __UTL bool_constant<input_iterator<T>> {};
 
 template <typename T>
 inline constexpr bool is_input_iterator_v = input_iterator<T>;
@@ -35,9 +34,8 @@ UTL_NAMESPACE_BEGIN
 
 template <typename T>
 struct __UTL_PUBLIC_TEMPLATE is_input_iterator :
-    UTL_SCOPE
-        conjunction<UTL_SCOPE is_input_or_output_iterator<T>, UTL_SCOPE is_indirectly_readable<T>,
-            UTL_SCOPE details::iterator_concept::implements<UTL_SCOPE input_iterator_tag, T>> {};
+    __UTL conjunction<__UTL is_input_or_output_iterator<T>, __UTL is_indirectly_readable<T>,
+        __UTL details::iterator_concept::implements<__UTL input_iterator_tag, T>> {};
 
 #  if UTL_CXX14
 template <typename T>

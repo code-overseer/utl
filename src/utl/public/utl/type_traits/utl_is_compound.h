@@ -70,7 +70,7 @@ UTL_NAMESPACE_END
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_compound(TYPE) UTL_SCOPE is_compound_v<TYPE>
+#  define UTL_TRAIT_is_compound(TYPE) __UTL is_compound_v<TYPE>
 #else
-#  define UTL_TRAIT_is_compound(TYPE) UTL_SCOPE is_compound<TYPE>::value
+#  define UTL_TRAIT_is_compound(TYPE) __UTL is_compound<TYPE>::value
 #endif

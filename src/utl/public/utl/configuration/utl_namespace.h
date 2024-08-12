@@ -8,7 +8,7 @@
 #  define UTL_NS utl
 #endif
 
-#define UTL_SCOPE ::UTL_NS::
+#define __UTL ::UTL_NS::
 
 #ifdef UTL_NAMESPACE_BEGIN
 #  error "Cannot define UTL_NAMESPACE_BEGIN"

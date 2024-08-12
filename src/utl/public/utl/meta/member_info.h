@@ -47,8 +47,7 @@ using member_info_t = typename member_info<M, Pointer>::type;
 
 #ifndef UTL_CXX17
 
-#  define UTL_MEMBER_INFO(CLASS, MEMBER) \
-      UTL_SCOPE member_info<decltype(&CLASS::MEMBER), &CLASS::MEMBER>
+#  define UTL_MEMBER_INFO(CLASS, MEMBER) __UTL member_info<decltype(&CLASS::MEMBER), &CLASS::MEMBER>
 
 #else // ifndef UTL_CXX17
 
@@ -57,7 +56,7 @@ using member_info_of = member_info<decltype(V), V>;
 template <auto V>
 using member_info_of_t = typename member_info<decltype(V), V>::type;
 
-#  define UTL_MEMBER_INFO(CLASS, MEMBER) UTL_SCOPE member_info_of<&CLASS::MEMBER>
+#  define UTL_MEMBER_INFO(CLASS, MEMBER) __UTL member_info_of<&CLASS::MEMBER>
 
 #endif // ifndef UTL_CXX17
 

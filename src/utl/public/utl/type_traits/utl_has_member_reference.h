@@ -10,11 +10,11 @@
 
 UTL_NAMESPACE_BEGIN
 template <typename T>
-struct __UTL_PUBLIC_TEMPLATE has_member_reference : UTL_SCOPE false_type {};
+struct __UTL_PUBLIC_TEMPLATE has_member_reference : __UTL false_type {};
 
 template <typename T>
 requires requires { typename T::reference; }
-struct __UTL_PUBLIC_TEMPLATE has_member_reference<T> : UTL_SCOPE true_type {};
+struct __UTL_PUBLIC_TEMPLATE has_member_reference<T> : __UTL true_type {};
 
 UTL_NAMESPACE_END
 
@@ -26,10 +26,10 @@ UTL_NAMESPACE_BEGIN
 namespace type_traits {
 namespace details {
 template <typename T, typename = void>
-struct has_member_reference_impl : UTL_SCOPE false_type {};
+struct has_member_reference_impl : __UTL false_type {};
 
 template <typename T>
-struct has_member_reference_impl<T, void_t<typename T::reference>> : UTL_SCOPE true_type {};
+struct has_member_reference_impl<T, void_t<typename T::reference>> : __UTL true_type {};
 } // namespace details
 } // namespace type_traits
 
@@ -51,7 +51,7 @@ UTL_INLINE_CXX17 constexpr bool has_member_reference_v = has_member_reference<T>
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
-#  define UTL_TRAIT_has_member_reference(...) UTL_SCOPE has_member_reference_v<__VA_ARGS__>
+#  define UTL_TRAIT_has_member_reference(...) __UTL has_member_reference_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_has_member_reference(...) UTL_SCOPE has_member_reference<__VA_ARGS__>::value
+#  define UTL_TRAIT_has_member_reference(...) __UTL has_member_reference<__VA_ARGS__>::value
 #endif

@@ -28,11 +28,11 @@ public:
         UTL_TRAIT_is_constructible(F, Fn&&))>
     __UTL_HIDE_FROM_ABI explicit scope_exit(Fn&& func) noexcept(
         UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
-        : base_type(UTL_SCOPE forward<Fn>(func)) {}
+        : base_type(__UTL forward<Fn>(func)) {}
     scope_exit(scope_exit const&) = delete;
     __UTL_HIDE_FROM_ABI scope_exit(move_t&& other) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(F))
-        : base_type(UTL_SCOPE move(other)) {}
+        : base_type(__UTL move(other)) {}
 
     using base_type::release;
 };
@@ -72,6 +72,6 @@ UTL_DEFINE_CUSTOMIZATION_POINT(exit_factory_t, exit_factory);
 } // namespace details
 
 #define UTL_ON_SCOPE_EXIT \
-    const auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::exit_factory->*[&]()
+    const auto UTL_UNIQUE_VAR(ScopeFail) = __UTL details::scope::exit_factory->*[&]()
 
 UTL_NAMESPACE_END

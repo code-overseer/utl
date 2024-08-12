@@ -76,9 +76,8 @@ UTL_NAMESPACE_END
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_trivially_move_assignable(TYPE) \
-      UTL_SCOPE is_trivially_move_assignable_v<TYPE>
+#  define UTL_TRAIT_is_trivially_move_assignable(TYPE) __UTL is_trivially_move_assignable_v<TYPE>
 #else
 #  define UTL_TRAIT_is_trivially_move_assignable(TYPE) \
-      UTL_SCOPE is_trivially_move_assignable<TYPE>::value
+      __UTL is_trivially_move_assignable<TYPE>::value
 #endif

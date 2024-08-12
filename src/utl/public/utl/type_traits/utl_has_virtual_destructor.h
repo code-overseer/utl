@@ -71,7 +71,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_has_virtual_destructor
 #  define UTL_TRAIT_has_virtual_destructor(...) UTL_BUILTIN_has_virtual_destructor(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_has_virtual_destructor(...) UTL_SCOPE has_virtual_destructor_v<__VA_ARGS__>
+#  define UTL_TRAIT_has_virtual_destructor(...) __UTL has_virtual_destructor_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_has_virtual_destructor(...) UTL_SCOPE has_virtual_destructor<__VA_ARGS__>::value
+#  define UTL_TRAIT_has_virtual_destructor(...) __UTL has_virtual_destructor<__VA_ARGS__>::value
 #endif

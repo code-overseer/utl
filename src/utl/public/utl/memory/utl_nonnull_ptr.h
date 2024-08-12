@@ -57,7 +57,7 @@ public:
      * @param ref A reference to the object.
      */
     __UTL_HIDE_FROM_ABI constexpr explicit nonnull_ptr(T& ref) noexcept
-        : ptr_(UTL_SCOPE addressof(ref)) {}
+        : ptr_(__UTL addressof(ref)) {}
 
     /**
      * Conversion operator to implicitly convert nonnull_ptr to the underlying raw pointer.

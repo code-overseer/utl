@@ -236,13 +236,13 @@ template <typename T>
 UTL_INLINE_CXX17 constexpr auto minimum_v = minimum<T>::value;
 template <typename T>
 UTL_INLINE_CXX17 constexpr auto lowest_v = lowest<T>::value;
-#  define UTL_NUMERIC_maximum(TYPE) UTL_SCOPE numeric::maximum_v<TYPE>
-#  define UTL_NUMERIC_minimum(TYPE) UTL_SCOPE numeric::minimum_v<TYPE>
-#  define UTL_NUMERIC_lowest(TYPE) UTL_SCOPE numeric::lowest_v<TYPE>
+#  define UTL_NUMERIC_maximum(TYPE) __UTL numeric::maximum_v<TYPE>
+#  define UTL_NUMERIC_minimum(TYPE) __UTL numeric::minimum_v<TYPE>
+#  define UTL_NUMERIC_lowest(TYPE) __UTL numeric::lowest_v<TYPE>
 #else
-#  define UTL_NUMERIC_maximum(TYPE) UTL_SCOPE numeric::maximum<TYPE>::value;
-#  define UTL_NUMERIC_minimum(TYPE) UTL_SCOPE numeric::minimum<TYPE>::value;
-#  define UTL_NUMERIC_lowest(TYPE) UTL_SCOPE numeric::lowest<TYPE>::value;
+#  define UTL_NUMERIC_maximum(TYPE) __UTL numeric::maximum<TYPE>::value;
+#  define UTL_NUMERIC_minimum(TYPE) __UTL numeric::minimum<TYPE>::value;
+#  define UTL_NUMERIC_lowest(TYPE) __UTL numeric::lowest<TYPE>::value;
 #endif
 } // namespace numeric
 

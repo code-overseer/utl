@@ -17,10 +17,9 @@ UTL_NAMESPACE_BEGIN
 #if UTL_CXX20
 template <typename T, typename U>
 struct __UTL_PUBLIC_TEMPLATE is_totally_ordered_with :
-    UTL_SCOPE bool_constant<UTL_SCOPE totally_ordered_with<T, U>> {};
+    __UTL bool_constant<__UTL totally_ordered_with<T, U>> {};
 template <typename T>
-struct __UTL_PUBLIC_TEMPLATE is_totally_ordered :
-    UTL_SCOPE bool_constant<UTL_SCOPE totally_ordered<T>> {};
+struct __UTL_PUBLIC_TEMPLATE is_totally_ordered : __UTL bool_constant<__UTL totally_ordered<T>> {};
 
 #else
 template <typename T, typename U>
@@ -39,12 +38,12 @@ struct __UTL_PUBLIC_TEMPLATE is_totally_ordered :
 #if UTL_CXX20
 
 template <typename T, typename U>
-UTL_INLINE_CXX17 constexpr bool is_totally_ordered_with_v = UTL_SCOPE totally_ordered_with<T, U>;
+UTL_INLINE_CXX17 constexpr bool is_totally_ordered_with_v = __UTL totally_ordered_with<T, U>;
 template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_totally_ordered_v = UTL_SCOPE totally_ordered<T>;
+UTL_INLINE_CXX17 constexpr bool is_totally_ordered_v = __UTL totally_ordered<T>;
 
-#  define UTL_TRAIT_is_totally_ordered_with(...) UTL_SCOPE totally_ordered_with<T, U>
-#  define UTL_TRAIT_is_totally_ordered(...) UTL_SCOPE totally_ordered<T>
+#  define UTL_TRAIT_is_totally_ordered_with(...) __UTL totally_ordered_with<T, U>
+#  define UTL_TRAIT_is_totally_ordered(...) __UTL totally_ordered<T>
 
 #elif UTL_CXX14
 
@@ -53,14 +52,13 @@ UTL_INLINE_CXX17 constexpr bool is_totally_ordered_with_v = is_totally_ordered_w
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_totally_ordered_v = is_totally_ordered<T>::value;
 
-#  define UTL_TRAIT_is_totally_ordered_with(...) UTL_SCOPE is_totally_ordered_with_v<__VA_ARGS__>
-#  define UTL_TRAIT_is_totally_ordered(...) UTL_SCOPE is_totally_ordered_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_totally_ordered_with(...) __UTL is_totally_ordered_with_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_totally_ordered(...) __UTL is_totally_ordered_v<__VA_ARGS__>
 
 #else // UTL_CXX14
 
-#  define UTL_TRAIT_is_totally_ordered_with(...) \
-      UTL_SCOPE is_totally_ordered_with<__VA_ARGS__>::value
-#  define UTL_TRAIT_is_totally_ordered(...) UTL_SCOPE is_totally_ordered<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_totally_ordered_with(...) __UTL is_totally_ordered_with<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_totally_ordered(...) __UTL is_totally_ordered<__VA_ARGS__>::value
 
 #endif // UTL_CXX14
 

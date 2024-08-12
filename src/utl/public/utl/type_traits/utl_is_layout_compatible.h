@@ -67,7 +67,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_layout_compatible
 #  define UTL_TRAIT_is_layout_compatible(...) UTL_BUILTIN_is_layout_compatible(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_layout_compatible(...) UTL_SCOPE is_layout_compatible_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_layout_compatible(...) __UTL is_layout_compatible_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_layout_compatible(...) UTL_SCOPE is_layout_compatible<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_layout_compatible(...) __UTL is_layout_compatible<__VA_ARGS__>::value
 #endif

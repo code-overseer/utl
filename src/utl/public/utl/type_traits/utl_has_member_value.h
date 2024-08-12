@@ -51,7 +51,7 @@ UTL_INLINE_CXX17 constexpr bool has_member_value_v = has_member_value<T>::value;
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
-#  define UTL_TRAIT_has_member_value(...) UTL_SCOPE has_member_value_v<__VA_ARGS__>
+#  define UTL_TRAIT_has_member_value(...) __UTL has_member_value_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_has_member_value(...) UTL_SCOPE has_member_value<__VA_ARGS__>::value
+#  define UTL_TRAIT_has_member_value(...) __UTL has_member_value<__VA_ARGS__>::value
 #endif

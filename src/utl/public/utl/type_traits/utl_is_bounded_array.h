@@ -39,7 +39,7 @@ UTL_NAMESPACE_END
 #define UTL_TRAIT_SUPPORTED_is_bounded_array 1
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_bounded_array(...) UTL_SCOPE is_bounded_array_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_bounded_array(...) __UTL is_bounded_array_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_bounded_array(...) UTL_SCOPE is_bounded_array<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_bounded_array(...) __UTL is_bounded_array<__VA_ARGS__>::value
 #endif

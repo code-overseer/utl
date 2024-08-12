@@ -69,7 +69,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_same
 #  define UTL_TRAIT_is_same(...) UTL_BUILTIN_is_same(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_same(...) UTL_SCOPE is_same_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_same(...) __UTL is_same_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_same(...) UTL_SCOPE is_same<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_same(...) __UTL is_same<__VA_ARGS__>::value
 #endif

@@ -72,8 +72,8 @@ UTL_NAMESPACE_END
 
 #if UTL_CXX14
 #  define UTL_TRAIT_is_nothrow_default_constructible(TYPE) \
-      UTL_SCOPE is_nothrow_default_constructible_v<TYPE>
+      __UTL is_nothrow_default_constructible_v<TYPE>
 #else
 #  define UTL_TRAIT_is_nothrow_default_constructible(TYPE) \
-      UTL_SCOPE is_nothrow_default_constructible<TYPE>::value
+      __UTL is_nothrow_default_constructible<TYPE>::value
 #endif

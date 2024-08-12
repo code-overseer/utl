@@ -30,12 +30,12 @@ public:
             UTL_REQUIRES_CXX11(UTL_TRAIT_is_constructible(F, Fn&&))>
     __UTL_HIDE_FROM_ABI explicit scope_success(Fn&& func) noexcept(
         UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
-        : base_type(UTL_SCOPE forward<Fn>(func))
+        : base_type(__UTL forward<Fn>(func))
         , exceptions_(uncaught_exceptions()) {}
     scope_success(scope_success const&) = delete;
     __UTL_HIDE_FROM_ABI scope_success(move_t&& other) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(F))
-        : base_type(UTL_SCOPE move(other))
+        : base_type(__UTL move(other))
         , exceptions_(other.exceptions_) {}
 
     using base_type::release;
@@ -61,7 +61,7 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) auto make_scope_success(Fn&& f) no
     UTL_TRAIT_is_nothrow_constructible(scope_success<decay_t<Fn>>, Fn))
     -> enable_if_t<UTL_TRAIT_is_constructible(scope_success<decay_t<Fn>>, Fn),
         scope_success<decay_t<Fn>>> {
-    return scope_success<decay_t<Fn>>{UTL_SCOPE forward<Fn>(f)};
+    return scope_success<decay_t<Fn>>{__UTL forward<Fn>(f)};
 }
 
 namespace details {
@@ -73,7 +73,7 @@ struct success_factory_t {
         noexcept(UTL_TRAIT_is_nothrow_constructible(scope_success<decay_t<Fn>>, Fn))
             -> enable_if_t<UTL_TRAIT_is_constructible(scope_success<decay_t<Fn>>, Fn),
                 scope_success<decay_t<Fn>>> {
-        return scope_success<decay_t<Fn>>{UTL_SCOPE forward<Fn>(f)};
+        return scope_success<decay_t<Fn>>{__UTL forward<Fn>(f)};
     }
 };
 
@@ -82,7 +82,7 @@ inline constexpr success_factory_t success_factory{};
 } // namespace details
 
 #  define UTL_ON_SCOPE_SUCCESS \
-      const auto UTL_UNIQUE_VAR(ScopeSuccess) = UTL_SCOPE details::scope::success_factory->*[&]()
+      const auto UTL_UNIQUE_VAR(ScopeSuccess) = __UTL details::scope::success_factory->*[&]()
 
 #else
 template <typename F>

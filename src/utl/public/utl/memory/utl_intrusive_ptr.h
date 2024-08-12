@@ -50,7 +50,7 @@ class __UTL_PUBLIC_TEMPLATE intrusive_ptr : private pointer_comparable<intrusive
      */
     template <typename F>
     __UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX14 auto iff_notnull(T* ptr, F&& func) UTL_THROWS
-        -> decltype(UTL_SCOPE declval<F>()((T*)nullptr)) {
+        -> decltype(__UTL declval<F>()((T*)nullptr)) {
         UTL_THROW_IF(ptr == nullptr,
             invalid_argument(UTL_MESSAGE_FORMAT(
                 "[UTL] intrusive_ptr operation failed, Reason=[Unexpected nullptr argument]")));
@@ -111,7 +111,7 @@ public:
      * Copy assignment
      */
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 intrusive_ptr& operator=(intrusive_ptr const& other) noexcept {
-        if (UTL_SCOPE addressof(other) != this) {
+        if (__UTL addressof(other) != this) {
             reset();
             if (other) {
                 increment(*other.resource_);
@@ -132,7 +132,7 @@ public:
      * Move assignment
      */
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 intrusive_ptr& operator=(intrusive_ptr&& other) noexcept {
-        if (UTL_SCOPE addressof(other) != this) {
+        if (__UTL addressof(other) != this) {
             reset();
             resource_ = exchange(other.resource_, nullptr);
         }

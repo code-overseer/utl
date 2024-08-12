@@ -34,14 +34,14 @@ namespace details {
 namespace indirectly_movable {
 
 template <typename From, typename To>
-__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> __UTL false_type;
 template <typename From, typename To>
 __UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
-    -> UTL_SCOPE conjunction<UTL_SCOPE is_indirectly_readable<From>,
-        UTL_SCOPE is_indirectly_writable<To, UTL_SCOPE iter_rvalue_reference_t<From>>>;
+    -> __UTL conjunction<__UTL is_indirectly_readable<From>,
+        __UTL is_indirectly_writable<To, __UTL iter_rvalue_reference_t<From>>>;
 
 template <typename From, typename To>
-using trait UTL_NODEBUG = decltype(UTL_SCOPE details::indirectly_movable::trait_impl<From, To>(0));
+using trait UTL_NODEBUG = decltype(__UTL details::indirectly_movable::trait_impl<From, To>(0));
 
 } // namespace indirectly_movable
 } // namespace details

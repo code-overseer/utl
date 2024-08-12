@@ -54,25 +54,25 @@ namespace weakly_incrementable {
 
 template <typename T>
 __UTL_HIDE_FROM_ABI auto pre_incrementable_impl(int) noexcept
-    -> UTL_SCOPE is_same<decltype(++UTL_SCOPE declval<T&>()), T&>;
+    -> __UTL is_same<decltype(++__UTL declval<T&>()), T&>;
 template <typename T>
-__UTL_HIDE_FROM_ABI auto pre_incrementable_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto pre_incrementable_impl(float) noexcept -> __UTL false_type;
 
 template <typename T>
 using pre_incrementable UTL_NODEBUG =
-    decltype(UTL_SCOPE details::weakly_incrementable::pre_incrementable_impl<T>(0));
+    decltype(__UTL details::weakly_incrementable::pre_incrementable_impl<T>(0));
 
 template <typename T>
 __UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
-    -> UTL_SCOPE conjunction<UTL_SCOPE is_signed<UTL_SCOPE iter_difference_t<T>>,
-        UTL_SCOPE is_integral<UTL_SCOPE iter_difference_t<T>>, pre_incrementable<T>,
-        UTL_SCOPE always_true_type<decltype(UTL_SCOPE declval<T&>()++)>>;
+    -> __UTL conjunction<__UTL is_signed<__UTL iter_difference_t<T>>,
+        __UTL is_integral<__UTL iter_difference_t<T>>, pre_incrementable<T>,
+        __UTL always_true_type<decltype(__UTL declval<T&>()++)>>;
 
 template <typename T>
-__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> __UTL false_type;
 
 template <typename T>
-using trait UTL_NODEBUG = decltype(UTL_SCOPE details::weakly_incrementable::trait_impl<T>(0));
+using trait UTL_NODEBUG = decltype(__UTL details::weakly_incrementable::trait_impl<T>(0));
 
 } // namespace weakly_incrementable
 } // namespace details

@@ -72,7 +72,7 @@ using pointer_t = typename pointer<Alloc>::type;
 
 template <typename Alloc, typename = void>
 struct difference_type {
-    using type UTL_NODEBUG = typename UTL_SCOPE pointer_traits<pointer_t<Alloc>>::difference_type;
+    using type UTL_NODEBUG = typename __UTL pointer_traits<pointer_t<Alloc>>::difference_type;
 };
 
 template <typename Alloc>
@@ -158,7 +158,7 @@ using implements_reallocate = decltype(implements_reallocate_impl<T>(0));
 
 template <typename T>
 concept implements_reallocate = requires(T& alloc, result_type_t<T> r, size_type_t<T> s) {
-    { alloc.reallocate(r, s) } -> UTL_SCOPE same_as<pointer_t<T>>;
+    { alloc.reallocate(r, s) } -> __UTL same_as<pointer_t<T>>;
 };
 
 #endif
@@ -169,7 +169,7 @@ __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 pointer_t<T> fallback_reallocate(
         is_pointer<pointer_t<T>>::value, "Only raw pointers can use the fallback reallocation");
     auto dst = allocator.allocate(size);
     auto blessed = libc::unsafe::memcpy(
-        UTL_SCOPE to_address(dst), UTL_SCOPE to_address(arg.ptr), libc::element_count_t(arg.size));
+        __UTL to_address(dst), __UTL to_address(arg.ptr), libc::element_count_t(arg.size));
     allocator.deallocate(arg.ptr, arg.size);
     return blessed;
 }
@@ -218,7 +218,7 @@ using implements_allocate_at_least UTL_NODEBUG = decltype(implements_allocate_at
 
 template <typename T>
 concept implements_allocate_at_least = requires(T& alloc, size_type_t<T> size) {
-    { alloc.allocate_at_least(size) } -> UTL_SCOPE same_as<result_type_t<T>>;
+    { alloc.allocate_at_least(size) } -> __UTL same_as<result_type_t<T>>;
 };
 
 #endif
@@ -253,7 +253,7 @@ using implements_reallocate_at_least = decltype(implements_reallocate_at_least_i
 
 template <typename T>
 concept implements_reallocate_at_least = requires(T& alloc, result_type_t<T> r, size_type_t<T> s) {
-    { alloc.reallocate_at_least(r, s) } -> UTL_SCOPE same_as<result_type_t<T>>;
+    { alloc.reallocate_at_least(r, s) } -> __UTL same_as<result_type_t<T>>;
 };
 
 #endif
@@ -261,7 +261,7 @@ concept implements_reallocate_at_least = requires(T& alloc, result_type_t<T> r, 
 template <typename T UTL_REQUIRES_CXX11(!implements_reallocate_at_least<T>::value)>
 __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 result_type_t<T> reallocate_at_least(
     T& allocator, result_type_t<T> arg, size_type_t<T> new_size) {
-    return {UTL_SCOPE details::allocator::reallocate(allocator, arg, new_size), new_size};
+    return {__UTL details::allocator::reallocate(allocator, arg, new_size), new_size};
 }
 
 template <UTL_CONCEPT_CXX20(implements_reallocate_at_least) T UTL_REQUIRES_CXX11(
@@ -296,28 +296,28 @@ struct __UTL_PUBLIC_TEMPLATE allocator_traits {
     using is_always_equal = details::allocator::is_always_equal<allocator_type>;
     using allocation_result = allocation_result<pointer, size_type>;
     using nothrow_move_assignable = bool_constant<propagate_on_container_move_assignment::value ||
-        (is_always_equal::value && UTL_SCOPE is_nothrow_move_assignable<allocator_type>::value)>;
+        (is_always_equal::value && __UTL is_nothrow_move_assignable<allocator_type>::value)>;
 
     template <typename T>
     using rebind_alloc = typename details::allocator::rebind<Alloc, T>::type;
     template <typename T>
     using rebind_traits = allocator_traits<rebind_alloc<T>>;
 
-    static_assert(UTL_SCOPE is_nothrow_copy_constructible<allocator_type>::value,
+    static_assert(__UTL is_nothrow_copy_constructible<allocator_type>::value,
         "Alloc must be nothrow copy constructible");
-    static_assert(UTL_SCOPE is_nothrow_move_constructible<allocator_type>::value,
+    static_assert(__UTL is_nothrow_move_constructible<allocator_type>::value,
         "Alloc must be nothrow move constructible");
     static_assert(
-        is_always_equal::value || UTL_SCOPE is_nothrow_equality_comparable<allocator_type>::value,
+        is_always_equal::value || __UTL is_nothrow_equality_comparable<allocator_type>::value,
         "Alloc must be nothrow equality comparable if it is not always equal");
     static_assert(!propagate_on_container_copy_assignment::value ||
-            UTL_SCOPE is_nothrow_copy_assignable<allocator_type>::value,
+            __UTL is_nothrow_copy_assignable<allocator_type>::value,
         "If propogation on copy assignment is required, allocator must be nothrow copy assignable");
     static_assert(!propagate_on_container_move_assignment::value ||
-            UTL_SCOPE is_nothrow_move_assignable<allocator_type>::value,
+            __UTL is_nothrow_move_assignable<allocator_type>::value,
         "If propogation on move assignment is required, allocator must be nothrow move assignable");
-    static_assert(!propagate_on_container_swap::value ||
-            UTL_SCOPE is_nothrow_swappable<allocator_type>::value,
+    static_assert(
+        !propagate_on_container_swap::value || __UTL is_nothrow_swappable<allocator_type>::value,
         "If propogation on swap is required, allocator must be nothrow swappable");
     static_assert(is_unsigned<size_type>::value, "size_type must be unsigned");
     static_assert(numeric::maximum<size_type>::value > sizeof(value_type),

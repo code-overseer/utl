@@ -74,7 +74,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_lvalue_reference
 #  define UTL_TRAIT_is_lvalue_reference(...) UTL_BUILTIN_is_lvalue_reference(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_lvalue_reference(...) UTL_SCOPE is_lvalue_reference_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_lvalue_reference(...) __UTL is_lvalue_reference_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_lvalue_reference(...) UTL_SCOPE is_lvalue_reference<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_lvalue_reference(...) __UTL is_lvalue_reference<__VA_ARGS__>::value
 #endif

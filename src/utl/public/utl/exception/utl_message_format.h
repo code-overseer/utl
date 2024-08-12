@@ -42,7 +42,7 @@ struct __UTL_ABI_PUBLIC message_format {
      */
     template <size_t N>
     __UTL_HIDE_FROM_ABI message_format(char const (&fmt)[N] UTL_LIFETIMEBOUND,
-        UTL_SCOPE source_location src = UTL_SOURCE_LOCATION()) noexcept
+        __UTL source_location src = UTL_SOURCE_LOCATION()) noexcept
         : format(fmt)
         , location(src) {}
 #else
@@ -58,16 +58,16 @@ struct __UTL_ABI_PUBLIC message_format {
      */
     template <size_t N>
     __UTL_HIDE_FROM_ABI message_format(
-        char const (&fmt)[N] UTL_LIFETIMEBOUND, UTL_SCOPE source_location src) noexcept
+        char const (&fmt)[N] UTL_LIFETIMEBOUND, __UTL source_location src) noexcept
         : format(fmt)
         , location(src) {}
 #endif
     char const* format;
-    UTL_SCOPE source_location location;
+    __UTL source_location location;
 };
 } // namespace exceptions
 
 UTL_NAMESPACE_END
 
 #define UTL_MESSAGE_FORMAT(FORMAT) \
-    UTL_SCOPE exceptions::message_format::forward({FORMAT, UTL_SOURCE_LOCATION()})
+    __UTL exceptions::message_format::forward({FORMAT, UTL_SOURCE_LOCATION()})

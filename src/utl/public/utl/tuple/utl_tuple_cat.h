@@ -33,25 +33,25 @@ using concat_elements_t = typename concat_elements<Ts...>::type;
 template <typename T0, typename T1, size_t... Is, size_t... Js>
 __UTL_HIDE_FROM_ABI auto concat_elements_helper(
     index_sequence<Is...>, index_sequence<Js...>) noexcept
-    -> UTL_SCOPE tuple<tuple_element_t<Is, T0>..., tuple_element_t<Js, T1>...>;
+    -> __UTL tuple<tuple_element_t<Is, T0>..., tuple_element_t<Js, T1>...>;
 template <typename T0, typename T1, size_t... Js>
 __UTL_HIDE_FROM_ABI auto concat_elements_helper(index_sequence<>, index_sequence<Js...>) noexcept
-    -> UTL_SCOPE tuple<tuple_element_t<Js, T1>...>;
+    -> __UTL tuple<tuple_element_t<Js, T1>...>;
 
 template <typename T0, typename T1, size_t... Is>
 __UTL_HIDE_FROM_ABI auto concat_elements_helper(index_sequence<Is...>, index_sequence<>) noexcept
-    -> UTL_SCOPE tuple<tuple_element_t<Is, T0>...>;
+    -> __UTL tuple<tuple_element_t<Is, T0>...>;
 
 template <typename T0, typename T1>
 __UTL_HIDE_FROM_ABI auto concat_elements_helper(index_sequence<>, index_sequence<>) noexcept
-    -> UTL_SCOPE tuple<>;
+    -> __UTL tuple<>;
 
 template <typename T0, size_t... Is>
 __UTL_HIDE_FROM_ABI auto concat_elements_helper(index_sequence<Is...>) noexcept
-    -> UTL_SCOPE tuple<tuple_element_t<Is, T0>...>;
+    -> __UTL tuple<tuple_element_t<Is, T0>...>;
 
 template <typename T0>
-__UTL_HIDE_FROM_ABI auto concat_elements_helper(index_sequence<>) noexcept -> UTL_SCOPE tuple<>;
+__UTL_HIDE_FROM_ABI auto concat_elements_helper(index_sequence<>) noexcept -> __UTL tuple<>;
 
 template <typename T0, typename T1>
 __UTL_HIDE_FROM_ABI auto concat_elements_helper() noexcept
@@ -63,8 +63,8 @@ __UTL_HIDE_FROM_ABI auto concat_elements_helper() noexcept
     -> decltype(concat_elements_helper<T0>(tuple_index_sequence<T0>{}));
 
 template <typename... Ts>
-struct concat_elements<UTL_SCOPE tuple<Ts...>> {
-    using type UTL_NODEBUG = UTL_SCOPE tuple<Ts...>;
+struct concat_elements<__UTL tuple<Ts...>> {
+    using type UTL_NODEBUG = __UTL tuple<Ts...>;
 };
 
 template <typename T0>
@@ -88,8 +88,8 @@ template <typename Tuple, size_t... Ns>
 __UTL_HIDE_FROM_ABI constexpr auto tuple_forward(Tuple&& tuple, index_sequence<Ns...>) noexcept(
     is_all_nothrow_gettable<Tuple>::value /* Only check the get expresions */
     /* We're constructing a tuple of references, so the construction should always be noexcept */
-    ) -> UTL_SCOPE tuple<get_type_t<Ns, Tuple>...> {
-    return {UTL_SCOPE get_element<Ns>(UTL_SCOPE forward<Tuple>(tuple))...};
+    ) -> __UTL tuple<get_type_t<Ns, Tuple>...> {
+    return {__UTL get_element<Ns>(__UTL forward<Tuple>(tuple))...};
 }
 
 template <typename Tuple>
@@ -102,21 +102,21 @@ __UTL_HIDE_FROM_ABI constexpr auto tuple_forward(Tuple&& tuple) noexcept(
 template <typename T>
 __UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl(T&& tuple) noexcept -> T&& {
     static_assert(is_all_reference<T>::value, "Elements must all be references");
-    return UTL_SCOPE forward<T>(tuple);
+    return __UTL forward<T>(tuple);
 }
 
 template <typename T0>
-__UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl(
-    T0&& tuple0, UTL_SCOPE tuple<> const& tuple1) noexcept -> T0&& {
+__UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl(T0&& tuple0, __UTL tuple<> const& tuple1) noexcept
+    -> T0&& {
     static_assert(is_all_reference<T0>::value, "Elements must all be references");
-    return UTL_SCOPE forward<T0>(tuple0);
+    return __UTL forward<T0>(tuple0);
 }
 
 template <typename T0>
-__UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl(
-    UTL_SCOPE tuple<> const& tuple1, T0&& tuple0) noexcept -> T0&& {
+__UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl(__UTL tuple<> const& tuple1, T0&& tuple0) noexcept
+    -> T0&& {
     static_assert(is_all_reference<T0>::value, "Elements must all be references");
-    return UTL_SCOPE forward<T0>(tuple0);
+    return __UTL forward<T0>(tuple0);
 }
 
 template <typename T0, typename T1, size_t... I0, size_t... I1>
@@ -125,8 +125,8 @@ __UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl_idx(T0&& tuple0, T1&& tuple1,
     is_all_nothrow_gettable<T1>::value &&
     is_nothrow_constructible<concat_elements_t<T0, T1>, get_type_t<I0, T0>...,
         get_type_t<I1, T1>...>::value) -> concat_elements_t<T0, T1> {
-    return {UTL_SCOPE get_element<I0>(UTL_SCOPE forward<T0>(tuple0))...,
-        UTL_SCOPE get_element<I1>(UTL_SCOPE forward<T1>(tuple1))...};
+    return {__UTL get_element<I0>(__UTL forward<T0>(tuple0))...,
+        __UTL get_element<I1>(__UTL forward<T1>(tuple1))...};
 }
 
 template <typename T0, typename T1>
@@ -135,7 +135,7 @@ __UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl(T0&& t0, T1&& t1) noexcept(
         tuple_index_sequence<T1>{}))) -> concat_elements_t<T0, T1> {
     static_assert(conjunction<is_all_reference<T0>, is_all_reference<T1>>::value,
         "Elements must all be references");
-    return tuple_cat_impl_idx(UTL_SCOPE forward<T0>(t0), UTL_SCOPE forward<T1>(t1),
+    return tuple_cat_impl_idx(__UTL forward<T0>(t0), __UTL forward<T1>(t1),
         tuple_index_sequence<T0>{}, tuple_index_sequence<T1>{});
 }
 
@@ -146,8 +146,8 @@ __UTL_HIDE_FROM_ABI constexpr auto tuple_cat_impl(T0&& t0, T1&& t1, T2&& t2,
     static_assert(conjunction<is_all_reference<T0>, is_all_reference<T1>, is_all_reference<T2>,
                       is_all_reference<Tail>...>::value,
         "Elements must all be references");
-    return tuple_cat_impl(tuple_cat_impl(UTL_SCOPE forward<T0>(t0), UTL_SCOPE forward<T1>(t1)),
-        UTL_SCOPE forward<T2>(t2), forward<Tail>(tail)...);
+    return tuple_cat_impl(tuple_cat_impl(__UTL forward<T0>(t0), __UTL forward<T1>(t1)),
+        __UTL forward<T2>(t2), forward<Tail>(tail)...);
 }
 
 } // namespace tuple
@@ -159,7 +159,7 @@ UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) constexpr auto tuple_cat(Tupl
     -> details::tuple::concat_elements_t<remove_reference_t<Tuples>...> {
     using return_type = details::tuple::concat_elements_t<remove_reference_t<Tuples>...>;
     return return_type(details::tuple::tuple_cat_impl(
-        details::tuple::tuple_forward(UTL_SCOPE forward<Tuples>(args))...));
+        details::tuple::tuple_forward(__UTL forward<Tuples>(args))...));
 }
 
 UTL_NAMESPACE_END

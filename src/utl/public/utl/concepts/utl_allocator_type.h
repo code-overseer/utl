@@ -23,7 +23,7 @@ template <typename T>
 concept comparability = empty_type<T> || requires {
     typename T::is_always_equal;
     requires T::is_always_equal::value;
-} || (UTL_SCOPE equality_comparable<T> && requires(T const& l, T const& r) {
+} || (__UTL equality_comparable<T> && requires(T const& l, T const& r) {
     { l == r } noexcept;
     { l != r } noexcept;
 });
@@ -49,12 +49,12 @@ concept copy_assignability =
 template <typename T>
 concept move_assignability =
     !move_propogation<T> || (assignable_from<T&, T&&> && requires(T& l, T&& r) {
-        { l = UTL_SCOPE move(r) } noexcept;
+        { l = __UTL move(r) } noexcept;
     });
 
 template <typename T>
 concept swappability =
-    !swap_propogation<T> || (UTL_SCOPE swappable<T> && UTL_SCOPE is_nothrow_swappable_v<T>);
+    !swap_propogation<T> || (__UTL swappable<T> && __UTL is_nothrow_swappable_v<T>);
 
 } // namespace allocator
 } // namespace details
@@ -63,7 +63,7 @@ template <typename T>
 concept allocator_type = copy_constructible<T> && move_constructible<T> &&
     requires(T t) {
         { T(t) } noexcept;
-        { T(UTL_SCOPE move(t)) } noexcept;
+        { T(__UTL move(t)) } noexcept;
     } && details::allocator::comparability<T> && details::allocator::copy_assignability<T> &&
     details::allocator::move_assignability<T> && details::allocator::swappability<T>;
 

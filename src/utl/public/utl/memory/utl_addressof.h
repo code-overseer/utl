@@ -50,24 +50,24 @@ namespace details {
 namespace addressof {
 
 template <typename T>
-__UTL_HIDE_FROM_ABI auto has_global_overload(int) -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto has_global_overload(int) -> __UTL false_type;
 template <typename T>
 __UTL_HIDE_FROM_ABI auto has_global_overload(float)
-    -> UTL_SCOPE always_true_type<decltype(operator&(UTL_SCOPE declval<T&>()))>;
+    -> __UTL always_true_type<decltype(operator&(__UTL declval<T&>()))>;
 
 template <typename T>
-__UTL_HIDE_FROM_ABI auto has_member_overload(int) -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto has_member_overload(int) -> __UTL false_type;
 template <typename T>
 __UTL_HIDE_FROM_ABI auto has_member_overload(float)
-    -> UTL_SCOPE always_true_type<decltype(UTL_SCOPE declval<T&>().operator&())>;
+    -> __UTL always_true_type<decltype(__UTL declval<T&>().operator&())>;
 template <typename T>
 __UTL_HIDE_FROM_ABI auto not_addressible(int) noexcept
-    -> UTL_SCOPE always_false_type<decltype(&UTL_SCOPE declval<T&>())>;
+    -> __UTL always_false_type<decltype(&__UTL declval<T&>())>;
 template <typename T>
-__UTL_HIDE_FROM_ABI auto not_addressible(float) noexcept -> UTL_SCOPE true_type;
+__UTL_HIDE_FROM_ABI auto not_addressible(float) noexcept -> __UTL true_type;
 
 template <typename T>
-using has_overload UTL_NODEBUG = UTL_SCOPE disjunction<decltype(not_addressible<T>(0)),
+using has_overload UTL_NODEBUG = __UTL disjunction<decltype(not_addressible<T>(0)),
     decltype(has_member_overload<T>(0)), decltype(has_global_overload<T>(0))>;
 } // namespace addressof
 } // namespace details

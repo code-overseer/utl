@@ -70,7 +70,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_trivial
 #  define UTL_TRAIT_is_trivial(...) UTL_BUILTIN_is_trivial(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_trivial(...) UTL_SCOPE is_trivial_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_trivial(...) __UTL is_trivial_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_trivial(...) UTL_SCOPE is_trivial<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_trivial(...) __UTL is_trivial<__VA_ARGS__>::value
 #endif

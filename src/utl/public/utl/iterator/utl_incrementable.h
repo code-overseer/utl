@@ -17,11 +17,11 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace incrementable {
 
-using UTL_SCOPE details::weakly_incrementable::pre_incrementable;
+using __UTL details::weakly_incrementable::pre_incrementable;
 
 template <typename T>
 concept post_incrementable = requires(T t) {
-    { t++ } -> UTL_SCOPE same_as<T>;
+    { t++ } -> __UTL same_as<T>;
 };
 
 template <typename T>
@@ -38,7 +38,7 @@ concept nothrow_pre_incrementable = pre_incrementable<T> && requires(T t) {
 } // namespace details
 
 template <typename T>
-concept incrementable = UTL_SCOPE regular<T> && UTL_SCOPE weakly_incrementable<T> &&
+concept incrementable = __UTL regular<T> && __UTL weakly_incrementable<T> &&
     details::incrementable::post_incrementable<T>;
 
 template <typename T>
@@ -77,37 +77,37 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace incrementable {
 
-using UTL_SCOPE details::weakly_incrementable::pre_incrementable;
+using __UTL details::weakly_incrementable::pre_incrementable;
 
 template <typename T>
 __UTL_HIDE_FROM_ABI auto post_incrementable_impl(int) noexcept
-    -> UTL_SCOPE is_same<decltype(UTL_SCOPE declval<T&>()++), T>;
+    -> __UTL is_same<decltype(__UTL declval<T&>()++), T>;
 template <typename T>
-__UTL_HIDE_FROM_ABI auto post_incrementable_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto post_incrementable_impl(float) noexcept -> __UTL false_type;
 
 template <typename T>
 using post_incrementable UTL_NODEBUG =
-    decltype(UTL_SCOPE details::incrementable::post_incrementable_impl<T>(0));
+    decltype(__UTL details::incrementable::post_incrementable_impl<T>(0));
 
 template <typename T>
 __UTL_HIDE_FROM_ABI auto nothrow_post_incrementable_impl(int) noexcept
-    -> UTL_SCOPE bool_constant<noexcept(UTL_SCOPE declval<T&>()++)>;
+    -> __UTL bool_constant<noexcept(__UTL declval<T&>()++)>;
 template <typename T>
-__UTL_HIDE_FROM_ABI auto nothrow_post_incrementable_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto nothrow_post_incrementable_impl(float) noexcept -> __UTL false_type;
 
 template <typename T>
 using nothrow_post_incrementable UTL_NODEBUG =
-    decltype(UTL_SCOPE details::incrementable::post_incrementable_impl<T>(0));
+    decltype(__UTL details::incrementable::post_incrementable_impl<T>(0));
 
 template <typename T>
 __UTL_HIDE_FROM_ABI auto nothrow_pre_incrementable_impl(int) noexcept
-    -> UTL_SCOPE bool_constant<noexcept(++UTL_SCOPE declval<T&>())>;
+    -> __UTL bool_constant<noexcept(++__UTL declval<T&>())>;
 template <typename T>
-__UTL_HIDE_FROM_ABI auto nothrow_pre_incrementable_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto nothrow_pre_incrementable_impl(float) noexcept -> __UTL false_type;
 
 template <typename T>
 using nothrow_pre_incrementable UTL_NODEBUG =
-    decltype(UTL_SCOPE details::incrementable::post_incrementable_impl<T>(0));
+    decltype(__UTL details::incrementable::post_incrementable_impl<T>(0));
 
 } // namespace incrementable
 } // namespace details

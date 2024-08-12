@@ -33,7 +33,7 @@ inline constexpr bool is_sized_sentinel_for_v = sized_sentinel_for<S, I>;
 
 UTL_NAMESPACE_END
 
-#  define UTL_TRAIT_is_sized_sentinel_for(...) UTL_SCOPE sized_sentinel_for<__VA_ARGS__>
+#  define UTL_TRAIT_is_sized_sentinel_for(...) __UTL sized_sentinel_for<__VA_ARGS__>
 
 #else // UTL_CXX20
 
@@ -50,7 +50,7 @@ UTL_INLINE_CXX17 constexpr bool disable_sized_sentinel_for = false;
 namespace details {
 namespace sized_sentinel_for {
 template <typename S, typename I>
-struct is_disabled : UTL_SCOPE bool_constant<disable_sized_sentinel_for<S, I>> {};
+struct is_disabled : __UTL bool_constant<disable_sized_sentinel_for<S, I>> {};
 } // namespace sized_sentinel_for
 } // namespace details
 
@@ -59,7 +59,7 @@ struct is_disabled : UTL_SCOPE bool_constant<disable_sized_sentinel_for<S, I>> {
 namespace details {
 namespace sized_sentinel_for {
 template <typename S, typename I>
-struct is_disabled : UTL_SCOPE false_type {};
+struct is_disabled : __UTL false_type {};
 } // namespace sized_sentinel_for
 } // namespace details
 
@@ -69,18 +69,18 @@ namespace details {
 namespace sized_sentinel_for {
 
 template <typename S, typename I>
-__UTL_HIDE_FROM_ABI auto subtractible(int) noexcept -> UTL_SCOPE conjunction<
-    UTL_SCOPE is_same<decltype(UTL_SCOPE declval<S const&>() - UTL_SCOPE declval<I const&>()),
-        UTL_SCOPE iter_difference_t<I>>,
-    UTL_SCOPE is_same<decltype(UTL_SCOPE declval<I const&>() - UTL_SCOPE declval<S const&>()),
-        UTL_SCOPE iter_difference_t<I>>>;
+__UTL_HIDE_FROM_ABI auto subtractible(int) noexcept -> __UTL
+    conjunction<__UTL is_same<decltype(__UTL declval<S const&>() - __UTL declval<I const&>()),
+                    __UTL iter_difference_t<I>>,
+        __UTL is_same<decltype(__UTL declval<I const&>() - __UTL declval<S const&>()),
+            __UTL iter_difference_t<I>>>;
 
 template <typename S, typename I>
-__UTL_HIDE_FROM_ABI auto subtractible(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto subtractible(float) noexcept -> __UTL false_type;
 
 template <typename S, typename I>
 using is_subtractible UTL_NODEBUG =
-    decltype(UTL_SCOPE details::sized_sentinel_for::subtractible<S, I>(0));
+    decltype(__UTL details::sized_sentinel_for::subtractible<S, I>(0));
 } // namespace sized_sentinel_for
 } // namespace details
 
@@ -96,6 +96,6 @@ UTL_INLINE_CXX17 constexpr bool is_sized_sentinel_for_v = is_sized_sentinel_for<
 
 UTL_NAMESPACE_END
 
-#  define UTL_TRAIT_is_sized_sentinel_for(...) UTL_SCOPE is_sized_sentinel_for<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_sized_sentinel_for(...) __UTL is_sized_sentinel_for<__VA_ARGS__>::value
 
 #endif // UTL_CXX20

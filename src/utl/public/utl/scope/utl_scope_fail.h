@@ -31,12 +31,12 @@ public:
             UTL_REQUIRES_CXX11(UTL_TRAIT_is_constructible(F, Fn&&))>
     __UTL_HIDE_FROM_ABI explicit scope_fail(Fn&& func) noexcept(
         UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
-        : base_type(UTL_SCOPE forward<Fn>(func))
-        , exceptions_(UTL_SCOPE uncaught_exceptions()) {}
+        : base_type(__UTL forward<Fn>(func))
+        , exceptions_(__UTL uncaught_exceptions()) {}
     scope_fail(scope_fail const&) = delete;
     __UTL_HIDE_FROM_ABI scope_fail(move_t&& other) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(F))
-        : base_type(UTL_SCOPE move(other))
+        : base_type(__UTL move(other))
         , exceptions_(other.exceptions_) {}
 
     using base_type::release;
@@ -49,7 +49,7 @@ public:
 
 private:
     __UTL_HIDE_FROM_ABI bool should_invoke() const noexcept {
-        return exceptions_ < UTL_SCOPE uncaught_exceptions();
+        return exceptions_ < __UTL uncaught_exceptions();
     }
     int exceptions_;
 };
@@ -62,7 +62,7 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline auto make_scope_fail(Fn&& f
     UTL_TRAIT_is_nothrow_constructible(scope_fail<decay_t<Fn>>, Fn))
     -> enable_if_t<UTL_TRAIT_is_constructible(scope_fail<decay_t<Fn>>, Fn),
         scope_fail<decay_t<Fn>>> {
-    return scope_fail<decay_t<Fn>>{UTL_SCOPE forward<Fn>(f)};
+    return scope_fail<decay_t<Fn>>{__UTL forward<Fn>(f)};
 }
 
 namespace details {
@@ -74,7 +74,7 @@ struct fail_factory_t {
         noexcept(UTL_TRAIT_is_nothrow_constructible(scope_fail<decay_t<Fn>>, Fn))
             -> enable_if_t<UTL_TRAIT_is_constructible(scope_fail<decay_t<Fn>>, Fn),
                 scope_fail<decay_t<Fn>>> {
-        return scope_fail<decay_t<Fn>>{UTL_SCOPE forward<Fn>(f)};
+        return scope_fail<decay_t<Fn>>{__UTL forward<Fn>(f)};
     }
 };
 
@@ -83,7 +83,7 @@ inline constexpr fail_factory_t fail_factory{};
 } // namespace details
 
 #  define UTL_ON_SCOPE_FAIL \
-      const auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::fail_factory->*[&]()
+      const auto UTL_UNIQUE_VAR(ScopeFail) = __UTL details::scope::fail_factory->*[&]()
 
 #else  // if UTL_CXX17
 template <typename F>

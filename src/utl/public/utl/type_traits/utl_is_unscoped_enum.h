@@ -24,7 +24,7 @@ UTL_INLINE_CXX17 constexpr bool is_unscoped_enum_v =
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_unscoped_enum(...) UTL_SCOPE is_unscoped_enum_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_unscoped_enum(...) __UTL is_unscoped_enum_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_unscoped_enum(...) UTL_SCOPE is_unscoped_enum<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_unscoped_enum(...) __UTL is_unscoped_enum<__VA_ARGS__>::value
 #endif

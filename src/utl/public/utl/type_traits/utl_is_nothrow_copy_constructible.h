@@ -74,9 +74,8 @@ UTL_NAMESPACE_END
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_nothrow_copy_constructible(TYPE) \
-      UTL_SCOPE is_nothrow_copy_constructible_v<TYPE>
+#  define UTL_TRAIT_is_nothrow_copy_constructible(TYPE) __UTL is_nothrow_copy_constructible_v<TYPE>
 #else
 #  define UTL_TRAIT_is_nothrow_copy_constructible(TYPE) \
-      UTL_SCOPE is_nothrow_copy_constructible<TYPE>::value
+      __UTL is_nothrow_copy_constructible<TYPE>::value
 #endif

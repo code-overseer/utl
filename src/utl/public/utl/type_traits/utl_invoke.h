@@ -57,7 +57,7 @@ __UTL_HIDE_FROM_ABI constexpr auto unwrap(T&& t) noexcept(noexcept(t.get())) -> 
 
 template <typename T UTL_REQUIRES_CXX11(!UTL_TRAIT_is_reference_wrapper(T))>
 __UTL_HIDE_FROM_ABI constexpr T&& unwrap(T&& t) noexcept {
-    return UTL_SCOPE forward(t);
+    return __UTL forward(t);
 }
 
 template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_is_dereferenceable(T))>
@@ -67,7 +67,7 @@ __UTL_HIDE_FROM_ABI constexpr auto unwrap(T&& t) noexcept(UTL_TRAIT_is_nothrow_d
 }
 
 template <typename T>
-using unwrap_t UTL_NODEBUG = decltype(UTL_SCOPE details::invocable::unwrap(UTL_SCOPE declval<T>()));
+using unwrap_t UTL_NODEBUG = decltype(__UTL details::invocable::unwrap(__UTL declval<T>()));
 
 template <typename F, typename A, typename Class = class_type_t<remove_cvref_t<F>>>
 using requires_member_function UTL_NODEBUG =
@@ -94,32 +94,32 @@ template <typename F, typename A, typename... Args, requires_member_function<F, 
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr auto invoke(F&& f, A&& a,
     Args&&... args) noexcept(noexcept((unwrap(declval<A>()).*declval<F>())(declval<Args>()...)))
     -> decltype((unwrap(declval<A>()).*declval<F>())(declval<Args>()...)) {
-    return (unwrap(UTL_SCOPE forward<A>(a)).*f)(UTL_SCOPE forward<Args>(args)...);
+    return (unwrap(__UTL forward<A>(a)).*f)(__UTL forward<Args>(args)...);
 }
 
 template <typename F, typename A, typename... Args, requires_member_function_ptr_arg<F, A> = 1>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr auto invoke(F&& f, A&& a,
     Args&&... args) noexcept(noexcept((unwrap(declval<A>()).*declval<F>())(declval<Args>()...)))
     -> decltype((unwrap(declval<A>()).*declval<F>())(declval<Args>()...)) {
-    return (unwrap(UTL_SCOPE forward<A>(a)).*f)(UTL_SCOPE forward<Args>(args)...);
+    return (unwrap(__UTL forward<A>(a)).*f)(__UTL forward<Args>(args)...);
 }
 
 template <typename F, typename A, requires_member_object<F, A> = 2>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr auto invoke(F&& f, A&& a) noexcept(
     noexcept(unwrap(declval<A>()).*declval<F>())) -> decltype(unwrap(declval<A>()).*declval<F>()) {
-    return unwrap(UTL_SCOPE forward<A>(a)).*f;
+    return unwrap(__UTL forward<A>(a)).*f;
 }
 
 template <typename F, typename A, requires_member_object_ptr_arg<F, A> = 3>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr auto invoke(F&& f, A&& a) noexcept(
     noexcept(unwrap(declval<A>()).*declval<F>())) -> decltype(unwrap(declval<A>()).*declval<F>()) {
-    return unwrap(UTL_SCOPE forward<A>(a)).*f;
+    return unwrap(__UTL forward<A>(a)).*f;
 }
 
 template <typename F, typename... Args>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr auto invoke(F&& f, Args&&... args) noexcept(
     noexcept(declval<F>()(declval<Args>()...))) -> decltype(declval<F>()(declval<Args>()...)) {
-    return UTL_SCOPE forward<F>(f)(UTL_SCOPE forward<Args>(args)...);
+    return __UTL forward<F>(f)(__UTL forward<Args>(args)...);
 }
 
 template <typename Result, typename T>
@@ -130,9 +130,9 @@ template <typename T>
 struct returnable_as<invalid_t, T> : false_type {};
 template <typename R, typename T>
 __UTL_HIDE_FROM_ABI auto returnable_as_impl(int) noexcept
-    -> decltype(static_cast<UTL_SCOPE true_type (*)(R)>(0)(static_cast<T (*)()>(0)()));
+    -> decltype(static_cast<__UTL true_type (*)(R)>(0)(static_cast<T (*)()>(0)()));
 template <typename R, typename T>
-__UTL_HIDE_FROM_ABI auto returnable_as_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto returnable_as_impl(float) noexcept -> __UTL false_type;
 template <typename Result, typename T>
 struct returnable_as : decltype(returnable_as_impl<Result, T>(0)) {};
 
@@ -149,8 +149,8 @@ struct nothrow_returnable_as :
     bool_constant<noexcept(noexcept_test<Result>(static_cast<T (*)()>(0)()))> {};
 
 template <typename F, typename... Args>
-using resolve_result_t UTL_NODEBUG = decltype(UTL_SCOPE details::invocable::invoke(
-    UTL_SCOPE declval<F>(), UTL_SCOPE declval<Args>()...));
+using resolve_result_t UTL_NODEBUG =
+    decltype(__UTL details::invocable::invoke(__UTL declval<F>(), __UTL declval<Args>()...));
 
 template <typename R, typename F, typename... Args>
 __UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> returnable_as<R, resolve_result_t<F, Args...>>;
@@ -159,7 +159,7 @@ __UTL_HIDE_FROM_ABI auto resolve(float) noexcept -> false_type;
 
 template <typename R, typename F, typename... Args,
     bool V = noexcept(
-        UTL_SCOPE details::invocable::invoke(UTL_SCOPE declval<F>(), UTL_SCOPE declval<Args>()...))>
+        __UTL details::invocable::invoke(__UTL declval<F>(), __UTL declval<Args>()...))>
 __UTL_HIDE_FROM_ABI auto resolve_nothrow(int) noexcept
     -> bool_constant<V && nothrow_returnable_as<R, resolve_result_t<F, Args...>>::value>;
 template <typename R, typename F, typename... Args>
@@ -205,23 +205,22 @@ UTL_NAMESPACE_END
 #define UTL_TRAIT_SUPPORTED_is_invocable_r 1
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_invocable_r(...) UTL_SCOPE is_invocable_r_v<__VA_ARGS__>
-#  define UTL_TRAIT_is_invocable(...) UTL_SCOPE is_invocable_v<__VA_ARGS__>
-#  define UTL_TRAIT_is_nothrow_invocable_r(...) UTL_SCOPE is_nothrow_invocable_r_v<__VA_ARGS__>
-#  define UTL_TRAIT_is_nothrow_invocable(...) UTL_SCOPE is_nothrow_invocable_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_invocable_r(...) __UTL is_invocable_r_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_invocable(...) __UTL is_invocable_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_nothrow_invocable_r(...) __UTL is_nothrow_invocable_r_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_nothrow_invocable(...) __UTL is_nothrow_invocable_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_invocable_r(...) UTL_SCOPE is_invocable_r<__VA_ARGS__>::value
-#  define UTL_TRAIT_is_invocable(...) UTL_SCOPE is_invocable<__VA_ARGS__>::value
-#  define UTL_TRAIT_is_nothrow_invocable_r(...) UTL_SCOPE is_nothrow_invocable_r<__VA_ARGS__>::value
-#  define UTL_TRAIT_is_nothrow_invocable(...) UTL_SCOPE is_nothrow_invocable<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_invocable_r(...) __UTL is_invocable_r<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_invocable(...) __UTL is_invocable<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_nothrow_invocable_r(...) __UTL is_nothrow_invocable_r<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_nothrow_invocable(...) __UTL is_nothrow_invocable<__VA_ARGS__>::value
 #endif
 
 UTL_NAMESPACE_BEGIN
 template <typename F, typename... Args>
 struct __UTL_PUBLIC_TEMPLATE invoke_result :
     enable_if<UTL_TRAIT_is_invocable(F, Args...),
-        decltype(details::invocable::invoke(
-            UTL_SCOPE declval<F>(), UTL_SCOPE declval<Args>()...))> {};
+        decltype(details::invocable::invoke(__UTL declval<F>(), __UTL declval<Args>()...))> {};
 
 template <typename F, typename... Args>
 using invoke_result_t = typename invoke_result<F, Args...>::type;

@@ -83,8 +83,7 @@ auto nothrow_impl(nothrow_branch_t<false, true>) noexcept -> false_type;
 
 template <typename T, typename... Args>
 using nothrow_impl_t = decltype(nothrow_impl<T, Args...>(
-    nothrow_branch_t<UTL_SCOPE is_constructible<T, Args...>::value,
-        UTL_SCOPE is_reference<T>::value>{}));
+    nothrow_branch_t<__UTL is_constructible<T, Args...>::value, __UTL is_reference<T>::value>{}));
 
 } // namespace constructible
 } // namespace details
@@ -108,8 +107,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_nothrow_constructible
 #  define UTL_TRAIT_is_nothrow_constructible(...) UTL_BUILTIN_is_nothrow_constructible(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_nothrow_constructible(...) UTL_SCOPE is_nothrow_constructible_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_nothrow_constructible(...) __UTL is_nothrow_constructible_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_nothrow_constructible(...) \
-      UTL_SCOPE is_nothrow_constructible<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_nothrow_constructible(...) __UTL is_nothrow_constructible<__VA_ARGS__>::value
 #endif

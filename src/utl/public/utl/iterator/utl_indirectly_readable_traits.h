@@ -34,21 +34,21 @@ namespace indirectly_readable {
 
 template <typename T>
 concept with_member_object_value_type = with_member_value_type<T> && !with_member_element_type<T> &&
-    UTL_SCOPE object_type<typename T::value_type>;
+    __UTL object_type<typename T::value_type>;
 
 template <typename T>
 concept with_member_object_element_type = with_member_element_type<T> &&
-    !with_member_value_type<T> && UTL_SCOPE object_type<typename T::element_type>;
+    !with_member_value_type<T> && __UTL object_type<typename T::element_type>;
 
 template <typename T>
 concept with_resolvable_conflict = with_member_value_type<T> && with_member_element_type<T> &&
-    UTL_SCOPE same_as<UTL_SCOPE remove_cv_t<typename T::value_type>,
-        UTL_SCOPE remove_cv_t<typename T::element_type>> &&
-    UTL_SCOPE object_type<typename T::value_type>;
+    __UTL same_as<__UTL remove_cv_t<typename T::value_type>,
+        __UTL remove_cv_t<typename T::element_type>> &&
+    __UTL object_type<typename T::value_type>;
 
 template <typename T>
 struct traits {
-    using value_type UTL_NODEBUG = UTL_SCOPE remove_cv_t<T>;
+    using value_type UTL_NODEBUG = __UTL remove_cv_t<T>;
 };
 } // namespace indirectly_readable
 } // namespace details
@@ -58,17 +58,17 @@ struct __UTL_PUBLIC_TEMPLATE indirectly_readable_traits {};
 
 template <array_type T>
 struct __UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T> :
-    details::indirectly_readable::traits<UTL_SCOPE remove_extent_t<T>> {};
+    details::indirectly_readable::traits<__UTL remove_extent_t<T>> {};
 
 template <object_type T>
 struct __UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T*> :
     details::indirectly_readable::traits<T> {};
 
-template <UTL_SCOPE details::indirectly_readable::with_member_object_value_type T>
+template <__UTL details::indirectly_readable::with_member_object_value_type T>
 struct __UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T> :
     details::indirectly_readable::traits<typename T::value_type> {};
 
-template <UTL_SCOPE details::indirectly_readable::with_member_object_element_type T>
+template <__UTL details::indirectly_readable::with_member_object_element_type T>
 struct __UTL_PUBLIC_TEMPLATE indirectly_readable_traits<T> :
     details::indirectly_readable::traits<typename T::element_type> {};
 
@@ -100,17 +100,17 @@ template <typename T, bool = true, bool = UTL_TRAIT_is_object(T)>
 struct object_value_type {};
 template <typename T>
 struct object_value_type<T, true, true> {
-    using value_type UTL_NODEBUG = UTL_SCOPE remove_cv_t<T>;
+    using value_type UTL_NODEBUG = __UTL remove_cv_t<T>;
 };
 
 struct empty_trait {};
 template <typename T>
-__UTL_HIDE_FROM_ABI auto resolve(int, int) noexcept -> UTL_SCOPE
-    enable_if_t<UTL_TRAIT_is_array(T), object_value_type<UTL_SCOPE remove_extent_t<T>>>;
+__UTL_HIDE_FROM_ABI auto resolve(int, int) noexcept
+    -> __UTL enable_if_t<UTL_TRAIT_is_array(T), object_value_type<__UTL remove_extent_t<T>>>;
 template <typename T>
 __UTL_HIDE_FROM_ABI auto resolve(int, int) noexcept -> object_value_type<typename T::value_type,
-    UTL_TRAIT_is_same(UTL_SCOPE remove_cv_t<typename T::value_type>,
-        UTL_SCOPE remove_cv_t<typename T::element_type>)>;
+    UTL_TRAIT_is_same(
+        __UTL remove_cv_t<typename T::value_type>, __UTL remove_cv_t<typename T::element_type>)>;
 template <typename T>
 __UTL_HIDE_FROM_ABI auto resolve(int, float) noexcept -> object_value_type<typename T::value_type>;
 template <typename T>

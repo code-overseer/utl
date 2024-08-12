@@ -34,7 +34,7 @@ UTL_INLINE_CXX17 constexpr bool is_reference_wrapper_v = is_reference_wrapper<T>
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_reference_wrapper(TYPE) UTL_SCOPE is_reference_wrapper_v<TYPE>
+#  define UTL_TRAIT_is_reference_wrapper(TYPE) __UTL is_reference_wrapper_v<TYPE>
 #else
-#  define UTL_TRAIT_is_reference_wrapper(TYPE) UTL_SCOPE is_reference_wrapper<TYPE>::value
+#  define UTL_TRAIT_is_reference_wrapper(TYPE) __UTL is_reference_wrapper<TYPE>::value
 #endif

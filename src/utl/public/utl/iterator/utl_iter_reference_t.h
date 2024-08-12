@@ -14,14 +14,14 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace iter_reference {
 
-template <UTL_CONCEPT_CXX20(UTL_SCOPE dereferenceable) T UTL_REQUIRES_CXX11(
+template <UTL_CONCEPT_CXX20(__UTL dereferenceable) T UTL_REQUIRES_CXX11(
     UTL_TRAIT_is_dereferenceable(T))>
-__UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> decltype(*UTL_SCOPE declval<T&>());
+__UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> decltype(*__UTL declval<T&>());
 
 } // namespace iter_reference
 } // namespace details
 
 template <UTL_CONCEPT_CXX20(dereferenceable) T>
-using iter_reference_t = decltype(details::iter_reference::resolve<UTL_SCOPE remove_cvref_t<T>>(0));
+using iter_reference_t = decltype(details::iter_reference::resolve<__UTL remove_cvref_t<T>>(0));
 
 UTL_NAMESPACE_END

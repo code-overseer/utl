@@ -58,17 +58,16 @@ UTL_INLINE_CXX17 constexpr bool is_nothrow_implicit_constructible_v =
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_implicit_constructible(...) \
-      UTL_SCOPE is_implicit_constructible_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_implicit_constructible(...) __UTL is_implicit_constructible_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_implicit_constructible(...) \
-      UTL_SCOPE is_implicit_constructible<__VA_ARGS__>::value
+      __UTL is_implicit_constructible<__VA_ARGS__>::value
 #endif
 
 #if UTL_CXX14
 #  define UTL_TRAIT_is_nothrow_implicit_constructible(...) \
-      UTL_SCOPE is_nothrow_implicit_constructible_v<__VA_ARGS__>
+      __UTL is_nothrow_implicit_constructible_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_nothrow_implicit_constructible(...) \
-      UTL_SCOPE is_nothrow_implicit_constructible<__VA_ARGS__>::value
+      __UTL is_nothrow_implicit_constructible<__VA_ARGS__>::value
 #endif

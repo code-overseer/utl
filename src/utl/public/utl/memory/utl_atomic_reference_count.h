@@ -55,7 +55,7 @@ private:
      */
     __UTL_HIDE_FROM_ABI friend void increment(T& obj) noexcept {
         static_assert(UTL_TRAIT_is_base_of(atomic_reference_count, T), "Invalid type relation");
-        ((atomic_reference_count&)obj).count_.fetch_add(1, UTL_SCOPE memory_order_relaxed);
+        ((atomic_reference_count&)obj).count_.fetch_add(1, __UTL memory_order_relaxed);
     }
 
     /**
@@ -66,10 +66,10 @@ private:
     __UTL_HIDE_FROM_ABI friend void decrement(T& obj) noexcept {
         static_assert(UTL_TRAIT_is_base_of(atomic_reference_count, T), "Invalid type relation");
         int const result =
-            ((atomic_reference_count&)obj).count_.fetch_sub(1, UTL_SCOPE memory_order_acq_rel);
+            ((atomic_reference_count&)obj).count_.fetch_sub(1, __UTL memory_order_acq_rel);
         if (result <= 1) {
             UTL_ASSERT(result > 0);
-            reference_counting::destroy(UTL_SCOPE addressof(obj));
+            reference_counting::destroy(__UTL addressof(obj));
         }
     }
 

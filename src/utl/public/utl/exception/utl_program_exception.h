@@ -41,7 +41,7 @@ public:
         : location_(fmt.location) {
         va_list args;
         va_start(args, fmt);
-        messages_.emplace(UTL_SCOPE move(fmt), args);
+        messages_.emplace(__UTL move(fmt), args);
         va_end(args);
     }
 
@@ -70,7 +70,7 @@ public:
     __UTL_HIDE_FROM_ABI void emplace_message(exceptions::message_format fmt, ...) {
         va_list args;
         va_start(args, fmt);
-        messages_.emplace(UTL_SCOPE move(fmt), args);
+        messages_.emplace(__UTL move(fmt), args);
         va_end(args);
     }
 
@@ -87,7 +87,7 @@ public:
 
 private:
     // TODO add stack trace
-    UTL_SCOPE source_location location_;
+    __UTL source_location location_;
     exceptions::message_stack messages_;
 };
 
@@ -122,8 +122,8 @@ public:
         is_constructible<T, U>::value)>
     __UTL_HIDE_FROM_ABI basic_exception(U&& u, exceptions::message_format fmt,
         Args... args) noexcept(UTL_TRAIT_is_nothrow_constructible(T, U))
-        : base_type(UTL_SCOPE move(fmt), args...)
-        , data_(UTL_SCOPE forward<U>(u)) {}
+        : base_type(__UTL move(fmt), args...)
+        , data_(__UTL forward<U>(u)) {}
 
     /**
      * @brief Retrieves the data associated with the exception.

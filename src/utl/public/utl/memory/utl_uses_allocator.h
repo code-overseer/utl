@@ -102,25 +102,25 @@ template <typename T, typename Alloc, typename... Args>
 UTL_INLINE_CXX17 constexpr bool is_implicit_constructible_with_allocator_v =
     is_implicit_constructible_with_allocator<T, Alloc, Args...>::value;
 
-#  define UTL_TRAIT_uses_allocator(...) UTL_SCOPE uses_allocator_v<__VA_ARGS__>
+#  define UTL_TRAIT_uses_allocator(...) __UTL uses_allocator_v<__VA_ARGS__>
 #  define UTL_TRAIT_is_constructible_with_allocator(...) \
-      UTL_SCOPE is_constructible_with_allocator_v<__VA_ARGS__>
+      __UTL is_constructible_with_allocator_v<__VA_ARGS__>
 #  define UTL_TRAIT_is_nothrow_constructible_with_allocator(...) \
-      UTL_SCOPE is_nothrow_constructible_with_allocator<__VA_ARGS__>
+      __UTL is_nothrow_constructible_with_allocator<__VA_ARGS__>
 #  define UTL_TRAIT_is_explicit_constructible_with_allocator(...) \
-      UTL_SCOPE is_explicit_constructible_with_allocator<__VA_ARGS__>
+      __UTL is_explicit_constructible_with_allocator<__VA_ARGS__>
 #  define UTL_TRAIT_is_implicit_constructible_with_allocator(...) \
-      UTL_SCOPE is_implicit_constructible_with_allocator<__VA_ARGS__>
+      __UTL is_implicit_constructible_with_allocator<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_uses_allocator(...) UTL_SCOPE uses_allocator<__VA_ARGS__>::value
+#  define UTL_TRAIT_uses_allocator(...) __UTL uses_allocator<__VA_ARGS__>::value
 #  define UTL_TRAIT_is_constructible_with_allocator(...) \
-      UTL_SCOPE is_constructible_with_allocator<__VA_ARGS__>::value
+      __UTL is_constructible_with_allocator<__VA_ARGS__>::value
 #  define UTL_TRAIT_is_nothrow_constructible_with_allocator(...) \
-      UTL_SCOPE is_nothrow_constructible_with_allocator<__VA_ARGS__>::value
+      __UTL is_nothrow_constructible_with_allocator<__VA_ARGS__>::value
 #  define UTL_TRAIT_is_explicit_constructible_with_allocator(...) \
-      UTL_SCOPE is_explicit_constructible_with_allocator<__VA_ARGS__>::value
+      __UTL is_explicit_constructible_with_allocator<__VA_ARGS__>::value
 #  define UTL_TRAIT_is_implicit_constructible_with_allocator(...) \
-      UTL_SCOPE is_implicit_constructible_with_allocator<__VA_ARGS__>::value
+      __UTL is_implicit_constructible_with_allocator<__VA_ARGS__>::value
 #endif
 
 UTL_NAMESPACE_END

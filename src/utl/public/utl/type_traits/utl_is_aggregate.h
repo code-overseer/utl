@@ -72,7 +72,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_aggregate
 #  define UTL_TRAIT_is_aggregate(...) UTL_BUILTIN_is_aggregate(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_aggregate(...) UTL_SCOPE is_aggregate_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_aggregate(...) __UTL is_aggregate_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_aggregate(...) UTL_SCOPE is_aggregate<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_aggregate(...) __UTL is_aggregate<__VA_ARGS__>::value
 #endif

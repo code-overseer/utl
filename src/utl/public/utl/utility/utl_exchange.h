@@ -38,18 +38,18 @@ UTL_NAMESPACE_BEGIN
 template <UTL_CONCEPT_CXX20(move_constructible) T, UTL_CONCEPT_CXX20(assignable_to<T&>) U = T>
 __UTL_HIDE_FROM_ABI constexpr UTL_ENABLE_IF_CXX11(T, UTL_TRAIT_is_move_constructible(T) && UTL_TRAIT_is_assignable(T&, U)) exchange(T& obj, U&& new_value) noexcept(
     UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_assignable(T&, U)) {
-    T previous(UTL_SCOPE move(obj));
-    obj = UTL_SCOPE forward<U>(new_value);
+    T previous(__UTL move(obj));
+    obj = __UTL forward<U>(new_value);
     return previous;
 }
 #  else
 template <UTL_CONCEPT_CXX20(move_constructible) T, UTL_CONCEPT_CXX20(assignable_to<T&>) U = T>
 __UTL_HIDE_FROM_ABI constexpr UTL_ENABLE_IF_CXX11(
-    T, UTL_TRAIT_is_move_constructible(T) && UTL_SCOPE is_assignable<T&, U>::value)
+    T, UTL_TRAIT_is_move_constructible(T) && __UTL is_assignable<T&, U>::value)
     exchange(T& obj, U&& new_value) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_assignable(T&, U)) {
-    T previous(UTL_SCOPE move(obj));
-    obj = UTL_SCOPE forward<U>(new_value);
+    T previous(__UTL move(obj));
+    obj = __UTL forward<U>(new_value);
     return previous;
 }
 #  endif

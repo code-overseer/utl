@@ -48,7 +48,7 @@ UTL_NAMESPACE_END
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_arithmetic(...) UTL_SCOPE is_arithmetic_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_arithmetic(...) __UTL is_arithmetic_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_arithmetic(...) UTL_SCOPE is_arithmetic<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_arithmetic(...) __UTL is_arithmetic<__VA_ARGS__>::value
 #endif

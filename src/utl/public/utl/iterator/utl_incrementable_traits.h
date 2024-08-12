@@ -19,8 +19,8 @@ using ptrdiff_t = decltype((char*)0 - (char*)0);
 namespace details {
 namespace incrementable {
 template <typename T>
-using subtract_result_t UTL_NODEBUG = UTL_SCOPE
-    make_signed_t<decltype(UTL_SCOPE declval<T const&>() - UTL_SCOPE declval<T const&>())>;
+using subtract_result_t UTL_NODEBUG =
+    __UTL make_signed_t<decltype(__UTL declval<T const&>() - __UTL declval<T const&>())>;
 }
 } // namespace details
 
@@ -49,7 +49,7 @@ struct __UTL_PUBLIC_TEMPLATE incrementable_traits {};
 
 template <object_type T>
 struct __UTL_PUBLIC_TEMPLATE incrementable_traits<T*> {
-    using difference_type = UTL_SCOPE ptrdiff_t;
+    using difference_type = __UTL ptrdiff_t;
 };
 
 template <details::incrementable::with_difference_type T>

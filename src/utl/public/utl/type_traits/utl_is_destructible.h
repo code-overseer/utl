@@ -53,10 +53,10 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace destructible {
 template <typename>
-__UTL_HIDE_FROM_ABI auto callable_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto callable_impl(float) noexcept -> __UTL false_type;
 template <typename T>
 __UTL_HIDE_FROM_ABI auto callable_impl(int) noexcept
-    -> UTL_SCOPE always_true_type<decltype(declval<T&>().~T())>;
+    -> __UTL always_true_type<decltype(declval<T&>().~T())>;
 template <typename T>
 using callable = decltype(callable_impl<T>(0));
 } // namespace destructible
@@ -94,7 +94,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_destructible
 #  define UTL_TRAIT_is_destructible(...) UTL_BUILTIN_is_destructible(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_destructible(...) UTL_SCOPE is_destructible_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_destructible(...) __UTL is_destructible_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_destructible(...) UTL_SCOPE is_destructible<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_destructible(...) __UTL is_destructible<__VA_ARGS__>::value
 #endif

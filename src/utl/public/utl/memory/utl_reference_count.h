@@ -60,7 +60,7 @@ private:
         auto& ref = (reference_count&)obj;
         if (--ref.count_ < 1) {
             UTL_ASSERT(ref.count_ == 0);
-            reference_counting::destroy(UTL_SCOPE addressof(obj));
+            reference_counting::destroy(__UTL addressof(obj));
         }
     }
 

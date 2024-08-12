@@ -36,7 +36,7 @@ UTL_INLINE_CXX17 constexpr bool is_boolean_v<bool const volatile> = true;
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_boolean(...) UTL_SCOPE is_boolean_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_boolean(...) __UTL is_boolean_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_boolean(...) UTL_SCOPE is_boolean<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_boolean(...) __UTL is_boolean<__VA_ARGS__>::value
 #endif

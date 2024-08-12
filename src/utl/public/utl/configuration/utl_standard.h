@@ -54,8 +54,8 @@
 #    define UTL_CONSTEVAL constexpr
 #    define UTL_EXPLICIT_IF(...)
 #    define UTL_IMPLICIT_IF(...) explicit
-#    define UTL_ENABLE_IF_CXX11(TYPE, ...) UTL_SCOPE enable_if_t<(__VA_ARGS__), TYPE>
-#    define UTL_REQUIRES_CXX11(...) , UTL_SCOPE enable_if_t<(__VA_ARGS__), int> = __LINE__
+#    define UTL_ENABLE_IF_CXX11(TYPE, ...) __UTL enable_if_t<(__VA_ARGS__), TYPE>
+#    define UTL_REQUIRES_CXX11(...) , __UTL enable_if_t<(__VA_ARGS__), int> = __LINE__
 #    define UTL_REQUIRES_CXX20(...)
 #    define UTL_CONCEPT_CXX20(...) typename
 #  endif /* UTL_CXX >= 202002L */

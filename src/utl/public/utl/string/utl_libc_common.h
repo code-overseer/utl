@@ -55,7 +55,7 @@ struct is_trivially_lexicographically_comparable :
 template <typename T, size_t N>
 concept exact_size = !is_empty_v<T> && (sizeof(T) == N);
 template <typename T>
-concept trivially_copyable = UTL_SCOPE is_trivially_copyable_v<T>;
+concept trivially_copyable = __UTL is_trivially_copyable_v<T>;
 #else
 template <typename T, size_t N>
 using exact_size UTL_NODEBUG = bool_constant<!UTL_TRAIT_is_empty(T) && (sizeof(T) == N)>;

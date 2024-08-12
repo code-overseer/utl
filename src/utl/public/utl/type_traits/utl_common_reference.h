@@ -108,10 +108,10 @@ using all_convertible_to UTL_NODEBUG = conjunction<is_convertible<Ts, Target>...
 
 template <typename T0, typename T1>
 struct simple_common_ref<T0&, T1&,
-    UTL_SCOPE enable_if_t<all_convertible_to<
-        UTL_SCOPE add_pointer_t<ternary_result_t<merge_cv_t<T0, type_list<T0, T1>>&,
-            merge_cv_t<T1, type_list<T0, T1>>&>>,
-        UTL_SCOPE add_pointer_t<T0&>, UTL_SCOPE add_pointer_t<T1&>>::value>> :
+    __UTL enable_if_t<
+        all_convertible_to<__UTL add_pointer_t<ternary_result_t<merge_cv_t<T0, type_list<T0, T1>>&,
+                               merge_cv_t<T1, type_list<T0, T1>>&>>,
+            __UTL add_pointer_t<T0&>, __UTL add_pointer_t<T1&>>::value>> :
     ternary_result<merge_cv_t<T0, type_list<T0, T1>>&, merge_cv_t<T1, type_list<T0, T1>>&> {};
 
 template <typename T>
@@ -123,9 +123,9 @@ template <typename T0, typename T1>
 struct simple_common_ref<T0&&, T1&&,
     enable_if_t<
         conjunction<all_convertible_to<rvalue_ref_t<simple_common_ref_t<T0&, T1&>>, T0&&, T1&&>,
-            all_convertible_to<UTL_SCOPE add_pointer_t<rvalue_ref_t<simple_common_ref_t<T0&, T1&>>>,
-                UTL_SCOPE add_pointer_t<T0&&>,
-                UTL_SCOPE add_pointer_t<T1&&>>>::value> // enable_if_t
+            all_convertible_to<__UTL add_pointer_t<rvalue_ref_t<simple_common_ref_t<T0&, T1&>>>,
+                __UTL add_pointer_t<T0&&>,
+                __UTL add_pointer_t<T1&&>>>::value> // enable_if_t
     > : rvalue_ref<simple_common_ref_t<T0&, T1&>> {};
 
 template <typename T0, typename T1>
@@ -153,14 +153,14 @@ using basic_common_ref UTL_NODEBUG = basic_common_reference<remove_cvref_t<T>, r
 
 template <typename T, typename U>
 using impl UTL_NODEBUG = first_type<simple_common_ref<T, U>, basic_common_ref<T, U>,
-    ternary_result<T, U>, UTL_SCOPE common_type<T, U>>;
+    ternary_result<T, U>, __UTL common_type<T, U>>;
 
 template <typename List, typename = void>
 struct sfinae_gt_2 {};
 
 template <typename T, typename U, typename... Vs>
-struct sfinae_gt_2<type_list<T, U, Vs...>, void_t<UTL_SCOPE common_reference_t<T, U>>> :
-    UTL_SCOPE common_reference<UTL_SCOPE common_reference_t<T, U>, Vs...> {};
+struct sfinae_gt_2<type_list<T, U, Vs...>, void_t<__UTL common_reference_t<T, U>>> :
+    __UTL common_reference<__UTL common_reference_t<T, U>, Vs...> {};
 
 template <typename T, typename U, typename... Vs>
 using impl_gt_2 = sfinae_gt_2<type_list<T, U, Vs...>>;

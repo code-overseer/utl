@@ -21,10 +21,10 @@ __UTL_ABI_PUBLIC constexpr T constant{};
 
 UTL_NAMESPACE_END
 
-#  define UTL_DEFINE_CUSTOMIZATION_POINT(TYPE, NAME)                                       \
-      namespace {                                                                          \
-      constexpr auto const& NAME = UTL_SCOPE details::customization_point::constant<TYPE>; \
-      }                                                                                    \
+#  define UTL_DEFINE_CUSTOMIZATION_POINT(TYPE, NAME)                                   \
+      namespace {                                                                      \
+      constexpr auto const& NAME = __UTL details::customization_point::constant<TYPE>; \
+      }                                                                                \
       static_assert(true, "semi-colon required")
 
 #else
@@ -44,10 +44,10 @@ constexpr T constant<T>::value;
 
 UTL_NAMESPACE_END
 
-#  define UTL_DEFINE_CUSTOMIZATION_POINT(TYPE, NAME)                                              \
-      namespace {                                                                                 \
-      constexpr auto const& NAME = UTL_SCOPE details::customization_point::constant<TYPE>::value; \
-      }                                                                                           \
+#  define UTL_DEFINE_CUSTOMIZATION_POINT(TYPE, NAME)                                          \
+      namespace {                                                                             \
+      constexpr auto const& NAME = __UTL details::customization_point::constant<TYPE>::value; \
+      }                                                                                       \
       static_assert(true, "semi-colon required")
 
 #endif

@@ -33,15 +33,15 @@ private:
 public:
     __UTL_HIDE_FROM_ABI constexpr message_stack() noexcept = default;
     __UTL_HIDE_FROM_ABI constexpr message_stack(message_stack&& other) noexcept
-        : head_(UTL_SCOPE exchange(other.head_, nullptr))
-        , tail_(UTL_SCOPE exchange(other.tail_, nullptr))
-        , size_(UTL_SCOPE exchange(other.size_, 0)) {}
+        : head_(__UTL exchange(other.head_, nullptr))
+        , tail_(__UTL exchange(other.tail_, nullptr))
+        , size_(__UTL exchange(other.size_, 0)) {}
     __UTL_HIDE_FROM_ABI constexpr message_stack(message_stack const& other) noexcept
         : head_(other.tail_ ? (increment(*other.tail_), other.head_) : other.head_)
         , tail_(other.tail_)
         , size_(other.size_) {}
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 message_stack& operator=(message_stack const& other) noexcept {
-        if (UTL_SCOPE addressof(other) == this) {
+        if (__UTL addressof(other) == this) {
             return *this;
         }
 
@@ -59,7 +59,7 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 message_stack& operator=(message_stack&& other) noexcept {
-        if (UTL_SCOPE addressof(other) == this) {
+        if (__UTL addressof(other) == this) {
             return *this;
         }
 
@@ -67,9 +67,9 @@ public:
             decrement(*tail_);
         }
 
-        head_ = UTL_SCOPE exchange(other.head_, nullptr);
-        tail_ = UTL_SCOPE exchange(other.tail_, nullptr);
-        size_ = UTL_SCOPE exchange(other.size_, 0);
+        head_ = __UTL exchange(other.head_, nullptr);
+        tail_ = __UTL exchange(other.tail_, nullptr);
+        size_ = __UTL exchange(other.size_, 0);
         return *this;
     }
 
@@ -78,7 +78,7 @@ public:
         using value_type = message_header const;
         using pointer = message_header const*;
         using reference = message_header const&;
-        using iterator_concept = UTL_SCOPE forward_iterator_tag;
+        using iterator_concept = __UTL forward_iterator_tag;
 
         __UTL_HIDE_FROM_ABI const_iterator operator++(int) noexcept {
             auto prev = *this;
@@ -141,7 +141,7 @@ public:
     __UTL_HIDE_FROM_ABI void emplace(message_format fmt, ...) UTL_THROWS {
         va_list args;
         va_start(args, fmt);
-        auto header = message_header::create(UTL_SCOPE move(fmt), args);
+        auto header = message_header::create(__UTL move(fmt), args);
         va_end(args);
         set_next(*header, head_);
 

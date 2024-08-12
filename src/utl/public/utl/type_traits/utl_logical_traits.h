@@ -54,11 +54,11 @@ UTL_NAMESPACE_END
 #define UTL_TRAIT_SUPPORTED_negation 1
 
 #if UTL_CXX14
-#  define UTL_TRAIT_conjunction(...) UTL_SCOPE conjunction_v<__VA_ARGS__>
-#  define UTL_TRAIT_disjunction(...) UTL_SCOPE disjunction_v<__VA_ARGS__>
-#  define UTL_TRAIT_negation(...) UTL_SCOPE negation_v<__VA_ARGS__>
+#  define UTL_TRAIT_conjunction(...) __UTL conjunction_v<__VA_ARGS__>
+#  define UTL_TRAIT_disjunction(...) __UTL disjunction_v<__VA_ARGS__>
+#  define UTL_TRAIT_negation(...) __UTL negation_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_conjunction(...) UTL_SCOPE conjunction<__VA_ARGS__>::value
-#  define UTL_TRAIT_disjunction(...) UTL_SCOPE disjunction<__VA_ARGS__>::value
-#  define UTL_TRAIT_negation(...) UTL_SCOPE negation<__VA_ARGS__>::value
+#  define UTL_TRAIT_conjunction(...) __UTL conjunction<__VA_ARGS__>::value
+#  define UTL_TRAIT_disjunction(...) __UTL disjunction<__VA_ARGS__>::value
+#  define UTL_TRAIT_negation(...) __UTL negation<__VA_ARGS__>::value
 #endif

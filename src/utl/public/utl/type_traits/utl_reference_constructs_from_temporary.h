@@ -133,8 +133,8 @@ UTL_NAMESPACE_END
       UTL_BUILTIN_reference_constructs_from_temporary(__VA_ARGS__)
 #elif UTL_CXX14
 #  define UTL_TRAIT_reference_constructs_from_temporary(...) \
-      UTL_SCOPE reference_constructs_from_temporary_v<__VA_ARGS__>
+      __UTL reference_constructs_from_temporary_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_reference_constructs_from_temporary(...) \
-      UTL_SCOPE reference_constructs_from_temporary<__VA_ARGS__>::value
+      __UTL reference_constructs_from_temporary<__VA_ARGS__>::value
 #endif

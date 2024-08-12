@@ -46,18 +46,17 @@ namespace details {
 namespace legacy_bidirectional_iterator {
 
 template <typename It>
-__UTL_HIDE_FROM_ABI auto check(float) -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto check(float) -> __UTL false_type;
 
 template <typename It>
-__UTL_HIDE_FROM_ABI auto check(int)
-    -> UTL_SCOPE conjunction<UTL_SCOPE is_legacy_forward_iterator<It>,
-        UTL_SCOPE is_same<decltype(--static_cast<It (*)()>(0)()), It&>,
-        UTL_SCOPE is_convertible<decltype(static_cast<It (*)()>(0)()--), It const&>,
-        UTL_SCOPE is_same<decltype(*static_cast<It (*)()>(0)()--), UTL_SCOPE iter_reference_t<It>>>;
+__UTL_HIDE_FROM_ABI auto check(int) -> __UTL conjunction<__UTL is_legacy_forward_iterator<It>,
+    __UTL is_same<decltype(--static_cast<It (*)()>(0)()), It&>,
+    __UTL is_convertible<decltype(static_cast<It (*)()>(0)()--), It const&>,
+    __UTL is_same<decltype(*static_cast<It (*)()>(0)()--), __UTL iter_reference_t<It>>>;
 
 template <typename It>
 using implemented UTL_NODEBUG =
-    decltype(UTL_SCOPE details::legacy_bidirectional_iterator::check<It>(0));
+    decltype(__UTL details::legacy_bidirectional_iterator::check<It>(0));
 
 } // namespace legacy_bidirectional_iterator
 } // namespace details
@@ -69,7 +68,7 @@ struct __UTL_PUBLIC_TEMPLATE is_legacy_bidirectional_iterator :
 #  if UTL_CXX14
 template <typename It>
 UTL_INLINE_CXX17 constexpr bool is_legacy_bidirectional_iterator_v =
-    UTL_SCOPE is_legacy_bidirectional_iterator<It>::value;
+    __UTL is_legacy_bidirectional_iterator<It>::value;
 #  endif
 
 UTL_NAMESPACE_END
@@ -78,8 +77,8 @@ UTL_NAMESPACE_END
 
 #if UTL_CXX14
 #  define UTL_TRAIT_is_legacy_bidirectional_iterator(...) \
-      UTL_SCOPE is_legacy_bidirectional_iterator_v<__VA_ARGS__>
+      __UTL is_legacy_bidirectional_iterator_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_legacy_bidirectional_iterator(...) \
-      UTL_SCOPE is_legacy_bidirectional_iterator<__VA_ARGS__>::value
+      __UTL is_legacy_bidirectional_iterator<__VA_ARGS__>::value
 #endif

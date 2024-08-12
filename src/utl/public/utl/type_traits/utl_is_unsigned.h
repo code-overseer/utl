@@ -78,7 +78,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_unsigned
 #  define UTL_TRAIT_is_unsigned(...) UTL_BUILTIN_is_unsigned(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_unsigned(...) UTL_SCOPE is_unsigned_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_unsigned(...) __UTL is_unsigned_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_unsigned(...) UTL_SCOPE is_unsigned<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_unsigned(...) __UTL is_unsigned<__VA_ARGS__>::value
 #endif

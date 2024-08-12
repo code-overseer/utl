@@ -70,7 +70,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_class
 #  define UTL_TRAIT_is_class(...) UTL_BUILTIN_is_class(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_class(...) UTL_SCOPE is_class_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_class(...) __UTL is_class_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_class(...) UTL_SCOPE is_class<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_class(...) __UTL is_class<__VA_ARGS__>::value
 #endif

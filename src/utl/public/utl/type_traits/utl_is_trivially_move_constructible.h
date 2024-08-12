@@ -75,8 +75,8 @@ UTL_NAMESPACE_END
 
 #if UTL_CXX14
 #  define UTL_TRAIT_is_trivially_move_constructible(TYPE) \
-      UTL_SCOPE is_trivially_move_constructible_v<TYPE>
+      __UTL is_trivially_move_constructible_v<TYPE>
 #else
 #  define UTL_TRAIT_is_trivially_move_constructible(TYPE) \
-      UTL_SCOPE is_trivially_move_constructible<TYPE>::value
+      __UTL is_trivially_move_constructible<TYPE>::value
 #endif

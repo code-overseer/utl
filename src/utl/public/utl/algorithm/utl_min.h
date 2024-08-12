@@ -32,7 +32,7 @@ namespace algorithm {
 
 template <typename T>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr T const& min(T* output, T* current, T* end) {
-    return current == end ? *output : min(UTL_SCOPE min(*output, *current), current + 1, end);
+    return current == end ? *output : min(__UTL min(*output, *current), current + 1, end);
 }
 template <typename T, typename F>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr T const& min(T* output, T* current, F&& compare, T* end) {
@@ -53,7 +53,7 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr T min(std::initializer_list<
 template <typename T, typename F>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr T min(std::initializer_list<T> list, F comp) noexcept(
     noexcept(comp(*list.begin(), *list.begin()))) {
-    return min(list.begin(), list.begin() + 1, UTL_SCOPE move(comp), list.end());
+    return min(list.begin(), list.begin() + 1, __UTL move(comp), list.end());
 }
 
 UTL_NAMESPACE_END

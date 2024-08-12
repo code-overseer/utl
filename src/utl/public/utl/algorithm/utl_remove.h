@@ -23,8 +23,8 @@ struct equality_t : private equal_to<void> {
 
     template <typename U>
     __UTL_HIDE_FROM_ABI constexpr bool operator()(U&& u) const
-        noexcept(noexcept(equal_to<void>::operator()(UTL_SCOPE forward<U>(u), value))) {
-        return equal_to<void>::operator()(UTL_SCOPE forward<U>(u), value);
+        noexcept(noexcept(equal_to<void>::operator()(__UTL forward<U>(u), value))) {
+        return equal_to<void>::operator()(__UTL forward<U>(u), value);
     }
 
     T const& value;
@@ -37,7 +37,7 @@ template <
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr It remove(It first, It last, T const& val) {
     static_assert(UTL_TRAIT_is_invocable(equal_to<void>, decltype(*first), T const&),
         "Arguments must be comparable");
-    return UTL_SCOPE remove_if(first, last, details::remove::equality_t<T>{val});
+    return __UTL remove_if(first, last, details::remove::equality_t<T>{val});
 }
 
 // TODO

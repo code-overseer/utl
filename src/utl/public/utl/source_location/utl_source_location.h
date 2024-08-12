@@ -22,7 +22,7 @@ UTL_NAMESPACE_BEGIN
 using ::std::source_location;
 UTL_NAMESPACE_END
 
-#  define UTL_SOURCE_LOCATION() UTL_SCOPE source_location::current()
+#  define UTL_SOURCE_LOCATION() __UTL source_location::current()
 
 #elif defined(UTL_BUILTIN_LINE) & defined(UTL_BUILTIN_FILE) & defined(UTL_BUILTIN_FUNCTION)
 
@@ -105,7 +105,7 @@ UTL_NAMESPACE_END
 
 #  undef __UTL_LOCATION_FUNCTION
 #  undef __UTL_LOCATION_COLUMN
-#  define UTL_SOURCE_LOCATION() UTL_SCOPE source_location::current()
+#  define UTL_SOURCE_LOCATION() __UTL source_location::current()
 
 #else // UTL_USE_STD_SOURCE_LOCATION && defined(UTL_BUILTIN_source_location) && UTL_CXX20
 
@@ -169,13 +169,12 @@ UTL_NAMESPACE_END
 
 #  if UTL_COMPILER_MSVC
 #    define UTL_SOURCE_LOCATION() \
-        UTL_SCOPE source_location::UTL_current(__FILE__, __FUNCSIG__, __LINE__)
+        __UTL source_location::UTL_current(__FILE__, __FUNCSIG__, __LINE__)
 #  elif UTL_COMPILER_GCC | UTL_COMPILER_CLANG | UTL_COMPILER_ICX | UTL_COMPILER_ICC
 #    define UTL_SOURCE_LOCATION() \
-        UTL_SCOPE source_location::UTL_current(__FILE__, __PRETTY_FUNCTION__, __LINE__)
+        __UTL source_location::UTL_current(__FILE__, __PRETTY_FUNCTION__, __LINE__)
 #  else
-#    define UTL_SOURCE_LOCATION() \
-        UTL_SCOPE source_location::UTL_current(__FILE__, __func__, __LINE__)
+#    define UTL_SOURCE_LOCATION() __UTL source_location::UTL_current(__FILE__, __func__, __LINE__)
 #  endif
 
 #endif

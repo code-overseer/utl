@@ -76,7 +76,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_signed
 #  define UTL_TRAIT_is_signed(...) UTL_BUILTIN_is_signed(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_signed(...) UTL_SCOPE is_signed_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_signed(...) __UTL is_signed_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_signed(...) UTL_SCOPE is_signed<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_signed(...) __UTL is_signed<__VA_ARGS__>::value
 #endif

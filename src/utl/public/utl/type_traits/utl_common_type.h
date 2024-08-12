@@ -46,7 +46,7 @@ namespace common_type {
 
 template <typename T, typename U>
 using ternary_result_t UTL_NODEBUG =
-    UTL_SCOPE decay_t<decltype(false ? UTL_SCOPE declval<T>() : UTL_SCOPE declval<U>())>;
+    __UTL decay_t<decltype(false ? __UTL declval<T>() : __UTL declval<U>())>;
 
 template <typename T, typename U, typename = void>
 struct impl_2 {};
@@ -58,7 +58,7 @@ struct impl_0 : impl_1<T, U> {};
 template <typename T, typename U>
 struct impl_0<T, U,
     enable_if_t<!UTL_TRAIT_is_same(T, decay_t<T>) || !UTL_TRAIT_is_same(U, decay_t<U>)>> :
-    UTL_SCOPE common_type<decay_t<T>, decay_t<U>> {};
+    __UTL common_type<decay_t<T>, decay_t<U>> {};
 
 template <typename T, typename U>
 struct impl_1<T, U, void_t<ternary_result_t<T, U>>> {
@@ -75,8 +75,8 @@ template <typename List, typename = void>
 struct sfinae_gt_2 {};
 
 template <typename T, typename U, typename... Vs>
-struct sfinae_gt_2<type_list<T, U, Vs...>, void_t<UTL_SCOPE common_type_t<T, U>>> :
-    UTL_SCOPE common_type<UTL_SCOPE common_type_t<T, U>, Vs...> {};
+struct sfinae_gt_2<type_list<T, U, Vs...>, void_t<__UTL common_type_t<T, U>>> :
+    __UTL common_type<__UTL common_type_t<T, U>, Vs...> {};
 
 template <typename T, typename U, typename... Vs>
 using impl_gt_2 = sfinae_gt_2<type_list<T, U, Vs...>>;

@@ -27,7 +27,7 @@ UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr bool is_constant_eval
 } // namespace details
 UTL_NAMESPACE_END
 
-#  define UTL_CONSTANT_P(...) UTL_SCOPE details::is_constant_evaluated()
+#  define UTL_CONSTANT_P(...) __UTL details::is_constant_evaluated()
 
 #else
 

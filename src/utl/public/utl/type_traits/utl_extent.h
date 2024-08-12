@@ -67,7 +67,7 @@ UTL_NAMESPACE_END
 #define UTL_TRAIT_SUPPORTED_extent 1
 
 #if UTL_CXX14
-#  define UTL_TRAIT_extent(...) UTL_SCOPE extent_v<__VA_ARGS__>
+#  define UTL_TRAIT_extent(...) __UTL extent_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_extent(...) UTL_SCOPE extent<__VA_ARGS__>::value
+#  define UTL_TRAIT_extent(...) __UTL extent<__VA_ARGS__>::value
 #endif

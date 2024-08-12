@@ -18,8 +18,8 @@ UTL_NAMESPACE_BEGIN
 template <typename T, typename U>
 concept common_with = same_as<common_type_t<T, U>, common_type_t<U, T>> &&
     requires {
-        static_cast<common_type_t<T, U>>(UTL_SCOPE declval<T>());
-        static_cast<common_type_t<T, U>>(UTL_SCOPE declval<U>());
+        static_cast<common_type_t<T, U>>(__UTL declval<T>());
+        static_cast<common_type_t<T, U>>(__UTL declval<U>());
     } && common_reference_with<add_lvalue_reference_t<T const>, add_lvalue_reference_t<U const>> &&
     common_reference_with<add_lvalue_reference_t<common_type_t<T, U>>,
         common_reference_t<add_lvalue_reference_t<T const>, add_lvalue_reference_t<U const>>>;

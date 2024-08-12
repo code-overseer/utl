@@ -32,7 +32,7 @@ UTL_INLINE_CXX17 constexpr bool is_complete_v = R::value;
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_complete(...) UTL_SCOPE is_complete_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_complete(...) __UTL is_complete_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_complete(...) UTL_SCOPE is_complete<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_complete(...) __UTL is_complete<__VA_ARGS__>::value
 #endif

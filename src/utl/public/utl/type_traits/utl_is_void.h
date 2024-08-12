@@ -78,7 +78,7 @@ UTL_NAMESPACE_END
 #ifdef UTL_BUILTIN_is_void
 #  define UTL_TRAIT_is_void(...) UTL_BUILTIN_is_void(__VA_ARGS__)
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_void(...) UTL_SCOPE is_void_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_void(...) __UTL is_void_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_void(...) UTL_SCOPE is_void<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_void(...) __UTL is_void<__VA_ARGS__>::value
 #endif

@@ -12,18 +12,18 @@ namespace details {
 namespace dereferenceable {
 template <typename T>
 __UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
-    -> UTL_SCOPE is_referenceable<decltype(*UTL_SCOPE declval<T>())>;
+    -> __UTL is_referenceable<decltype(*__UTL declval<T>())>;
 template <typename T>
-__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> __UTL false_type;
 
 template <typename T>
 using trait UTL_NODEBUG = decltype(trait_impl<T>(0));
 
 template <typename T>
 __UTL_HIDE_FROM_ABI auto nothrow_impl(int) noexcept
-    -> UTL_SCOPE bool_constant<noexcept(*UTL_SCOPE declval<T>())>;
+    -> __UTL bool_constant<noexcept(*__UTL declval<T>())>;
 template <typename T>
-__UTL_HIDE_FROM_ABI auto nothrow_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto nothrow_impl(float) noexcept -> __UTL false_type;
 
 template <typename T>
 using is_nothrow UTL_NODEBUG = decltype(nothrow_impl<T>(0));
@@ -48,11 +48,10 @@ UTL_INLINE_CXX17 constexpr bool is_nothrow_dereferenceable_v = details::derefere
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_dereferenceable(...) UTL_SCOPE is_dereferenceable_v<__VA_ARGS__>
-#  define UTL_TRAIT_is_nothrow_dereferenceable(...) \
-      UTL_SCOPE is_nothrow_dereferenceable_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_dereferenceable(...) __UTL is_dereferenceable_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_nothrow_dereferenceable(...) __UTL is_nothrow_dereferenceable_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_dereferenceable(...) UTL_SCOPE is_dereferenceable<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_dereferenceable(...) __UTL is_dereferenceable<__VA_ARGS__>::value
 #  define UTL_TRAIT_is_nothrow_dereferenceable(...) \
-      UTL_SCOPE is_nothrow_dereferenceable<__VA_ARGS__>::value
+      __UTL is_nothrow_dereferenceable<__VA_ARGS__>::value
 #endif
