@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "utl/utl_config.h"
+
 #if UTL_USE_STD_tuple
 
 #else // UTL_USE_STD_tuple
