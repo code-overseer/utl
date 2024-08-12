@@ -25,9 +25,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_integral)
+#  if __UTL_SHOULD_USE_BUILTIN(is_integral)
 #    define UTL_BUILTIN_is_integral(...) __is_integral(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_integral)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_integral)
 
 #  ifdef UTL_BUILTIN_is_integral
 

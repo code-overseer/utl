@@ -21,10 +21,10 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_pointer_interconvertible_base_of)
+#  if __UTL_SHOULD_USE_BUILTIN(is_pointer_interconvertible_base_of)
 #    define UTL_BUILTIN_is_pointer_interconvertible_base_of(...) \
         __is_pointer_interconvertible_base_of(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_pointer_interconvertible_base_of)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_pointer_interconvertible_base_of)
 
 #  ifdef UTL_BUILTIN_is_pointer_interconvertible_base_of
 

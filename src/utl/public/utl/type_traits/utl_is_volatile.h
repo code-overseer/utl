@@ -31,9 +31,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_volatile)
+#  if __UTL_SHOULD_USE_BUILTIN(is_volatile)
 #    define UTL_BUILTIN_is_volatile(...) __is_volatile(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_volatile)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_volatile)
 
 #  ifdef UTL_BUILTIN_is_volatile
 

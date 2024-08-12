@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_compound)
+#  if __UTL_SHOULD_USE_BUILTIN(is_compound)
 #    define UTL_BUILTIN_is_compound(...) __is_compound(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_compound)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_compound)
 
 #  ifdef UTL_BUILTIN_is_compound
 

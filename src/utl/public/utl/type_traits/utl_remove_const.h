@@ -29,9 +29,9 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(remove_const)
+#  if __UTL_SHOULD_USE_BUILTIN(remove_const)
 #    define UTL_BUILTIN_add_const(...) __remove_const(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(add_const)
+#  endif // __UTL_SHOULD_USE_BUILTIN(add_const)
 
 #  ifdef UTL_BUILTIN_remove_const
 

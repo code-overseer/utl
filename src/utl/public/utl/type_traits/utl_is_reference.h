@@ -29,9 +29,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_reference)
+#  if __UTL_SHOULD_USE_BUILTIN(is_reference)
 #    define UTL_BUILTIN_is_reference(...) __is_reference(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_reference)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_reference)
 
 #  ifdef UTL_BUILTIN_is_reference
 

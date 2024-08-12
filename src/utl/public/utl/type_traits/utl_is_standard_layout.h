@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_standard_layout)
+#  if __UTL_SHOULD_USE_BUILTIN(is_standard_layout)
 #    define UTL_BUILTIN_is_standard_layout(...) __is_standard_layout(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_standard_layout)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_standard_layout)
 
 #  ifdef UTL_BUILTIN_is_standard_layout
 

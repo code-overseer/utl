@@ -31,9 +31,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_trivially_copyable)
+#  if __UTL_SHOULD_USE_BUILTIN(is_trivially_copyable)
 #    define UTL_BUILTIN_is_trivially_copyable(...) __is_trivially_copyable(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_trivially_copyable)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_trivially_copyable)
 
 #  ifdef UTL_BUILTIN_is_trivially_copyable
 

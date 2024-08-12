@@ -32,9 +32,9 @@ UTL_PRAGMA_WARN("builtin array_rank is disabled by default and cannot be enabled
 #  endif
 #  define UTL_DISABLE_BUILTIN_array_rank 1
 
-#  if UTL_SHOULD_USE_BUILTIN(array_rank)
+#  if __UTL_SHOULD_USE_BUILTIN(array_rank)
 #    define UTL_BUILTIN_array_rank(...) __array_rank(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(array_rank) && 0
+#  endif // __UTL_SHOULD_USE_BUILTIN(array_rank) && 0
 
 #  ifdef UTL_BUILTIN_array_rank
 

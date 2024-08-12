@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(make_signed)
+#  if __UTL_SHOULD_USE_BUILTIN(make_signed)
 #    define UTL_BUILTIN_make_signed(...) __make_signed(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(make_signed)
+#  endif // __UTL_SHOULD_USE_BUILTIN(make_signed)
 
 #  ifdef UTL_BUILTIN_make_signed
 

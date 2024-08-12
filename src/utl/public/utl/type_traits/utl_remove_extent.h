@@ -33,9 +33,9 @@ UTL_NAMESPACE_END
 #    define UTL_DISABLE_BUILTIN_remove_extent 0
 #  endif
 
-#  if UTL_SHOULD_USE_BUILTIN(remove_extent)
+#  if __UTL_SHOULD_USE_BUILTIN(remove_extent)
 #    define UTL_BUILTIN_remove_extent(...) __remove_extent(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(remove_extent)
+#  endif // __UTL_SHOULD_USE_BUILTIN(remove_extent)
 
 #  ifdef UTL_BUILTIN_remove_extent
 

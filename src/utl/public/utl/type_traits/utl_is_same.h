@@ -25,9 +25,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_same)
+#  if __UTL_SHOULD_USE_BUILTIN(is_same)
 #    define UTL_BUILTIN_is_same(...) __is_same(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_same)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_same)
 
 #  ifdef UTL_BUILTIN_is_same
 

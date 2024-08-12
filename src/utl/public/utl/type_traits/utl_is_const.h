@@ -31,9 +31,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_const)
+#  if __UTL_SHOULD_USE_BUILTIN(is_const)
 #    define UTL_BUILTIN_is_const(...) __is_const(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_const)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_const)
 
 #  ifdef UTL_BUILTIN_is_const
 

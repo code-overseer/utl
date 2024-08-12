@@ -37,9 +37,9 @@ UTL_PRAGMA_WARN("builtin is_array is disabled by default and cannot be enabled")
 #    define UTL_DISABLE_BUILTIN_is_array 1
 #  endif
 
-#  if UTL_SHOULD_USE_BUILTIN(is_array)
+#  if __UTL_SHOULD_USE_BUILTIN(is_array)
 #    define UTL_BUILTIN_is_array(...) __is_array(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_array)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_array)
 
 #  ifdef UTL_BUILTIN_is_array
 

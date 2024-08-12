@@ -21,9 +21,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_layout_compatible)
+#  if __UTL_SHOULD_USE_BUILTIN(is_layout_compatible)
 #    define UTL_BUILTIN_is_layout_compatible(...) __is_layout_compatible(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_layout_compatible)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_layout_compatible)
 
 #  ifdef UTL_BUILTIN_is_layout_compatible
 

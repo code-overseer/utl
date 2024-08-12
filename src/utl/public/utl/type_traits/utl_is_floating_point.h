@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_floating_point)
+#  if __UTL_SHOULD_USE_BUILTIN(is_floating_point)
 #    define UTL_BUILTIN_is_floating_point(...) __is_floating_point(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_floating_point)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_floating_point)
 
 #  ifdef UTL_BUILTIN_is_floating_point
 

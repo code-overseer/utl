@@ -20,10 +20,10 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(has_unique_object_representations)
+#  if __UTL_SHOULD_USE_BUILTIN(has_unique_object_representations)
 #    define UTL_BUILTIN_has_unique_object_representations(...) \
         __has_unique_object_representations(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(has_unique_object_representations)
+#  endif // __UTL_SHOULD_USE_BUILTIN(has_unique_object_representations)
 
 #  ifdef UTL_BUILTIN_has_unique_object_representations
 

@@ -18,9 +18,9 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(is_implicit_lifetime)
+#  if __UTL_SHOULD_USE_BUILTIN(is_implicit_lifetime)
 #    define UTL_BUILTIN_is_implicit_lifetime(...) __is_implicit_lifetime(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_implicit_lifetime)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_implicit_lifetime)
 
 #  ifdef UTL_BUILTIN_is_implicit_lifetime
 

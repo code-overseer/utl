@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(underlying_type)
+#  if __UTL_SHOULD_USE_BUILTIN(underlying_type)
 #    define UTL_BUILTIN_underlying_type(...) __underlying_type(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(underlying_type)
+#  endif // __UTL_SHOULD_USE_BUILTIN(underlying_type)
 
 #  ifdef UTL_BUILTIN_underlying_type
 

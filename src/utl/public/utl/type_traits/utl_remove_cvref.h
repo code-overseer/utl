@@ -18,9 +18,9 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(remove_cvref)
+#  if __UTL_SHOULD_USE_BUILTIN(remove_cvref)
 #    define UTL_BUILTIN_remove_cvref(...) __remove_cvref(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(remove_cvref)
+#  endif // __UTL_SHOULD_USE_BUILTIN(remove_cvref)
 
 #  ifdef UTL_BUILTIN_remove_cvref
 

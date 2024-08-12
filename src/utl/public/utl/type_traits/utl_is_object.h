@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_object)
+#  if __UTL_SHOULD_USE_BUILTIN(is_object)
 #    define UTL_BUILTIN_is_object(...) __is_object(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_object)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_object)
 
 #  ifdef UTL_BUILTIN_is_object
 

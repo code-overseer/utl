@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_abi.h"
+#include "utl/configuration/utl_abi.h"
 
 #ifndef UTL_NS
 #  define UTL_NS utl

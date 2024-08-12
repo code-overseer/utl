@@ -25,9 +25,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 /* (31.01.2024) Clang's __array_extent has a bug so disable for now */
-#  if UTL_SHOULD_USE_BUILTIN(array_extent)
+#  if __UTL_SHOULD_USE_BUILTIN(array_extent)
 #    define UTL_BUILTIN_array_extent(...) __array_extent(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(array_extent)
+#  endif // __UTL_SHOULD_USE_BUILTIN(array_extent)
 
 #  ifdef UTL_BUILTIN_array_extent
 

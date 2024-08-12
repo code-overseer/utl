@@ -29,9 +29,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(add_rvalue_reference)
+#  if __UTL_SHOULD_USE_BUILTIN(add_rvalue_reference)
 #    define UTL_BUILTIN_add_rvalue_reference(...) __add_rvalue_reference(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(add_rvalue_reference)
+#  endif // __UTL_SHOULD_USE_BUILTIN(add_rvalue_reference)
 
 #  ifdef UTL_BUILTIN_add_rvalue_reference
 

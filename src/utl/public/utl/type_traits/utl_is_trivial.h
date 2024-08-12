@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_trivial)
+#  if __UTL_SHOULD_USE_BUILTIN(is_trivial)
 #    define UTL_BUILTIN_is_trivial(...) __is_trivial(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_trivial)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_trivial)
 
 #  ifdef UTL_BUILTIN_is_trivial
 

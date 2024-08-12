@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(decay)
+#  if __UTL_SHOULD_USE_BUILTIN(decay)
 #    define UTL_BUILTIN_decay(...) __decay(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(decay)
+#  endif // __UTL_SHOULD_USE_BUILTIN(decay)
 
 #  ifdef UTL_BUILTIN_decay
 

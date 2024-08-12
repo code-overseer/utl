@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_polymorphic)
+#  if __UTL_SHOULD_USE_BUILTIN(is_polymorphic)
 #    define UTL_BUILTIN_is_polymorphic(...) __is_polymorphic(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_polymorphic)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_polymorphic)
 
 #  ifdef UTL_BUILTIN_is_polymorphic
 

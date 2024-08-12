@@ -25,9 +25,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_pointer)
+#  if __UTL_SHOULD_USE_BUILTIN(is_pointer)
 #    define UTL_BUILTIN_is_pointer(...) __is_pointer(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_pointer)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_pointer)
 
 #  ifdef UTL_BUILTIN_is_pointer
 

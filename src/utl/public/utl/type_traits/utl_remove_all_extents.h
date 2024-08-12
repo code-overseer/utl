@@ -29,9 +29,9 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(remove_all_extents)
+#  if __UTL_SHOULD_USE_BUILTIN(remove_all_extents)
 #    define UTL_BUILTIN_remove_all_extents(...) __remove_all_extents(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(remove_all_extents)
+#  endif // __UTL_SHOULD_USE_BUILTIN(remove_all_extents)
 
 #  ifdef UTL_BUILTIN_remove_all_extents
 

@@ -31,9 +31,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_trivially_constructible)
+#  if __UTL_SHOULD_USE_BUILTIN(is_trivially_constructible)
 #    define UTL_BUILTIN_is_trivially_constructible(...) __is_trivially_constructible(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_trivially_constructible)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_trivially_constructible)
 
 #  ifdef UTL_BUILTIN_is_trivially_constructible
 

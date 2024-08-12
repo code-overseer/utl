@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_class)
+#  if __UTL_SHOULD_USE_BUILTIN(is_class)
 #    define UTL_BUILTIN_is_class(...) __is_class(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_class)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_class)
 
 #  ifdef UTL_BUILTIN_is_class
 

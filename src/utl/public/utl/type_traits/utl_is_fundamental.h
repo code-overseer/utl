@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_fundamental)
+#  if __UTL_SHOULD_USE_BUILTIN(is_fundamental)
 #    define UTL_BUILTIN_is_fundamental(...) __is_fundamental(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_fundamental)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_fundamental)
 
 #  ifdef UTL_BUILTIN_is_fundamental
 

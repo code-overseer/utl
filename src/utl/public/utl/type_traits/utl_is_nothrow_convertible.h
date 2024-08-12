@@ -31,9 +31,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_nothrow_convertible)
+#  if __UTL_SHOULD_USE_BUILTIN(is_nothrow_convertible)
 #    define UTL_BUILTIN_is_nothrow_convertible(...) __is_nothrow_convertible(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_nothrow_convertible)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_nothrow_convertible)
 
 #  ifdef UTL_BUILTIN_is_nothrow_convertible
 

@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_empty)
+#  if __UTL_SHOULD_USE_BUILTIN(is_empty)
 #    define UTL_BUILTIN_is_empty(...) __is_empty(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_empty)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_empty)
 
 #  ifdef UTL_BUILTIN_is_empty
 

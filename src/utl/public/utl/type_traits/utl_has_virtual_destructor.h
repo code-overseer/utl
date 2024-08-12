@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(has_virtual_destructor)
+#  if __UTL_SHOULD_USE_BUILTIN(has_virtual_destructor)
 #    define UTL_BUILTIN_has_virtual_destructor(...) __has_virtual_destructor(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(has_virtual_destructor)
+#  endif // __UTL_SHOULD_USE_BUILTIN(has_virtual_destructor)
 
 #  ifdef UTL_BUILTIN_has_virtual_destructor
 

@@ -26,9 +26,9 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(is_function)
+#  if __UTL_SHOULD_USE_BUILTIN(is_function)
 #    define UTL_BUILTIN_is_function(...) __is_function(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_function)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_function)
 
 #  ifdef UTL_BUILTIN_is_function
 

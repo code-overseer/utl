@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_enum)
+#  if __UTL_SHOULD_USE_BUILTIN(is_enum)
 #    define UTL_BUILTIN_is_enum(...) __is_enum(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_enum)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_enum)
 
 #  ifdef UTL_BUILTIN_is_enum
 

@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(remove_pointer)
+#  if __UTL_SHOULD_USE_BUILTIN(remove_pointer)
 #    define UTL_BUILTIN_remove_pointer(...) __remove_pointer(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(remove_pointer)
+#  endif // __UTL_SHOULD_USE_BUILTIN(remove_pointer)
 
 #  ifdef UTL_BUILTIN_remove_pointer
 

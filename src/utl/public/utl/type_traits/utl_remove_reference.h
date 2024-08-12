@@ -29,9 +29,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(remove_reference)
+#  if __UTL_SHOULD_USE_BUILTIN(remove_reference)
 #    define UTL_BUILTIN_remove_reference(...) __remove_reference(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(remove_reference)
+#  endif // __UTL_SHOULD_USE_BUILTIN(remove_reference)
 
 #  ifdef UTL_BUILTIN_remove_reference
 

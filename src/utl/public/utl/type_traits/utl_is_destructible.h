@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_destructible)
+#  if __UTL_SHOULD_USE_BUILTIN(is_destructible)
 #    define UTL_BUILTIN_is_destructible(...) __is_destructible(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_destructible)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_destructible)
 
 #  ifdef UTL_BUILTIN_is_destructible
 

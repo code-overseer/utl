@@ -29,9 +29,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_signed)
+#  if __UTL_SHOULD_USE_BUILTIN(is_signed)
 #    define UTL_BUILTIN_is_signed(...) __is_signed(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_signed)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_signed)
 
 #  ifdef UTL_BUILTIN_is_signed
 

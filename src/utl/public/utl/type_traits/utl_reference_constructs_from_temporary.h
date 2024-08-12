@@ -23,10 +23,10 @@ UTL_NAMESPACE_END
 #  include "utl/type_traits/utl_constants.h"
 #  include "utl/type_traits/utl_reference_binds_to_temporary.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(reference_constructs_from_temporary)
+#  if __UTL_SHOULD_USE_BUILTIN(reference_constructs_from_temporary)
 #    define UTL_BUILTIN_reference_constructs_from_temporary(...) \
         __reference_constructs_from_temporary(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(reference_constructs_from_temporary)
+#  endif // __UTL_SHOULD_USE_BUILTIN(reference_constructs_from_temporary)
 
 #  ifdef UTL_BUILTIN_reference_constructs_from_temporary
 

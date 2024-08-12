@@ -29,9 +29,9 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(remove_volatile)
+#  if __UTL_SHOULD_USE_BUILTIN(remove_volatile)
 #    define UTL_BUILTIN_add_volatile(...) __remove_volatile(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(add_volatile)
+#  endif // __UTL_SHOULD_USE_BUILTIN(add_volatile)
 
 #  ifdef UTL_BUILTIN_remove_volatile
 

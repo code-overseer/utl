@@ -31,9 +31,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_trivially_assignable)
+#  if __UTL_SHOULD_USE_BUILTIN(is_trivially_assignable)
 #    define UTL_BUILTIN_is_trivially_assignable(...) __is_trivially_assignable(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_trivially_assignable)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_trivially_assignable)
 
 #  ifdef UTL_BUILTIN_is_trivially_assignable
 

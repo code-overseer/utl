@@ -27,9 +27,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_final)
+#  if __UTL_SHOULD_USE_BUILTIN(is_final)
 #    define UTL_BUILTIN_is_final(...) __is_final(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_final)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_final)
 
 #  ifdef UTL_BUILTIN_is_final
 
