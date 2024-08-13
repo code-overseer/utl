@@ -77,12 +77,12 @@ template <typename T>
 struct difference_identity {
     using difference_type UTL_NODEBUG = T;
 };
-template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_is_object(T))>
+template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_object(T))>
 using object_pointer UTL_NODEBUG = difference_identity<ptrdiff_t>;
-template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_has_member_difference_type(T))>
+template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_has_member_difference_type(T))>
 __UTL_HIDE_FROM_ABI auto resolve_trait(int) noexcept
     -> difference_identity<typename T::difference_type>;
-template <typename T UTL_REQUIRES_CXX11(!UTL_TRAIT_has_member_difference_type(T))>
+template <typename T UTL_CONSTRAINT_CXX11(!UTL_TRAIT_has_member_difference_type(T))>
 __UTL_HIDE_FROM_ABI auto resolve_trait(int) noexcept -> difference_identity<subtract_result_t<T>>;
 
 struct fallback_t {};

@@ -44,10 +44,10 @@ using impl UTL_NODEBUG = R;
 
 struct __UTL_ABI_PUBLIC allocator_arg_t {
     explicit constexpr allocator_arg_t() noexcept = default;
-    template <UTL_CONCEPT_CXX20(same_as<::std::allocator_arg_t>) T UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(same_as<::std::allocator_arg_t>) T UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_same(T, ::std::allocator_arg_t))>
     __UTL_HIDE_FROM_ABI constexpr allocator_arg_t(T) noexcept {}
-    template <UTL_CONCEPT_CXX20(same_as<::std::allocator_arg_t>) T UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(same_as<::std::allocator_arg_t>) T UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_same(T, ::std::allocator_arg_t))>
     __UTL_HIDE_FROM_ABI constexpr operator T() const noexcept {
         return {};

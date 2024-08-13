@@ -44,8 +44,8 @@
 #    define UTL_IMPLICIT_IF(...) explicit(!(__VA_ARGS__))
 
 #    define UTL_ENABLE_IF_CXX11(TYPE, ...) TYPE
-#    define UTL_REQUIRES_CXX11(...)
-#    define UTL_REQUIRES_CXX20(...) requires (__VA_ARGS__)
+#    define UTL_CONSTRAINT_CXX11(...)
+#    define UTL_CONSTRAINT_CXX20(...) requires (__VA_ARGS__)
 #    define UTL_CONCEPT_CXX20(...) __VA_ARGS__
 
 #  else /* UTL_CXX >= 202002L */
@@ -55,8 +55,8 @@
 #    define UTL_EXPLICIT_IF(...)
 #    define UTL_IMPLICIT_IF(...) explicit
 #    define UTL_ENABLE_IF_CXX11(TYPE, ...) __UTL enable_if_t<(__VA_ARGS__), TYPE>
-#    define UTL_REQUIRES_CXX11(...) , __UTL enable_if_t<(__VA_ARGS__), int> = __LINE__
-#    define UTL_REQUIRES_CXX20(...)
+#    define UTL_CONSTRAINT_CXX11(...) , __UTL enable_if_t<(__VA_ARGS__), int> = __LINE__
+#    define UTL_CONSTRAINT_CXX20(...)
 #    define UTL_CONCEPT_CXX20(...) typename
 #  endif /* UTL_CXX >= 202002L */
 

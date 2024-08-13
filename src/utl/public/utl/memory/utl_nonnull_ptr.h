@@ -46,7 +46,7 @@ public:
                                                 "Reason=[Pointer argument cannot be null]")));
     }
 
-    template <UTL_CONCEPT_CXX20(convertible_to<T*>) U UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(convertible_to<T*>) U UTL_CONSTRAINT_CXX11(
         is_convertible<U, T*>::value)>
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 nonnull_ptr(U&& obj)
         UTL_THROWS : nonnull_ptr((T*)obj) {}

@@ -112,11 +112,11 @@ struct __UTL_PUBLIC_TEMPLATE variadic_traits {
             __UTL is_implicit_constructible<Types>>... // disjunction
             > {};
 
-    template <typename... UTypes UTL_REQUIRES_CXX11(sizeof...(Types) != sizeof...(UTypes))>
-    UTL_REQUIRES_CXX20(sizeof...(Types) != sizeof...(UTypes))
+    template <typename... UTypes UTL_CONSTRAINT_CXX11(sizeof...(Types) != sizeof...(UTypes))>
+    UTL_CONSTRAINT_CXX20(sizeof...(Types) != sizeof...(UTypes))
     static auto is_explicit_constructible_impl() noexcept -> false_type;
-    template <typename... UTypes UTL_REQUIRES_CXX11(sizeof...(Types) == sizeof...(UTypes))>
-    UTL_REQUIRES_CXX20(sizeof...(Types) == sizeof...(UTypes))
+    template <typename... UTypes UTL_CONSTRAINT_CXX11(sizeof...(Types) == sizeof...(UTypes))>
+    UTL_CONSTRAINT_CXX20(sizeof...(Types) == sizeof...(UTypes))
     static auto is_explicit_constructible_impl() noexcept
         -> disjunction<__UTL is_explicit_constructible<Types, UTypes>...>;
     template <typename... UTypes>

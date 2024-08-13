@@ -13,7 +13,7 @@ UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace iter_difference {
-template <UTL_CONCEPT_CXX20(__UTL details::iterator_traits::is_specialized) T UTL_REQUIRES_CXX11(
+template <UTL_CONCEPT_CXX20(__UTL details::iterator_traits::is_specialized) T UTL_CONSTRAINT_CXX11(
     __UTL details::iterator_traits::is_specialized<T>::value)>
 __UTL_HIDE_FROM_ABI typename __UTL iterator_traits<T>::difference_type resolve(int) noexcept;
 template <typename T>

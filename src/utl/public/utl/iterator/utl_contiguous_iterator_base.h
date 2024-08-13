@@ -158,13 +158,13 @@ protected:
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 ~contiguous_iterator_base() noexcept = default;
 
     template <UTL_CONCEPT_CXX20(constructible_as<stored_pointer, __UTL add_pointer>) T
-            UTL_REQUIRES_CXX11(UTL_TRAIT_is_constructible(stored_pointer, T*))>
+            UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_constructible(stored_pointer, T*))>
     __UTL_HIDE_FROM_ABI constexpr contiguous_iterator_base(
         contiguous_iterator_base<It, T> it) noexcept
         : ptr_(it.operator->()){};
 
     template <UTL_CONCEPT_CXX20(assignable_to<stored_pointer, __UTL add_pointer>) T
-            UTL_REQUIRES_CXX11(UTL_TRAIT_is_assignable(stored_pointer&, T*))>
+            UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_assignable(stored_pointer&, T*))>
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 contiguous_iterator_base& operator=(
         contiguous_iterator_base<It, T> it) noexcept {
         ptr_ = it.operator->();

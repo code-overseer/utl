@@ -29,7 +29,7 @@ namespace string {
 
 UTL_INLINE_CXX17 constexpr size_t npos = numeric::maximum<size_t>::value;
 
-template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
+template <UTL_CONCEPT_CXX20(string_char) T UTL_CONSTRAINT_CXX11(is_string_char<T>::value)>
 UTL_ATTRIBUTE(CONST_FUNCTION) constexpr size_t to_index(T const* base, T const* ptr) noexcept {
     return ptr ? ptr - base : __UTL details::string::npos;
 }

@@ -65,7 +65,7 @@ private:
     value_type result_;
 };
 
-template <UTL_CONCEPT_CXX20(signed_integral) T UTL_REQUIRES_CXX11(
+template <UTL_CONCEPT_CXX20(signed_integral) T UTL_CONSTRAINT_CXX11(
     UTL_TRAIT_is_signed(T) && UTL_TRAIT_is_integral(T))>
 __UTL_HIDE_FROM_ABI constexpr T impl(T left, T right) noexcept {
     return signed_impl<T>(left, right).result();
@@ -117,7 +117,7 @@ __UTL_HIDE_FROM_ABI auto has_overload_impl(float) noexcept -> __UTL false_type;
 template <typename T>
 using has_overload = decltype(__UTL details::add_sat::runtime::has_overload_impl<T>(0));
 
-template <UTL_CONCEPT_CXX20(signed_integral) T UTL_REQUIRES_CXX11(
+template <UTL_CONCEPT_CXX20(signed_integral) T UTL_CONSTRAINT_CXX11(
     UTL_TRAIT_is_signed(T) && UTL_TRAIT_is_integral(T) && !has_overload<T>::value)>
 __UTL_HIDE_FROM_ABI T impl(T left, T right) noexcept {
     return __UTL details::add_sat::compile_time::impl(left, right);
@@ -125,7 +125,7 @@ __UTL_HIDE_FROM_ABI T impl(T left, T right) noexcept {
 
 } // namespace runtime
 
-template <UTL_CONCEPT_CXX20(signed_integral) T UTL_REQUIRES_CXX11(
+template <UTL_CONCEPT_CXX20(signed_integral) T UTL_CONSTRAINT_CXX11(
     UTL_TRAIT_is_signed(T) && UTL_TRAIT_is_integral(T) && !runtime::has_overload<T>::value)>
 __UTL_HIDE_FROM_ABI constexpr T impl(T left, T right) noexcept {
     return UTL_CONSTANT_P(left == right) ? __UTL details::add_sat::compile_time::impl(left, right)
@@ -137,7 +137,7 @@ __UTL_HIDE_FROM_ABI constexpr T saturate(T result, T left) noexcept {
     return result | -(result < left);
 }
 
-template <UTL_CONCEPT_CXX20(unsigned_integral) T UTL_REQUIRES_CXX11(UTL_TRAIT_is_unsigned(T))>
+template <UTL_CONCEPT_CXX20(unsigned_integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_unsigned(T))>
 __UTL_HIDE_FROM_ABI constexpr T impl(T left, T right) noexcept {
     return __UTL details::add_sat::saturate(left + right, left);
 }
@@ -145,7 +145,7 @@ __UTL_HIDE_FROM_ABI constexpr T impl(T left, T right) noexcept {
 } // namespace add_sat
 } // namespace details
 
-template <UTL_CONCEPT_CXX20(saturatable) T UTL_REQUIRES_CXX11(UTL_TRAIT_is_saturatable(T))>
+template <UTL_CONCEPT_CXX20(saturatable) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_saturatable(T))>
 UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI, FLATTEN) constexpr T add_sat(T left, T right) noexcept {
     return __UTL details::add_sat::impl(left, right);
 }

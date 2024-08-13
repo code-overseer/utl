@@ -24,7 +24,7 @@ class UTL_ATTRIBUTES(
     using move_t UTL_NODEBUG = conditional_t<is_movable::value, scope_exit, invalid_t>;
 
 public:
-    template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_constructible(F, Fn&&))>
     __UTL_HIDE_FROM_ABI explicit scope_exit(Fn&& func) noexcept(
         UTL_TRAIT_is_nothrow_constructible(F, Fn&&))

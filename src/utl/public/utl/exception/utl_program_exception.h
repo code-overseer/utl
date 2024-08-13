@@ -118,7 +118,7 @@ public:
      * @param fmt The message format object containing the format string and source location.
      * @param args The additional arguments for the message format.
      */
-    template <UTL_CONCEPT_CXX20(constructible_as<T>) U, typename... Args UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(constructible_as<T>) U, typename... Args UTL_CONSTRAINT_CXX11(
         is_constructible<T, U>::value)>
     __UTL_HIDE_FROM_ABI basic_exception(U&& u, exceptions::message_format fmt,
         Args... args) noexcept(UTL_TRAIT_is_nothrow_constructible(T, U))

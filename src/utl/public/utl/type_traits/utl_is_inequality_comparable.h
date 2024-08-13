@@ -15,14 +15,15 @@ namespace inequality_comparable {
 template <typename T, typename U>
 using result_t UTL_NODEBUG = decltype(__UTL declval<T>() != __UTL declval<U>());
 
-template <typename T, typename U UTL_REQUIRES_CXX11(UTL_TRAIT_is_boolean_testable(result_t<T, U>))>
-UTL_REQUIRES_CXX20(UTL_TRAIT_is_boolean_testable(result_t<T, U>))
+template <typename T, typename U UTL_CONSTRAINT_CXX11(
+    UTL_TRAIT_is_boolean_testable(result_t<T, U>))>
+UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_boolean_testable(result_t<T, U>))
 __UTL_HIDE_FROM_ABI __UTL true_type impl(int) noexcept;
 template <typename T, typename U>
 __UTL_HIDE_FROM_ABI __UTL false_type impl(float) noexcept;
-template <typename T, typename U UTL_REQUIRES_CXX11(
+template <typename T, typename U UTL_CONSTRAINT_CXX11(
     UTL_TRAIT_is_nothrow_boolean_testable(result_t<T, U>))>
-UTL_REQUIRES_CXX20(UTL_TRAIT_is_nothrow_boolean_testable(result_t<T, U>))
+UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_nothrow_boolean_testable(result_t<T, U>))
 __UTL_HIDE_FROM_ABI __UTL true_type nothrow_check(int) noexcept;
 template <typename T, typename U>
 __UTL_HIDE_FROM_ABI __UTL false_type nothrow_check(float) noexcept;

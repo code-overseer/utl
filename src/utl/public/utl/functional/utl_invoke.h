@@ -38,9 +38,9 @@ struct invoke_t<void> {
 } // namespace invoke
 } // namespace details
 
-template <typename R, typename F, typename... Args UTL_REQUIRES_CXX11(
+template <typename R, typename F, typename... Args UTL_CONSTRAINT_CXX11(
     UTL_TRAIT_is_invocable_r(R, F, Args...))>
-UTL_REQUIRES_CXX20(UTL_TRAIT_is_invocable_r(R, F, Args...))
+UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_invocable_r(R, F, Args...))
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr R invoke_r(F&& f, Args&&... args) noexcept(
     UTL_TRAIT_is_nothrow_invocable_r(R, F, Args...)) {
     return details::invoke::invoke_t<R>::call(__UTL forward<F>(f), __UTL forward<Args>(args)...);

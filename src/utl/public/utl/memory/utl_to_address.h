@@ -73,17 +73,17 @@ struct to_address_t {
         return ptr;
     }
 
-    template <UTL_CONCEPT_CXX20(has_to_address) T UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(has_to_address) T UTL_CONSTRAINT_CXX11(
         !__UTL is_pointer<T>::value && has_to_address<T>::value)>
-    UTL_REQUIRES_CXX20(!__UTL is_pointer<T>::value)
+    UTL_CONSTRAINT_CXX20(!__UTL is_pointer<T>::value)
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) inline constexpr auto operator()(
         T const& ptr) const noexcept -> decltype(__UTL pointer_traits<T>::to_address(ptr)) {
         return __UTL pointer_traits<T>::to_address(ptr);
     }
 
-    template <UTL_CONCEPT_CXX20(has_arrow_operator) T UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(has_arrow_operator) T UTL_CONSTRAINT_CXX11(
         !__UTL is_pointer<T>::value && !has_to_address<T>::value && has_arrow_operator<T>::value)>
-    UTL_REQUIRES_CXX20(!__UTL is_pointer<T>::value && !has_to_address<T>)
+    UTL_CONSTRAINT_CXX20(!__UTL is_pointer<T>::value && !has_to_address<T>)
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) inline constexpr auto operator()(
         T const& ptr) const noexcept -> decltype(this->operator()(ptr.operator->())) {
         return this->operator()(ptr.operator->());

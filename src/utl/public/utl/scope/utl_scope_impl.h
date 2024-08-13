@@ -33,7 +33,7 @@ private:
     using not_move_t UTL_NODEBUG = conditional_t<is_movable::value, invalid_t, impl>;
 
 protected:
-    template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_constructible(F, Fn&&))>
     __UTL_HIDE_FROM_ABI constexpr impl(Fn&& func) noexcept(
         UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
@@ -56,13 +56,13 @@ protected:
     }
 
 private:
-    template <UTL_CONCEPT_CXX20(same_as<invalid_t>) T UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(same_as<invalid_t>) T UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_same(T, invalid_t))>
     __UTL_HIDE_FROM_ABI impl(false_type, T&& other) noexcept;
 
-    template <UTL_CONCEPT_CXX20(same_as<impl>) T = impl UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(same_as<impl>) T = impl UTL_CONSTRAINT_CXX11(
         is_movable::value && UTL_TRAIT_is_same(T, impl))>
-    UTL_REQUIRES_CXX20(is_movable::value)
+    UTL_CONSTRAINT_CXX20(is_movable::value)
     __UTL_HIDE_FROM_ABI constexpr impl(true_type, T&& other) noexcept
         : callable_(__UTL move(other.callable_))
         , released_(other.released_) {

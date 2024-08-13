@@ -127,7 +127,7 @@ private:
         __UTL conditional_t<!UTL_TRAIT_is_base_of(random_access_iterator_tag, iterator_concept),
             difference_type, inaccessible_t>;
 
-    template <UTL_CONCEPT_CXX20(legacy_random_access_iterator) I UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(legacy_random_access_iterator) I UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_legacy_random_access_iterator(I))>
     __UTL_HIDE_FROM_ABI static constexpr auto subscript(I const& current,
         difference_type idx) noexcept(UTL_TRAIT_is_nothrow_subscriptable(I, difference_type))
@@ -140,8 +140,8 @@ private:
         return 0;
     }
 
-    template <typename I UTL_REQUIRES_CXX11(UTL_TRAIT_is_pointer(I))>
-    UTL_REQUIRES_CXX20(is_pointer_v<I>)
+    template <typename I UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(I))>
+    UTL_CONSTRAINT_CXX20(is_pointer_v<I>)
     __UTL_HIDE_FROM_ABI static constexpr auto redirect(I current, int) noexcept -> I {
         return current - 1;
     }
@@ -168,9 +168,9 @@ public:
         UTL_TRAIT_is_nothrow_copy_constructible(iterator_type)) = default;
     __UTL_HIDE_FROM_ABI constexpr reverse_iterator(reverse_iterator&&) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(iterator_type)) = default;
-    template <typename U UTL_REQUIRES_CXX11(
+    template <typename U UTL_CONSTRAINT_CXX11(
         !UTL_TRAIT_is_same(U, iterator_type) && UTL_TRAIT_is_convertible(U const&, iterator_type))>
-    UTL_REQUIRES_CXX20(!same_as<U, iterator_type> && convertible_to<U const&, iterator_type>)
+    UTL_CONSTRAINT_CXX20(!same_as<U, iterator_type> && convertible_to<U const&, iterator_type>)
     __UTL_HIDE_FROM_ABI constexpr reverse_iterator(reverse_iterator<U> const& it) noexcept(
         UTL_TRAIT_is_nothrow_convertible(U const&, iterator_type))
         : current(it.base()) {}
@@ -179,10 +179,10 @@ public:
         UTL_TRAIT_is_nothrow_copy_assignable(iterator_type)) = default;
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reverse_iterator& operator=(reverse_iterator&&) noexcept(
         UTL_TRAIT_is_nothrow_move_assignable(iterator_type)) = default;
-    template <typename U UTL_REQUIRES_CXX11(!UTL_TRAIT_is_same(U, iterator_type) &&
+    template <typename U UTL_CONSTRAINT_CXX11(!UTL_TRAIT_is_same(U, iterator_type) &&
         UTL_TRAIT_is_convertible(U const&, iterator_type) &&
         UTL_TRAIT_is_assignable(iterator_type&, U const&))>
-    UTL_REQUIRES_CXX20(!same_as<U, iterator_type> && convertible_to<U const&, iterator_type> &&
+    UTL_CONSTRAINT_CXX20(!same_as<U, iterator_type> && convertible_to<U const&, iterator_type> &&
         assignable_from<iterator_type&, U const&>)
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 reverse_iterator&
     operator=(reverse_iterator<U> const& it) noexcept(
@@ -206,7 +206,7 @@ public:
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, FLATTEN) constexpr pointer operator->() const
         noexcept(noexcept(redirect(this->current, 0u)))
-        UTL_REQUIRES_CXX20(__UTL is_pointer_v<iterator_type> ||
+        UTL_CONSTRAINT_CXX20(__UTL is_pointer_v<iterator_type> ||
         requires(iterator_type const i) { i.operator->(); })
     {
         return redirect(this->current, 0u);
@@ -314,7 +314,7 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr reverse_itera
 }
 
 template <typename It1, typename It2>
-UTL_REQUIRES_CXX20(requires(It1 l, It2 r) { l == r; })
+UTL_CONSTRAINT_CXX20(requires(It1 l, It2 r) { l == r; })
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator==(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_equality_comparable_with(decltype(l.base()), decltype(r.base()))) -> 
@@ -323,7 +323,7 @@ operator==(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexc
 }
 
 template <typename It1, typename It2>
-UTL_REQUIRES_CXX20(requires(It1 l, It2 r) { l != r; })
+UTL_CONSTRAINT_CXX20(requires(It1 l, It2 r) { l != r; })
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator!=(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_inequality_comparable_with(decltype(l.base()), decltype(r.base())))
@@ -333,7 +333,7 @@ operator!=(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexc
 }
 
 template <typename It1, typename It2>
-UTL_REQUIRES_CXX20(requires(It1 l, It2 r) { l < r; })
+UTL_CONSTRAINT_CXX20(requires(It1 l, It2 r) { l < r; })
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator<(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_strict_subordinate_comparable_with(decltype(l.base()), decltype(r.base())))
@@ -343,7 +343,7 @@ operator<(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexce
 }
 
 template <typename It1, typename It2>
-UTL_REQUIRES_CXX20(requires(It1 l, It2 r) { l > r; })
+UTL_CONSTRAINT_CXX20(requires(It1 l, It2 r) { l > r; })
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator>(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_strict_superordinate_comparable_with(
@@ -353,7 +353,7 @@ operator>(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexce
 }
 
 template <typename It1, typename It2>
-UTL_REQUIRES_CXX20(requires(It1 l, It2 r) { l <= r; })
+UTL_CONSTRAINT_CXX20(requires(It1 l, It2 r) { l <= r; })
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator<=(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_subordinate_comparable_with(decltype(l.base()), decltype(r.base())))
@@ -363,7 +363,7 @@ operator<=(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexc
 }
 
 template <typename It1, typename It2>
-UTL_REQUIRES_CXX20(requires(It1 l, It2 r) { l >= r; })
+UTL_CONSTRAINT_CXX20(requires(It1 l, It2 r) { l >= r; })
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator>=(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_superordinate_comparable_with(decltype(l.base()), decltype(r.base())))
@@ -374,7 +374,7 @@ operator>=(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexc
 
 #if UTL_CXX20
 template <typename It1, typename It2>
-UTL_REQUIRES_CXX20(requires(It1 l, It2 r) { l <=> r; })
+UTL_CONSTRAINT_CXX20(requires(It1 l, It2 r) { l <=> r; })
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator<=>(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_three_way_comparable_with(decltype(l.base()), decltype(r.base())))
@@ -387,7 +387,7 @@ operator<=>(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noex
 #if UTL_CXX14
 
 template <typename It1, typename It2>
-UTL_REQUIRES_CXX20(!sized_sentinel_for<It1, It2>)
+UTL_CONSTRAINT_CXX20(!sized_sentinel_for<It1, It2>)
 UTL_INLINE_CXX17 constexpr bool disable_sized_sentinel_for<reverse_iterator<It1>, reverse_iterator<It2>> =
     !is_sized_sentinel_for_v<It1, It2>;
 

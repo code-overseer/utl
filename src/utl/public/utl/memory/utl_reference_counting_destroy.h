@@ -52,15 +52,15 @@ private:
     using has_custom_destroy UTL_NODEBUG = decltype(has_custom_destroy_impl<T>(0));
 
 public:
-    template <UTL_CONCEPT_CXX20(reference_countable) T UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(reference_countable) T UTL_CONSTRAINT_CXX11(
         is_reference_countable<T>::value && has_custom_destroy<T>::value)>
-    UTL_REQUIRES_CXX20(requires(T* p) {
+    UTL_CONSTRAINT_CXX20(requires(T* p) {
         destroy(p); })
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void operator()(T* ptr) const noexcept {
         destroy(ptr);
     }
 
-    template <UTL_CONCEPT_CXX20(reference_countable) T UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(reference_countable) T UTL_CONSTRAINT_CXX11(
         is_reference_countable<T>::value && !has_custom_destroy<T>::value)>
     __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void operator()(T* ptr) const noexcept {
         delete ptr;
