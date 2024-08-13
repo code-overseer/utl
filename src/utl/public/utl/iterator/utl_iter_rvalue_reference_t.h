@@ -41,7 +41,7 @@ namespace iter_rvalue_reference {
 
 template <UTL_CONCEPT_CXX20(dereferenceable) T UTL_REQUIRES_CXX11(UTL_TRAIT_is_dereferenceable(T))>
 __UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> __UTL
-    enable_if_t<__UTL is_referenceable<decltype(ranges::iter_move(__UTL declval<T&>()))>::value,
+    enable_if_t<UTL_TRAIT_is_referenceable(decltype(ranges::iter_move(__UTL declval<T&>()))),
         decltype(ranges::iter_move(__UTL declval<T&>()))>;
 
 } // namespace iter_rvalue_reference

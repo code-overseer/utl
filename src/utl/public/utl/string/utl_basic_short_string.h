@@ -15,6 +15,7 @@
 #include "utl/exception.h"
 #include "utl/iterator/utl_contiguous_iterator_base.h"
 #include "utl/iterator/utl_distance.h"
+#include "utl/iterator/utl_iterator_traits.h"
 #include "utl/iterator/utl_legacy_forward_iterator.h"
 #include "utl/iterator/utl_legacy_input_iterator.h"
 #include "utl/iterator/utl_reverse_iterator.h"
