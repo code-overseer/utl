@@ -105,9 +105,7 @@ struct __UTL_PUBLIC_TEMPLATE is_floating_point<bfloat16> : true_type {};
 UTL_NAMESPACE_END
 #endif // if UTL_CXX23
 
-#ifdef UTL_BUILTIN_is_floating_point
-#  define UTL_TRAIT_is_floating_point(...) UTL_BUILTIN_is_floating_point(__VA_ARGS__)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_is_floating_point(...) __UTL is_floating_point_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_floating_point(...) __UTL is_floating_point<__VA_ARGS__>::value

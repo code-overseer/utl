@@ -81,9 +81,7 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_array
-#  define UTL_TRAIT_is_array(...) UTL_BUILTIN_is_array(__VA_ARGS__)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_is_array(...) __UTL is_array_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_array(...) __UTL is_array<__VA_ARGS__>::value

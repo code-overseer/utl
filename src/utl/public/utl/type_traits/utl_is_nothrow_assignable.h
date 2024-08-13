@@ -103,9 +103,7 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_nothrow_assignable
-#  define UTL_TRAIT_is_nothrow_assignable(...) UTL_BUILTIN_is_nothrow_assignable(__VA_ARGS__)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_is_nothrow_assignable(...) __UTL is_nothrow_assignable_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_nothrow_assignable(...) __UTL is_nothrow_assignable<__VA_ARGS__>::value

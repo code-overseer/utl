@@ -113,9 +113,7 @@ UTL_NAMESPACE_END
 
 #define UTL_TRAIT_SUPPORTED_is_integral 1
 
-#ifdef UTL_BUILTIN_is_integral
-#  define UTL_TRAIT_is_integral(...) UTL_BUILTIN_is_integral(__VA_ARGS__)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_is_integral(...) __UTL is_integral_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_integral(...) __UTL is_integral<__VA_ARGS__>::value

@@ -74,9 +74,7 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_trivially_copyable
-#  define UTL_TRAIT_is_trivially_copyable(...) UTL_BUILTIN_is_trivially_copyable(__VA_ARGS__)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_is_trivially_copyable(...) __UTL is_trivially_copyable_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_trivially_copyable(...) __UTL is_trivially_copyable<__VA_ARGS__>::value

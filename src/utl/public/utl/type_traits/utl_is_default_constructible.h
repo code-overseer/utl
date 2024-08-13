@@ -68,9 +68,7 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_default_constructible
-#  define UTL_TRAIT_is_default_constructible(...) UTL_BUILTIN_is_default_constructible(__VA_ARGS__)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_is_default_constructible(...) __UTL is_default_constructible_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_default_constructible(...) __UTL is_default_constructible<__VA_ARGS__>::value

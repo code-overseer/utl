@@ -74,9 +74,7 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_fundamental
-#  define UTL_TRAIT_is_fundamental(...) UTL_BUILTIN_is_fundamental(__VA_ARGS__)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_is_fundamental(...) __UTL is_fundamental_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_fundamental(...) __UTL is_fundamental<__VA_ARGS__>::value

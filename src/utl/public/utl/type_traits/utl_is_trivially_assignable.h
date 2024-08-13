@@ -66,10 +66,16 @@ template <typename T, typename U>
 UTL_INLINE_CXX17 constexpr bool is_trivially_assignable_v = is_trivially_assignable<T, U>::value;
 #    endif // UTL_CXX14
 
-#    define UTL_TRAIT_SUPPORTED_is_nothrow_assignable 0
+#    define UTL_TRAIT_SUPPORTED_is_trivially_assignable 0
 
 UTL_NAMESPACE_END
 
 #  endif // ifdef UTL_BUILTIN_is_trivially_assignable
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
+
+#if UTL_CXX14
+#  define UTL_TRAIT_is_trivially_assignable(...) __UTL is_trivially_assignable_v<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_is_trivially_assignable(...) __UTL is_trivially_assignable<__VA_ARGS__>::value
+#endif
