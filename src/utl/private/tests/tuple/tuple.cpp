@@ -219,7 +219,7 @@ static_assert(utl::is_move_assignable<utl::tuple<move_only<0>, move_only<1>>>::v
 template <int J>
 struct defaultable {
     constexpr defaultable() noexcept = default;
-    template <int i UTL_REQUIRES_CXX11(i != J)>
+    template <int i UTL_CONSTRAINT_CXX11(i != J)>
     constexpr defaultable(defaultable<i>) noexcept {}
 };
 
