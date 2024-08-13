@@ -15,20 +15,20 @@ namespace details {
 namespace constructible {
 
 template <typename T>
-UTL_HIDE_FROM_ABI void implicit_conv(T) noexcept;
+__UTL_HIDE_FROM_ABI void implicit_conv(T) noexcept;
 
 template <typename T, typename THead, typename... TTail>
-UTL_HIDE_FROM_ABI auto implicit_test(float) noexcept
+__UTL_HIDE_FROM_ABI auto implicit_test(float) noexcept
     -> decltype((implicit_conv<T>({declval<THead>(), declval<TTail>()...}),
         is_constructible<T, THead, TTail...>{}));
 template <typename T, typename THead>
-UTL_HIDE_FROM_ABI auto implicit_test(int) noexcept
+__UTL_HIDE_FROM_ABI auto implicit_test(int) noexcept
     -> conjunction<is_convertible<THead, T>, is_constructible<T, THead>>;
 template <typename T>
-UTL_HIDE_FROM_ABI auto implicit_test(int) noexcept
+__UTL_HIDE_FROM_ABI auto implicit_test(int) noexcept
     -> decltype((implicit_conv<T>({}), is_default_constructible<T>{}));
 template <typename T, typename...>
-UTL_HIDE_FROM_ABI auto implicit_test(...) noexcept -> false_type;
+__UTL_HIDE_FROM_ABI auto implicit_test(...) noexcept -> false_type;
 
 template <typename TTarget, typename... TArgs>
 using is_implicit UTL_NODEBUG = decltype(implicit_test<TTarget, TArgs...>(0));
@@ -37,11 +37,11 @@ using is_implicit UTL_NODEBUG = decltype(implicit_test<TTarget, TArgs...>(0));
 } // namespace details
 
 template <typename TTarget, typename... TArgs>
-struct UTL_PUBLIC_TEMPLATE is_implicit_constructible :
+struct __UTL_PUBLIC_TEMPLATE is_implicit_constructible :
     details::constructible::is_implicit<TTarget, TArgs...> {};
 
 template <typename TTarget, typename... TArgs>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_implicit_constructible :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_implicit_constructible :
     conjunction<is_implicit_constructible<TTarget, TArgs...>,
         is_nothrow_constructible<TTarget, TArgs...>> {};
 
@@ -58,17 +58,16 @@ UTL_INLINE_CXX17 constexpr bool is_nothrow_implicit_constructible_v =
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_implicit_constructible(...) \
-      UTL_SCOPE is_implicit_constructible_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_implicit_constructible(...) __UTL is_implicit_constructible_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_implicit_constructible(...) \
-      UTL_SCOPE is_implicit_constructible<__VA_ARGS__>::value
+      __UTL is_implicit_constructible<__VA_ARGS__>::value
 #endif
 
 #if UTL_CXX14
 #  define UTL_TRAIT_is_nothrow_implicit_constructible(...) \
-      UTL_SCOPE is_nothrow_implicit_constructible_v<__VA_ARGS__>
+      __UTL is_nothrow_implicit_constructible_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_nothrow_implicit_constructible(...) \
-      UTL_SCOPE is_nothrow_implicit_constructible<__VA_ARGS__>::value
+      __UTL is_nothrow_implicit_constructible<__VA_ARGS__>::value
 #endif

@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include "utl/configuration/utl_compiler.h"
+#include "utl/configuration/utl_declspec.h"
+
 #include "utl/preprocessor/utl_apply_macro.h"
-#include "utl/preprocessor/utl_compiler.h"
 #include "utl/preprocessor/utl_concatenation.h"
-#include "utl/preprocessor/utl_declspec.h"
 #include "utl/preprocessor/utl_is_empty.h"
 #include "utl/preprocessor/utl_paste.h"
 
@@ -215,3 +216,6 @@
         __UTL_NONEMPTY_ATTRIBUTE(__UTL_FILTER_MSVC_EXT_ATTRIBUTES(ARGS))
 
 #define UTL_HAS_ATTRIBUTE(NAME) __UTL_HAS_ATTRIBUTE(__UTL_ATTRIBUTE_ATOMIZATION((NAME)))
+
+#define UTL_HAS_AGGREGATE_ATTRIBUTE(NAME) \
+    UTL_IS_EMPTY(UTL_CONCAT(__UTL_ATTRIBUTE_TYPE_AGGREGATE_, NAME))

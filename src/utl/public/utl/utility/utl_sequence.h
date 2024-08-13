@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #if UTL_CXX14 && UTL_USE_STD_sequence_utility
 
@@ -29,7 +29,7 @@ UTL_NAMESPACE_BEGIN
 using size_t = decltype(sizeof(0));
 
 template <typename T, T... Is>
-struct UTL_PUBLIC_TEMPLATE integer_sequence {};
+struct __UTL_PUBLIC_TEMPLATE integer_sequence {};
 
 namespace details {
 namespace sequence {

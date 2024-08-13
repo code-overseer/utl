@@ -25,16 +25,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_same)
+#  if __UTL_SHOULD_USE_BUILTIN(is_same)
 #    define UTL_BUILTIN_is_same(...) __is_same(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_same)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_same)
 
 #  ifdef UTL_BUILTIN_is_same
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T0, typename T1>
-struct UTL_PUBLIC_TEMPLATE is_same : bool_constant<UTL_BUILTIN_is_same(T0, T1)> {};
+struct __UTL_PUBLIC_TEMPLATE is_same : bool_constant<UTL_BUILTIN_is_same(T0, T1)> {};
 
 #    if UTL_CXX14
 template <typename T0, typename T1>
@@ -48,10 +48,10 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename, typename>
-struct UTL_PUBLIC_TEMPLATE is_same : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_same : false_type {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_same<T, T> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_same<T, T> : true_type {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -66,10 +66,8 @@ UTL_NAMESPACE_END
 
 #define UTL_TRAIT_SUPPORTED_is_same 1
 
-#ifdef UTL_BUILTIN_is_same
-#  define UTL_TRAIT_is_same(...) UTL_BUILTIN_is_same(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_same(...) UTL_SCOPE is_same_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_same(...) __UTL is_same_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_same(...) UTL_SCOPE is_same<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_same(...) __UTL is_same<__VA_ARGS__>::value
 #endif

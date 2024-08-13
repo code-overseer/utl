@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/string/utl_string_fwd.h"
 
+#include "utl/assert/utl_assert.h"
 #include "utl/exception.h"
 #include "utl/iterator/utl_contiguous_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator_base.h"
@@ -20,14 +21,14 @@
 #include "utl/string/utl_string_details.h"
 
 #define __UTL_ATTRIBUTE_STRING_INLINE_PURE \
-    (ALWAYS_INLINE)(PURE)(NODISCARD)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+    (ALWAYS_INLINE)(PURE)(NODISCARD)__UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_INLINE_PURE
-#define __UTL_ATTRIBUTE_STRING_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_STRING_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_PURE
 
 UTL_NAMESPACE_BEGIN
 template <typename CharType, typename Traits>
-class UTL_PUBLIC_TEMPLATE basic_string_view {
+class __UTL_PUBLIC_TEMPLATE basic_string_view {
 public:
     using value_type = CharType;
     using size_type = size_t;
@@ -40,11 +41,11 @@ public:
     static constexpr size_type npos = details::string::npos;
     class const_iterator;
     using iterator = const_iterator;
-    using const_reverse_iterator = UTL_SCOPE reverse_iterator<const_iterator>;
+    using const_reverse_iterator = __UTL reverse_iterator<const_iterator>;
     using reverse_iterator = const_reverse_iterator;
 
-    class UTL_ABI_PUBLIC const_iterator :
-        UTL_SCOPE contiguous_iterator_base<const_iterator, value_type const> {
+    class __UTL_ABI_PUBLIC const_iterator :
+        __UTL contiguous_iterator_base<const_iterator, value_type const> {
         using base_type = contiguous_iterator_base<const_iterator, value_type const>;
 
     public:
@@ -54,43 +55,44 @@ public:
         using typename base_type::reference;
         using typename base_type::value_type;
 
-        UTL_HIDE_FROM_ABI constexpr const_iterator() noexcept = default;
-        UTL_HIDE_FROM_ABI constexpr const_iterator(const_iterator const& other) noexcept = default;
-        UTL_HIDE_FROM_ABI constexpr const_iterator(const_iterator&& other) noexcept = default;
-        UTL_HIDE_FROM_ABI constexpr const_iterator& operator=(
+        __UTL_HIDE_FROM_ABI constexpr const_iterator() noexcept = default;
+        __UTL_HIDE_FROM_ABI constexpr const_iterator(
             const_iterator const& other) noexcept = default;
-        UTL_HIDE_FROM_ABI constexpr const_iterator& operator=(
+        __UTL_HIDE_FROM_ABI constexpr const_iterator(const_iterator&& other) noexcept = default;
+        __UTL_HIDE_FROM_ABI constexpr const_iterator& operator=(
+            const_iterator const& other) noexcept = default;
+        __UTL_HIDE_FROM_ABI constexpr const_iterator& operator=(
             const_iterator&& other) noexcept = default;
         using base_type::operator*;
         using base_type::operator->;
 
     private:
         friend basic_string_view;
-        UTL_HIDE_FROM_ABI constexpr const_iterator(pointer data) noexcept : base_type(data) {}
+        __UTL_HIDE_FROM_ABI constexpr const_iterator(pointer data) noexcept : base_type(data) {}
     };
 
     basic_string_view(decltype(nullptr)) = delete;
-    UTL_HIDE_FROM_ABI constexpr basic_string_view() noexcept : data_(), size_() {}
-    UTL_HIDE_FROM_ABI constexpr basic_string_view(basic_string_view const&) noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr basic_string_view(const_pointer data, size_type size) noexcept
+    __UTL_HIDE_FROM_ABI constexpr basic_string_view() noexcept : data_(), size_() {}
+    __UTL_HIDE_FROM_ABI constexpr basic_string_view(basic_string_view const&) noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr basic_string_view(const_pointer data, size_type size) noexcept
         : data_(data)
         , size_(size) {}
-    UTL_HIDE_FROM_ABI constexpr basic_string_view(const_pointer data) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr basic_string_view(const_pointer data) noexcept(
         noexcept(traits_type::length(data)))
         : data_(data)
         , size_(traits_type::length(data)) {}
 
     template <UTL_CONCEPT_CXX20(contiguous_iterator) It,
-        UTL_CONCEPT_CXX20(sized_sentinel_for<It>) E UTL_REQUIRES_CXX11(
+        UTL_CONCEPT_CXX20(sized_sentinel_for<It>) E UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_contiguous_iterator(It) && UTL_TRAIT_is_sized_sentinel_for(E, It))>
-    UTL_HIDE_FROM_ABI constexpr basic_string_view(It begin, E end) noexcept(
+    __UTL_HIDE_FROM_ABI constexpr basic_string_view(It begin, E end) noexcept(
         UTL_TRAIT_is_nothrow_dereferenceable(It) && noexcept(end - begin))
-        : data_(UTL_SCOPE to_address(begin))
+        : data_(__UTL to_address(begin))
         , size_(end - begin) {}
 
     // TODO: ranges ctor
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_string_view& operator=(
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_string_view& operator=(
         basic_string_view const&) noexcept = default;
 
     UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr const_pointer data() const noexcept UTL_LIFETIMEBOUND {
@@ -100,7 +102,7 @@ public:
     UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr size_type size() const noexcept { return size_; }
     UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr size_type length() const noexcept { return size_; }
 
-    UTL_ATTRIBUTES(CONST, NODISCARD, HIDE_FROM_ABI) constexpr size_type max_size() const noexcept {
+    UTL_ATTRIBUTES(CONST, NODISCARD, _HIDE_FROM_ABI) constexpr size_type max_size() const noexcept {
         return npos;
     }
 
@@ -134,8 +136,7 @@ public:
     UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr const_reference back() const noexcept UTL_LIFETIMEBOUND {
         return data_[size_ - 1];
     }
-    UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr const_reference operator[](
-        size_type idx) const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTE(STRING_INLINE_PURE) constexpr const_reference operator[](size_type idx) const noexcept UTL_LIFETIMEBOUND {
         return data_[idx];
     }
 
@@ -147,34 +148,34 @@ public:
         return *this[idx];
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void remove_prefix(size_type n) noexcept {
-        n = UTL_SCOPE numeric::min(n, size());
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void remove_prefix(size_type n) noexcept {
+        n = __UTL numeric::min(n, size());
         data_ += n;
         size_ -= n;
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void remove_suffix(size_type n) noexcept {
-        n = UTL_SCOPE numeric::min(n, size());
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void remove_suffix(size_type n) noexcept {
+        n = __UTL numeric::min(n, size());
         size_ -= n;
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(basic_string_view& other) noexcept {
-        other = UTL_SCOPE exchange(*this, other);
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(basic_string_view& other) noexcept {
+        other = __UTL exchange(*this, other);
     }
 
-    UTL_HIDE_FROM_ABI friend UTL_CONSTEXPR_CXX14 void swap(
+    __UTL_HIDE_FROM_ABI friend UTL_CONSTEXPR_CXX14 void swap(
         basic_string_view& l, basic_string_view& r) noexcept {
         l.swap(r);
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 size_t copy(
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 size_t copy(
         pointer dest, size_type count, size_type pos = 0) const UTL_THROWS {
         UTL_ASSERT(dest != nullptr);
         UTL_THROW_IF(pos > size(),
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_string_view::copy` operation failed, "
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
                 pos, size()));
-        auto const copied = UTL_SCOPE numeric::min(count, size() - pos);
+        auto const copied = __UTL numeric::min(count, size() - pos);
         traits_type::copy(dest, data() + pos, copied);
         return copied;
     }
@@ -183,7 +184,7 @@ public:
         size_type pos = 0, size_type count = npos) const UTL_THROWS {
         return pos >= size()
             ? substr_throw(UTL_SOURCE_LOCATION(), pos, size())
-            : basic_string_view(data() + pos, UTL_SCOPE numeric::min(count, size() - pos));
+            : basic_string_view(data() + pos, __UTL numeric::min(count, size() - pos));
     }
 
     UTL_ATTRIBUTE(STRING_PURE) constexpr int compare(basic_string_view other) const noexcept {
@@ -375,8 +376,8 @@ public:
     }
 
 private:
-    UTL_ATTRIBUTES(NORETURN, NOINLINE, HIDE_FROM_ABI) static basic_string_view substr_throw(
-        UTL_SCOPE source_location src, size_t pos, size_t size) UTL_THROWS {
+    UTL_ATTRIBUTES(NORETURN, NOINLINE, _HIDE_FROM_ABI) static basic_string_view substr_throw(
+        __UTL source_location src, size_t pos, size_t size) UTL_THROWS {
         exceptions::message_format format = {"[UTL] `basic_string_view::substr` operation failed, "
                                              "Reason=[index out of range], pos=[%zu], size=[%zu]",
             src};

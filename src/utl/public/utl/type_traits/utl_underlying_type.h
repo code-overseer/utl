@@ -27,16 +27,16 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(underlying_type)
+#  if __UTL_SHOULD_USE_BUILTIN(underlying_type)
 #    define UTL_BUILTIN_underlying_type(...) __underlying_type(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(underlying_type)
+#  endif // __UTL_SHOULD_USE_BUILTIN(underlying_type)
 
 #  ifdef UTL_BUILTIN_underlying_type
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE underlying_type {
+struct __UTL_PUBLIC_TEMPLATE underlying_type {
     using type UTL_NODEBUG = UTL_BUILTIN_underlying_type(T);
 };
 
@@ -54,7 +54,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE underlying_type : undefined_trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE underlying_type : undefined_trait<T> {};
 
 template <typename T>
 using underlying_type_t = typename underlying_type<T>::type;

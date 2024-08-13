@@ -2,33 +2,33 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_constants.h"
 
 UTL_NAMESPACE_BEGIN
 
-struct UTL_ABI_PUBLIC input_iterator_tag {};
-struct UTL_ABI_PUBLIC output_iterator_tag {};
-struct UTL_ABI_PUBLIC forward_iterator_tag : input_iterator_tag {};
-struct UTL_ABI_PUBLIC bidirectional_iterator_tag : forward_iterator_tag {};
-struct UTL_ABI_PUBLIC random_access_iterator_tag : bidirectional_iterator_tag {};
-struct UTL_ABI_PUBLIC contiguous_iterator_tag : random_access_iterator_tag {};
+struct __UTL_ABI_PUBLIC input_iterator_tag {};
+struct __UTL_ABI_PUBLIC output_iterator_tag {};
+struct __UTL_ABI_PUBLIC forward_iterator_tag : input_iterator_tag {};
+struct __UTL_ABI_PUBLIC bidirectional_iterator_tag : forward_iterator_tag {};
+struct __UTL_ABI_PUBLIC random_access_iterator_tag : bidirectional_iterator_tag {};
+struct __UTL_ABI_PUBLIC contiguous_iterator_tag : random_access_iterator_tag {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_iterator_tag : UTL_SCOPE false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_iterator_tag : __UTL false_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_iterator_tag<input_iterator_tag> : UTL_SCOPE true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_iterator_tag<input_iterator_tag> : __UTL true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_iterator_tag<output_iterator_tag> : UTL_SCOPE true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_iterator_tag<output_iterator_tag> : __UTL true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_iterator_tag<forward_iterator_tag> : UTL_SCOPE true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_iterator_tag<forward_iterator_tag> : __UTL true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_iterator_tag<bidirectional_iterator_tag> : UTL_SCOPE true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_iterator_tag<bidirectional_iterator_tag> : __UTL true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_iterator_tag<random_access_iterator_tag> : UTL_SCOPE true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_iterator_tag<random_access_iterator_tag> : __UTL true_type {};
 template <>
-struct UTL_PUBLIC_TEMPLATE is_iterator_tag<contiguous_iterator_tag> : UTL_SCOPE true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_iterator_tag<contiguous_iterator_tag> : __UTL true_type {};
 
 #if UTL_CXX14
 template <typename T>
@@ -55,7 +55,7 @@ concept iterator_tag = is_iterator_tag_v<T>;
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_iterator_tag(...) UTL_SCOPE is_iterator_tag_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_iterator_tag(...) __UTL is_iterator_tag_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_iterator_tag(...) UTL_SCOPE is_iterator_tag<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_iterator_tag(...) __UTL is_iterator_tag<__VA_ARGS__>::value
 #endif

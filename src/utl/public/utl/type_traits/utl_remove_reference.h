@@ -29,16 +29,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(remove_reference)
+#  if __UTL_SHOULD_USE_BUILTIN(remove_reference)
 #    define UTL_BUILTIN_remove_reference(...) __remove_reference(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(remove_reference)
+#  endif // __UTL_SHOULD_USE_BUILTIN(remove_reference)
 
 #  ifdef UTL_BUILTIN_remove_reference
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_reference {
+struct __UTL_PUBLIC_TEMPLATE remove_reference {
     using type UTL_NODEBUG = UTL_BUILTIN_remove_reference(T);
 };
 
@@ -52,15 +52,15 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_reference {
+struct __UTL_PUBLIC_TEMPLATE remove_reference {
     using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_reference<T&> {
+struct __UTL_PUBLIC_TEMPLATE remove_reference<T&> {
     using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_reference<T&&> {
+struct __UTL_PUBLIC_TEMPLATE remove_reference<T&&> {
     using type UTL_NODEBUG = T;
 };
 

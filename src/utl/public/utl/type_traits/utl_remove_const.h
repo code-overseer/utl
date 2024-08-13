@@ -29,16 +29,16 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(remove_const)
+#  if __UTL_SHOULD_USE_BUILTIN(remove_const)
 #    define UTL_BUILTIN_add_const(...) __remove_const(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(add_const)
+#  endif // __UTL_SHOULD_USE_BUILTIN(add_const)
 
 #  ifdef UTL_BUILTIN_remove_const
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_const {
+struct __UTL_PUBLIC_TEMPLATE remove_const {
     using type UTL_NODEBUG = UTL_BUILTIN_remove_const(T);
 };
 
@@ -52,11 +52,11 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_const {
+struct __UTL_PUBLIC_TEMPLATE remove_const {
     using type UTL_NODEBUG = T;
 };
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_const<T const> {
+struct __UTL_PUBLIC_TEMPLATE remove_const<T const> {
     using type UTL_NODEBUG = T;
 };
 

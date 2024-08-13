@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_constants.h"
 
@@ -16,7 +16,7 @@ concept sentinel_for =
     semiregular<S> && input_or_output_iterator<I> && details::equality_comparable::weak<S, I>;
 
 template <typename S, typename I>
-struct UTL_PUBLIC_TEMPLATE is_sentinel_for : bool_constant<sentinel_for<S, I>> {};
+struct __UTL_PUBLIC_TEMPLATE is_sentinel_for : bool_constant<sentinel_for<S, I>> {};
 
 template <typename S, typename I>
 inline constexpr bool is_sentinel_for_v = sentinel_for<S, I>;
@@ -34,7 +34,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename S, typename I>
-struct UTL_PUBLIC_TEMPLATE is_sentinel_for :
+struct __UTL_PUBLIC_TEMPLATE is_sentinel_for :
     conjunction<is_copyable<S>, is_default_constructible<S>, is_input_or_output_iterator<I>,
         is_equality_comparable_with<S, I>, is_inequality_comparable_with<S, I>,
         is_equality_comparable_with<I, S>, is_inequality_comparable_with<I, S>> {};

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_incrementable.h"
 #include "utl/iterator/utl_input_iterator.h"
@@ -16,12 +16,12 @@
 
 UTL_NAMESPACE_BEGIN
 template <typename T>
-concept forward_iterator = UTL_SCOPE input_iterator<T> &&
-    UTL_SCOPE details::iterator_concept::implements<T, UTL_SCOPE forward_iterator_tag> &&
-    UTL_SCOPE incrementable<T> && UTL_SCOPE sentinel_for<T, T>;
+concept forward_iterator = __UTL input_iterator<T> &&
+    __UTL details::iterator_concept::implements<T, __UTL forward_iterator_tag> &&
+    __UTL incrementable<T> && __UTL sentinel_for<T, T>;
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_forward_iterator : UTL_SCOPE bool_constant<forward_iterator<T>> {};
+struct __UTL_PUBLIC_TEMPLATE is_forward_iterator : __UTL bool_constant<forward_iterator<T>> {};
 
 template <typename T>
 inline constexpr bool is_forward_iterator_v = forward_iterator<T>;
@@ -35,10 +35,10 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_forward_iterator :
-    UTL_SCOPE conjunction<UTL_SCOPE is_input_iterator<T>,
-        UTL_SCOPE details::iterator_concept::implements<UTL_SCOPE forward_iterator_tag, T>,
-        UTL_SCOPE is_incrementable<T>, UTL_SCOPE is_sentinel_for<T, T>> {};
+struct __UTL_PUBLIC_TEMPLATE is_forward_iterator :
+    __UTL conjunction<__UTL is_input_iterator<T>,
+        __UTL details::iterator_concept::implements<__UTL forward_iterator_tag, T>,
+        __UTL is_incrementable<T>, __UTL is_sentinel_for<T, T>> {};
 
 #  if UTL_CXX14
 template <typename T>

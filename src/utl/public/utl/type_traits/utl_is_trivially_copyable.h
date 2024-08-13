@@ -31,16 +31,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_trivially_copyable)
+#  if __UTL_SHOULD_USE_BUILTIN(is_trivially_copyable)
 #    define UTL_BUILTIN_is_trivially_copyable(...) __is_trivially_copyable(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_trivially_copyable)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_trivially_copyable)
 
 #  ifdef UTL_BUILTIN_is_trivially_copyable
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_trivially_copyable :
+struct __UTL_PUBLIC_TEMPLATE is_trivially_copyable :
     bool_constant<UTL_BUILTIN_is_trivially_copyable(T)> {};
 
 #    if UTL_CXX14
@@ -59,7 +59,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_trivially_copyable : undefined_trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_trivially_copyable : undefined_trait<T> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -74,10 +74,8 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_trivially_copyable
-#  define UTL_TRAIT_is_trivially_copyable(...) UTL_BUILTIN_is_trivially_copyable(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_trivially_copyable(...) UTL_SCOPE is_trivially_copyable_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_trivially_copyable(...) __UTL is_trivially_copyable_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_trivially_copyable(...) UTL_SCOPE is_trivially_copyable<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_trivially_copyable(...) __UTL is_trivially_copyable<__VA_ARGS__>::value
 #endif

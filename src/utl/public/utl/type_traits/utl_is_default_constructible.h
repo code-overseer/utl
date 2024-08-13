@@ -36,7 +36,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_default_constructible :
+struct __UTL_PUBLIC_TEMPLATE is_default_constructible :
     bool_constant<UTL_BUILTIN_is_constructible(T)> {};
 
 #    if UTL_CXX14
@@ -53,7 +53,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_default_constructible : is_constructible<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_default_constructible : is_constructible<T> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -68,11 +68,8 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_default_constructible
-#  define UTL_TRAIT_is_default_constructible(...) UTL_BUILTIN_is_default_constructible(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_default_constructible(...) UTL_SCOPE is_default_constructible_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_default_constructible(...) __UTL is_default_constructible_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_default_constructible(...) \
-      UTL_SCOPE is_default_constructible<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_default_constructible(...) __UTL is_default_constructible<__VA_ARGS__>::value
 #endif

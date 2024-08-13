@@ -27,16 +27,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_class)
+#  if __UTL_SHOULD_USE_BUILTIN(is_class)
 #    define UTL_BUILTIN_is_class(...) __is_class(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_class)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_class)
 
 #  ifdef UTL_BUILTIN_is_class
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_class : bool_constant<UTL_BUILTIN_is_class(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_class : bool_constant<UTL_BUILTIN_is_class(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -54,7 +54,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_class : undefined_trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_class : undefined_trait<T> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -67,10 +67,8 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_class
-#  define UTL_TRAIT_is_class(...) UTL_BUILTIN_is_class(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_class(...) UTL_SCOPE is_class_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_class(...) __UTL is_class_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_class(...) UTL_SCOPE is_class<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_class(...) __UTL is_class<__VA_ARGS__>::value
 #endif

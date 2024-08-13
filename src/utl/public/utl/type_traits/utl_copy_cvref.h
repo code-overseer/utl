@@ -2,20 +2,20 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_namespace.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_copy_cv.h"
 
 UTL_NAMESPACE_BEGIN
 
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE copy_cvref : copy_cv<From, To> {};
+struct __UTL_PUBLIC_TEMPLATE copy_cvref : copy_cv<From, To> {};
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE copy_cvref<From&, To> {
+struct __UTL_PUBLIC_TEMPLATE copy_cvref<From&, To> {
     using type UTL_NODEBUG = typename copy_cv<From, To>::type&;
 };
 template <typename From, typename To>
-struct UTL_PUBLIC_TEMPLATE copy_cvref<From&&, To> {
+struct __UTL_PUBLIC_TEMPLATE copy_cvref<From&&, To> {
     using type UTL_NODEBUG = typename copy_cv<From, To>::type&&;
 };
 

@@ -27,16 +27,17 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_standard_layout)
+#  if __UTL_SHOULD_USE_BUILTIN(is_standard_layout)
 #    define UTL_BUILTIN_is_standard_layout(...) __is_standard_layout(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_standard_layout)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_standard_layout)
 
 #  ifdef UTL_BUILTIN_is_standard_layout
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_standard_layout : bool_constant<UTL_BUILTIN_is_standard_layout(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_standard_layout :
+    bool_constant<UTL_BUILTIN_is_standard_layout(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -54,7 +55,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_standard_layout : undefined_trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_standard_layout : undefined_trait<T> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -67,10 +68,8 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_standard_layout
-#  define UTL_TRAIT_is_standard_layout(...) UTL_BUILTIN_is_standard_layout(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_standard_layout(...) UTL_SCOPE is_standard_layout_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_standard_layout(...) __UTL is_standard_layout_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_standard_layout(...) UTL_SCOPE is_standard_layout<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_standard_layout(...) __UTL is_standard_layout<__VA_ARGS__>::value
 #endif

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/memory/utl_is_reference_countable.h"
 #include "utl/utility/utl_customization_point.h"
@@ -40,36 +40,36 @@ namespace details {
 template <typename T>
 void destroy(T*) noexcept = delete;
 
-struct UTL_ABI_PUBLIC destroy_cpo_t {
+struct __UTL_ABI_PUBLIC destroy_cpo_t {
 private:
     template <typename T>
-    UTL_HIDE_FROM_ABI static auto has_custom_destroy_impl(int) noexcept
+    __UTL_HIDE_FROM_ABI static auto has_custom_destroy_impl(int) noexcept
         -> always_true_type<decltype(destroy((T*)0))>;
     template <typename T>
-    UTL_HIDE_FROM_ABI static auto has_custom_destroy_impl(float) noexcept -> false_type;
+    __UTL_HIDE_FROM_ABI static auto has_custom_destroy_impl(float) noexcept -> false_type;
 
     template <typename T>
     using has_custom_destroy UTL_NODEBUG = decltype(has_custom_destroy_impl<T>(0));
 
 public:
-    template <UTL_CONCEPT_CXX20(reference_countable) T UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(reference_countable) T UTL_CONSTRAINT_CXX11(
         is_reference_countable<T>::value && has_custom_destroy<T>::value)>
-    UTL_REQUIRES_CXX20(requires(T* p) {
+    UTL_CONSTRAINT_CXX20(requires(T* p) {
         destroy(p); })
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void operator()(T* ptr) const noexcept {
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void operator()(T* ptr) const noexcept {
         destroy(ptr);
     }
 
-    template <UTL_CONCEPT_CXX20(reference_countable) T UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(reference_countable) T UTL_CONSTRAINT_CXX11(
         is_reference_countable<T>::value && !has_custom_destroy<T>::value)>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void operator()(T* ptr) const noexcept {
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 void operator()(T* ptr) const noexcept {
         delete ptr;
     }
 };
 } // namespace details
 
 inline namespace cpo {
-UTL_DEFINE_CUSTOMIZATION_POINT(UTL_SCOPE reference_counting::details::destroy_cpo_t, destroy);
+UTL_DEFINE_CUSTOMIZATION_POINT(__UTL reference_counting::details::destroy_cpo_t, destroy);
 }
 
 } // namespace reference_counting

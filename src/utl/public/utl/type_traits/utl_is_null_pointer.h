@@ -25,16 +25,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_null_pointer)
+#  if __UTL_SHOULD_USE_BUILTIN(is_null_pointer)
 #    define UTL_BUILTIN_is_null_pointer(...) __is_null_pointer(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_null_pointer)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_null_pointer)
 
 #  ifdef UTL_BUILTIN_is_null_pointer
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_null_pointer : bool_constant<UTL_BUILTIN_is_null_pointer(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_null_pointer : bool_constant<UTL_BUILTIN_is_null_pointer(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -48,19 +48,19 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_null_pointer : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_null_pointer : false_type {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_null_pointer<decltype(nullptr)> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_null_pointer<decltype(nullptr)> : true_type {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_null_pointer<decltype(nullptr) const> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_null_pointer<decltype(nullptr) const> : true_type {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_null_pointer<decltype(nullptr) volatile> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_null_pointer<decltype(nullptr) volatile> : true_type {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_null_pointer<decltype(nullptr) const volatile> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_null_pointer<decltype(nullptr) const volatile> : true_type {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -75,10 +75,8 @@ UTL_NAMESPACE_END
 
 #define UTL_TRAIT_SUPPORTED_is_null_pointer 1
 
-#ifdef UTL_BUILTIN_is_null_pointer
-#  define UTL_TRAIT_is_null_pointer(...) UTL_BUILTIN_is_null_pointer(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_null_pointer(...) UTL_SCOPE is_null_pointer_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_null_pointer(...) __UTL is_null_pointer_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_null_pointer(...) UTL_SCOPE is_null_pointer<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_null_pointer(...) __UTL is_null_pointer<__VA_ARGS__>::value
 #endif

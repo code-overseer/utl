@@ -10,10 +10,10 @@
 
 UTL_NAMESPACE_BEGIN
 
-#define __UTL_ATTRIBUTE_COMPARE_API (NODISCARD)(CONST)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_COMPARE_API (NODISCARD)(CONST)(ALWAYS_INLINE)__UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_COMPARE_API
 
-class UTL_ABI_PUBLIC strong_ordering :
+class __UTL_ABI_PUBLIC strong_ordering :
     details::compare::less_value<strong_ordering>,
     details::compare::equivalent_value<strong_ordering>,
     details::compare::greater_value<strong_ordering>,
@@ -32,33 +32,33 @@ public:
     using details::compare::greater_value<strong_ordering>::greater;
     using details::compare::equal_value<strong_ordering>::equal;
 
-    UTL_HIDE_FROM_ABI constexpr operator partial_ordering() const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr operator partial_ordering() const noexcept {
         return partial_ordering(order_t(value));
     }
-    UTL_HIDE_FROM_ABI constexpr operator weak_ordering() const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr operator weak_ordering() const noexcept {
         return weak_ordering(order_t(value));
     }
 #if UTL_CXX20
     template <same_as<std::strong_ordering> T>
-    UTL_HIDE_FROM_ABI constexpr strong_ordering(T p) noexcept
+    __UTL_HIDE_FROM_ABI constexpr strong_ordering(T p) noexcept
         : value(p == T::less           ? less
                   : p == T::equivalent ? equivalent
                   : p == T::equal      ? equal
                                        : greater) {}
 
     template <same_as<std::strong_ordering> T>
-    UTL_HIDE_FROM_ABI constexpr operator T() noexcept {
+    __UTL_HIDE_FROM_ABI constexpr operator T() noexcept {
         return *this == less      ? T::less
             : *this == equivalent ? T::equivalent
             : *this == equal      ? T::equal
                                   : T::greater;
     }
 #endif
-    UTL_HIDE_FROM_ABI constexpr strong_ordering(strong_ordering const&) noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr strong_ordering(strong_ordering&&) noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr strong_ordering& operator=(
+    __UTL_HIDE_FROM_ABI constexpr strong_ordering(strong_ordering const&) noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr strong_ordering(strong_ordering&&) noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr strong_ordering& operator=(
         strong_ordering const&) noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr strong_ordering& operator=(strong_ordering&&) noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr strong_ordering& operator=(strong_ordering&&) noexcept = default;
 
     UTL_ATTRIBUTE(COMPARE_API) friend constexpr bool operator==(
         strong_ordering l, strong_ordering r) noexcept {
@@ -98,7 +98,7 @@ public:
 #endif
 
 private:
-    UTL_HIDE_FROM_ABI constexpr explicit strong_ordering(order_t value) noexcept
+    __UTL_HIDE_FROM_ABI constexpr explicit strong_ordering(order_t value) noexcept
         : value(value_t(value)) {}
 
     value_t value;

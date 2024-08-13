@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #if UTL_USE_STD_ranges_swap && UTL_CXX20
 
@@ -43,33 +43,33 @@ void swap(T&, T&) = delete;
 
 template <typename L, typename R>
 concept unqualified_swappable =
-    requires(L&& l, R&& r) { swap(UTL_SCOPE forward<L>(l), UTL_SCOPE forward<R>(r)); };
+    requires(L&& l, R&& r) { swap(__UTL forward<L>(l), __UTL forward<R>(r)); };
 
 template <typename L, typename R>
 concept nothrow_unqualified_swappable = unqualified_swappable<L, R> && requires(L&& l, R&& r) {
-    { swap(UTL_SCOPE forward<L>(l), UTL_SCOPE forward<R>(r)) } noexcept;
+    { swap(__UTL forward<L>(l), __UTL forward<R>(r)) } noexcept;
 };
 
 template <typename L, typename R, size_t N>
 concept unqualified_swappable_array =
-    (!unqualified_swappable<L (&)[N], R (&)[N]> && UTL_SCOPE extent_v<L> == UTL_SCOPE extent_v<R> &&
+    (!unqualified_swappable<L (&)[N], R (&)[N]> && __UTL extent_v<L> == __UTL extent_v<R> &&
         requires(L (&l)[N], R (&r)[N], function_t const& func) { func(*l, *r); });
 
 template <typename T>
-concept exchangable = !unqualified_swappable<T&, T&> && UTL_SCOPE move_constructible<T> &&
-    UTL_SCOPE assignable_from<T&, T>;
+concept exchangable =
+    !unqualified_swappable<T&, T&> && __UTL move_constructible<T> && __UTL assignable_from<T&, T>;
 
 struct function_t {
     template <typename L, typename R>
     requires unqualified_swappable<L, R>
-    UTL_ATTRIBUTES(ALWAYS_INLINE, HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 void operator()(L&& l, R&& r) const
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 void operator()(L&& l, R&& r) const
         noexcept(nothrow_unqualified_swappable<L, R>) {
         swap(l, r);
     }
 
     template <typename L, typename R, size_t N>
     requires unqualified_swappable_array<L, R, N>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void operator()(L (&l)[N], R (&r)[N]) const
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void operator()(L (&l)[N], R (&r)[N]) const
         noexcept(noexcept((*this)(*l, *r))) {
         for (decltype(N) i = 0; i < N; ++i) {
             (*this)(l[i], r[i]);
@@ -77,31 +77,31 @@ struct function_t {
     }
 
     template <exchangable T>
-    UTL_ATTRIBUTES(ALWAYS_INLINE, HIDE_FROM_ABI)
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI)
     UTL_CONSTEXPR_CXX14 void operator()(T& l, T& r) const noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_move_assignable(T)) {
-        r = UTL_SCOPE exchange(l, UTL_SCOPE move(r));
+        r = __UTL exchange(l, __UTL move(r));
     }
 };
 } // namespace swap
 } // namespace details
 
 inline namespace cpo {
-UTL_DEFINE_CUSTOMIZATION_POINT(UTL_SCOPE ranges::details::swap::function_t, swap);
+UTL_DEFINE_CUSTOMIZATION_POINT(__UTL ranges::details::swap::function_t, swap);
 } // namespace cpo
 
 namespace details {
 namespace swap {
 template <typename L, typename R>
 concept invocable = requires(L&& l, R&& r) {
-    UTL_SCOPE ranges::swap(UTL_SCOPE forward<L>(l), UTL_SCOPE forward<R>(r));
-    UTL_SCOPE ranges::swap(UTL_SCOPE forward<R>(r), UTL_SCOPE forward<L>(l));
+    __UTL ranges::swap(__UTL forward<L>(l), __UTL forward<R>(r));
+    __UTL ranges::swap(__UTL forward<R>(r), __UTL forward<L>(l));
 };
 
 template <typename L, typename R>
 concept nothrow_invocable = invocable<L, R> && requires(L&& l, R&& r) {
-    { UTL_SCOPE ranges::swap(UTL_SCOPE forward<L>(l), UTL_SCOPE forward<R>(r)) } noexcept;
-    { UTL_SCOPE ranges::swap(UTL_SCOPE forward<R>(r), UTL_SCOPE forward<L>(l)) } noexcept;
+    { __UTL ranges::swap(__UTL forward<L>(l), __UTL forward<R>(r)) } noexcept;
+    { __UTL ranges::swap(__UTL forward<R>(r), __UTL forward<L>(l)) } noexcept;
 };
 } // namespace swap
 } // namespace details
@@ -131,25 +131,24 @@ template <typename T>
 void swap(T&, T&) = delete;
 
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto unqualified_swappable_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto unqualified_swappable_impl(float) noexcept -> __UTL false_type;
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto unqualified_swappable_impl(int) noexcept
-    -> UTL_SCOPE always_true_type<decltype(swap(UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>()))>;
+__UTL_HIDE_FROM_ABI auto unqualified_swappable_impl(int) noexcept
+    -> __UTL always_true_type<decltype(swap(__UTL declval<L>(), __UTL declval<R>()))>;
 
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto nothrow_unqualified_swappable_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto nothrow_unqualified_swappable_impl(float) noexcept -> __UTL false_type;
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto nothrow_unqualified_swappable_impl(int) noexcept
-    -> UTL_SCOPE bool_constant<noexcept(swap(UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>()))>;
+__UTL_HIDE_FROM_ABI auto nothrow_unqualified_swappable_impl(int) noexcept
+    -> __UTL bool_constant<noexcept(swap(__UTL declval<L>(), __UTL declval<R>()))>;
 
 template <typename L, typename R, size_t N>
-UTL_HIDE_FROM_ABI auto unqualified_swappable_array_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto unqualified_swappable_array_impl(float) noexcept -> __UTL false_type;
 
 template <typename L, typename R, size_t N, typename F = function_t const&>
-UTL_HIDE_FROM_ABI auto unqualified_swappable_array_impl(int) noexcept -> UTL_SCOPE
-    conjunction<UTL_SCOPE bool_constant<(UTL_SCOPE extent_v<L> == UTL_SCOPE extent_v<R>)>,
-        UTL_SCOPE always_true_type<decltype(UTL_SCOPE declval<F>()(
-            UTL_SCOPE declval<L&>(), UTL_SCOPE declval<R&>()))>>;
+__UTL_HIDE_FROM_ABI auto unqualified_swappable_array_impl(int) noexcept -> __UTL conjunction<
+    __UTL bool_constant<(__UTL extent_v<L> == __UTL extent_v<R>)>,
+    __UTL always_true_type<decltype(__UTL declval<F>()(__UTL declval<L&>(), __UTL declval<R&>()))>>;
 
 template <typename L, typename R>
 using unqualified_swappable = decltype(unqualified_swappable_impl<L, R>(0));
@@ -166,15 +165,15 @@ private:
     } first = {};
 
     template <typename L, typename R>
-    UTL_ATTRIBUTES(ALWAYS_INLINE, HIDE_FROM_ABI)
-    UTL_CONSTEXPR_CXX14 UTL_SCOPE enable_if_t<unqualified_swappable<L, R>::value>
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI)
+    UTL_CONSTEXPR_CXX14 __UTL enable_if_t<unqualified_swappable<L, R>::value>
     dispatch(L&& l, R&& r, first_t) const noexcept(nothrow_unqualified_swappable<L, R>::value) {
-        swap(UTL_SCOPE forward<L>(l), UTL_SCOPE forward<R>(r));
+        swap(__UTL forward<L>(l), __UTL forward<R>(r));
     }
 
     template <typename L, typename R, size_t N>
-    UTL_ATTRIBUTES(ALWAYS_INLINE, HIDE_FROM_ABI)
-    UTL_CONSTEXPR_CXX14 UTL_SCOPE enable_if_t<unqualified_swappable_array<L, R, N>::value>
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI)
+    UTL_CONSTEXPR_CXX14 __UTL enable_if_t<unqualified_swappable_array<L, R, N>::value>
     dispatch(L (&l)[N], R (&r)[N], second_t) const noexcept(noexcept((*this)(*l, *r))) {
         for (decltype(N) i = 0; i < N; ++i) {
             (*this)(l[i], r[i]);
@@ -182,28 +181,27 @@ private:
     }
 
     template <typename T>
-    UTL_ATTRIBUTES(ALWAYS_INLINE, HIDE_FROM_ABI)
-    UTL_CONSTEXPR_CXX14 UTL_SCOPE
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI)
+    UTL_CONSTEXPR_CXX14 __UTL
         enable_if_t<UTL_TRAIT_is_move_constructible(T) && UTL_TRAIT_is_move_assignable(T)>
         dispatch(T& l, T& r, third_t) const noexcept(
             UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_move_assignable(T)) {
-        r = UTL_SCOPE exchange(l, UTL_SCOPE move(r));
+        r = __UTL exchange(l, __UTL move(r));
     }
 
 public:
     template <typename L, typename R>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 auto operator()(L&& l, R&& r) const noexcept(
-        noexcept(this->dispatch(UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>(), function_t::first)))
-        -> decltype(this->dispatch(
-            UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>(), function_t::first)) {
-        this->dispatch(UTL_SCOPE forward<L>(l), UTL_SCOPE forward<R>(r), function_t::first);
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 auto operator()(L&& l, R&& r) const noexcept(
+        noexcept(this->dispatch(__UTL declval<L>(), __UTL declval<R>(), function_t::first)))
+        -> decltype(this->dispatch(__UTL declval<L>(), __UTL declval<R>(), function_t::first)) {
+        this->dispatch(__UTL forward<L>(l), __UTL forward<R>(r), function_t::first);
     }
 };
 } // namespace swap
 } // namespace details
 
 inline namespace cpo {
-UTL_DEFINE_CUSTOMIZATION_POINT(UTL_SCOPE ranges::details::swap::function_t, swap);
+UTL_DEFINE_CUSTOMIZATION_POINT(__UTL ranges::details::swap::function_t, swap);
 } // namespace cpo
 } // namespace ranges
 

@@ -27,16 +27,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_final)
+#  if __UTL_SHOULD_USE_BUILTIN(is_final)
 #    define UTL_BUILTIN_is_final(...) __is_final(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_final)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_final)
 
 #  ifdef UTL_BUILTIN_is_final
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_final : bool_constant<UTL_BUILTIN_is_final(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_final : bool_constant<UTL_BUILTIN_is_final(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -54,7 +54,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_final : undefined_trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_final : undefined_trait<T> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -69,10 +69,8 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_final
-#  define UTL_TRAIT_is_final(...) UTL_BUILTIN_is_final(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_final(...) UTL_SCOPE is_final_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_final(...) __UTL is_final_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_final(...) UTL_SCOPE is_final<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_final(...) __UTL is_final<__VA_ARGS__>::value
 #endif

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_forward_iterator.h"
 #include "utl/iterator/utl_iterator_concept_t.h"
@@ -15,16 +15,16 @@
 
 UTL_NAMESPACE_BEGIN
 template <typename T>
-concept bidirectional_iterator = UTL_SCOPE forward_iterator<T> &&
-    UTL_SCOPE details::iterator_concept::implements<T, UTL_SCOPE bidirectional_iterator_tag> &&
+concept bidirectional_iterator = __UTL forward_iterator<T> &&
+    __UTL details::iterator_concept::implements<T, __UTL bidirectional_iterator_tag> &&
     requires(T t) {
-        { --t } -> UTL_SCOPE same_as<T&>;
-        { t-- } -> UTL_SCOPE same_as<T>;
+        { --t } -> __UTL same_as<T&>;
+        { t-- } -> __UTL same_as<T>;
     };
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_bidirectional_iterator :
-    UTL_SCOPE bool_constant<bidirectional_iterator<T>> {};
+struct __UTL_PUBLIC_TEMPLATE is_bidirectional_iterator :
+    __UTL bool_constant<bidirectional_iterator<T>> {};
 
 template <typename T>
 inline constexpr bool is_bidirectional_iterator_v = bidirectional_iterator<T>;
@@ -42,12 +42,12 @@ namespace details {
 namespace bidirectional_iterator {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto reversible(int) noexcept
-    -> UTL_SCOPE conjunction<UTL_SCOPE is_same<decltype(--static_cast<T (*)()>(0)()), T&>,
-        UTL_SCOPE is_same<decltype(static_cast<T (*)()>(0)()--), T>>;
+__UTL_HIDE_FROM_ABI auto reversible(int) noexcept
+    -> __UTL conjunction<__UTL is_same<decltype(--static_cast<T (*)()>(0)()), T&>,
+        __UTL is_same<decltype(static_cast<T (*)()>(0)()--), T>>;
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto reversible(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto reversible(float) noexcept -> __UTL false_type;
 
 template <typename T>
 using is_reversible UTL_NODEBUG = decltype(reversible<T>(0));
@@ -56,10 +56,10 @@ using is_reversible UTL_NODEBUG = decltype(reversible<T>(0));
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_bidirectional_iterator :
-    UTL_SCOPE conjunction<UTL_SCOPE is_forward_iterator<T>,
-        UTL_SCOPE details::iterator_concept::implements<UTL_SCOPE bidirectional_iterator_tag, T>,
-        UTL_SCOPE details::bidirectional_iterator::is_reversible<T>> {};
+struct __UTL_PUBLIC_TEMPLATE is_bidirectional_iterator :
+    __UTL conjunction<__UTL is_forward_iterator<T>,
+        __UTL details::iterator_concept::implements<__UTL bidirectional_iterator_tag, T>,
+        __UTL details::bidirectional_iterator::is_reversible<T>> {};
 
 #  if UTL_CXX14
 template <typename T>

@@ -33,22 +33,22 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename L, typename R>
-struct UTL_PUBLIC_TEMPLATE is_swappable_with :
+struct __UTL_PUBLIC_TEMPLATE is_swappable_with :
     bool_constant<ranges::details::swap::invocable<L, R>> {};
 template <typename L, typename R>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable_with :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_swappable_with :
     bool_constant<ranges::details::swap::nothrow_invocable<L, R>> {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_swappable : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_swappable : false_type {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_swappable : false_type {};
 
 template <referenceable T>
-struct UTL_PUBLIC_TEMPLATE is_swappable<T> :
+struct __UTL_PUBLIC_TEMPLATE is_swappable<T> :
     bool_constant<ranges::details::swap::invocable<T&, T&>> {};
 template <referenceable T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable<T> :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_swappable<T> :
     bool_constant<ranges::details::swap::nothrow_invocable<T&, T&>> {};
 
 template <typename L, typename R>
@@ -73,20 +73,18 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace swappable {
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> __UTL false_type;
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
-    -> UTL_SCOPE always_true_type<decltype(UTL_SCOPE ranges::swap(
-                                      UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>())),
-        decltype(UTL_SCOPE ranges::swap(UTL_SCOPE declval<R>(), UTL_SCOPE declval<L>()))>;
+__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
+    -> __UTL always_true_type<decltype(__UTL ranges::swap(__UTL declval<L>(), __UTL declval<R>())),
+        decltype(__UTL ranges::swap(__UTL declval<R>(), __UTL declval<L>()))>;
 
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto nothrow_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto nothrow_impl(float) noexcept -> __UTL false_type;
 template <typename L, typename R>
-UTL_HIDE_FROM_ABI auto nothrow_impl(int) noexcept
-    -> UTL_SCOPE bool_constant<noexcept(UTL_SCOPE ranges::swap(
-                                   UTL_SCOPE declval<L>(), UTL_SCOPE declval<R>())) &&
-        noexcept(UTL_SCOPE ranges::swap(UTL_SCOPE declval<R>(), UTL_SCOPE declval<L>()))>;
+__UTL_HIDE_FROM_ABI auto nothrow_impl(int) noexcept
+    -> __UTL bool_constant<noexcept(__UTL ranges::swap(__UTL declval<L>(), __UTL declval<R>())) &&
+        noexcept(__UTL ranges::swap(__UTL declval<R>(), __UTL declval<L>()))>;
 
 template <typename L, typename R>
 using trait UTL_NODEBUG = decltype(trait_impl<L, R>(0));
@@ -96,15 +94,15 @@ using is_nothrow UTL_NODEBUG = decltype(nothrow_impl<L, R>(0));
 } // namespace details
 
 template <typename L, typename R>
-struct UTL_PUBLIC_TEMPLATE is_swappable_with : details::swappable::trait<L, R> {};
+struct __UTL_PUBLIC_TEMPLATE is_swappable_with : details::swappable::trait<L, R> {};
 template <typename L, typename R>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable_with : details::swappable::is_nothrow<L, R> {};
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_swappable_with : details::swappable::is_nothrow<L, R> {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_swappable :
+struct __UTL_PUBLIC_TEMPLATE is_swappable :
     conjunction<is_referenceable<T>, is_swappable_with<T&, T&>> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_swappable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_swappable :
     conjunction<is_referenceable<T>, is_nothrow_swappable_with<T&, T&>> {};
 
 #    if UTL_CXX14
@@ -127,23 +125,22 @@ UTL_NAMESPACE_END
 #endif // if UTL_USE_STD_TYPE_TRAITS && UTL_USE_STD_swap
 
 #if UTL_CXX20
-#  define UTL_TRAIT_is_swappable_with(...) UTL_SCOPE ranges::details::swap::invocable<__VA_ARGS__>
+#  define UTL_TRAIT_is_swappable_with(...) __UTL ranges::details::swap::invocable<__VA_ARGS__>
 #  define UTL_TRAIT_is_nothrow_swappable_with(...) \
-      UTL_SCOPE ranges::details::swap::nothrow_invocable<__VA_ARGS__>
-#  define UTL_TRAIT_is_swappable(...) UTL_SCOPE is_swappable_v<__VA_ARGS__>
-#  define UTL_TRAIT_is_nothrow_swappable(...) UTL_SCOPE is_nothrow_swappable_v<__VA_ARGS__>
+      __UTL ranges::details::swap::nothrow_invocable<__VA_ARGS__>
+#  define UTL_TRAIT_is_swappable(...) __UTL is_swappable_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_nothrow_swappable(...) __UTL is_nothrow_swappable_v<__VA_ARGS__>
 #elif UTL_CXX14
-#  define UTL_TRAIT_is_swappable(...) UTL_SCOPE is_swappable_v<__VA_ARGS__>
-#  define UTL_TRAIT_is_nothrow_swappable(...) UTL_SCOPE is_nothrow_swappable_v<__VA_ARGS__>
-#  define UTL_TRAIT_is_swappable_with(...) UTL_SCOPE is_swappable_with_v<__VA_ARGS__>
-#  define UTL_TRAIT_is_nothrow_swappable_with(...) \
-      UTL_SCOPE is_nothrow_swappable_with_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_swappable(...) __UTL is_swappable_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_nothrow_swappable(...) __UTL is_nothrow_swappable_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_swappable_with(...) __UTL is_swappable_with_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_nothrow_swappable_with(...) __UTL is_nothrow_swappable_with_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_swappable(...) UTL_SCOPE is_swappable<__VA_ARGS__>::value
-#  define UTL_TRAIT_is_nothrow_swappable(...) UTL_SCOPE is_nothrow_swappable<__VA_ARGS__>::value
-#  define UTL_TRAIT_is_swappable_with(...) UTL_SCOPE is_swappable_with<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_swappable(...) __UTL is_swappable<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_nothrow_swappable(...) __UTL is_nothrow_swappable<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_swappable_with(...) __UTL is_swappable_with<__VA_ARGS__>::value
 #  define UTL_TRAIT_is_nothrow_swappable_with(...) \
-      UTL_SCOPE is_nothrow_swappable_with<__VA_ARGS__>::value
+      __UTL is_nothrow_swappable_with<__VA_ARGS__>::value
 #endif
 
 #define UTL_TRAIT_SUPPORTED_is_swappable 1

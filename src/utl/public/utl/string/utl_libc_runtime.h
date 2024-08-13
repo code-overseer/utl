@@ -2,17 +2,17 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/string/utl_libc_common.h"
 #include "utl/utility/utl_signs.h"
 
 UTL_NAMESPACE_BEGIN
 
-#define __UTL_ATTRIBUTE_LIBC_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_LIBC_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_LIBC_PURE
 #define __UTL_ATTRIBUTE_LIBC_INLINE_PURE \
-    (PURE)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+    (PURE)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_LIBC_INLINE_PURE
 
 namespace libc {
@@ -22,8 +22,8 @@ namespace standard {
 #  pragma intrinsic(memcpy)
 #endif
 
-template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
-UTL_ATTRIBUTES(ALWAYS_INLINE,HIDE_FROM_ABI) inline T* memcpy(
+template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_CONSTRAINT_CXX11(is_trivially_copyable<T>::value)>
+UTL_ATTRIBUTES(ALWAYS_INLINE,_HIDE_FROM_ABI) inline T* memcpy(
     T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
     return (T*)__builtin_memcpy(dst, src, byte_count<T>(count));
@@ -32,8 +32,8 @@ UTL_ATTRIBUTES(ALWAYS_INLINE,HIDE_FROM_ABI) inline T* memcpy(
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(is_trivially_copyable<T>::value)>
-UTL_ATTRIBUTES(ALWAYS_INLINE,HIDE_FROM_ABI) inline T* memmove(
+template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_CONSTRAINT_CXX11(is_trivially_copyable<T>::value)>
+UTL_ATTRIBUTES(ALWAYS_INLINE,_HIDE_FROM_ABI) inline T* memmove(
     T* dst, T const* src, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
     return (T*)__builtin_memmove(dst, src, byte_count<T>(count));
@@ -46,10 +46,10 @@ UTL_ATTRIBUTES(ALWAYS_INLINE,HIDE_FROM_ABI) inline T* memmove(
 #  pragma intrinsic(memset)
 #endif
 
-template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_REQUIRES_CXX11(
+template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_CONSTRAINT_CXX11(
     is_trivially_copyable<T>::value && exact_size<T, 1>::value)>
-UTL_REQUIRES_CXX20(exact_size<T, 1>)
-UTL_ATTRIBUTES(ALWAYS_INLINE, HIDE_FROM_ABI) inline T* memset(
+UTL_CONSTRAINT_CXX20(exact_size<T, 1>)
+UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) inline T* memset(
     T* dst, T const value, element_count_t count) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
     return (T*)__builtin_memset(dst, as_byte(value), byte_count<T>(count));
@@ -58,7 +58,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, HIDE_FROM_ABI) inline T* memset(
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T, UTL_CONCEPT_CXX20(exact_size<1>) U UTL_REQUIRES_CXX11(
+template <UTL_CONCEPT_CXX20(exact_size<1>) T, UTL_CONCEPT_CXX20(exact_size<1>) U UTL_CONSTRAINT_CXX11(
     exact_size<T, 1>::value && exact_size<U, 1>::value)>
 UTL_ATTRIBUTES(LIBC_INLINE_PURE) inline T* memchr(T const* ptr, U value, size_t bytes) noexcept {
 #if UTL_HAS_BUILTIN(__builtin_char_memchr)
@@ -103,7 +103,7 @@ UTL_ATTRIBUTES(LIBC_INLINE_PURE) inline size_t strlen(wchar_t const* str) noexce
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
+template <UTL_CONCEPT_CXX20(string_char) T UTL_CONSTRAINT_CXX11(is_string_char<T>::value)>
 UTL_ATTRIBUTES(LIBC_PURE) inline size_t strlen(T const* str) noexcept {
     size_t count = 0;
     while (*str) {
@@ -130,7 +130,7 @@ UTL_ATTRIBUTES(LIBC_INLINE_PURE) inline wchar_t* strchr(wchar_t const* str, wcha
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
+template <UTL_CONCEPT_CXX20(string_char) T UTL_CONSTRAINT_CXX11(is_string_char<T>::value)>
 UTL_ATTRIBUTES(LIBC_PURE) inline T* strnchr(T const* str, T const ch, element_count_t count) noexcept {
     size_t len = size_t(count);
     while (len) {
@@ -148,7 +148,7 @@ UTL_ATTRIBUTES(LIBC_PURE) inline T* strnchr(T const* str, T const ch, element_co
     return nullptr;
 }
 
-template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
+template <UTL_CONCEPT_CXX20(string_char) T UTL_CONSTRAINT_CXX11(is_string_char<T>::value)>
 UTL_ATTRIBUTES(LIBC_PURE) inline T* strchr(T const* str, T const ch) noexcept {
     while (*str != ch) {
         if (!*str) {
@@ -180,7 +180,7 @@ UTL_ATTRIBUTES(LIBC_INLINE_PURE) inline int strcmp(wchar_t const* left, wchar_t 
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
+template <UTL_CONCEPT_CXX20(string_char) T UTL_CONSTRAINT_CXX11(is_string_char<T>::value)>
 UTL_ATTRIBUTES(LIBC_PURE) inline int strcmp(T const* left, T const* right) noexcept {
     while (*left == *right) {
         if (!*left && !*right) {
@@ -212,7 +212,7 @@ UTL_ATTRIBUTES(LIBC_INLINE_PURE) inline int strncmp(
 #endif
 }
 
-template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
+template <UTL_CONCEPT_CXX20(string_char) T UTL_CONSTRAINT_CXX11(is_string_char<T>::value)>
 UTL_ATTRIBUTES(LIBC_PURE) inline int strncmp(T const* left, T const* right, element_count_t elements) noexcept {
     size_t len = (size_t)elements;
     while (len && *left == *right) {
@@ -232,7 +232,7 @@ UTL_ATTRIBUTES(LIBC_PURE) inline int strncmp(T const* left, T const* right, elem
 #  pragma intrinsic(memcpy)
 #endif
 
-template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
+template <UTL_CONCEPT_CXX20(string_char) T UTL_CONSTRAINT_CXX11(is_string_char<T>::value)>
 UTL_ATTRIBUTES(LIBC_PURE) inline T* strnset(T* dst, T const val, element_count_t elements) noexcept {
     size_t len = (size_t)elements;
     if (!len) {

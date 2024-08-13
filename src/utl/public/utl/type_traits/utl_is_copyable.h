@@ -10,7 +10,7 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_copyable :
+struct __UTL_PUBLIC_TEMPLATE is_copyable :
     bool_constant<UTL_TRAIT_is_movable(T) && UTL_TRAIT_is_copy_constructible(T) &&
         UTL_TRAIT_is_copy_assignable(T)> {};
 
@@ -22,7 +22,7 @@ UTL_INLINE_CXX17 constexpr bool is_copyable_v = is_copyable<T>::value;
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_copyable(...) UTL_SCOPE is_copyable_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_copyable(...) __UTL is_copyable_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_copyable(...) UTL_SCOPE is_copyable<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_copyable(...) __UTL is_copyable<__VA_ARGS__>::value
 #endif

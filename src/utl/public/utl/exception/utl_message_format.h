@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/source_location/utl_source_location.h"
 
@@ -21,11 +21,11 @@ namespace exceptions {
  *
  * Use `UTL_COMPILER_SUPPORTS_SOURCE_LOCATION` to check for source location intrinsic support
  */
-struct UTL_ABI_PUBLIC message_format {
+struct __UTL_ABI_PUBLIC message_format {
     /**
      * Internal use only to prevent assignment
      */
-    UTL_HIDE_FROM_ABI static constexpr message_format&& forward(
+    __UTL_HIDE_FROM_ABI static constexpr message_format&& forward(
         message_format&& src UTL_LIFETIMEBOUND) noexcept {
         return static_cast<message_format&&>(src);
     }
@@ -41,8 +41,8 @@ struct UTL_ABI_PUBLIC message_format {
      * @param src - The source location information, defaulting to the current location.
      */
     template <size_t N>
-    UTL_HIDE_FROM_ABI message_format(char const (&fmt)[N] UTL_LIFETIMEBOUND,
-        UTL_SCOPE source_location src = UTL_SOURCE_LOCATION()) noexcept
+    __UTL_HIDE_FROM_ABI message_format(char const (&fmt)[N] UTL_LIFETIMEBOUND,
+        __UTL source_location src = UTL_SOURCE_LOCATION()) noexcept
         : format(fmt)
         , location(src) {}
 #else
@@ -57,17 +57,17 @@ struct UTL_ABI_PUBLIC message_format {
      * @param src - The source location information.
      */
     template <size_t N>
-    UTL_HIDE_FROM_ABI message_format(
-        char const (&fmt)[N] UTL_LIFETIMEBOUND, UTL_SCOPE source_location src) noexcept
+    __UTL_HIDE_FROM_ABI message_format(
+        char const (&fmt)[N] UTL_LIFETIMEBOUND, __UTL source_location src) noexcept
         : format(fmt)
         , location(src) {}
 #endif
     char const* format;
-    UTL_SCOPE source_location location;
+    __UTL source_location location;
 };
 } // namespace exceptions
 
 UTL_NAMESPACE_END
 
 #define UTL_MESSAGE_FORMAT(FORMAT) \
-    UTL_SCOPE exceptions::message_format::forward({FORMAT, UTL_SOURCE_LOCATION()})
+    __UTL exceptions::message_format::forward({FORMAT, UTL_SOURCE_LOCATION()})

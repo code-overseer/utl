@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/string/utl_string_fwd.h"
 
@@ -19,12 +19,12 @@
 #include "utl/numeric/utl_min.h"
 #include "utl/string/utl_string_details.h"
 
-#define __UTL_ATTRIBUTE_STRING_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_STRING_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_PURE
 
 UTL_NAMESPACE_BEGIN
 template <typename CharType, typename Traits>
-class UTL_PUBLIC_TEMPLATE basic_zstring_view : private basic_string_view<CharType, Traits> {
+class __UTL_PUBLIC_TEMPLATE basic_zstring_view : private basic_string_view<CharType, Traits> {
     using base_type = basic_string_view<CharType, Traits>;
 
 public:
@@ -43,33 +43,33 @@ public:
     using typename base_type::value_type;
 
     basic_zstring_view(decltype(nullptr)) = delete;
-    UTL_HIDE_FROM_ABI constexpr basic_zstring_view() noexcept = default;
-    UTL_HIDE_FROM_ABI constexpr basic_zstring_view(basic_zstring_view const&) noexcept = default;
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_zstring_view(const_pointer data, size_type size) UTL_THROWS
+    __UTL_HIDE_FROM_ABI constexpr basic_zstring_view() noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr basic_zstring_view(basic_zstring_view const&) noexcept = default;
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_zstring_view(const_pointer data, size_type size) UTL_THROWS
         : base_type(data, size) {
         UTL_THROW_IF(data()[size] != 0,
             invalid_argument(UTL_MESSAGE_FORMAT(
                 "zstring_view construction failed, Reason=[argument string not null-terminated]")));
     }
-    UTL_HIDE_FROM_ABI constexpr basic_zstring_view(const_pointer data)
+    __UTL_HIDE_FROM_ABI constexpr basic_zstring_view(const_pointer data)
         UTL_NOEXCEPT(noexcept(traits_type::length(data)))
         : base_type(data, traits_type::length(data)) {}
 
     template <UTL_CONCEPT_CXX20(contiguous_iterator) It,
-        UTL_CONCEPT_CXX20(sized_sentinel_for<It>) E UTL_REQUIRES_CXX11(
+        UTL_CONCEPT_CXX20(sized_sentinel_for<It>) E UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_contiguous_iterator(It) && UTL_TRAIT_is_sized_sentinel_for(E, It))>
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_zstring_view(It begin, E end)
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_zstring_view(It begin, E end)
         UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_dereferenceable(It)&& noexcept(end - begin))
-        : basic_zstring_view(UTL_SCOPE to_address(begin), end - begin) {}
+        : basic_zstring_view(__UTL to_address(begin), end - begin) {}
 
-    UTL_HIDE_FROM_ABI explicit UTL_CONSTEXPR_CXX14 basic_zstring_view(base_type other) UTL_THROWS
+    __UTL_HIDE_FROM_ABI explicit UTL_CONSTEXPR_CXX14 basic_zstring_view(base_type other) UTL_THROWS
         : basic_zstring_view(other.data(), other.size()) {}
 
-    UTL_HIDE_FROM_ABI constexpr operator base_type() const { return *this; }
+    __UTL_HIDE_FROM_ABI constexpr operator base_type() const { return *this; }
 
     // TODO: ranges ctor
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_zstring_view& operator=(
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 basic_zstring_view& operator=(
         basic_zstring_view const&) noexcept = default;
 
     using base_type::back;
@@ -98,30 +98,30 @@ public:
         return *this[idx];
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(basic_zstring_view& other) noexcept {
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 void swap(basic_zstring_view& other) noexcept {
         base_type::swap(other);
     }
 
-    UTL_HIDE_FROM_ABI friend UTL_CONSTEXPR_CXX14 void swap(
+    __UTL_HIDE_FROM_ABI friend UTL_CONSTEXPR_CXX14 void swap(
         basic_zstring_view& l, basic_zstring_view& r) noexcept {
         l.swap(r);
     }
 
-    UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 size_type copy(
+    __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX14 size_type copy(
         pointer dest, size_type count, size_type pos = 0) const UTL_THROWS {
         UTL_THROW_IF(pos > size(),
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_zstring_view::copy` operation failed, "
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
                 pos, size()));
-        auto const copied = UTL_SCOPE numeric::min(count, size() - pos);
+        auto const copied = __UTL numeric::min(count, size() - pos);
         traits_type::copy(dest, data() + pos, copied);
         return copied;
     }
 
-    UTL_HIDE_FROM_ABI constexpr base_type substr(
+    __UTL_HIDE_FROM_ABI constexpr base_type substr(
         size_type pos = 0, size_type count = npos) const UTL_THROWS {
         return pos >= size() ? substr_throw(UTL_SOURCE_LOCATION(), pos, size())
-                             : base_type(data() + pos, UTL_SCOPE numeric::min(count, size() - pos));
+                             : base_type(data() + pos, __UTL numeric::min(count, size() - pos));
     }
 
     using base_type::compare;
@@ -136,8 +136,8 @@ public:
     using base_type::starts_with;
 
 private:
-    UTL_ATTRIBUTES(NORETURN, NOINLINE, HIDE_FROM_ABI) static basic_zstring_view substr_throw(
-        UTL_SCOPE source_location src, size_t pos, size_t size) UTL_THROWS {
+    UTL_ATTRIBUTES(NORETURN, NOINLINE, _HIDE_FROM_ABI) static basic_zstring_view substr_throw(
+        __UTL source_location src, size_t pos, size_t size) UTL_THROWS {
         exceptions::message_format format = {"[UTL] `basic_zstring_view::substr` operation failed, "
                                              "Reason=[index out of range], pos=[%zu], size=[%zu]",
             src};

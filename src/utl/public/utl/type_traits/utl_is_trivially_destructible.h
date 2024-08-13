@@ -31,16 +31,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_trivially_destructible)
+#  if __UTL_SHOULD_USE_BUILTIN(is_trivially_destructible)
 #    define UTL_BUILTIN_is_trivially_destructible(...) __is_trivially_destructible(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_trivially_destructible)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_trivially_destructible)
 
 #  ifdef UTL_BUILTIN_is_trivially_destructible
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_trivially_destructible :
+struct __UTL_PUBLIC_TEMPLATE is_trivially_destructible :
     bool_constant<UTL_BUILTIN_is_trivially_destructible(T)> {};
 
 #    if UTL_CXX14
@@ -59,7 +59,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_trivially_destructible : undefined_trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_trivially_destructible : undefined_trait<T> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -74,13 +74,9 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_trivially_destructible
-#  define UTL_TRAIT_is_trivially_destructible(...) \
-      UTL_BUILTIN_is_trivially_destructible(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_trivially_destructible(...) \
-      UTL_SCOPE is_trivially_destructible_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_trivially_destructible(...) __UTL is_trivially_destructible_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_trivially_destructible(...) \
-      UTL_SCOPE is_trivially_destructible<__VA_ARGS__>::value
+      __UTL is_trivially_destructible<__VA_ARGS__>::value
 #endif

@@ -2,12 +2,22 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_attribute_check.h"
-#include "utl/preprocessor/utl_attribute_list.h"
-#include "utl/preprocessor/utl_builtins.h"
-#include "utl/preprocessor/utl_compiler.h"
-#include "utl/preprocessor/utl_declspec.h"
-#include "utl/preprocessor/utl_msvc_extensions.h"
+#include "utl/configuration/utl_builtins.h"
+#include "utl/configuration/utl_compiler.h"
+#include "utl/configuration/utl_declspec.h"
+#include "utl/configuration/utl_keywords.h"
+
+#if defined(__cplusplus) && defined(__has_cpp_attribute)
+#  define UTL_HAS_CPP_ATTRIBUTE(NAME) __has_cpp_attribute(NAME)
+#else /* ifdef __has_cpp_attribute */
+#  define UTL_HAS_CPP_ATTRIBUTE(NAME) 0
+#endif /* ifdef __has_cpp_attribute */
+
+#ifdef __has_attribute
+#  define UTL_HAS_GNU_ATTRIBUTE(NAME) __has_attribute(NAME)
+#else /* ifdef __has_attribute */
+#  define UTL_HAS_GNU_ATTRIBUTE(NAME) 0
+#endif /* ifdef __has_attribute */
 
 #if UTL_HAS_CPP_ATTRIBUTE(nodiscard) && UTL_CXX17
 #  define UTL_NODISCARD [[nodiscard]]
@@ -25,7 +35,7 @@
 #  define UTL_NODISCARD __attribute__((__warn_unused_result__))
 #  define __UTL_ATTRIBUTE_NODISCARD __warn_unused_result__
 #  define __UTL_ATTRIBUTE_TYPE_GNU_NODISCARD
-#elif UTL_HAS_SAL_ANNOTATION(_Check_return_)
+#elif UTL_HAS_KEYWORD(_Check_return_)
 #  define UTL_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_NODISCARD _Check_return_
 #  define __UTL_ATTRIBUTE_TYPE_MSVC_EXT_NODISCARD
@@ -311,7 +321,7 @@
 #  define __UTL_ATTRIBUTE_TYPE_CPP_LIKELY
 #else
 #  define UTL_LIKELY
-#endif /* UTL_HAS_CPP_ATTRIBUTE(likely) */
+#endif
 
 #if UTL_HAS_CPP_ATTRIBUTE(unlikely) && UTL_CXX20
 #  define UTL_UNLIKELY [[unlikely]]
@@ -323,4 +333,4 @@
 #  define __UTL_ATTRIBUTE_TYPE_CPP_UNLIKELY
 #else
 #  define UTL_UNLIKELY
-#endif /* UTL_HAS_CPP_ATTRIBUTE(unlikely) */
+#endif

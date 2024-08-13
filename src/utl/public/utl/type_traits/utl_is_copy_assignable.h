@@ -37,7 +37,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_copy_assignable :
+struct __UTL_PUBLIC_TEMPLATE is_copy_assignable :
     bool_constant<UTL_BUILTIN_is_assignable(
         add_lvalue_reference_t<T>, add_lvalue_reference_t<T const>)> {};
 
@@ -56,7 +56,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_copy_assignable :
+struct __UTL_PUBLIC_TEMPLATE is_copy_assignable :
     is_assignable<add_lvalue_reference_t<T>, add_lvalue_reference_t<T const>> {};
 
 #    if UTL_CXX14
@@ -74,7 +74,7 @@ UTL_NAMESPACE_END
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_copy_assignable(TYPE) UTL_SCOPE is_copy_assignable_v<TYPE>
+#  define UTL_TRAIT_is_copy_assignable(TYPE) __UTL is_copy_assignable_v<TYPE>
 #else
-#  define UTL_TRAIT_is_copy_assignable(TYPE) UTL_SCOPE is_copy_assignable<TYPE>::value
+#  define UTL_TRAIT_is_copy_assignable(TYPE) __UTL is_copy_assignable<TYPE>::value
 #endif

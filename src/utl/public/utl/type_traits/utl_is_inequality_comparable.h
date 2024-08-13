@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_declval.h"
@@ -13,19 +13,20 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace inequality_comparable {
 template <typename T, typename U>
-using result_t UTL_NODEBUG = decltype(UTL_SCOPE declval<T>() != UTL_SCOPE declval<U>());
+using result_t UTL_NODEBUG = decltype(__UTL declval<T>() != __UTL declval<U>());
 
-template <typename T, typename U UTL_REQUIRES_CXX11(UTL_TRAIT_is_boolean_testable(result_t<T, U>))>
-UTL_REQUIRES_CXX20(UTL_TRAIT_is_boolean_testable(result_t<T, U>))
-UTL_HIDE_FROM_ABI UTL_SCOPE true_type impl(int) noexcept;
+template <typename T, typename U UTL_CONSTRAINT_CXX11(
+    UTL_TRAIT_is_boolean_testable(result_t<T, U>))>
+UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_boolean_testable(result_t<T, U>))
+__UTL_HIDE_FROM_ABI __UTL true_type impl(int) noexcept;
 template <typename T, typename U>
-UTL_HIDE_FROM_ABI UTL_SCOPE false_type impl(float) noexcept;
-template <typename T, typename U UTL_REQUIRES_CXX11(
+__UTL_HIDE_FROM_ABI __UTL false_type impl(float) noexcept;
+template <typename T, typename U UTL_CONSTRAINT_CXX11(
     UTL_TRAIT_is_nothrow_boolean_testable(result_t<T, U>))>
-UTL_REQUIRES_CXX20(UTL_TRAIT_is_nothrow_boolean_testable(result_t<T, U>))
-UTL_HIDE_FROM_ABI UTL_SCOPE true_type nothrow_check(int) noexcept;
+UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_nothrow_boolean_testable(result_t<T, U>))
+__UTL_HIDE_FROM_ABI __UTL true_type nothrow_check(int) noexcept;
 template <typename T, typename U>
-UTL_HIDE_FROM_ABI UTL_SCOPE false_type nothrow_check(float) noexcept;
+__UTL_HIDE_FROM_ABI __UTL false_type nothrow_check(float) noexcept;
 
 template <typename T, typename U>
 using impl_t UTL_NODEBUG = decltype(impl<T, U>(0));
@@ -35,17 +36,17 @@ using nothrow_t UTL_NODEBUG = decltype(nothrow_check<T, U>(0));
 } // namespace details
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_inequality_comparable_with :
+struct __UTL_PUBLIC_TEMPLATE is_inequality_comparable_with :
     details::inequality_comparable::impl_t<T, U> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_inequality_comparable :
+struct __UTL_PUBLIC_TEMPLATE is_inequality_comparable :
     details::inequality_comparable::impl_t<T, T> {};
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_inequality_comparable_with :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_inequality_comparable_with :
     details::inequality_comparable::nothrow_t<T, U> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_nothrow_inequality_comparable :
+struct __UTL_PUBLIC_TEMPLATE is_nothrow_inequality_comparable :
     details::inequality_comparable::nothrow_t<T, T> {};
 
 #if UTL_CXX14
@@ -62,23 +63,22 @@ UTL_INLINE_CXX17 constexpr bool is_nothrow_inequality_comparable_v =
     is_nothrow_inequality_comparable<T>::value;
 
 #  define UTL_TRAIT_is_inequality_comparable_with(...) \
-      UTL_SCOPE is_inequality_comparable_with_v<__VA_ARGS__>
-#  define UTL_TRAIT_is_inequality_comparable(...) UTL_SCOPE is_inequality_comparable_v<__VA_ARGS__>
+      __UTL is_inequality_comparable_with_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_inequality_comparable(...) __UTL is_inequality_comparable_v<__VA_ARGS__>
 #  define UTL_TRAIT_is_nothrow_inequality_comparable_with(...) \
-      UTL_SCOPE is_nothrow_inequality_comparable_with_v<__VA_ARGS__>
+      __UTL is_nothrow_inequality_comparable_with_v<__VA_ARGS__>
 #  define UTL_TRAIT_is_nothrow_inequality_comparable(...) \
-      UTL_SCOPE is_nothrow_inequality_comparable_v<__VA_ARGS__>
+      __UTL is_nothrow_inequality_comparable_v<__VA_ARGS__>
 
 #else // UTL_CXX14
 
 #  define UTL_TRAIT_is_inequality_comparable_with(...) \
-      UTL_SCOPE is_inequality_comparable_with<__VA_ARGS__>::value
-#  define UTL_TRAIT_is_inequality_comparable(...) \
-      UTL_SCOPE is_inequality_comparable<__VA_ARGS__>::value
+      __UTL is_inequality_comparable_with<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_inequality_comparable(...) __UTL is_inequality_comparable<__VA_ARGS__>::value
 #  define UTL_TRAIT_is_nothrow_inequality_comparable_with(...) \
-      UTL_SCOPE is_nothrow_inequality_comparable_with<__VA_ARGS__>::value
+      __UTL is_nothrow_inequality_comparable_with<__VA_ARGS__>::value
 #  define UTL_TRAIT_is_nothrow_inequality_comparable(...) \
-      UTL_SCOPE is_nothrow_inequality_comparable<__VA_ARGS__>::value
+      __UTL is_nothrow_inequality_comparable<__VA_ARGS__>::value
 
 #endif // UTL_CXX14
 

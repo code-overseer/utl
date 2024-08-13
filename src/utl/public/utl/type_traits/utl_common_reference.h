@@ -48,16 +48,16 @@ struct empty_t {};
 
 template <typename T, typename U, template <typename> class TQual, template <typename> class UQual,
     size_t = sizeof(::std::basic_common_reference<T, U, TQual, UQual>)>
-UTL_HIDE_FROM_ABI ::std::basic_common_reference<T, U, TQual, UQual> basic_ref_test(int);
+__UTL_HIDE_FROM_ABI ::std::basic_common_reference<T, U, TQual, UQual> basic_ref_test(int);
 
 template <typename T, typename U, template <typename> class TQual, template <typename> class UQual>
-UTL_HIDE_FROM_ABI empty_t basic_ref_test(float);
+__UTL_HIDE_FROM_ABI empty_t basic_ref_test(float);
 
 } // namespace common_reference
 } // namespace details
 
 template <typename T, typename U, template <typename> class TQual, template <typename> class UQual>
-struct UTL_PUBLIC_TEMPLATE basic_common_reference :
+struct __UTL_PUBLIC_TEMPLATE basic_common_reference :
     decltype(details::common_reference::basic_ref_test<T, U, TQual, UQual>(0)) {};
 
 template <typename T, typename U, template <typename> class TQual, template <typename> class UQual>
@@ -70,9 +70,9 @@ template <typename... Ts>
 using common_reference_t = typename common_reference<Ts...>::type;
 
 template <>
-struct UTL_PUBLIC_TEMPLATE common_reference<> {};
+struct __UTL_PUBLIC_TEMPLATE common_reference<> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE common_reference<T> {
+struct __UTL_PUBLIC_TEMPLATE common_reference<T> {
     using type UTL_NODEBUG = T;
 };
 
@@ -108,10 +108,10 @@ using all_convertible_to UTL_NODEBUG = conjunction<is_convertible<Ts, Target>...
 
 template <typename T0, typename T1>
 struct simple_common_ref<T0&, T1&,
-    UTL_SCOPE enable_if_t<all_convertible_to<
-        UTL_SCOPE add_pointer_t<ternary_result_t<merge_cv_t<T0, type_list<T0, T1>>&,
-            merge_cv_t<T1, type_list<T0, T1>>&>>,
-        UTL_SCOPE add_pointer_t<T0&>, UTL_SCOPE add_pointer_t<T1&>>::value>> :
+    __UTL enable_if_t<
+        all_convertible_to<__UTL add_pointer_t<ternary_result_t<merge_cv_t<T0, type_list<T0, T1>>&,
+                               merge_cv_t<T1, type_list<T0, T1>>&>>,
+            __UTL add_pointer_t<T0&>, __UTL add_pointer_t<T1&>>::value>> :
     ternary_result<merge_cv_t<T0, type_list<T0, T1>>&, merge_cv_t<T1, type_list<T0, T1>>&> {};
 
 template <typename T>
@@ -123,9 +123,9 @@ template <typename T0, typename T1>
 struct simple_common_ref<T0&&, T1&&,
     enable_if_t<
         conjunction<all_convertible_to<rvalue_ref_t<simple_common_ref_t<T0&, T1&>>, T0&&, T1&&>,
-            all_convertible_to<UTL_SCOPE add_pointer_t<rvalue_ref_t<simple_common_ref_t<T0&, T1&>>>,
-                UTL_SCOPE add_pointer_t<T0&&>,
-                UTL_SCOPE add_pointer_t<T1&&>>>::value> // enable_if_t
+            all_convertible_to<__UTL add_pointer_t<rvalue_ref_t<simple_common_ref_t<T0&, T1&>>>,
+                __UTL add_pointer_t<T0&&>,
+                __UTL add_pointer_t<T1&&>>>::value> // enable_if_t
     > : rvalue_ref<simple_common_ref_t<T0&, T1&>> {};
 
 template <typename T0, typename T1>
@@ -153,14 +153,14 @@ using basic_common_ref UTL_NODEBUG = basic_common_reference<remove_cvref_t<T>, r
 
 template <typename T, typename U>
 using impl UTL_NODEBUG = first_type<simple_common_ref<T, U>, basic_common_ref<T, U>,
-    ternary_result<T, U>, UTL_SCOPE common_type<T, U>>;
+    ternary_result<T, U>, __UTL common_type<T, U>>;
 
 template <typename List, typename = void>
 struct sfinae_gt_2 {};
 
 template <typename T, typename U, typename... Vs>
-struct sfinae_gt_2<type_list<T, U, Vs...>, void_t<UTL_SCOPE common_reference_t<T, U>>> :
-    UTL_SCOPE common_reference<UTL_SCOPE common_reference_t<T, U>, Vs...> {};
+struct sfinae_gt_2<type_list<T, U, Vs...>, void_t<__UTL common_reference_t<T, U>>> :
+    __UTL common_reference<__UTL common_reference_t<T, U>, Vs...> {};
 
 template <typename T, typename U, typename... Vs>
 using impl_gt_2 = sfinae_gt_2<type_list<T, U, Vs...>>;
@@ -169,10 +169,10 @@ using impl_gt_2 = sfinae_gt_2<type_list<T, U, Vs...>>;
 } // namespace details
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE common_reference<T, U> : details::common_reference::impl<T, U> {};
+struct __UTL_PUBLIC_TEMPLATE common_reference<T, U> : details::common_reference::impl<T, U> {};
 
 template <typename T, typename U, typename... Vs>
-struct UTL_PUBLIC_TEMPLATE common_reference<T, U, Vs...> :
+struct __UTL_PUBLIC_TEMPLATE common_reference<T, U, Vs...> :
     details::common_reference::impl_gt_2<T, U, Vs...> {};
 
 UTL_NAMESPACE_END

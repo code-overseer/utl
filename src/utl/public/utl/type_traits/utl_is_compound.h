@@ -27,16 +27,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_compound)
+#  if __UTL_SHOULD_USE_BUILTIN(is_compound)
 #    define UTL_BUILTIN_is_compound(...) __is_compound(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_compound)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_compound)
 
 #  ifdef UTL_BUILTIN_is_compound
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_compound : bool_constant<UTL_BUILTIN_is_compound(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_compound : bool_constant<UTL_BUILTIN_is_compound(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -54,7 +54,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_compound : bool_constant<!is_fundamental<T>::value> {};
+struct __UTL_PUBLIC_TEMPLATE is_compound : bool_constant<!is_fundamental<T>::value> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -70,7 +70,7 @@ UTL_NAMESPACE_END
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_compound(TYPE) UTL_SCOPE is_compound_v<TYPE>
+#  define UTL_TRAIT_is_compound(TYPE) __UTL is_compound_v<TYPE>
 #else
-#  define UTL_TRAIT_is_compound(TYPE) UTL_SCOPE is_compound<TYPE>::value
+#  define UTL_TRAIT_is_compound(TYPE) __UTL is_compound<TYPE>::value
 #endif

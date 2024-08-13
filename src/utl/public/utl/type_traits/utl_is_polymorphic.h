@@ -27,16 +27,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_polymorphic)
+#  if __UTL_SHOULD_USE_BUILTIN(is_polymorphic)
 #    define UTL_BUILTIN_is_polymorphic(...) __is_polymorphic(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_polymorphic)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_polymorphic)
 
 #  ifdef UTL_BUILTIN_is_polymorphic
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_polymorphic : bool_constant<UTL_BUILTIN_is_polymorphic(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_polymorphic : bool_constant<UTL_BUILTIN_is_polymorphic(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -54,7 +54,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_polymorphic : undefined_trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_polymorphic : undefined_trait<T> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -67,10 +67,8 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_polymorphic
-#  define UTL_TRAIT_is_polymorphic(...) UTL_BUILTIN_is_polymorphic(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_polymorphic(...) UTL_SCOPE is_polymorphic_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_polymorphic(...) __UTL is_polymorphic_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_polymorphic(...) UTL_SCOPE is_polymorphic<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_polymorphic(...) __UTL is_polymorphic<__VA_ARGS__>::value
 #endif

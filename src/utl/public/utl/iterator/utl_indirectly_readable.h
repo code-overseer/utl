@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/iterator/utl_iter_move.h"
 #include "utl/iterator/utl_iter_reference_t.h"
@@ -23,30 +23,24 @@ namespace indirectly_readable {
 template <typename T>
 concept concept_impl =
     requires(T const t) {
-        typename UTL_SCOPE iter_value_t<T>;
-        typename UTL_SCOPE iter_reference_t<T>;
-        typename UTL_SCOPE iter_rvalue_reference_t<T>;
-        { *t } -> UTL_SCOPE same_as<UTL_SCOPE iter_reference_t<T>>;
-        {
-            UTL_SCOPE ranges::iter_move(t)
-        } -> UTL_SCOPE same_as<UTL_SCOPE iter_rvalue_reference_t<T>>;
-    } &&
-    UTL_SCOPE common_reference_with<UTL_SCOPE iter_reference_t<T>&&, UTL_SCOPE iter_value_t<T>&> &&
-    UTL_SCOPE common_reference_with<UTL_SCOPE iter_reference_t<T>&&,
-        UTL_SCOPE iter_rvalue_reference_t<T>&&> &&
-    UTL_SCOPE
-        common_reference_with<UTL_SCOPE iter_rvalue_reference_t<T>&&, UTL_SCOPE iter_value_t<T>&>;
+        typename __UTL iter_value_t<T>;
+        typename __UTL iter_reference_t<T>;
+        typename __UTL iter_rvalue_reference_t<T>;
+        { *t } -> __UTL same_as<__UTL iter_reference_t<T>>;
+        { __UTL ranges::iter_move(t) } -> __UTL same_as<__UTL iter_rvalue_reference_t<T>>;
+    } && __UTL common_reference_with<__UTL iter_reference_t<T>&&, __UTL iter_value_t<T>&> &&
+    __UTL common_reference_with<__UTL iter_reference_t<T>&&, __UTL iter_rvalue_reference_t<T>&&> &&
+    __UTL common_reference_with<__UTL iter_rvalue_reference_t<T>&&, __UTL iter_value_t<T>&>;
 
 } // namespace indirectly_readable
 } // namespace details
 
 template <typename T>
-concept indirectly_readable =
-    details::indirectly_readable::concept_impl<UTL_SCOPE remove_cvref_t<T>>;
+concept indirectly_readable = details::indirectly_readable::concept_impl<__UTL remove_cvref_t<T>>;
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_indirectly_readable :
-    UTL_SCOPE bool_constant<indirectly_readable<T>> {};
+struct __UTL_PUBLIC_TEMPLATE is_indirectly_readable :
+    __UTL bool_constant<indirectly_readable<T>> {};
 
 template <typename T>
 inline constexpr bool is_indirectly_readable_v = indirectly_readable<T>;
@@ -60,11 +54,10 @@ namespace details {
 namespace indirectly_readable {
 
 template <typename T>
-UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> UTL_SCOPE false_type;
+__UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> __UTL false_type;
 template <typename T>
-UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept
-    -> UTL_SCOPE always_true_type<UTL_SCOPE iter_value_t<T>, UTL_SCOPE iter_reference_t<T>,
-        UTL_SCOPE iter_rvalue_reference_t<T>>;
+__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept -> __UTL always_true_type<__UTL iter_value_t<T>,
+    __UTL iter_reference_t<T>, __UTL iter_rvalue_reference_t<T>>;
 
 template <typename T>
 using trait UTL_NODEBUG = decltype(trait_impl<T>(0));
@@ -73,7 +66,7 @@ using trait UTL_NODEBUG = decltype(trait_impl<T>(0));
 } // namespace details
 
 template <typename T>
-struct is_indirectly_readable : details::indirectly_readable::trait<UTL_SCOPE remove_cvref_t<T>> {};
+struct is_indirectly_readable : details::indirectly_readable::trait<__UTL remove_cvref_t<T>> {};
 
 #  if UTL_CXX14
 template <typename T>

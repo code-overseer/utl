@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_namespace.h"
+#include "utl/utl_config.h"
 
 UTL_STD_NAMESPACE_BEGIN
 /* UTL_UNDEFINED_BEHAVIOUR */
@@ -16,17 +16,17 @@ template <typename>
 class reference_wrapper;
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE unwrap_reference {
+struct __UTL_PUBLIC_TEMPLATE unwrap_reference {
     using type UTL_NODEBUG = T;
 };
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE unwrap_reference<reference_wrapper<T>> {
+struct __UTL_PUBLIC_TEMPLATE unwrap_reference<reference_wrapper<T>> {
     using type UTL_NODEBUG = T&;
 };
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE unwrap_reference<::std::reference_wrapper<T>> {
+struct __UTL_PUBLIC_TEMPLATE unwrap_reference<::std::reference_wrapper<T>> {
     using type UTL_NODEBUG = T&;
 };
 

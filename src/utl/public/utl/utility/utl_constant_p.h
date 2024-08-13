@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #ifdef UTL_BUILTIN_is_constant_evaluated
 
@@ -14,7 +14,7 @@
 #elif UTL_COMPILER_MSVC
 UTL_NAMESPACE_BEGIN
 namespace details {
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr bool is_constant_evaluated() noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr bool is_constant_evaluated() noexcept {
     struct C {};
     struct M : C {
         int a;
@@ -27,7 +27,7 @@ UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr bool is_constant_evalu
 } // namespace details
 UTL_NAMESPACE_END
 
-#  define UTL_CONSTANT_P(...) UTL_SCOPE details::is_constant_evaluated()
+#  define UTL_CONSTANT_P(...) __UTL details::is_constant_evaluated()
 
 #else
 

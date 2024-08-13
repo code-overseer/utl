@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
-#include "utl/preprocessor/utl_assertion.h"
-
+#include "utl/assert/utl_assert.h"
 #include "utl/type_traits/utl_constants.h"
 
 #include <exception>
@@ -79,20 +78,20 @@ UTL_NAMESPACE_END
 #    define UTL_NOEXCEPT(...) noexcept(__VA_ARGS__)
 #  endif
 
-#  define UTL_THROW(...)                                           \
-      UTL_ASSERT(UTL_SCOPE always_false<decltype(__VA_ARGS__)>()); \
+#  define UTL_THROW(...)                                       \
+      UTL_ASSERT(__UTL always_false<decltype(__VA_ARGS__)>()); \
       UTL_BUILTIN_unreachable()
 #  define UTL_RETHROW(...)            \
       UTL_ASSERT(false, __VA_ARGS__); \
       UTL_BUILTIN_unreachable()
 #  define UTL_TRY if UTL_CONSTEXPR_CXX17 (1)
 
-#  define UTL_THROW_IF(CONDITION, ...)                                             \
-      UTL_ASSERT(!(CONDITION) && UTL_SCOPE always_false<decltype(__VA_ARGS__)>()); \
+#  define UTL_THROW_IF(CONDITION, ...)                                         \
+      UTL_ASSERT(!(CONDITION) && __UTL always_false<decltype(__VA_ARGS__)>()); \
       UTL_BUILTIN_unreachable()
 
-#  define UTL_CATCH(...)                                                          \
-      else if UTL_CONSTEXPR_CXX17 (UTL_SCOPE details::exception::catch_statement( \
+#  define UTL_CATCH(...)                                                      \
+      else if UTL_CONSTEXPR_CXX17 (__UTL details::exception::catch_statement( \
                                        [](__VA_ARGS__) -> void {}))
 
 #endif // UTL_WITH_EXCEPTIONS

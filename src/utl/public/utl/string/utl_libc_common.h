@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/string/utl_is_string_char.h"
 #include "utl/type_traits/utl_enable_if.h"
@@ -15,7 +15,7 @@
 #include <cstring>
 
 UTL_NAMESPACE_BEGIN
-#define __UTL_ATTRIBUTE_LIBC_API (CONST)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_LIBC_API (CONST)(NODISCARD)(ALWAYS_INLINE)__UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_LIBC_API
 namespace libc {
 
@@ -55,13 +55,13 @@ struct is_trivially_lexicographically_comparable :
 template <typename T, size_t N>
 concept exact_size = !is_empty_v<T> && (sizeof(T) == N);
 template <typename T>
-concept trivially_copyable = UTL_SCOPE is_trivially_copyable_v<T>;
+concept trivially_copyable = __UTL is_trivially_copyable_v<T>;
 #else
 template <typename T, size_t N>
 using exact_size UTL_NODEBUG = bool_constant<!UTL_TRAIT_is_empty(T) && (sizeof(T) == N)>;
 #endif
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
+template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_CONSTRAINT_CXX11(exact_size<T, 1>::value)>
 UTL_ATTRIBUTE(LIBC_API) unsigned char as_byte(T val) noexcept {
     return *((unsigned char const*)&val);
 }

@@ -18,16 +18,16 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(is_implicit_lifetime)
+#  if __UTL_SHOULD_USE_BUILTIN(is_implicit_lifetime)
 #    define UTL_BUILTIN_is_implicit_lifetime(...) __is_implicit_lifetime(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_implicit_lifetime)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_implicit_lifetime)
 
 #  ifdef UTL_BUILTIN_is_implicit_lifetime
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_implicit_lifetime {
+struct __UTL_PUBLIC_TEMPLATE is_implicit_lifetime {
     using type UTL_NODEBUG = UTL_BUILTIN_is_implicit_lifetime(T);
 };
 
@@ -47,7 +47,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_implicit_lifetime :
+struct __UTL_PUBLIC_TEMPLATE is_implicit_lifetime :
     bool_constant<UTL_TRAIT_is_trivially_destructible(T) &&
         (UTL_TRAIT_is_aggregate(T) || UTL_TRAIT_is_trivially_default_constructible(T) ||
             UTL_TRAIT_is_trivially_copy_constructible(T) ||
@@ -68,10 +68,8 @@ UTL_NAMESPACE_END
 
 #define UTL_TRAIT_SUPPORTED_is_implicit_lifetime 1
 
-#ifdef UTL_BUILTIN_is_implicit_lifetime
-#  define UTL_TRAIT_is_implicit_lifetime(...) UTL_BUILTIN_is_implicit_lifetime(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_implicit_lifetime(...) UTL_SCOPE is_implicit_lifetime_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_implicit_lifetime(...) __UTL is_implicit_lifetime_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_implicit_lifetime(...) UTL_SCOPE is_implicit_lifetime<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_implicit_lifetime(...) __UTL is_implicit_lifetime<__VA_ARGS__>::value
 #endif

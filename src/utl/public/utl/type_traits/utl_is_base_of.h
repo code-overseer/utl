@@ -27,16 +27,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_base_of)
+#  if __UTL_SHOULD_USE_BUILTIN(is_base_of)
 #    define UTL_BUILTIN_is_base_of(...) __is_base_of(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_base_of)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_base_of)
 
 #  ifdef UTL_BUILTIN_is_base_of
 
 UTL_NAMESPACE_BEGIN
 
 template <typename Base, typename Derive>
-struct UTL_PUBLIC_TEMPLATE is_base_of : bool_constant<UTL_BUILTIN_is_base_of(Base, Derive)> {};
+struct __UTL_PUBLIC_TEMPLATE is_base_of : bool_constant<UTL_BUILTIN_is_base_of(Base, Derive)> {};
 
 #    if UTL_CXX14
 template <typename Base, typename Derive>
@@ -56,12 +56,12 @@ UTL_NAMESPACE_BEGIN
 namespace type_traits {
 namespace details {
 template <typename Base, typename Derive>
-UTL_HIDE_FROM_ABI auto unambiguous_public_inheritance(int) noexcept
+__UTL_HIDE_FROM_ABI auto unambiguous_public_inheritance(int) noexcept
     -> decltype(((true_type(*)(Base const volatile*))0)(
         static_cast<Derive const volatile*>((Base const volatile*)0)));
 
 template <typename Base, typename Derive>
-UTL_HIDE_FROM_ABI auto unambiguous_public_inheritance(float) noexcept
+__UTL_HIDE_FROM_ABI auto unambiguous_public_inheritance(float) noexcept
     -> undefined_trait<Base, Derive>;
 
 template <typename Base, typename Derive>
@@ -71,7 +71,7 @@ using is_unambiguous_public_inheritance UTL_NODEBUG =
 } // namespace type_traits
 
 template <typename Base, typename Derive>
-struct UTL_PUBLIC_TEMPLATE is_base_of :
+struct __UTL_PUBLIC_TEMPLATE is_base_of :
     type_traits::details::is_unambiguous_public_inheritance<Base, Derive> {};
 
 #    if UTL_CXX14
@@ -87,10 +87,8 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_base_of
-#  define UTL_TRAIT_is_base_of(...) UTL_BUILTIN_is_base_of(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_base_of(...) UTL_SCOPE is_base_of_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_base_of(...) __UTL is_base_of_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_base_of(...) UTL_SCOPE is_base_of<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_base_of(...) __UTL is_base_of<__VA_ARGS__>::value
 #endif

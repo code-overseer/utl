@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_abi.h"
+#include "utl/configuration/utl_abi.h"
 
 #ifndef UTL_NS
 #  define UTL_NS utl
 #endif
 
-#define UTL_SCOPE ::UTL_NS::
+#define __UTL ::UTL_NS::
 
 #ifdef UTL_NAMESPACE_BEGIN
 #  error "Cannot define UTL_NAMESPACE_BEGIN"
@@ -20,7 +20,7 @@
 /* extern C++ for MSVC */
 #define UTL_NAMESPACE_BEGIN \
     UTL_EXTERN_CXX_BEGIN    \
-    namespace UTL_ATTRIBUTE(TYPE_VISIBILITY("default")) UTL_NS {
+    namespace __UTL_NAMESPACE_VISIBILITY UTL_NS {
 
 #ifndef UTL_NAMESPACE_END
 #  define UTL_NAMESPACE_END \

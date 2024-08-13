@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/numeric/utl_add_sat.h"
 #include "utl/numeric/utl_limits.h"
@@ -14,14 +14,14 @@
 UTL_NAMESPACE_BEGIN
 
 #define __UTL_ATTRIBUTE_INLINE_PURE_FUNCTION \
-    (NODISCARD)(PURE)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+    (NODISCARD)(PURE)(ALWAYS_INLINE)__UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_INLINE_PURE_FUNCTION
-#define __UTL_ATTRIBUTE_PURE_FUNCTION (NODISCARD)(PURE) __UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_PURE_FUNCTION (NODISCARD)(PURE) __UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_PURE_FUNCTION
 #define __UTL_ATTRIBUTE_INLINE_CONST_FUNCTION \
-    (NODISCARD)(CONST)(ALWAYS_INLINE)__UTL_ATTRIBUTE_HIDE_FROM_ABI
+    (NODISCARD)(CONST)(ALWAYS_INLINE)__UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_INLINE_CONST_FUNCTION
-#define __UTL_ATTRIBUTE_CONST_FUNCTION (NODISCARD)(CONST) __UTL_ATTRIBUTE_HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_CONST_FUNCTION (NODISCARD)(CONST) __UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_CONST_FUNCTION
 
 namespace details {
@@ -29,9 +29,9 @@ namespace string {
 
 UTL_INLINE_CXX17 constexpr size_t npos = numeric::maximum<size_t>::value;
 
-template <UTL_CONCEPT_CXX20(string_char) T UTL_REQUIRES_CXX11(is_string_char<T>::value)>
+template <UTL_CONCEPT_CXX20(string_char) T UTL_CONSTRAINT_CXX11(is_string_char<T>::value)>
 UTL_ATTRIBUTE(CONST_FUNCTION) constexpr size_t to_index(T const* base, T const* ptr) noexcept {
-    return ptr ? ptr - base : UTL_SCOPE details::string::npos;
+    return ptr ? ptr - base : __UTL details::string::npos;
 }
 
 UTL_ATTRIBUTE(CONST_FUNCTION) constexpr int negative_if_true(bool b) noexcept {
@@ -53,17 +53,17 @@ UTL_ATTRIBUTE(CONST_FUNCTION) constexpr int compare_size(int strcmp, size_t left
 namespace compile_time {
 
 template <typename T>
-UTL_HIDE_FROM_ABI constexpr T* rfind_char(T const* str, T const ch, T const* org) noexcept {
+__UTL_HIDE_FROM_ABI constexpr T* rfind_char(T const* str, T const ch, T const* org) noexcept {
     return *str == ch ? const_cast<T*>(str) : str == org ? nullptr : rfind_char(str - 1, ch, org);
 }
 
 template <typename T>
-UTL_HIDE_FROM_ABI constexpr T* rfind_char(T const* str, T const ch, size_t len) noexcept {
+__UTL_HIDE_FROM_ABI constexpr T* rfind_char(T const* str, T const ch, size_t len) noexcept {
     return rfind_char(str + len - 1, ch, str);
 }
 
 template <typename Traits, typename T>
-UTL_HIDE_FROM_ABI constexpr T* find_first_of(
+__UTL_HIDE_FROM_ABI constexpr T* find_first_of(
     T const* str, size_t len, T const* chars, size_t chars_count) noexcept {
     return len == 0 ? nullptr
         : Traits::find(chars, chars_count, *str)
@@ -72,7 +72,7 @@ UTL_HIDE_FROM_ABI constexpr T* find_first_of(
 }
 
 template <typename Traits, typename T>
-UTL_HIDE_FROM_ABI constexpr T* find_first_not_of(
+__UTL_HIDE_FROM_ABI constexpr T* find_first_not_of(
     T const* str, size_t len, T const* chars, size_t chars_count) noexcept {
     return len == 0 ? nullptr
         : !Traits::find(chars, chars_count, *str)
@@ -81,7 +81,7 @@ UTL_HIDE_FROM_ABI constexpr T* find_first_not_of(
 }
 
 template <typename Traits, typename T>
-UTL_HIDE_FROM_ABI constexpr T* find_last_of(
+__UTL_HIDE_FROM_ABI constexpr T* find_last_of(
     T const* str, T const* current, T const* chars, size_t chars_count) noexcept {
     return current < str ? nullptr
         : Traits::find(chars, chars_count, *current)
@@ -90,7 +90,7 @@ UTL_HIDE_FROM_ABI constexpr T* find_last_of(
 }
 
 template <typename Traits, typename T>
-UTL_HIDE_FROM_ABI constexpr T* find_last_not_of(
+__UTL_HIDE_FROM_ABI constexpr T* find_last_not_of(
     T const* str, T const* current, T const* chars, size_t chars_count) noexcept {
     return current < str ? nullptr
         : !Traits::find(chars, chars_count, *current)
@@ -105,45 +105,45 @@ class substring_search {
     using value_type = CharType;
 
 public:
-    UTL_HIDE_FROM_ABI constexpr substring_search(const_pointer substr, size_type len) noexcept
+    __UTL_HIDE_FROM_ABI constexpr substring_search(const_pointer substr, size_type len) noexcept
         : substr_(substr)
         , len_(len) {}
 
-    UTL_HIDE_FROM_ABI constexpr const_pointer find_for(
+    __UTL_HIDE_FROM_ABI constexpr const_pointer find_for(
         const_pointer str, size_type len) const noexcept {
         return len_ == 0 ? str : find_for_impl(str, len);
     }
 
 private:
-    UTL_HIDE_FROM_ABI constexpr const_pointer find_for_impl(
+    __UTL_HIDE_FROM_ABI constexpr const_pointer find_for_impl(
         const_pointer str, size_type len) const noexcept {
         return find_for_impl_comparing(str, len, find_front(str, len));
     }
 
-    UTL_HIDE_FROM_ABI constexpr const_pointer find_for_impl_comparing(
+    __UTL_HIDE_FROM_ABI constexpr const_pointer find_for_impl_comparing(
         const_pointer str, size_type len, const_pointer found) const noexcept {
         return found == nullptr   ? nullptr
             : compare_with(found) ? found
                                   : find_for_impl_tail(found + 1, len, str);
     }
 
-    UTL_HIDE_FROM_ABI constexpr const_pointer find_for_impl_tail(
+    __UTL_HIDE_FROM_ABI constexpr const_pointer find_for_impl_tail(
         const_pointer found, size_type len, const_pointer str) const noexcept {
         return find_for_impl(found, len - (found - str));
     }
 
-    UTL_HIDE_FROM_ABI constexpr const_pointer find_front(
+    __UTL_HIDE_FROM_ABI constexpr const_pointer find_front(
         const_pointer str, size_type len) const noexcept {
-        return Traits::find(str, UTL_SCOPE sub_sat(len + 1, size()), front());
+        return Traits::find(str, __UTL sub_sat(len + 1, size()), front());
     }
 
-    UTL_HIDE_FROM_ABI constexpr bool compare_with(const_pointer found) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr bool compare_with(const_pointer found) const noexcept {
         return Traits::compare(found, data(), size()) == 0;
     }
 
-    UTL_HIDE_FROM_ABI constexpr value_type front() const { return *substr_; }
-    UTL_HIDE_FROM_ABI constexpr size_type size() const { return len_; }
-    UTL_HIDE_FROM_ABI constexpr const_pointer data() const { return substr_; }
+    __UTL_HIDE_FROM_ABI constexpr value_type front() const { return *substr_; }
+    __UTL_HIDE_FROM_ABI constexpr size_type size() const { return len_; }
+    __UTL_HIDE_FROM_ABI constexpr const_pointer data() const { return substr_; }
 
     const_pointer substr_;
     size_type len_;
@@ -156,65 +156,65 @@ class substring_rsearch {
     using value_type = CharType;
 
 public:
-    UTL_HIDE_FROM_ABI constexpr substring_rsearch(const_pointer substr, size_type len) noexcept
+    __UTL_HIDE_FROM_ABI constexpr substring_rsearch(const_pointer substr, size_type len) noexcept
         : substr_(substr)
         , len_(len) {}
 
-    UTL_HIDE_FROM_ABI constexpr const_pointer find_for(
+    __UTL_HIDE_FROM_ABI constexpr const_pointer find_for(
         const_pointer str, size_type len) const noexcept {
         return len_ == 0 ? str : find_for_impl(str, len);
     }
 
 private:
-    UTL_HIDE_FROM_ABI constexpr const_pointer find_for_impl(
+    __UTL_HIDE_FROM_ABI constexpr const_pointer find_for_impl(
         const_pointer str, size_type len) const noexcept {
         return find_for_impl(str, len, min_len(len));
     }
 
-    UTL_HIDE_FROM_ABI constexpr const_pointer find_for_impl(
+    __UTL_HIDE_FROM_ABI constexpr const_pointer find_for_impl(
         const_pointer str, size_type len, size_type min) const noexcept {
         return find_for_impl_tail(str, len, find_back(str, len, min), min);
     }
 
-    UTL_HIDE_FROM_ABI constexpr const_pointer find_for_impl_tail(
+    __UTL_HIDE_FROM_ABI constexpr const_pointer find_for_impl_tail(
         const_pointer str, size_type len, const_pointer found, size_type min) const noexcept {
         return found == nullptr ? nullptr : find_for_impl_tail(str, len, found, found - min);
     }
 
-    UTL_HIDE_FROM_ABI constexpr const_pointer find_for_impl_tail(
+    __UTL_HIDE_FROM_ABI constexpr const_pointer find_for_impl_tail(
         const_pointer str, size_type len, const_pointer found, const_pointer begin) const noexcept {
         return compare_with(begin) ? begin : find_for_impl(str, found - str);
     }
 
-    UTL_HIDE_FROM_ABI constexpr const_pointer find_back(
+    __UTL_HIDE_FROM_ABI constexpr const_pointer find_back(
         const_pointer str, size_type len, size_type min) const noexcept {
-        return rfind_char(str + min, back(), UTL_SCOPE sub_sat(len, min));
+        return rfind_char(str + min, back(), __UTL sub_sat(len, min));
     }
 
-    UTL_HIDE_FROM_ABI constexpr bool compare_with(const_pointer begin) const {
+    __UTL_HIDE_FROM_ABI constexpr bool compare_with(const_pointer begin) const {
         return Traits::compare(begin, data(), size()) == 0;
     }
 
-    UTL_HIDE_FROM_ABI constexpr size_type min_len(size_type len) const noexcept {
-        return UTL_SCOPE numeric::min(len_ - 1, len);
+    __UTL_HIDE_FROM_ABI constexpr size_type min_len(size_type len) const noexcept {
+        return __UTL numeric::min(len_ - 1, len);
     }
 
-    UTL_HIDE_FROM_ABI constexpr value_type back() const noexcept { return substr_[len_ - 1]; }
-    UTL_HIDE_FROM_ABI constexpr size_type size() const noexcept { return len_; }
-    UTL_HIDE_FROM_ABI constexpr const_pointer data() const noexcept { return substr_; }
+    __UTL_HIDE_FROM_ABI constexpr value_type back() const noexcept { return substr_[len_ - 1]; }
+    __UTL_HIDE_FROM_ABI constexpr size_type size() const noexcept { return len_; }
+    __UTL_HIDE_FROM_ABI constexpr const_pointer data() const noexcept { return substr_; }
 
     const_pointer substr_;
     size_type len_;
 };
 
 template <typename Traits, typename CharType>
-UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) constexpr CharType const* search_substring(
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr CharType const* search_substring(
     CharType const* l, size_t l_count, CharType const* r, size_t r_count) noexcept {
     return substring_search<CharType, Traits>(r, r_count).find_for(l, l_count);
 }
 
 template <typename Traits, typename CharType>
-UTL_ATTRIBUTES(NODISCARD, HIDE_FROM_ABI) constexpr CharType const* rsearch_substring(
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr CharType const* rsearch_substring(
     CharType const* l, size_t l_count, CharType const* r, size_t r_count) noexcept {
     return substring_rsearch<CharType, Traits>(r, r_count).find_for(l, l_count);
 }
@@ -299,7 +299,7 @@ UTL_ATTRIBUTE(PURE_FUNCTION) CharType const* search_substring(
     }
     auto const r_first = *r;
     while (true) {
-        auto l_front = Traits::find(l, UTL_SCOPE sub_sat(l_count + 1, r_count), r_first);
+        auto l_front = Traits::find(l, __UTL sub_sat(l_count + 1, r_count), r_first);
         if (l_front == nullptr) {
             return nullptr;
         }
@@ -322,8 +322,8 @@ UTL_ATTRIBUTE(PURE_FUNCTION) CharType const* rsearch_substring(
     }
     auto const r_last = r[r_count - 1];
     while (true) {
-        auto min = UTL_SCOPE numeric::min(r_count - 1, l_count);
-        auto const l_last = rfind_char(l + min, r_last, UTL_SCOPE sub_sat(l_count, min));
+        auto min = __UTL numeric::min(r_count - 1, l_count);
+        auto const l_last = rfind_char(l + min, r_last, __UTL sub_sat(l_count, min));
         if (l_last == nullptr) {
             return nullptr;
         }
@@ -371,15 +371,14 @@ template <typename Traits, typename CharType>
 UTL_ATTRIBUTE(PURE_FUNCTION) constexpr size_t find(
     CharType const* l, size_t l_count, CharType const* r, size_t r_count, size_t l_pos) noexcept {
     return find<Traits>(
-        l + UTL_SCOPE numeric::min(l_pos, l_count), UTL_SCOPE sub_sat(l_count, l_pos), r, r_count);
+        l + __UTL numeric::min(l_pos, l_count), __UTL sub_sat(l_count, l_pos), r, r_count);
 }
 
 template <typename Traits, typename CharType>
 UTL_ATTRIBUTE(PURE_FUNCTION) constexpr size_t find(
     CharType const* str, size_t length, CharType const ch, size_t pos) noexcept {
-    return to_index(str,
-        Traits::find(
-            str + UTL_SCOPE numeric::min(length, pos), UTL_SCOPE sub_sat(length, pos), ch));
+    return to_index(
+        str, Traits::find(str + __UTL numeric::min(length, pos), __UTL sub_sat(length, pos), ch));
 }
 
 template <typename Traits, typename CharType>
@@ -397,7 +396,7 @@ UTL_ATTRIBUTE(PURE_FUNCTION) constexpr size_t rfind(
 template <typename Traits, typename CharType>
 UTL_ATTRIBUTE(PURE_FUNCTION) constexpr size_t rfind(
     CharType const* str, size_t length, CharType const ch, size_t pos) noexcept {
-    return rfind(str, UTL_SCOPE numeric::min(length, UTL_SCOPE add_sat<size_t>(pos, 1)), ch);
+    return rfind(str, __UTL numeric::min(length, __UTL add_sat<size_t>(pos, 1)), ch);
 }
 
 template <typename Traits, typename CharType>
@@ -405,7 +404,7 @@ UTL_ATTRIBUTE(PURE_FUNCTION) constexpr size_t rfind(
     CharType const* l, size_t l_count, CharType const* r, size_t r_count, size_t l_pos) noexcept {
     return to_index(l,
         rsearch_substring<Traits>(
-            l, UTL_SCOPE numeric::min(UTL_SCOPE add_sat<size_t>(l_pos, 1), l_count), r, r_count));
+            l, __UTL numeric::min(__UTL add_sat<size_t>(l_pos, 1), l_count), r, r_count));
 }
 
 template <typename Traits, typename T>
@@ -421,14 +420,14 @@ template <typename Traits, typename T>
 UTL_ATTRIBUTE(PURE_FUNCTION) constexpr size_t find_first_of(
     T const* str, size_t len, T const* chars, size_t chars_count, size_t pos) noexcept {
     return find_first_of<Traits>(
-        str + UTL_SCOPE numeric::min(pos, len), UTL_SCOPE sub_sat(len, pos), chars, chars_count);
+        str + __UTL numeric::min(pos, len), __UTL sub_sat(len, pos), chars, chars_count);
 }
 
 template <typename Traits, typename T>
 UTL_ATTRIBUTE(PURE_FUNCTION) constexpr size_t find_first_of(
     T const* str, size_t len, T const ch, size_t pos) noexcept {
     return to_index(
-        str, Traits::find(str + UTL_SCOPE numeric::min(pos, len), UTL_SCOPE sub_sat(len, pos), ch));
+        str, Traits::find(str + __UTL numeric::min(pos, len), __UTL sub_sat(len, pos), ch));
 }
 
 template <typename Traits, typename T>
@@ -449,7 +448,7 @@ template <typename Traits, typename T>
 UTL_ATTRIBUTE(PURE_FUNCTION) constexpr size_t find_first_not_of(
     T const* str, size_t len, T const* chars, size_t chars_count, size_t pos) noexcept {
     return find_first_not_of<Traits>(
-        str + UTL_SCOPE numeric::min(pos, len), UTL_SCOPE sub_sat(len, pos), chars, chars_count);
+        str + __UTL numeric::min(pos, len), __UTL sub_sat(len, pos), chars, chars_count);
 }
 
 template <typename Traits, typename T>
@@ -464,7 +463,7 @@ UTL_ATTRIBUTE(PURE_FUNCTION) constexpr size_t find_last_of(
 template <typename Traits, typename T>
 UTL_ATTRIBUTE(PURE_FUNCTION) constexpr size_t find_last_of(
     T const* str, size_t len, T const* chars, size_t chars_count, size_t pos) noexcept {
-    return find_last_of<Traits>(str, UTL_SCOPE numeric::min(len, pos), chars, chars_count);
+    return find_last_of<Traits>(str, __UTL numeric::min(len, pos), chars, chars_count);
 }
 
 template <typename Traits, typename T>
@@ -480,14 +479,14 @@ template <typename Traits, typename T>
 UTL_ATTRIBUTE(PURE_FUNCTION) constexpr size_t find_last_not_of(
     T const* str, size_t len, T const* chars, size_t chars_count, size_t pos) noexcept {
     return find_last_not_of<Traits>(
-        str, UTL_SCOPE numeric::min(len, UTL_SCOPE add_sat<size_t>(pos, 1)), chars, chars_count);
+        str, __UTL numeric::min(len, __UTL add_sat<size_t>(pos, 1)), chars, chars_count);
 }
 
 template <typename Traits, typename T>
 UTL_ATTRIBUTE(PURE_FUNCTION) constexpr int compare(
     T const* left, size_t l_len, T const* right, size_t r_len) noexcept {
     return compare_size(
-        Traits::compare(left, right, UTL_SCOPE numeric::min(l_len, r_len)), l_len, r_len);
+        Traits::compare(left, right, __UTL numeric::min(l_len, r_len)), l_len, r_len);
 }
 
 } // namespace string

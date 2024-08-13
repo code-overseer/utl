@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/utl_config.h"
 
 #define UTL_ASSERTIONS_ENABLED 0
 #define UTL_ASSERT(...)

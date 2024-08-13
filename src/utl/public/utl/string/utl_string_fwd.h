@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/memory/utl_allocator_fwd.h"
 
@@ -12,16 +12,16 @@ UTL_NAMESPACE_BEGIN
 using size_t = decltype(sizeof(0));
 
 template <typename>
-struct UTL_PUBLIC_TEMPLATE char_traits;
+struct __UTL_PUBLIC_TEMPLATE char_traits;
 
 template <typename CharType, typename Traits = char_traits<CharType>>
-class UTL_PUBLIC_TEMPLATE basic_string_view;
+class __UTL_PUBLIC_TEMPLATE basic_string_view;
 template <typename CharType, typename Traits = char_traits<CharType>>
-class UTL_PUBLIC_TEMPLATE basic_zstring_view;
+class __UTL_PUBLIC_TEMPLATE basic_zstring_view;
 
 template <typename CharType, size_t ShortSize, typename Traits = char_traits<CharType>,
     typename Alloc = allocator<CharType>>
-class UTL_PUBLIC_TEMPLATE basic_short_string;
+class __UTL_PUBLIC_TEMPLATE basic_short_string;
 
 namespace details {
 namespace string {
@@ -53,7 +53,7 @@ public:
 };
 
 template <>
-struct default_inline_size<char, UTL_SCOPE allocator<char>> {
+struct default_inline_size<char, __UTL allocator<char>> {
 private:
     static constexpr size_t bytes = 24;
 
@@ -62,7 +62,7 @@ public:
 };
 
 template <typename CharType>
-struct default_inline_size<CharType, UTL_SCOPE allocator<CharType>> {
+struct default_inline_size<CharType, __UTL allocator<CharType>> {
 private:
     static constexpr size_t bytes = 32;
 
@@ -72,8 +72,8 @@ public:
 
 #ifdef UTL_SUPPORTS_CHAR8_T
 template <>
-struct default_inline_size<char8_t, UTL_SCOPE allocator<char8_t>> :
-    default_inline_size<char, UTL_SCOPE allocator<char>> {};
+struct default_inline_size<char8_t, __UTL allocator<char8_t>> :
+    default_inline_size<char, __UTL allocator<char>> {};
 #endif
 
 template <typename CharType, typename Traits, typename Alloc>

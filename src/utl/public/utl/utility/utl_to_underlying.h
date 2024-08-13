@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #if UTL_CXX23 && UTL_USE_STD_to_underlying
 
@@ -28,7 +28,7 @@ UTL_PRAGMA_WARN(
 UTL_NAMESPACE_BEGIN
 
 template <typename Enum>
-UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE, HIDE_FROM_ABI) constexpr enable_if_t<is_enum<Enum>::value, underlying_type_t<Enum>>
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE, _HIDE_FROM_ABI) constexpr enable_if_t<is_enum<Enum>::value, underlying_type_t<Enum>>
 to_underlying(Enum value) noexcept {
     return static_cast<underlying_type_t<Enum>>(value);
 }

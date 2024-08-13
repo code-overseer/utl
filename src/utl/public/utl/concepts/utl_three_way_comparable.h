@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include "utl/utl_config.h"
+
 #include "utl/compare/utl_compare_fwd.h"
+
 #include "utl/concepts/utl_boolean_testable.h"
 #include "utl/concepts/utl_equality_comparable.h"
 #include "utl/concepts/utl_partially_ordered_with.h"
 #include "utl/concepts/utl_same_as.h"
-#include "utl/preprocessor/utl_config.h"
 #include "utl/type_traits/utl_common_comparison_category.h"
 #include "utl/type_traits/utl_remove_reference.h"
 
@@ -21,14 +23,14 @@ concept compare_as = same_as<common_comparison_category_t<T, Cat>, Cat>;
 } // namespace three_way_comparable
 } // namespace details
 
-template <typename T, typename Cat = UTL_SCOPE partial_ordering>
+template <typename T, typename Cat = __UTL partial_ordering>
 concept three_way_comparable =
     details::equality_comparable::weak<T, T> && partially_ordered_with<T, T> &&
     requires(remove_reference_t<T> const& l, remove_reference_t<T> const& r) {
         { l <=> r } -> details::three_way_comparable::compare_as<Cat>;
     };
 
-template <typename T, typename U, typename Cat = UTL_SCOPE partial_ordering>
+template <typename T, typename U, typename Cat = __UTL partial_ordering>
 concept three_way_comparable_with = details::equality_comparable::weak<T, U> &&
     partially_ordered_with<T, U> && three_way_comparable<T, Cat> && three_way_comparable<U, Cat> &&
     common_reference_with<remove_reference_t<T> const&, remove_reference_t<U> const&> &&

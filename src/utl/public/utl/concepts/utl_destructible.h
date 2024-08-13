@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #if UTL_CXX20
 #  include "utl/type_traits/utl_is_nothrow_destructible.h"

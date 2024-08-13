@@ -29,16 +29,16 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(remove_all_extents)
+#  if __UTL_SHOULD_USE_BUILTIN(remove_all_extents)
 #    define UTL_BUILTIN_remove_all_extents(...) __remove_all_extents(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(remove_all_extents)
+#  endif // __UTL_SHOULD_USE_BUILTIN(remove_all_extents)
 
 #  ifdef UTL_BUILTIN_remove_all_extents
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_all_extents {
+struct __UTL_PUBLIC_TEMPLATE remove_all_extents {
     using type UTL_NODEBUG = UTL_BUILTIN_remove_all_extents(T);
 };
 
@@ -52,18 +52,18 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_all_extents {
+struct __UTL_PUBLIC_TEMPLATE remove_all_extents {
     using type UTL_NODEBUG = T;
 };
 template <typename T>
 using remove_all_extents_t = typename remove_all_extents<T>::type;
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE remove_all_extents<T[]> {
+struct __UTL_PUBLIC_TEMPLATE remove_all_extents<T[]> {
     using type UTL_NODEBUG = remove_all_extents_t<T>;
 };
 template <typename T, size_t N>
-struct UTL_PUBLIC_TEMPLATE remove_all_extents<T[N]> {
+struct __UTL_PUBLIC_TEMPLATE remove_all_extents<T[N]> {
     using type UTL_NODEBUG = remove_all_extents_t<T>;
 };
 

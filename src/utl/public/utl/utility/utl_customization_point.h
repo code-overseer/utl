@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #if UTL_CXX17
 
@@ -15,16 +15,16 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace customization_point {
 template <typename T>
-UTL_ABI_PUBLIC constexpr T constant{};
+__UTL_ABI_PUBLIC constexpr T constant{};
 } // namespace customization_point
 } // namespace details
 
 UTL_NAMESPACE_END
 
-#  define UTL_DEFINE_CUSTOMIZATION_POINT(TYPE, NAME)                                       \
-      namespace {                                                                          \
-      constexpr auto const& NAME = UTL_SCOPE details::customization_point::constant<TYPE>; \
-      }                                                                                    \
+#  define UTL_DEFINE_CUSTOMIZATION_POINT(TYPE, NAME)                                   \
+      namespace {                                                                      \
+      constexpr auto const& NAME = __UTL details::customization_point::constant<TYPE>; \
+      }                                                                                \
       static_assert(true, "semi-colon required")
 
 #else
@@ -33,8 +33,8 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace customization_point {
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE constant {
-    static constexpr T value = {};
+struct __UTL_PUBLIC_TEMPLATE constant {
+    static constexpr T value{};
 };
 
 template <typename T>
@@ -44,10 +44,10 @@ constexpr T constant<T>::value;
 
 UTL_NAMESPACE_END
 
-#  define UTL_DEFINE_CUSTOMIZATION_POINT(TYPE, NAME)                                              \
-      namespace {                                                                                 \
-      constexpr auto const& NAME = UTL_SCOPE details::customization_point::constant<TYPE>::value; \
-      }                                                                                           \
+#  define UTL_DEFINE_CUSTOMIZATION_POINT(TYPE, NAME)                                          \
+      namespace {                                                                             \
+      constexpr auto const& NAME = __UTL details::customization_point::constant<TYPE>::value; \
+      }                                                                                       \
       static_assert(true, "semi-colon required")
 
 #endif

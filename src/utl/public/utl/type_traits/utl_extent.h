@@ -25,16 +25,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 /* (31.01.2024) Clang's __array_extent has a bug so disable for now */
-#  if UTL_SHOULD_USE_BUILTIN(array_extent)
+#  if __UTL_SHOULD_USE_BUILTIN(array_extent)
 #    define UTL_BUILTIN_array_extent(...) __array_extent(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(array_extent)
+#  endif // __UTL_SHOULD_USE_BUILTIN(array_extent)
 
 #  ifdef UTL_BUILTIN_array_extent
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T, size_t Dim = 0>
-struct UTL_PUBLIC_TEMPLATE extent : size_constant<UTL_BUILTIN_array_extent(T, Dim)> {};
+struct __UTL_PUBLIC_TEMPLATE extent : size_constant<UTL_BUILTIN_array_extent(T, Dim)> {};
 
 #    if UTL_CXX14
 template <typename T, size_t Dim = 0>
@@ -48,15 +48,15 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, size_t Dim>
-struct UTL_PUBLIC_TEMPLATE extent : size_constant<0> {};
+struct __UTL_PUBLIC_TEMPLATE extent : size_constant<0> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE extent<T[], 0> : size_constant<0> {};
+struct __UTL_PUBLIC_TEMPLATE extent<T[], 0> : size_constant<0> {};
 template <typename T, size_t Dim>
-struct UTL_PUBLIC_TEMPLATE extent<T[], Dim> : extent<T, Dim - 1> {};
+struct __UTL_PUBLIC_TEMPLATE extent<T[], Dim> : extent<T, Dim - 1> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE extent<T[N], 0> : size_constant<N> {};
+struct __UTL_PUBLIC_TEMPLATE extent<T[N], 0> : size_constant<N> {};
 template <typename T, size_t Dim>
-struct UTL_PUBLIC_TEMPLATE extent<T[N], Dim> : extent<T, Dim - 1> {};
+struct __UTL_PUBLIC_TEMPLATE extent<T[N], Dim> : extent<T, Dim - 1> {};
 
 UTL_NAMESPACE_END
 
@@ -67,7 +67,7 @@ UTL_NAMESPACE_END
 #define UTL_TRAIT_SUPPORTED_extent 1
 
 #if UTL_CXX14
-#  define UTL_TRAIT_extent(...) UTL_SCOPE extent_v<__VA_ARGS__>
+#  define UTL_TRAIT_extent(...) __UTL extent_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_extent(...) UTL_SCOPE extent<__VA_ARGS__>::value
+#  define UTL_TRAIT_extent(...) __UTL extent<__VA_ARGS__>::value
 #endif

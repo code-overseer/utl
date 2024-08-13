@@ -32,9 +32,9 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_unbounded_array : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_unbounded_array : false_type {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_unbounded_array<T[]> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_unbounded_array<T[]> : true_type {};
 
 #  if UTL_CXX14
 template <typename T>
@@ -48,7 +48,7 @@ UTL_NAMESPACE_END
 #define UTL_TRAIT_SUPPORTED_is_unbounded_array 1
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_unbounded_array(...) UTL_SCOPE is_unbounded_array_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_unbounded_array(...) __UTL is_unbounded_array_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_unbounded_array(...) UTL_SCOPE is_unbounded_array<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_unbounded_array(...) __UTL is_unbounded_array<__VA_ARGS__>::value
 #endif

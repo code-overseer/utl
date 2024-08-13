@@ -27,16 +27,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_empty)
+#  if __UTL_SHOULD_USE_BUILTIN(is_empty)
 #    define UTL_BUILTIN_is_empty(...) __is_empty(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_empty)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_empty)
 
 #  ifdef UTL_BUILTIN_is_empty
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_empty : bool_constant<UTL_BUILTIN_is_empty(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_empty : bool_constant<UTL_BUILTIN_is_empty(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -61,7 +61,7 @@ struct UTL_ATTRIBUTE(EMPTY_BASES) check : T {
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_empty :
+struct __UTL_PUBLIC_TEMPLATE is_empty :
     bool_constant<sizeof(T) == 1 &&
         sizeof(details::emptiness::check<T>) == sizeof(details::emptiness::check<T>::data)> {};
 
@@ -78,10 +78,8 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_empty
-#  define UTL_TRAIT_is_empty(...) UTL_BUILTIN_is_empty(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_empty(...) UTL_SCOPE is_empty_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_empty(...) __UTL is_empty_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_empty(...) UTL_SCOPE is_empty<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_empty(...) __UTL is_empty<__VA_ARGS__>::value
 #endif

@@ -25,16 +25,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_void)
+#  if __UTL_SHOULD_USE_BUILTIN(is_void)
 #    define UTL_BUILTIN_is_void(...) __is_void(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_void)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_void)
 
 #  ifdef UTL_BUILTIN_is_void
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_void : bool_constant<UTL_BUILTIN_is_void(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_void : bool_constant<UTL_BUILTIN_is_void(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -48,19 +48,19 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_void : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_void : false_type {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_void<void> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_void<void> : true_type {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_void<void const> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_void<void const> : true_type {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_void<void volatile> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_void<void volatile> : true_type {};
 
 template <>
-struct UTL_PUBLIC_TEMPLATE is_void<void const volatile> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_void<void const volatile> : true_type {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -75,10 +75,8 @@ UTL_NAMESPACE_END
 
 #define UTL_TRAIT_SUPPORTED_is_void 1
 
-#ifdef UTL_BUILTIN_is_void
-#  define UTL_TRAIT_is_void(...) UTL_BUILTIN_is_void(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_void(...) UTL_SCOPE is_void_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_void(...) __UTL is_void_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_void(...) UTL_SCOPE is_void<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_void(...) __UTL is_void<__VA_ARGS__>::value
 #endif

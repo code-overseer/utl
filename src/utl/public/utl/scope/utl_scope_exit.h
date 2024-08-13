@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/concepts/utl_constructible_as.h"
 #include "utl/exception.h"
@@ -17,22 +17,22 @@ UTL_NAMESPACE_BEGIN
 
 template <typename F>
 class UTL_ATTRIBUTES(
-    PUBLIC_TEMPLATE, NODISCARD) scope_exit : private details::scope::impl<scope_exit<F>, F> {
+    _PUBLIC_TEMPLATE, NODISCARD) scope_exit : private details::scope::impl<scope_exit<F>, F> {
     using base_type UTL_NODEBUG = details::scope::impl<scope_exit<F>, F>;
     using typename base_type::invalid_t;
     using typename base_type::is_movable;
     using move_t UTL_NODEBUG = conditional_t<is_movable::value, scope_exit, invalid_t>;
 
 public:
-    template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_constructible(F, Fn&&))>
-    UTL_HIDE_FROM_ABI explicit scope_exit(Fn&& func) noexcept(
+    __UTL_HIDE_FROM_ABI explicit scope_exit(Fn&& func) noexcept(
         UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
-        : base_type(UTL_SCOPE forward<Fn>(func)) {}
+        : base_type(__UTL forward<Fn>(func)) {}
     scope_exit(scope_exit const&) = delete;
-    UTL_HIDE_FROM_ABI scope_exit(move_t&& other) noexcept(
+    __UTL_HIDE_FROM_ABI scope_exit(move_t&& other) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(F))
-        : base_type(UTL_SCOPE move(other)) {}
+        : base_type(__UTL move(other)) {}
 
     using base_type::release;
 };
@@ -45,7 +45,7 @@ explicit scope_exit(Fn&& f) -> scope_exit<decay_t<Fn>>;
 #endif
 
 template <typename Fn>
-UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) inline auto make_scope_exit(Fn&& f) noexcept(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline auto make_scope_exit(Fn&& f) noexcept(
     UTL_TRAIT_is_nothrow_constructible(scope_exit<decay_t<Fn>>, Fn))
     -> enable_if_t<UTL_TRAIT_is_constructible(scope_exit<decay_t<Fn>>, Fn),
         scope_exit<decay_t<Fn>>> {
@@ -55,10 +55,10 @@ UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) inline auto make_scope_exit(Fn&& f)
 namespace details {
 namespace scope {
 struct exit_factory_t {
-    UTL_HIDE_FROM_ABI constexpr explicit exit_factory_t() noexcept = default;
+    __UTL_HIDE_FROM_ABI constexpr explicit exit_factory_t() noexcept = default;
 
     template <typename Fn>
-    UTL_ATTRIBUTES(HIDE_FROM_ABI, ALWAYS_INLINE) inline auto operator->*(Fn&& f) const
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline auto operator->*(Fn&& f) const
         noexcept(UTL_TRAIT_is_nothrow_constructible(scope_exit<decay_t<Fn>>, Fn))
             -> enable_if_t<UTL_TRAIT_is_constructible(scope_exit<decay_t<Fn>>, Fn),
                 scope_exit<decay_t<Fn>>> {
@@ -72,6 +72,6 @@ UTL_DEFINE_CUSTOMIZATION_POINT(exit_factory_t, exit_factory);
 } // namespace details
 
 #define UTL_ON_SCOPE_EXIT \
-    const auto UTL_UNIQUE_VAR(ScopeFail) = UTL_SCOPE details::scope::exit_factory->*[&]()
+    const auto UTL_UNIQUE_VAR(ScopeFail) = __UTL details::scope::exit_factory->*[&]()
 
 UTL_NAMESPACE_END

@@ -37,16 +37,16 @@ UTL_PRAGMA_WARN("builtin is_array is disabled by default and cannot be enabled")
 #    define UTL_DISABLE_BUILTIN_is_array 1
 #  endif
 
-#  if UTL_SHOULD_USE_BUILTIN(is_array)
+#  if __UTL_SHOULD_USE_BUILTIN(is_array)
 #    define UTL_BUILTIN_is_array(...) __is_array(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_array)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_array)
 
 #  ifdef UTL_BUILTIN_is_array
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_array : bool_constant<UTL_BUILTIN_is_array(T)> {};
+struct __UTL_PUBLIC_TEMPLATE is_array : bool_constant<UTL_BUILTIN_is_array(T)> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -60,13 +60,13 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_array : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_array : false_type {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_array<T[]> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_array<T[]> : true_type {};
 
 template <typename T, size_t N>
-struct UTL_PUBLIC_TEMPLATE is_array<T[N]> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_array<T[N]> : true_type {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -81,10 +81,8 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_array
-#  define UTL_TRAIT_is_array(...) UTL_BUILTIN_is_array(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_array(...) UTL_SCOPE is_array_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_array(...) __UTL is_array_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_array(...) UTL_SCOPE is_array<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_array(...) __UTL is_array<__VA_ARGS__>::value
 #endif

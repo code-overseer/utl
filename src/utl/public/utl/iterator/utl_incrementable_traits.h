@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_make_signed.h"
@@ -12,15 +12,15 @@ UTL_NAMESPACE_BEGIN
 template <typename>
 struct incrementable_traits;
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE incrementable_traits<T const> : incrementable_traits<T> {};
+struct __UTL_PUBLIC_TEMPLATE incrementable_traits<T const> : incrementable_traits<T> {};
 
 using ptrdiff_t = decltype((char*)0 - (char*)0);
 
 namespace details {
 namespace incrementable {
 template <typename T>
-using subtract_result_t UTL_NODEBUG = UTL_SCOPE
-    make_signed_t<decltype(UTL_SCOPE declval<T const&>() - UTL_SCOPE declval<T const&>())>;
+using subtract_result_t UTL_NODEBUG =
+    __UTL make_signed_t<decltype(__UTL declval<T const&>() - __UTL declval<T const&>())>;
 }
 } // namespace details
 
@@ -45,20 +45,20 @@ concept subtractable = !with_difference_type<T> && requires(T const& a, T const&
 } // namespace details
 
 template <typename>
-struct UTL_PUBLIC_TEMPLATE incrementable_traits {};
+struct __UTL_PUBLIC_TEMPLATE incrementable_traits {};
 
 template <object_type T>
-struct UTL_PUBLIC_TEMPLATE incrementable_traits<T*> {
-    using difference_type = UTL_SCOPE ptrdiff_t;
+struct __UTL_PUBLIC_TEMPLATE incrementable_traits<T*> {
+    using difference_type = __UTL ptrdiff_t;
 };
 
 template <details::incrementable::with_difference_type T>
-struct UTL_PUBLIC_TEMPLATE incrementable_traits<T> {
+struct __UTL_PUBLIC_TEMPLATE incrementable_traits<T> {
     using difference_type = typename T::difference_type;
 };
 
 template <details::incrementable::subtractable T>
-struct UTL_PUBLIC_TEMPLATE incrementable_traits<T> :
+struct __UTL_PUBLIC_TEMPLATE incrementable_traits<T> :
     details::incrementable::subtract_result_t<T> {};
 
 UTL_NAMESPACE_END
@@ -77,17 +77,17 @@ template <typename T>
 struct difference_identity {
     using difference_type UTL_NODEBUG = T;
 };
-template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_is_object(T))>
+template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_object(T))>
 using object_pointer UTL_NODEBUG = difference_identity<ptrdiff_t>;
-template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_has_member_difference_type(T))>
-UTL_HIDE_FROM_ABI auto resolve_trait(int) noexcept
+template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_has_member_difference_type(T))>
+__UTL_HIDE_FROM_ABI auto resolve_trait(int) noexcept
     -> difference_identity<typename T::difference_type>;
-template <typename T UTL_REQUIRES_CXX11(!UTL_TRAIT_has_member_difference_type(T))>
-UTL_HIDE_FROM_ABI auto resolve_trait(int) noexcept -> difference_identity<subtract_result_t<T>>;
+template <typename T UTL_CONSTRAINT_CXX11(!UTL_TRAIT_has_member_difference_type(T))>
+__UTL_HIDE_FROM_ABI auto resolve_trait(int) noexcept -> difference_identity<subtract_result_t<T>>;
 
 struct fallback_t {};
 template <typename T>
-UTL_HIDE_FROM_ABI auto resolve_trait(float) noexcept -> fallback_t;
+__UTL_HIDE_FROM_ABI auto resolve_trait(float) noexcept -> fallback_t;
 template <typename T>
 using traits UTL_NODEBUG = decltype(resolve_trait<T>(0));
 
@@ -95,10 +95,11 @@ using traits UTL_NODEBUG = decltype(resolve_trait<T>(0));
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE incrementable_traits : details::incrementable::traits<T> {};
+struct __UTL_PUBLIC_TEMPLATE incrementable_traits : details::incrementable::traits<T> {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE incrementable_traits<T*> : details::incrementable::object_pointer<T> {};
+struct __UTL_PUBLIC_TEMPLATE incrementable_traits<T*> :
+    details::incrementable::object_pointer<T> {};
 
 UTL_NAMESPACE_END
 

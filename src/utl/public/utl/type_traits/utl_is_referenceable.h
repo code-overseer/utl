@@ -11,9 +11,9 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace referenceable {
 template <typename T>
-UTL_HIDE_FROM_ABI T& check_trait(int) noexcept;
+__UTL_HIDE_FROM_ABI T& check_trait(int) noexcept;
 template <typename T>
-UTL_HIDE_FROM_ABI T check_trait(float) noexcept;
+__UTL_HIDE_FROM_ABI T check_trait(float) noexcept;
 
 template <typename T>
 using trait UTL_NODEBUG = bool_constant<UTL_TRAIT_is_lvalue_reference(decltype(check_trait<T>(0)))>;
@@ -21,7 +21,7 @@ using trait UTL_NODEBUG = bool_constant<UTL_TRAIT_is_lvalue_reference(decltype(c
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_referenceable : details::referenceable::trait<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_referenceable : details::referenceable::trait<T> {};
 
 #if UTL_CXX14
 template <typename T>
@@ -32,7 +32,7 @@ UTL_INLINE_CXX17 constexpr bool is_referenceable_v =
 UTL_NAMESPACE_END
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_referenceable(...) UTL_SCOPE is_referenceable_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_referenceable(...) __UTL is_referenceable_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_referenceable(...) UTL_SCOPE is_referenceable<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_referenceable(...) __UTL is_referenceable<__VA_ARGS__>::value
 #endif

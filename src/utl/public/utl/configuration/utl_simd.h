@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_architecture.h"
+#include "utl/configuration/utl_architecture.h"
 
 #if UTL_ARCH_x86
 

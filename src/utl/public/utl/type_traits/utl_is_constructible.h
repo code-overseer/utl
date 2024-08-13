@@ -31,16 +31,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_constructible)
+#  if __UTL_SHOULD_USE_BUILTIN(is_constructible)
 #    define UTL_BUILTIN_is_constructible(...) __is_constructible(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_constructible)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_constructible)
 
 #  ifdef UTL_BUILTIN_is_constructible
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_constructible :
+struct __UTL_PUBLIC_TEMPLATE is_constructible :
     bool_constant<UTL_BUILTIN_is_constructible(T, Args...)> {};
 
 #    if UTL_CXX14
@@ -61,10 +61,10 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace constructible {
 template <typename T, typename... Args>
-UTL_HIDE_FROM_ABI auto impl(int) noexcept -> decltype((T(declval<Args>()...), true_type));
+__UTL_HIDE_FROM_ABI auto impl(int) noexcept -> decltype((T(declval<Args>()...), true_type));
 
 template <typename T, typename... Args>
-UTL_HIDE_FROM_ABI auto impl(float) noexcept -> false_type;
+__UTL_HIDE_FROM_ABI auto impl(float) noexcept -> false_type;
 
 template <typename T, typename... Args>
 using impl_t UTL_NODEBUG = decltype(impl<T, Args...>(0));
@@ -72,7 +72,7 @@ using impl_t UTL_NODEBUG = decltype(impl<T, Args...>(0));
 } // namespace details
 
 template <typename T, typename... Args>
-struct UTL_PUBLIC_TEMPLATE is_constructible : details::constructible::impl_t<T, Args...> {};
+struct __UTL_PUBLIC_TEMPLATE is_constructible : details::constructible::impl_t<T, Args...> {};
 
 #    if UTL_CXX14
 template <typename T, typename... Args>
@@ -87,10 +87,8 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_constructible
-#  define UTL_TRAIT_is_constructible(...) UTL_BUILTIN_is_constructible(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_constructible(...) UTL_SCOPE is_constructible_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_constructible(...) __UTL is_constructible_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_constructible(...) UTL_SCOPE is_constructible<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_constructible(...) __UTL is_constructible<__VA_ARGS__>::value
 #endif

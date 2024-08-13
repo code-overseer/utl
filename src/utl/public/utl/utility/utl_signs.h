@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_integral.h"
@@ -14,13 +14,14 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr enable_if_t<is_integral<T>::value, make_unsigned_t<T>>
+UTL_ATTRIBUTES(NODISCARD, CONST,
+    _HIDE_FROM_ABI) constexpr enable_if_t<is_integral<T>::value, make_unsigned_t<T>>
 to_unsigned(T val) noexcept {
     return (make_unsigned_t<T>)val;
 }
 
 template <typename T>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr enable_if_t<is_integral<T>::value, make_signed_t<T>>
+UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr enable_if_t<is_integral<T>::value, make_signed_t<T>>
 to_signed(T val) noexcept {
     return (make_signed_t<T>)val;
 }
@@ -34,12 +35,12 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <integral T>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr make_unsigned_t<T> to_unsigned(T val) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr make_unsigned_t<T> to_unsigned(T val) noexcept {
     return (make_unsigned_t<T>)val;
 }
 
 template <integral T>
-UTL_ATTRIBUTES(NODISCARD, CONST, HIDE_FROM_ABI) constexpr make_unsigned_t<T> to_signed(T val) noexcept {
+UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr make_unsigned_t<T> to_signed(T val) noexcept {
     return (make_signed_t<T>)val;
 }
 

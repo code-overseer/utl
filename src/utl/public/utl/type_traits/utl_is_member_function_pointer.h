@@ -31,16 +31,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_member_function_pointer)
+#  if __UTL_SHOULD_USE_BUILTIN(is_member_function_pointer)
 #    define UTL_BUILTIN_is_member_function_pointer(...) __is_member_function_pointer(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_member_function_pointer)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_member_function_pointer)
 
 #  ifdef UTL_BUILTIN_is_member_function_pointer
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_member_function_pointer :
+struct __UTL_PUBLIC_TEMPLATE is_member_function_pointer :
     bool_constant<UTL_BUILTIN_is_member_function_pointer(T)> {};
 
 #    if UTL_CXX14
@@ -57,10 +57,10 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_member_function_pointer : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_member_function_pointer : false_type {};
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_member_function_pointer<T U::*> : is_function<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_member_function_pointer<T U::*> : is_function<T> {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -75,13 +75,9 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_member_function_pointer
-#  define UTL_TRAIT_is_member_function_pointer(...) \
-      UTL_BUILTIN_is_member_function_pointer(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_member_function_pointer(...) \
-      UTL_SCOPE is_member_function_pointer_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_member_function_pointer(...) __UTL is_member_function_pointer_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_member_function_pointer(...) \
-      UTL_SCOPE is_member_function_pointer<__VA_ARGS__>::value
+      __UTL is_member_function_pointer<__VA_ARGS__>::value
 #endif

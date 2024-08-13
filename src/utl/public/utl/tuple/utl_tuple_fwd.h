@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "utl/utl_config.h"
+
 #if UTL_USE_STD_tuple
 
 #else // UTL_USE_STD_tuple
@@ -51,9 +53,9 @@ UTL_NAMESPACE_END
 #endif // UTL_USE_STD_tuple
 
 #if UTL_CXX14
-#  define UTL_TRAIT_tuple_size(...) UTL_SCOPE tuple_size_v<__VA_ARGS__>
-#  define UTL_TRAIT_is_tuple(...) UTL_SCOPE is_tuple_v<__VA_ARGS__>
+#  define UTL_TRAIT_tuple_size(...) __UTL tuple_size_v<__VA_ARGS__>
+#  define UTL_TRAIT_is_tuple(...) __UTL is_tuple_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_tuple_size(...) UTL_SCOPE tuple_size<__VA_ARGS__>::value
-#  define UTL_TRAIT_is_tuple(...) UTL_SCOPE is_tuple<__VA_ARGS__>::value
+#  define UTL_TRAIT_tuple_size(...) __UTL tuple_size<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_tuple(...) __UTL is_tuple<__VA_ARGS__>::value
 #endif

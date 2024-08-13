@@ -2,18 +2,16 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_compiler.h"
-#include "utl/preprocessor/utl_namespace.h"
-#include "utl/preprocessor/utl_standard.h"
+#include "utl/utl_config.h"
 
 #if UTL_COMPILER_GCC
 // TODO: add preprocessor flag to either include std header/use this UB/disable std compatibility
 namespace std {
 /* UTL_UNDEFINED_BEHAVIOUR */
 /* @note (22/12/2023) GCC does not put the orderings under an inline namespace */
-class UTL_ABI_PUBLIC strong_ordering;
-class UTL_ABI_PUBLIC partial_ordering;
-class UTL_ABI_PUBLIC weak_ordering;
+class __UTL_ABI_PUBLIC strong_ordering;
+class __UTL_ABI_PUBLIC partial_ordering;
+class __UTL_ABI_PUBLIC weak_ordering;
 } // namespace std
 #else
 UTL_STD_NAMESPACE_BEGIN
@@ -41,28 +39,28 @@ enum class order_t : value_t {
 enum class unorder_t : value_t {
     unordered = 2
 };
-struct UTL_ABI_PUBLIC zero_t {
-    UTL_HIDE_FROM_ABI UTL_CONSTEVAL zero_t(zero_t*) noexcept {}
+struct __UTL_ABI_PUBLIC zero_t {
+    __UTL_HIDE_FROM_ABI UTL_CONSTEVAL zero_t(zero_t*) noexcept {}
 };
 template <typename T>
 struct less_value {
-    UTL_ABI_PUBLIC static T const less;
+    __UTL_ABI_PUBLIC static T const less;
 };
 template <typename T>
 struct greater_value {
-    UTL_ABI_PUBLIC static T const greater;
+    __UTL_ABI_PUBLIC static T const greater;
 };
 template <typename T>
 struct equal_value {
-    UTL_ABI_PUBLIC static T const equal;
+    __UTL_ABI_PUBLIC static T const equal;
 };
 template <typename T>
 struct equivalent_value {
-    UTL_ABI_PUBLIC static T const equivalent;
+    __UTL_ABI_PUBLIC static T const equivalent;
 };
 template <typename T>
 struct unordered_value {
-    UTL_ABI_PUBLIC static T const unordered;
+    __UTL_ABI_PUBLIC static T const unordered;
 };
 
 template <typename T>

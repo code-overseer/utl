@@ -31,9 +31,9 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_nothrow_assignable)
+#  if __UTL_SHOULD_USE_BUILTIN(is_nothrow_assignable)
 #    define UTL_BUILTIN_is_nothrow_assignable(...) __is_nothrow_assignable(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_nothrow_assignable)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_nothrow_assignable)
 
 #  ifdef UTL_BUILTIN_is_nothrow_assignable
 
@@ -82,7 +82,7 @@ auto nothrow_impl(nothrow_branch_t<false, true>) noexcept -> false_type;
 
 template <typename T, typename U>
 using nothrow_impl_t = decltype(nothrow_impl<T, U>(
-    nothrow_branch_t<UTL_SCOPE is_assignable<T, Args>::value, UTL_SCOPE is_reference<T>::value>{}));
+    nothrow_branch_t<__UTL is_assignable<T, Args>::value, __UTL is_reference<T>::value>{}));
 
 } // namespace assignable
 } // namespace details
@@ -103,10 +103,8 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_nothrow_assignable
-#  define UTL_TRAIT_is_nothrow_assignable(...) UTL_BUILTIN_is_nothrow_assignable(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_nothrow_assignable(...) UTL_SCOPE is_nothrow_assignable_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_nothrow_assignable(...) __UTL is_nothrow_assignable_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_nothrow_assignable(...) UTL_SCOPE is_nothrow_assignable<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_nothrow_assignable(...) __UTL is_nothrow_assignable<__VA_ARGS__>::value
 #endif

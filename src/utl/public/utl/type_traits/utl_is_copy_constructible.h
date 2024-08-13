@@ -37,7 +37,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_copy_constructible :
+struct __UTL_PUBLIC_TEMPLATE is_copy_constructible :
     bool_constant<UTL_BUILTIN_is_constructible(T, add_lvalue_reference_t<T const>)> {};
 
 #    if UTL_CXX14
@@ -55,7 +55,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_copy_constructible :
+struct __UTL_PUBLIC_TEMPLATE is_copy_constructible :
     is_constructible<T, add_lvalue_reference_t<T const>> {};
 
 #    if UTL_CXX14
@@ -73,7 +73,7 @@ UTL_NAMESPACE_END
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_copy_constructible(TYPE) UTL_SCOPE is_copy_constructible_v<TYPE>
+#  define UTL_TRAIT_is_copy_constructible(TYPE) __UTL is_copy_constructible_v<TYPE>
 #else
-#  define UTL_TRAIT_is_copy_constructible(TYPE) UTL_SCOPE is_copy_constructible<TYPE>::value
+#  define UTL_TRAIT_is_copy_constructible(TYPE) __UTL is_copy_constructible<TYPE>::value
 #endif

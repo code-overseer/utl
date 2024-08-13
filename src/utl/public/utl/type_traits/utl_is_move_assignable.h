@@ -38,7 +38,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_move_assignable :
+struct __UTL_PUBLIC_TEMPLATE is_move_assignable :
     bool_constant<UTL_BUILTIN_is_assignable(add_lvalue_reference_t<T>, add_rvalue_reference_t<T>)> {
 };
 
@@ -57,7 +57,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_move_assignable :
+struct __UTL_PUBLIC_TEMPLATE is_move_assignable :
     is_assignable<add_lvalue_reference_t<T>, add_rvalue_reference_t<T>> {};
 
 #    if UTL_CXX14
@@ -75,7 +75,7 @@ UTL_NAMESPACE_END
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
 #if UTL_CXX14
-#  define UTL_TRAIT_is_move_assignable(TYPE) UTL_SCOPE is_move_assignable_v<TYPE>
+#  define UTL_TRAIT_is_move_assignable(TYPE) __UTL is_move_assignable_v<TYPE>
 #else
-#  define UTL_TRAIT_is_move_assignable(TYPE) UTL_SCOPE is_move_assignable<TYPE>::value
+#  define UTL_TRAIT_is_move_assignable(TYPE) __UTL is_move_assignable<TYPE>::value
 #endif

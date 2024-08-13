@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "utl/preprocessor/utl_config.h"
+#include "utl/utl_config.h"
 
 #if UTL_CXX17 && UTL_USE_STD_as_const
 
@@ -27,13 +27,13 @@ template <typename T>
 void as_const(T&&) noexcept = delete;
 
 template <typename T>
-UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE, HIDE_FROM_ABI) constexpr T const& as_const(
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE, _HIDE_FROM_ABI) constexpr T const& as_const(
     T const& value UTL_LIFETIMEBOUND) noexcept {
     return value;
 }
 
 template <typename T>
-UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE, HIDE_FROM_ABI) constexpr T const& as_const(
+UTL_ATTRIBUTES(NODISCARD, CONST, ALWAYS_INLINE, _HIDE_FROM_ABI) constexpr T const& as_const(
     T& value UTL_LIFETIMEBOUND) noexcept {
     return value;
 }

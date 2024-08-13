@@ -27,16 +27,16 @@ UTL_NAMESPACE_END
 
 #else // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#  if UTL_SHOULD_USE_BUILTIN(decay)
+#  if __UTL_SHOULD_USE_BUILTIN(decay)
 #    define UTL_BUILTIN_decay(...) __decay(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(decay)
+#  endif // __UTL_SHOULD_USE_BUILTIN(decay)
 
 #  ifdef UTL_BUILTIN_decay
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE decay {
+struct __UTL_PUBLIC_TEMPLATE decay {
     using type UTL_NODEBUG = UTL_BUILTIN_decay(T);
 };
 
@@ -79,7 +79,7 @@ struct decay_impl<T[N]> {
 } // namespace details
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE decay : details::type_traits::decay_impl<remove_reference_t<T>> {};
+struct __UTL_PUBLIC_TEMPLATE decay : details::type_traits::decay_impl<remove_reference_t<T>> {};
 
 template <typename T>
 using decay_t = typename details::type_traits::decay_impl<remove_reference_t<T>>::type;

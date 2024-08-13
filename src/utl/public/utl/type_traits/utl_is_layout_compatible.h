@@ -21,16 +21,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_layout_compatible)
+#  if __UTL_SHOULD_USE_BUILTIN(is_layout_compatible)
 #    define UTL_BUILTIN_is_layout_compatible(...) __is_layout_compatible(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_layout_compatible)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_layout_compatible)
 
 #  ifdef UTL_BUILTIN_is_layout_compatible
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_layout_compatible :
+struct __UTL_PUBLIC_TEMPLATE is_layout_compatible :
     bool_constant<UTL_BUILTIN_is_layout_compatible(T, U)> {};
 
 #    if UTL_CXX14
@@ -49,9 +49,9 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_layout_compatible : undefined_trait<T, U> {};
+struct __UTL_PUBLIC_TEMPLATE is_layout_compatible : undefined_trait<T, U> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_layout_compatible<T, T> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_layout_compatible<T, T> : true_type {};
 
 #    if UTL_CXX14
 template <typename T, typename U>
@@ -64,10 +64,8 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS && UTL_CXX20
 
-#ifdef UTL_BUILTIN_is_layout_compatible
-#  define UTL_TRAIT_is_layout_compatible(...) UTL_BUILTIN_is_layout_compatible(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_layout_compatible(...) UTL_SCOPE is_layout_compatible_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_layout_compatible(...) __UTL is_layout_compatible_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_layout_compatible(...) UTL_SCOPE is_layout_compatible<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_layout_compatible(...) __UTL is_layout_compatible<__VA_ARGS__>::value
 #endif

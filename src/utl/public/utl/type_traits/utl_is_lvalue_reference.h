@@ -29,16 +29,16 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_lvalue_reference)
+#  if __UTL_SHOULD_USE_BUILTIN(is_lvalue_reference)
 #    define UTL_BUILTIN_is_lvalue_reference(...) __is_lvalue_reference(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_lvalue_reference)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_lvalue_reference)
 
 #  ifdef UTL_BUILTIN_is_lvalue_reference
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_lvalue_reference :
+struct __UTL_PUBLIC_TEMPLATE is_lvalue_reference :
     bool_constant<UTL_BUILTIN_is_lvalue_reference(T)> {};
 
 #    if UTL_CXX14
@@ -53,10 +53,10 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_lvalue_reference : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_lvalue_reference : false_type {};
 
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_lvalue_reference<T&> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_lvalue_reference<T&> : true_type {};
 
 #    if UTL_CXX14
 template <typename T>
@@ -71,10 +71,8 @@ UTL_NAMESPACE_END
 
 #define UTL_TRAIT_SUPPORTED_is_lvalue_reference 1
 
-#ifdef UTL_BUILTIN_is_lvalue_reference
-#  define UTL_TRAIT_is_lvalue_reference(...) UTL_BUILTIN_is_lvalue_reference(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_lvalue_reference(...) UTL_SCOPE is_lvalue_reference_v<__VA_ARGS__>
+#if UTL_CXX14
+#  define UTL_TRAIT_is_lvalue_reference(...) __UTL is_lvalue_reference_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_is_lvalue_reference(...) UTL_SCOPE is_lvalue_reference<__VA_ARGS__>::value
+#  define UTL_TRAIT_is_lvalue_reference(...) __UTL is_lvalue_reference<__VA_ARGS__>::value
 #endif

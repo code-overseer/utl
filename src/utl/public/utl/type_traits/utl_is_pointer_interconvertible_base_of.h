@@ -21,17 +21,17 @@ UTL_NAMESPACE_END
 
 #  include "utl/type_traits/utl_constants.h"
 
-#  if UTL_SHOULD_USE_BUILTIN(is_pointer_interconvertible_base_of)
+#  if __UTL_SHOULD_USE_BUILTIN(is_pointer_interconvertible_base_of)
 #    define UTL_BUILTIN_is_pointer_interconvertible_base_of(...) \
         __is_pointer_interconvertible_base_of(__VA_ARGS__)
-#  endif // UTL_SHOULD_USE_BUILTIN(is_pointer_interconvertible_base_of)
+#  endif // __UTL_SHOULD_USE_BUILTIN(is_pointer_interconvertible_base_of)
 
 #  ifdef UTL_BUILTIN_is_pointer_interconvertible_base_of
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_pointer_interconvertible_base_of :
+struct __UTL_PUBLIC_TEMPLATE is_pointer_interconvertible_base_of :
     bool_constant<UTL_BUILTIN_is_pointer_interconvertible_base_of(T, U)> {};
 
 #    if UTL_CXX14
@@ -51,9 +51,9 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename U>
-struct UTL_PUBLIC_TEMPLATE is_pointer_interconvertible_base_of : undefined_trait<T, U> {};
+struct __UTL_PUBLIC_TEMPLATE is_pointer_interconvertible_base_of : undefined_trait<T, U> {};
 template <typename T>
-struct UTL_PUBLIC_TEMPLATE is_pointer_interconvertible_base_of<T, T> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_pointer_interconvertible_base_of<T, T> : true_type {};
 
 #    if UTL_CXX14
 template <typename T, typename U>
@@ -67,13 +67,10 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS && UTL_CXX20
 
-#ifdef UTL_BUILTIN_is_pointer_interconvertible_base_of
+#if UTL_CXX14
 #  define UTL_TRAIT_is_pointer_interconvertible_base_of(...) \
-      UTL_BUILTIN_is_pointer_interconvertible_base_of(__VA_ARGS__)
-#elif UTL_CXX14
-#  define UTL_TRAIT_is_pointer_interconvertible_base_of(...) \
-      UTL_SCOPE is_pointer_interconvertible_base_of_v<__VA_ARGS__>
+      __UTL is_pointer_interconvertible_base_of_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_pointer_interconvertible_base_of(...) \
-      UTL_SCOPE is_pointer_interconvertible_base_of<__VA_ARGS__>::value
+      __UTL is_pointer_interconvertible_base_of<__VA_ARGS__>::value
 #endif
