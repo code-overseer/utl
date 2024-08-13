@@ -73,9 +73,7 @@ UTL_NAMESPACE_END
 
 #define UTL_TRAIT_SUPPORTED_is_reference 1
 
-#ifdef UTL_BUILTIN_is_reference
-#  define UTL_TRAIT_is_reference(...) UTL_BUILTIN_is_reference(__VA_ARGS__)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_is_reference(...) __UTL is_reference_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_reference(...) __UTL is_reference<__VA_ARGS__>::value

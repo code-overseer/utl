@@ -31,14 +31,12 @@ private:
 
     UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) static constexpr value_type* get_ptr(
         It const& it) noexcept {
-        static_assert(
-            __UTL is_base_of<contiguous_iterator_base, It>::value, "Invalid iterator type");
+        static_assert(UTL_TRAIT_is_base_of(contiguous_iterator_base, It), "Invalid iterator type");
         return ((contiguous_iterator_base const&)it).ptr_;
     }
 
     __UTL_HIDE_FROM_ABI static constexpr It& set_ptr(It& it, value_type* value) noexcept {
-        static_assert(
-            __UTL is_base_of<contiguous_iterator_base, It>::value, "Invalid iterator type");
+        static_assert(UTL_TRAIT_is_base_of(contiguous_iterator_base, It), "Invalid iterator type");
         return ((contiguous_iterator_base&)it).ptr_ = value, it;
     }
 

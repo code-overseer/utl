@@ -75,9 +75,7 @@ UTL_NAMESPACE_END
 
 #define UTL_TRAIT_SUPPORTED_is_null_pointer 1
 
-#ifdef UTL_BUILTIN_is_null_pointer
-#  define UTL_TRAIT_is_null_pointer(...) UTL_BUILTIN_is_null_pointer(__VA_ARGS__)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_is_null_pointer(...) __UTL is_null_pointer_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_null_pointer(...) __UTL is_null_pointer<__VA_ARGS__>::value

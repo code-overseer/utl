@@ -19,11 +19,13 @@ namespace iterator_concept {
 
 template <typename T>
 struct trait_type {
-    using type UTL_NODEBUG = T;
-};
-template <__UTL details::iterator_traits::is_specialized T>
-struct trait_type<T> {
     using type UTL_NODEBUG = __UTL iterator_traits<T>;
+};
+
+template <typename T>
+requires (!__UTL details::iterator_traits::is_specialized<T>)
+struct trait_type<T> {
+    using type UTL_NODEBUG = T;
 };
 
 template <typename T>
@@ -33,9 +35,15 @@ template <typename T>
 struct tag_type {};
 
 template <typename T>
-concept with_iterator_concept = requires { typename trait_type_t<T>::iterator_concept; };
+concept with_iterator_concept = requires {
+    typename trait_type<T>::type;
+    typename trait_type_t<T>::iterator_concept;
+};
 template <typename T>
-concept with_iterator_category = requires { typename trait_type_t<T>::iterator_category; };
+concept with_iterator_category = requires {
+    typename trait_type<T>::type;
+    typename trait_type_t<T>::iterator_category;
+};
 
 template <with_iterator_concept T>
 struct tag_type<T> {
@@ -49,7 +57,7 @@ struct tag_type<T> {
 };
 
 template <typename T>
-requires (!with_iterator_category<T> && !with_iterator_concept<T> &&
+requires (!with_iterator_concept<T> && !with_iterator_category<T> &&
     !__UTL details::iterator_traits::is_specialized<T>)
 struct tag_type<T> {
     using type UTL_NODEBUG = __UTL random_access_iterator_tag;

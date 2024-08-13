@@ -91,9 +91,7 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_destructible
-#  define UTL_TRAIT_is_destructible(...) UTL_BUILTIN_is_destructible(__VA_ARGS__)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_is_destructible(...) __UTL is_destructible_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_destructible(...) __UTL is_destructible<__VA_ARGS__>::value

@@ -47,3 +47,11 @@ UTL_NAMESPACE_END
 #  endif // ifdef UTL_BUILTIN_has_unique_object_representations
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
+
+#if UTL_CXX14
+#  define UTL_TRAIT_has_unique_object_representations(...) \
+      __UTL has_unique_object_representations_v<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_has_unique_object_representations(...) \
+      __UTL has_unique_object_representations<__VA_ARGS__>::value
+#endif

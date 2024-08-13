@@ -68,9 +68,7 @@ UTL_NAMESPACE_END
 
 #define UTL_TRAIT_SUPPORTED_is_implicit_lifetime 1
 
-#ifdef UTL_BUILTIN_is_implicit_lifetime
-#  define UTL_TRAIT_is_implicit_lifetime(...) UTL_BUILTIN_is_implicit_lifetime(__VA_ARGS__)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_is_implicit_lifetime(...) __UTL is_implicit_lifetime_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_implicit_lifetime(...) __UTL is_implicit_lifetime<__VA_ARGS__>::value

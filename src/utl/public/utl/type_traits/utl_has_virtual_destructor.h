@@ -68,9 +68,7 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_has_virtual_destructor
-#  define UTL_TRAIT_has_virtual_destructor(...) UTL_BUILTIN_has_virtual_destructor(__VA_ARGS__)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_has_virtual_destructor(...) __UTL has_virtual_destructor_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_has_virtual_destructor(...) __UTL has_virtual_destructor<__VA_ARGS__>::value

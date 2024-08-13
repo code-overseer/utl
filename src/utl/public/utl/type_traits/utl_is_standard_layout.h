@@ -68,9 +68,7 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_standard_layout
-#  define UTL_TRAIT_is_standard_layout(...) UTL_BUILTIN_is_standard_layout(__VA_ARGS__)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_is_standard_layout(...) __UTL is_standard_layout_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_standard_layout(...) __UTL is_standard_layout<__VA_ARGS__>::value

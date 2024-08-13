@@ -67,10 +67,17 @@ template <typename T, typename... Args>
 UTL_INLINE_CXX17 constexpr bool is_trivially_constructible_v = is_trivially_constructible<T, Args...>::value;
 #    endif // UTL_CXX14
 
-#    define UTL_TRAIT_SUPPORTED_is_nothrow_constructible 0
+#    define UTL_TRAIT_SUPPORTED_is_trivially_constructible 0
 
 UTL_NAMESPACE_END
 
 #  endif // ifdef UTL_BUILTIN_is_trivially_constructible
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
+
+#if UTL_CXX14
+#  define UTL_TRAIT_is_trivially_constructible(...) __UTL is_trivially_constructible_v<__VA_ARGS__>
+#else
+#  define UTL_TRAIT_is_trivially_constructible(...) \
+      __UTL is_trivially_constructible<__VA_ARGS__>::value
+#endif

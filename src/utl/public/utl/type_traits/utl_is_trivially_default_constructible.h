@@ -71,10 +71,7 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_trivially_constructible
-#  define UTL_TRAIT_is_trivially_default_constructible(TYPE) \
-      UTL_BUILTIN_is_trivially_constructible(TYPE)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_is_trivially_default_constructible(TYPE) \
       __UTL is_trivially_default_constructible_v<TYPE>
 #else

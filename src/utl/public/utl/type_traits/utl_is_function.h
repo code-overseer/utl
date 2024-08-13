@@ -71,9 +71,7 @@ UTL_NAMESPACE_END
 
 #endif // ifdef UTL_USE_STD_TYPE_TRAITS
 
-#ifdef UTL_BUILTIN_is_function
-#  define UTL_TRAIT_is_function(...) UTL_BUILTIN_is_function(__VA_ARGS__)
-#elif UTL_CXX14
+#if UTL_CXX14
 #  define UTL_TRAIT_is_function(...) __UTL is_function_v<__VA_ARGS__>
 #else
 #  define UTL_TRAIT_is_function(...) __UTL is_function<__VA_ARGS__>::value

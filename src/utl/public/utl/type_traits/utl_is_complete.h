@@ -8,24 +8,23 @@
 
 UTL_NAMESPACE_BEGIN
 
-namespace type_traits {
 namespace details {
-using size_t = decltype(sizeof(0));
+namespace complete_type {
 
-template <typename T, size_t = sizeof(T)>
-__UTL_HIDE_FROM_ABI true_type is_complete(int);
+template <typename T, int = sizeof(T)>
+__UTL_HIDE_FROM_ABI __UTL true_type is_complete(int) noexcept;
 
 template <typename T>
-__UTL_HIDE_FROM_ABI false_type is_complete(float);
+__UTL_HIDE_FROM_ABI __UTL false_type is_complete(float) noexcept;
 
+} // namespace complete_type
 } // namespace details
-} // namespace type_traits
 
-template <typename T, typename R = decltype(type_traits::details::is_complete<T>(0))>
+template <typename T, typename R = decltype(details::complete_type::is_complete<T>(0))>
 struct __UTL_PUBLIC_TEMPLATE is_complete : R {};
 
 #if UTL_CXX14
-template <typename T, typename R = decltype(type_traits::details::is_complete<T>(0))>
+template <typename T, typename R = decltype(details::complete_type::is_complete<T>(0))>
 UTL_INLINE_CXX17 constexpr bool is_complete_v = R::value;
 #endif // UTL_CXX14
 
