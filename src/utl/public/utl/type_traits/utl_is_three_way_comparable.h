@@ -20,11 +20,11 @@ namespace three_way_comparable {
 template <typename T, typename U>
 using result_t UTL_NODEBUG = decltype(__UTL declval<T>() <=> __UTL declval<U>());
 
-template <typename T, typename U UTL_REQUIRES_CXX11((sizeof(result_t<T, U>) > 0))>
+template <typename T, typename U UTL_CONSTRAINT_CXX11((sizeof(result_t<T, U>) > 0))>
 __UTL_HIDE_FROM_ABI __UTL true_type possible(int) noexcept;
-template <typename T, typename U, typename Cat UTL_REQUIRES_CXX11( UTL_TRAIT_is_convertible(result_t<T, U>, Cat))>
+template <typename T, typename U, typename Cat UTL_CONSTRAINT_CXX11( UTL_TRAIT_is_convertible(result_t<T, U>, Cat))>
 __UTL_HIDE_FROM_ABI __UTL true_type impl(int) noexcept;
-template <typename T, typename U, typename Cat UTL_REQUIRES_CXX11( UTL_TRAIT_is_nothrow_convertible(result_t<T, U>, Cat))>
+template <typename T, typename U, typename Cat UTL_CONSTRAINT_CXX11( UTL_TRAIT_is_nothrow_convertible(result_t<T, U>, Cat))>
 __UTL_HIDE_FROM_ABI __UTL true_type nothrow_check(int) noexcept;
 
 #endif // UTL_CXX20

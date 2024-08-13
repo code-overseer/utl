@@ -109,12 +109,12 @@ Macros:
 - UTL_CONSTEXPR_CXX20=constexpr
 - UTL_CONSTEXPR_CXX23=constexpr
 - UTL_CONSTEVAL=consteval
-- UTL_REQUIRES_CXX11(X)=,typename=enable_if_t<X>
-- UTL_REQUIRES_CXX11(X,Y)=,typename=enable_if_t<X,Y>
-- UTL_REQUIRES_CXX11(X,Y,Z)=,typename=enable_if_t<X,Y,Z>
-- UTL_REQUIRES_CXX20(X)=requires (X)
-- UTL_REQUIRES_CXX20(X,Y)=requires (X,Y)
-- UTL_REQUIRES_CXX20(X,Y,Z)=requires (X,Y,Z)
+- UTL_CONSTRAINT_CXX11(X)=,typename=enable_if_t<X>
+- UTL_CONSTRAINT_CXX11(X,Y)=,typename=enable_if_t<X,Y>
+- UTL_CONSTRAINT_CXX11(X,Y,Z)=,typename=enable_if_t<X,Y,Z>
+- UTL_CONSTRAINT_CXX20(X)=requires (X)
+- UTL_CONSTRAINT_CXX20(X,Y)=requires (X,Y)
+- UTL_CONSTRAINT_CXX20(X,Y,Z)=requires (X,Y,Z)
 - UTL_CONCEPT_CXX20(X)=type<X>
 - UTL_NODISCARD=[[nodiscard]]
 - UTL_ENABLE_IF_CXX11(X,Y)=void

@@ -29,7 +29,7 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace iter_value {
 
-template <typename T UTL_REQUIRES_CXX11(__UTL details::iterator_traits::is_specialized<T>::value)>
+template <typename T UTL_CONSTRAINT_CXX11(__UTL details::iterator_traits::is_specialized<T>::value)>
 __UTL_HIDE_FROM_ABI typename __UTL iterator_traits<T>::value_type resolve(int) noexcept;
 } // namespace iter_value
 } // namespace details

@@ -14,7 +14,7 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace iter_reference {
 
-template <UTL_CONCEPT_CXX20(__UTL dereferenceable) T UTL_REQUIRES_CXX11(
+template <UTL_CONCEPT_CXX20(__UTL dereferenceable) T UTL_CONSTRAINT_CXX11(
     UTL_TRAIT_is_dereferenceable(T))>
 __UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> decltype(*__UTL declval<T&>());
 

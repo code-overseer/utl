@@ -53,7 +53,7 @@ make_pair(T&& t, U&& u) {
 
 namespace details {
 namespace pair {
-template <size_t I, typename P> UTL_REQUIRES_CXX20(I == 0 && requires(P&& p) {
+template <size_t I, typename P> UTL_CONSTRAINT_CXX20(I == 0 && requires(P&& p) {
         requires is_pair<P>::value;
         __UTL forward<P>(p).first;
     })
@@ -62,7 +62,7 @@ UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr auto get(P&& p UTL_LI
     return __UTL forward<P>(p).first;
 }
 
-template <size_t I, typename P> UTL_REQUIRES_CXX20(I == 1 && requires(P&& p) {
+template <size_t I, typename P> UTL_CONSTRAINT_CXX20(I == 1 && requires(P&& p) {
         requires is_pair<P>::value;
         __UTL forward<P>(p).second;
     })

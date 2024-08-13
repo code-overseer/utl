@@ -61,7 +61,7 @@ template <typename T, size_t N>
 using exact_size UTL_NODEBUG = bool_constant<!UTL_TRAIT_is_empty(T) && (sizeof(T) == N)>;
 #endif
 
-template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_REQUIRES_CXX11(exact_size<T, 1>::value)>
+template <UTL_CONCEPT_CXX20(exact_size<1>) T UTL_CONSTRAINT_CXX11(exact_size<T, 1>::value)>
 UTL_ATTRIBUTE(LIBC_API) unsigned char as_byte(T val) noexcept {
     return *((unsigned char const*)&val);
 }

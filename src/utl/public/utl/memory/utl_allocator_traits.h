@@ -174,9 +174,9 @@ __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 pointer_t<T> fallback_reallocate(
     return blessed;
 }
 
-template <UTL_CONCEPT_CXX20(implements_reallocate) T UTL_REQUIRES_CXX11(
+template <UTL_CONCEPT_CXX20(implements_reallocate) T UTL_CONSTRAINT_CXX11(
     implements_reallocate<T>::value && is_pointer<pointer_t<T>>::value)>
-UTL_REQUIRES_CXX20(is_pointer_v<pointer_t<T>>)
+UTL_CONSTRAINT_CXX20(is_pointer_v<pointer_t<T>>)
 __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
     T& allocator, result_type_t<T> arg, size_type_t<T> size) {
 #if UTL_CXX20
@@ -187,15 +187,15 @@ __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
     return allocator.reallocate(arg, size);
 }
 
-template <UTL_CONCEPT_CXX20(implements_reallocate) T UTL_REQUIRES_CXX11(
+template <UTL_CONCEPT_CXX20(implements_reallocate) T UTL_CONSTRAINT_CXX11(
     implements_reallocate<T>::value && !is_pointer<pointer_t<T>>::value)>
-UTL_REQUIRES_CXX20(!is_pointer_v<pointer_t<T>>)
+UTL_CONSTRAINT_CXX20(!is_pointer_v<pointer_t<T>>)
 __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
     T& allocator, result_type_t<T> arg, size_type_t<T> size) {
     return allocator.reallocate(arg, size);
 }
 
-template <typename T UTL_REQUIRES_CXX11(!implements_reallocate<T>::value)>
+template <typename T UTL_CONSTRAINT_CXX11(!implements_reallocate<T>::value)>
 __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 pointer_t<T> reallocate(
     T& allocator, result_type_t<T> arg, size_type_t<T> size) {
     return fallback_reallocate(allocator, arg, size);
@@ -223,13 +223,13 @@ concept implements_allocate_at_least = requires(T& alloc, size_type_t<T> size) {
 
 #endif
 
-template <typename T UTL_REQUIRES_CXX11(!implements_allocate_at_least<T>::value)>
+template <typename T UTL_CONSTRAINT_CXX11(!implements_allocate_at_least<T>::value)>
 __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 result_type_t<T> allocate_at_least(
     T& allocator, size_type_t<T> size) {
     return {allocator.allocate(size), size};
 }
 
-template <UTL_CONCEPT_CXX20(implements_allocate_at_least) T UTL_REQUIRES_CXX11(
+template <UTL_CONCEPT_CXX20(implements_allocate_at_least) T UTL_CONSTRAINT_CXX11(
     implements_allocate_at_least<T>::value)>
 __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 result_type_t<T> allocate_at_least(
     T& allocator, size_type_t<T> size) {
@@ -258,13 +258,13 @@ concept implements_reallocate_at_least = requires(T& alloc, result_type_t<T> r, 
 
 #endif
 
-template <typename T UTL_REQUIRES_CXX11(!implements_reallocate_at_least<T>::value)>
+template <typename T UTL_CONSTRAINT_CXX11(!implements_reallocate_at_least<T>::value)>
 __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 result_type_t<T> reallocate_at_least(
     T& allocator, result_type_t<T> arg, size_type_t<T> new_size) {
     return {__UTL details::allocator::reallocate(allocator, arg, new_size), new_size};
 }
 
-template <UTL_CONCEPT_CXX20(implements_reallocate_at_least) T UTL_REQUIRES_CXX11(
+template <UTL_CONCEPT_CXX20(implements_reallocate_at_least) T UTL_CONSTRAINT_CXX11(
     implements_reallocate_at_least<T>::value)>
 __UTL_HIDE_FROM_ABI UTL_CONSTEXPR_CXX20 result_type_t<T> reallocate_at_least(
     T& allocator, result_type_t<T> arg, size_type_t<T> size) {

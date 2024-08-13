@@ -27,7 +27,7 @@ class UTL_ATTRIBUTES(_PUBLIC_TEMPLATE, NODISCARD) scope_success :
 
 public:
     template <UTL_CONCEPT_CXX20(constructible_as<F, add_rvalue_reference>) Fn
-            UTL_REQUIRES_CXX11(UTL_TRAIT_is_constructible(F, Fn&&))>
+            UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_constructible(F, Fn&&))>
     __UTL_HIDE_FROM_ABI explicit scope_success(Fn&& func) noexcept(
         UTL_TRAIT_is_nothrow_constructible(F, Fn&&))
         : base_type(__UTL forward<Fn>(func))

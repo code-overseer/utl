@@ -49,18 +49,18 @@ struct class_type<R C::*> {
     using type = C;
 };
 
-template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_is_reference_wrapper(T))>
-UTL_REQUIRES_CXX20(UTL_TRAIT_is_reference_wrapper(T))
+template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_reference_wrapper(T))>
+UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_reference_wrapper(T))
 __UTL_HIDE_FROM_ABI constexpr auto unwrap(T&& t) noexcept(noexcept(t.get())) -> decltype(t.get()) {
     return t.get();
 }
 
-template <typename T UTL_REQUIRES_CXX11(!UTL_TRAIT_is_reference_wrapper(T))>
+template <typename T UTL_CONSTRAINT_CXX11(!UTL_TRAIT_is_reference_wrapper(T))>
 __UTL_HIDE_FROM_ABI constexpr T&& unwrap(T&& t) noexcept {
     return __UTL forward(t);
 }
 
-template <typename T UTL_REQUIRES_CXX11(UTL_TRAIT_is_dereferenceable(T))>
+template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_dereferenceable(T))>
 __UTL_HIDE_FROM_ABI constexpr auto unwrap(T&& t) noexcept(UTL_TRAIT_is_nothrow_dereferenceable(T))
     -> decltype(*t) {
     return *t;

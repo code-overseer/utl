@@ -14,7 +14,7 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace iter_common_reference {
 
-template <UTL_CONCEPT_CXX20(__UTL indirectly_readable) T UTL_REQUIRES_CXX11(
+template <UTL_CONCEPT_CXX20(__UTL indirectly_readable) T UTL_CONSTRAINT_CXX11(
     __UTL is_indirectly_readable<T>::value)>
 __UTL_HIDE_FROM_ABI auto resolve(int) noexcept
     -> __UTL common_reference_t<__UTL iter_reference_t<T>, __UTL iter_value_t<T>&>;

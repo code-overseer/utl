@@ -61,8 +61,9 @@ public:
         return get<I>(__UTL forward<T>(t));
     }
 
-    template <UTL_CONCEPT_CXX20(has_member_get<I>) T UTL_REQUIRES_CXX11(!has_adl_get<T, I>::value)>
-    UTL_REQUIRES_CXX20(!has_adl_get<T, I>)
+    template <UTL_CONCEPT_CXX20(has_member_get<I>) T UTL_CONSTRAINT_CXX11(
+        !has_adl_get<T, I>::value)>
+    UTL_CONSTRAINT_CXX20(!has_adl_get<T, I>)
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr auto operator()(
         T&& t UTL_LIFETIMEBOUND) const noexcept(nothrow_member_get<T>::value)
         -> decltype(__UTL declval<T>().template get<I>()) {

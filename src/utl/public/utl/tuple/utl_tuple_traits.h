@@ -51,18 +51,18 @@ namespace details {
 namespace tuple {
 struct invalid_size_t {};
 
-template <typename T UTL_REQUIRES_CXX11(sizeof(::std::tuple_size<T>))>
-UTL_REQUIRES_CXX20(sizeof(::std::tuple_size<T>) > 0)
+template <typename T UTL_CONSTRAINT_CXX11(sizeof(::std::tuple_size<T>))>
+UTL_CONSTRAINT_CXX20(sizeof(::std::tuple_size<T>) > 0)
 __UTL_HIDE_FROM_ABI auto size_impl(int) noexcept -> ::std::tuple_size<T>;
 
-template <typename T UTL_REQUIRES_CXX11(is_same<remove_cvref_t<T>, T>::value)>
-UTL_REQUIRES_CXX20(is_same<remove_cvref_t<T>, T>::value)
+template <typename T UTL_CONSTRAINT_CXX11(is_same<remove_cvref_t<T>, T>::value)>
+UTL_CONSTRAINT_CXX20(is_same<remove_cvref_t<T>, T>::value)
 __UTL_HIDE_FROM_ABI auto size_impl(...) noexcept -> invalid_size_t;
 
 struct invalid_element_t {};
 
-template <size_t I, typename T UTL_REQUIRES_CXX11(sizeof(::std::tuple_element<I, T>))>
-UTL_REQUIRES_CXX20(sizeof(::std::tuple_element<I, T>) > 0)
+template <size_t I, typename T UTL_CONSTRAINT_CXX11(sizeof(::std::tuple_element<I, T>))>
+UTL_CONSTRAINT_CXX20(sizeof(::std::tuple_element<I, T>) > 0)
 __UTL_HIDE_FROM_ABI auto element_impl(int) noexcept -> ::std::tuple_element<I, T>;
 
 template <size_t I, typename T>

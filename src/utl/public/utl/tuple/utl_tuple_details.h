@@ -42,16 +42,16 @@ struct variadic_traits;
 
 namespace details {
 namespace tuple {
-template <size_t I, typename T UTL_REQUIRES_CXX11((I < tuple_size_v<T>))>
-UTL_REQUIRES_CXX20(requires {
+template <size_t I, typename T UTL_CONSTRAINT_CXX11((I < tuple_size_v<T>))>
+UTL_CONSTRAINT_CXX20(requires {
     __UTL get_element<I>(__UTL declval<T>()); })
 auto decl_element() noexcept -> decltype(__UTL get_element<I>(__UTL declval<T>()));
 
-template <size_t I, typename T UTL_REQUIRES_CXX11((I >= tuple_size_v<T>))>
+template <size_t I, typename T UTL_CONSTRAINT_CXX11((I >= tuple_size_v<T>))>
 void decl_element() noexcept = delete;
 
-template <size_t I, typename T UTL_REQUIRES_CXX11((I < tuple_size_v<T>))>
-UTL_REQUIRES_CXX20(requires {
+template <size_t I, typename T UTL_CONSTRAINT_CXX11((I < tuple_size_v<T>))>
+UTL_CONSTRAINT_CXX20(requires {
     __UTL get_element<I>(__UTL declval<T>()); })
 using get_type_t = decltype(__UTL get_element<I>(__UTL declval<T>()));
 
@@ -164,59 +164,59 @@ public:
         UTL_TRAIT_is_nothrow_move_assignable(T)) = default;
 #endif
 
-    template <UTL_CONCEPT_CXX20(constructible_as<T>) U UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(constructible_as<T>) U UTL_CONSTRAINT_CXX11(
         !__UTL is_same<U, storage>::value && __UTL is_constructible<T, U>::value)>
-    UTL_REQUIRES_CXX20(!same_as<remove_reference_t<U>, storage>)
+    UTL_CONSTRAINT_CXX20(!same_as<remove_reference_t<U>, storage>)
     __UTL_HIDE_FROM_ABI constexpr storage(U&& head) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, U))
         : head(__UTL forward<U>(head)) {}
 
-    template <UTL_CONCEPT_CXX20(allocator_usable_with<T>) Alloc UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(allocator_usable_with<T>) Alloc UTL_CONSTRAINT_CXX11(
         conjunction<__UTL uses_allocator<T, Alloc>,
             __UTL is_constructible<T, allocator_arg_t, Alloc const&>>::value)>
-    UTL_REQUIRES_CXX20(constructible_from<T, allocator_arg_t, Alloc const&>)
+    UTL_CONSTRAINT_CXX20(constructible_from<T, allocator_arg_t, Alloc const&>)
     __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, allocator_arg_t, Alloc const&))
         : head(allocator_arg, alloc) {}
 
-    template <UTL_CONCEPT_CXX20(allocator_usable_with<T>) Alloc UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(allocator_usable_with<T>) Alloc UTL_CONSTRAINT_CXX11(
         conjunction<__UTL uses_allocator<T, Alloc>,
             negation<__UTL is_constructible<T, allocator_arg_t, Alloc const&>>,
             __UTL is_constructible<T, Alloc const&>>::value)>
-    UTL_REQUIRES_CXX20(!constructible_from<T, allocator_arg_t, Alloc const&> &&
+    UTL_CONSTRAINT_CXX20(!constructible_from<T, allocator_arg_t, Alloc const&> &&
         constructible_from<T, Alloc const&>)
     __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, Alloc const&))
         : head(alloc) {}
 
-    template <UTL_CONCEPT_CXX20(allocator_type) Alloc UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(allocator_type) Alloc UTL_CONSTRAINT_CXX11(
         !UTL_TRAIT_uses_allocator(T, Alloc))>
-    UTL_REQUIRES_CXX20(constructible_from<T>)
+    UTL_CONSTRAINT_CXX20(constructible_from<T>)
     __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T))
         : head() {}
 
     template <UTL_CONCEPT_CXX20(allocator_usable_with<T>) Alloc,
-        typename U UTL_REQUIRES_CXX11(conjunction<__UTL uses_allocator<T, Alloc>,
+        typename U UTL_CONSTRAINT_CXX11(conjunction<__UTL uses_allocator<T, Alloc>,
             __UTL is_constructible<T, allocator_arg_t, Alloc const&, U>>::value)>
-    UTL_REQUIRES_CXX20(constructible_from<T, allocator_arg_t, Alloc const&, U>)
+    UTL_CONSTRAINT_CXX20(constructible_from<T, allocator_arg_t, Alloc const&, U>)
     __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc, U&& u) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, allocator_arg_t, Alloc const&, U))
         : head(allocator_arg, alloc, __UTL forward<U>(u)) {}
 
     template <UTL_CONCEPT_CXX20(allocator_usable_with<T>) Alloc,
-        typename U UTL_REQUIRES_CXX11(conjunction<__UTL uses_allocator<T, Alloc>,
+        typename U UTL_CONSTRAINT_CXX11(conjunction<__UTL uses_allocator<T, Alloc>,
             negation<__UTL is_constructible<T, allocator_arg_t, Alloc const&, U>>,
             __UTL is_constructible<T, U, Alloc const&>>::value)>
-    UTL_REQUIRES_CXX20(!constructible_from<T, allocator_arg_t, Alloc const&, U> &&
+    UTL_CONSTRAINT_CXX20(!constructible_from<T, allocator_arg_t, Alloc const&, U> &&
         constructible_from<T, U, Alloc const&>)
     __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc, U&& u) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, U, Alloc const&))
         : head(__UTL forward<U>(u), alloc) {}
 
-    template <UTL_CONCEPT_CXX20(allocator_usable_with<T>) Alloc, typename U UTL_REQUIRES_CXX11(
+    template <UTL_CONCEPT_CXX20(allocator_usable_with<T>) Alloc, typename U UTL_CONSTRAINT_CXX11(
         !UTL_TRAIT_uses_allocator(T, Alloc))>
-    UTL_REQUIRES_CXX20(constructible_from<T, U>)
+    UTL_CONSTRAINT_CXX20(constructible_from<T, U>)
     __UTL_HIDE_FROM_ABI constexpr storage(allocator_arg_t, Alloc const& alloc, U&& u) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, U))
         : head(__UTL forward<U>(u)) {}
@@ -260,27 +260,27 @@ public:
     }
 
     template <size_t I>
-    UTL_REQUIRES_CXX20(I == 0)
+    UTL_CONSTRAINT_CXX20(I == 0)
     UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 auto get() && noexcept UTL_LIFETIMEBOUND
     -> UTL_ENABLE_IF_CXX11(T&&, I == 0) {
         return __UTL move(head);
     }
 
     template <size_t I>
-    UTL_REQUIRES_CXX20(I == 0)
+    UTL_CONSTRAINT_CXX20(I == 0)
     UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) UTL_CONSTEXPR_CXX14 auto get() & noexcept UTL_LIFETIMEBOUND
     -> UTL_ENABLE_IF_CXX11(T&, I == 0) {
         return head;
     }
 
     template <size_t I>
-    UTL_REQUIRES_CXX20(I == 0)
+    UTL_CONSTRAINT_CXX20(I == 0)
     UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr auto get() const&& noexcept UTL_LIFETIMEBOUND -> UTL_ENABLE_IF_CXX11(T const&&, I == 0) {
         return __UTL move(head);
     }
 
     template <size_t I>
-    UTL_REQUIRES_CXX20(I == 0)
+    UTL_CONSTRAINT_CXX20(I == 0)
     UTL_ATTRIBUTES(NODISCARD, CONST, _HIDE_FROM_ABI) constexpr auto get() const& noexcept UTL_LIFETIMEBOUND -> UTL_ENABLE_IF_CXX11(T const&, I == 0) {
         return head;
     }

@@ -191,7 +191,7 @@ public:
         UTL_TRAIT_is_explicit_constructible(T1)) constexpr pair() noexcept = default;
     UTL_DISABLE_WARNING_POP()
 #else
-    template <typename U0 = T0, typename U1 = T1 UTL_REQUIRES_CXX11(defer<bool_constant<
+    template <typename U0 = T0, typename U1 = T1 UTL_CONSTRAINT_CXX11(defer<bool_constant<
             UTL_TRAIT_is_implicit_constructible(T0) && UTL_TRAIT_is_implicit_constructible(T1)>,
         U0, U1>::value)>
     __UTL_HIDE_FROM_ABI constexpr pair() noexcept(UTL_TRAIT_is_nothrow_default_constructible(T0) &&
@@ -199,7 +199,7 @@ public:
         : first()
         , second() {}
 
-    template <typename U0 = T0, typename U1 = T1 UTL_REQUIRES_CXX11(defer<bool_constant<
+    template <typename U0 = T0, typename U1 = T1 UTL_CONSTRAINT_CXX11(defer<bool_constant<
             UTL_TRAIT_is_explicit_constructible(T0) || UTL_TRAIT_is_explicit_constructible(T1)>,
         U0, U1>::value)>
     __UTL_HIDE_FROM_ABI explicit constexpr pair() noexcept(

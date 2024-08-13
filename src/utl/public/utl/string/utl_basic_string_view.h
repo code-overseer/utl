@@ -83,7 +83,7 @@ public:
         , size_(traits_type::length(data)) {}
 
     template <UTL_CONCEPT_CXX20(contiguous_iterator) It,
-        UTL_CONCEPT_CXX20(sized_sentinel_for<It>) E UTL_REQUIRES_CXX11(
+        UTL_CONCEPT_CXX20(sized_sentinel_for<It>) E UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_contiguous_iterator(It) && UTL_TRAIT_is_sized_sentinel_for(E, It))>
     __UTL_HIDE_FROM_ABI constexpr basic_string_view(It begin, E end) noexcept(
         UTL_TRAIT_is_nothrow_dereferenceable(It) && noexcept(end - begin))

@@ -10,7 +10,7 @@ namespace details {
 namespace bit {
 
 template <typename T>
-UTL_REQUIRES_CXX20(requires(T x) {
+UTL_CONSTRAINT_CXX20(requires(T x) {
     { +x } -> same_as<T>;
 })
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto bit_ceil(T x) noexcept -> UTL_ENABLE_IF_CXX11(

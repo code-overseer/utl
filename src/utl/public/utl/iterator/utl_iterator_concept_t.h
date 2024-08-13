@@ -109,14 +109,14 @@ template <typename T>
 struct has_member_iterator_category<T, __UTL void_t<typename trait_type_t<T>::iterator_category>> :
     __UTL true_type {};
 
-template <typename T UTL_REQUIRES_CXX11(has_member_iterator_concept<T>::value)>
+template <typename T UTL_CONSTRAINT_CXX11(has_member_iterator_concept<T>::value)>
 __UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> typename trait_type_t<T>::iterator_concept;
 
-template <typename T UTL_REQUIRES_CXX11(
+template <typename T UTL_CONSTRAINT_CXX11(
     !has_member_iterator_concept<T>::value && has_member_iterator_category<T>::value)>
 __UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> typename trait_type_t<T>::iterator_category;
 
-template <typename T UTL_REQUIRES_CXX11(!has_member_iterator_concept<T>::value &&
+template <typename T UTL_CONSTRAINT_CXX11(!has_member_iterator_concept<T>::value &&
     !has_member_iterator_category<T>::value &&
     !__UTL details::iterator_traits::is_specialized<T>::value)>
 __UTL_HIDE_FROM_ABI auto resolve(int) noexcept -> __UTL random_access_iterator_tag;
