@@ -358,21 +358,19 @@ class graph_tuple_impl<index_sequence<Is...>, Vs...> : element<Is, Vs>... {
     using element_type UTL_NODEBUG = template_element_t<I, type_list<Vs...>>;
     template <size_t I>
     using base_type UTL_NODEBUG = element<I, element_type<I>>;
-    static constexpr size_t paths =
-        numeric::sum<size_t>((dependency_count<Is, graph>::value == 0)...);
 
 public:
     template <typename... Args>
-    __UTL_HIDE_FROM_ABI explicit vertex_space_impl(Args&&... args) noexcept(
+    __UTL_HIDE_FROM_ABI explicit graph_tuple_impl(Args&&... args) noexcept(
         __UTL conjunction<__UTL is_nothrow_constructible<element<Is, Vs>, Args>...>::value)
         : element<Is, Vs>(__UTL forward<Args>(args))... {}
-    __UTL_HIDE_FROM_ABI vertex_space_impl(vertex_space_impl const&) noexcept(
+    __UTL_HIDE_FROM_ABI graph_tuple_impl(graph_tuple_impl const&) noexcept(
         __UTL conjunction<__UTL is_nothrow_copy_constructible<Vs>...>::value) = default;
-    __UTL_HIDE_FROM_ABI vertex_space_impl& operator=(vertex_space_impl const&) noexcept(
+    __UTL_HIDE_FROM_ABI graph_tuple_impl& operator=(graph_tuple_impl const&) noexcept(
         __UTL conjunction<__UTL is_nothrow_copy_assignable<Vs>...>::value) = default;
-    __UTL_HIDE_FROM_ABI vertex_space_impl(vertex_space_impl&&) noexcept(
+    __UTL_HIDE_FROM_ABI graph_tuple_impl(graph_tuple_impl&&) noexcept(
         __UTL conjunction<__UTL is_nothrow_move_constructible<Vs>...>::value) = default;
-    __UTL_HIDE_FROM_ABI vertex_space_impl& operator=(vertex_space_impl&&) noexcept(
+    __UTL_HIDE_FROM_ABI graph_tuple_impl& operator=(graph_tuple_impl&&) noexcept(
         __UTL conjunction<__UTL is_nothrow_move_assignable<Vs>...>::value) = default;
 
     template <size_t I, typename... Args>
@@ -406,9 +404,66 @@ public:
 template <typename... Vs>
 using graph_tuple = graph_tuple_impl<index_sequence_for<Vs...>, Vs...>;
 
-template <size_t... Is, typename Graph>
+template <typename Graph>
+struct vertex_sequence_impl;
+template <typename... Vs, typename... Es>
+struct vertex_sequence_impl<graph<vertex_space<Vs...>, Es...>> {
+    using type UTL_NODEBUG = index_sequence_for<Vs...>;
+};
+
+template <typename Graph>
+using vertex_sequence UTL_NODEBUG = typename vertex_sequence_impl<Graph>::type;
+
+template <typename Graph, size_t... Is>
 __UTL_HIDE_FROM_ABI graph_tuple<barrier<dependency_count<Is, Graph>::value>...> decl_barriers(
     index_sequence<Is...>) noexcept;
+
+template <typename Graph, size_t... Is>
+__UTL_HIDE_FROM_ABI index_sequence<(dependency_count<Is, Graph>::value == 0)...> decl_entrymask(
+    index_sequence<Is...>) noexcept;
+
+template <typename Graph>
+using vertex_barriers UTL_NODEBUG = decltype(decl_barriers<Graph>(vertex_sequence<Graph>{}));
+template <typename Graph>
+using entrypoint_mask UTL_NODEBUG = decltype(decl_entrymask<Graph>(vertex_sequence<Graph>{}));
+
+using size_array_t UTL_NODEBUG = size_t[];
+template <size_t I, size_t... Vs>
+struct sum_before;
+template <size_t... Vs>
+struct sum_before<0, Vs...> : size_constant<0> {};
+template <size_t I, size_t... Vs>
+struct sum_before : size_constant<size_array_t{Vs...}[I - 1] + sum_before<I - 1, Vs...>::value> {};
+
+template <size_t... Is, size_t... Ns>
+__UTL_HIDE_FROM_ABI auto exclusive_scan_sequence_impl(index_sequence<Is...>,
+    index_sequence<Ns...>) noexcept -> index_sequence<sum_before<Is, Ns...>::value...>;
+
+template <size_t... Ns>
+using exclusive_scan_for = decltype(exclusive_scan_sequence_impl(
+    make_index_sequence<sizeof...(Ns)>{}, index_sequence<Ns...>{}));
+
+template <size_t... Bs>
+__UTL_HIDE_FROM_ABI auto path_sequence_impl(index_sequence<Bs...>) noexcept
+    -> exclusive_scan_for<Bs...>;
+
+template <typename Graph>
+using path_sequence UTL_NODEBUG = decltype(path_sequence_impl(entrypoint_mask<Graph>{}));
+
+template <size_t I, size_t... BranchIds>
+__UTL_HIDE_FROM_ABI auto path_id_impl(index_sequence<BranchIds...>) noexcept
+    -> size_constant<size_array_t{BranchIds...}[I]>;
+
+template <size_t I, typename Graph>
+using path_id UTL_NODEBUG = decltype(path_id_impl(path_sequence<Graph>{}));
+
+template <typename Graph, size_t... Is>
+__UTL_HIDE_FROM_ABI auto path_count_impl(index_sequence<Is...>) noexcept
+    -> size_constant<numeric::sum<size_t>((dependency_count<Is, Graph>::value == 0)...)>;
+
+template <typename Graph>
+using path_count UTL_NODEBUG = decltype(path_count_impl<Graph>(vertex_sequence<Graph>{}));
+
 } // namespace details
 
 template <typename... Vs>
@@ -426,32 +481,41 @@ class graph<vertex_space<Vs...>, edge<Fs, Ts>...> {
 
     static_assert((... && (template_count<edge<Fs, Ts>, type_list<edge<Fs, Ts>...>>::value == 1)),
         "Non-unique edge detected");
-    using exception_span = __UTL span<__UTL exception_ptr, sizeof...(Vs)>;
+    using exception_span = __UTL span<__UTL exception_ptr, details::path_count<graph>::value>;
 
 public:
     template <typename S>
-    void begin(S& scheduler) {
+    void begin(S& scheduler) UTL_THROWS {
+        UTL_THROW_IF(!is_running(),
+            program_exception(UTL_MESSAGE_FORMAT(
+                "[UTL] task graph intiation error, Reason=[Graph already initiated]")));
+
         static_assert(is_acyclic<graph>::value, "Cycle detected!");
+        for (auto& ptr : exceptions_) {
+            ptr = nullptr;
+        }
         [&]<size_t... Is>(index_sequence<Is...>) { (..., begin<Is>(scheduler)); }(
             index_sequence_for<Vs...>{});
     }
 
     __UTL expected<void, exception_span> wait() noexcept UTL_LIFETIMEBOUND {
-        graph_barrier_.wait();
+        if (is_running()) {
+            graph_barrier_.wait();
+        }
+
         return create_result();
     }
 
     template <typename R, typename P>
     __UTL expected<void, exception_span> wait(std::chrono::duration<R, P> duration) noexcept UTL_LIFETIMEBOUND {
-        graph_barrier_.wait(duration);
+        if (is_running()) {
+            graph_barrier_.wait(duration);
+        }
+
         return create_result();
     }
 
-#if UTL_WITH_EXCEPTIONS
-    exception_span exceptions() noexcept UTL_LIFETIMEBOUND { return exceptions_; }
-#else
-    exception_span exceptions() noexcept UTL_LIFETIMEBOUND { return {}; }
-#endif
+    ~graph() noexcept { wait(); }
 
 private:
     __UTL expected<void, exception_span> create_result() noexcept UTL_LIFETIMEBOUND {
@@ -468,36 +532,39 @@ private:
     }
 
 private:
-    using vertices = vertex_space<Vs...>;
-    using vertex_barriers = decltype(details::decl_barriers(index_sequence_for<Vs...>{}));
+    using graph_barrier UTL_NODEBUG = barrier<sizeof...(Vs)>;
+    using vertices UTL_NODEBUG = vertex_space<Vs...>;
+    using vertex_barriers UTL_NODEBUG = details::vertex_barriers<graph>;
+    using exception_array UTL_NODEBUG = exception_ptr[details::path_count<graph>::value];
 
     template <size_t I, typename S>
     void begin(S& scheduler) {
+        static constexpr details::path_id<I, graph> path{};
         if constexpr (dependency_count<I, graph>::value == 0) {
-            this->schedule<I>(scheduler);
+            this->schedule<I>(path, scheduler);
         }
     }
 
-    template <size_t I, typename S>
-    void schedule(S& scheduler) {
+    template <size_t I, size_t B, typename S>
+    void schedule(size_constant<B> path, S& scheduler) {
         static constexpr size_constant<I> index{};
         scheduler.schedule([&]() {
             UTL_TRY {
                 __UTL invoke(vertices_, index);
-                (..., on_complete<I, Fs, Ts>(scheduler));
+                (..., on_complete<I, Fs, Ts>(path, scheduler));
                 graph_barrier_.arrive(); // noexcept
             } UTL_CATCH(...) {
-                exceptions_[I] = __UTL current_exception();
+                exceptions_[path] = __UTL current_exception();
                 (..., on_fail<I, Fs, Ts>());
             }
         });
     }
 
-    template <size_t Current, size_t From, size_t To, typename S>
-    void on_complete(S& scheduler) {
+    template <size_t Current, size_t From, size_t To, size_t B, typename S>
+    void on_complete(size_constant<B> path, S& scheduler) {
         if constexpr (Current == From) {
             if (__UTL get_element<To>(vertex_barriers_).arrive()) {
-                this->schedule<To>(scheduler);
+                this->schedule<To>(path, scheduler);
             }
         }
     }
@@ -510,11 +577,11 @@ private:
         }
     }
 
-    barrier<sizeof...(Vs)> graph_barrier_;
 #if UTL_WITH_EXCEPTIONS
-    exception_ptr exceptions_[sizeof...(Vs)];
+    exception_array exceptions_ = {};
 #endif
-    alignas(64) vertex_space<Vs...> vertices_;
+    graph_barrier graph_barrier_;
+    alignas(64) vertices vertices_;
     alignas(64) vertex_barriers vertex_barriers_;
 };
 } // namespace task_graph
