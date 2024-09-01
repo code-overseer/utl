@@ -19,9 +19,9 @@ template <>
 struct __UTL_PUBLIC_TEMPLATE clock_traits<system_clock_t> {
 public:
     using clock = system_clock_t;
-    using value_type = unsigned long long;
+    using value_type = long long;
     using duration = time_duration;
-    using epoch_conversion = integral_constant<value_type, 11644473600ULL>;
+    using epoch_conversion = integral_constant<value_type, 11644473600LL>;
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
         value_type t) noexcept {
@@ -67,7 +67,7 @@ template <>
 struct __UTL_PUBLIC_TEMPLATE clock_traits<steady_clock_t> {
 public:
     using clock = steady_clock_t;
-    using value_type = unsigned long long;
+    using value_type = long long;
     using duration = time_duration;
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
@@ -105,7 +105,7 @@ template <>
 struct __UTL_PUBLIC_TEMPLATE clock_traits<high_resolution_clock_t> {
 public:
     using clock = high_resolution_clock_t;
-    using value_type = unsigned long long;
+    using value_type = long long;
     using duration = time_duration;
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
@@ -139,7 +139,7 @@ private:
 
 // TODO move this
 struct rdtscp_t {
-    unsigned long long tick;
+    long long tick;
     int aux;
 };
 
@@ -152,7 +152,7 @@ public:
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
         value_type t) noexcept {
-        return duration(t.tick - 0);
+        return duration(t.tick - 0ll);
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration difference(
@@ -172,11 +172,15 @@ public:
             return l.tick < r.tick ? -1 : l.tick > r.tick ? 1 : 0;
         }
 
-        return l.aux - r.aux;
+        return l.aux < r.aux ? -1 : 1;
     }
 
-    friend __UTL_HIDE_FROM_ABI time_point<high_resolution_clock_t> get_time(
-        hardware_ticks) noexcept {
+    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(hardware_clock_t c) noexcept {
+        return get_time(c, __UTL memory_order_seq_cst);
+    }
+
+    friend __UTL_HIDE_FROM_ABI time_point<hardware_clock_t> get_time(
+        hardware_clock_t, __UTL memory_order) noexcept {
         return time_point<hardware_clock_t>{get_time()};
     }
 

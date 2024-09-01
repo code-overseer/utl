@@ -9,6 +9,6 @@
 #include <cstdint>
 
 UTL_STD_NAMESPACE_BEGIN
-template <intmax_t N, intmax_t D = 1>
+template <intmax_t N, intmax_t D>
 class ratio;
 UTL_STD_NAMESPACE_END

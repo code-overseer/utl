@@ -16,25 +16,25 @@ UTL_NAMESPACE_BEGIN
 
 namespace platform {
 class time_duration {
-    static constexpr size_t nano_divisor = size_t(1000000000);
+    static constexpr long long nano_divisor = 1000000000ll;
     struct construct_t {};
 
     template <typename R, typename P>
-    time_duration from_chrono(::std::chrono::duration<R, P> const& t) noexcept {
-        using nano_duration = ::std::chrono::duration<long long, ::std::ratio<1, 1000000000>>;
+    static constexpr time_duration from_chrono(::std::chrono::duration<R, P> const& t) noexcept {
+        using nano_ratio = ::std::ratio<1, 1000000000>;
+        using nano_duration = ::std::chrono::duration<long long, nano_ratio>;
         auto const time = ::std::chrono::duration_cast<nano_duration>(t).count();
-        using time_type = decltype(time);
-        static constexpr time_type divisor = time_type(1000000000);
+        auto const divisor = 1000000000ll;
         auto const seconds = time / divisor;
-        return time_duration{construct_t{}, seconds, time - seconds * divisor};
+        return {construct_t{}, seconds, time - seconds * divisor};
     }
 
-    constexpr time_duration adjust(size_t s, size_t ns) noexcept {
+    static constexpr time_duration adjust(long long s, long long ns) noexcept {
         auto const extra = ns / nano_divisor;
-        return time_duration{construct_t{}, s + extra, ns - extra * nano_divisor};
+        return {construct_t{}, s + extra, ns - extra * nano_divisor};
     }
 
-    constexpr time_duration(construct_t, size_t seconds, size_t nanoseconds) noexcept
+    constexpr time_duration(construct_t, long long seconds, long long nanoseconds) noexcept
         : seconds_(seconds)
         , nanoseconds_(nanoseconds) {}
 
@@ -42,7 +42,7 @@ public:
     template <typename R, typename P>
     explicit time_duration(::std::chrono::duration<R, P> const& t) noexcept
         : time_duration(from_chrono(t)) {}
-    constexpr explicit time_duration(size_t seconds, size_t nanoseconds = 0) noexcept
+    constexpr explicit time_duration(long long seconds, long long nanoseconds = 0) noexcept
         : time_duration(adjust(seconds, nanoseconds)) {}
     constexpr explicit time_duration() noexcept : seconds_(0), nanoseconds_(0) {}
 
@@ -52,12 +52,12 @@ public:
         return {(decltype(T::tv_sec))seconds_, (decltype(T::tv_nsec))nanoseconds_};
     }
 
-    UTL_ATTRIBUTES(PURE, ALWAYS_INLINE) size_t seconds() const { return seconds_; }
-    UTL_ATTRIBUTES(PURE, ALWAYS_INLINE) size_t nanoseconds() const { return nanoseconds_; }
+    UTL_ATTRIBUTES(PURE, ALWAYS_INLINE) long long seconds() const { return seconds_; }
+    UTL_ATTRIBUTES(PURE, ALWAYS_INLINE) long long nanoseconds() const { return nanoseconds_; }
 
 private:
-    size_t seconds_;
-    size_t nanoseconds_;
+    long long seconds_;
+    long long nanoseconds_;
 };
 } // namespace platform
 

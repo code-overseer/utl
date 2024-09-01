@@ -14,12 +14,12 @@ namespace platform {
 class hardware_ticks {
 public:
     constexpr explicit hardware_ticks() noexcept : ticks_(0) {}
-    constexpr explicit hardware_ticks(size_t t) noexcept : ticks_(t) {}
+    constexpr explicit hardware_ticks(long long t) noexcept : ticks_(t) {}
 
-    size_t value() const noexcept { return ticks_; }
+    long long value() const noexcept { return ticks_; }
 
 private:
-    size_t ticks_;
+    long long ticks_;
 };
 } // namespace platform
 

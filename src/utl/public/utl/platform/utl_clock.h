@@ -7,7 +7,9 @@
 #include "utl/chrono/utl_chrono_fwd.h"
 #include "utl/platform/utl_clock_fwd.h"
 
+#include "utl/atomic.h"
 #include "utl/compare/utl_strong_ordering.h"
+#include "utl/platform/utl_hardware_ticks.h"
 #include "utl/platform/utl_time_duration.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_is_copy_constructible.h"
@@ -112,7 +114,9 @@ public:
 
 #endif
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) value_type const& value() const noexcept { return value_; }
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) constexpr value_type const& value() const noexcept {
+        return value_;
+    }
 
     constexpr explicit time_point() noexcept(
         UTL_TRAIT_is_nothrow_default_constructible(value_type)) = default;
@@ -123,32 +127,37 @@ private:
         : value_(v){};
 
     friend time_point<clock> get_time(clock) noexcept;
+    // Only defined by hardware_clock if supported
+    friend time_point<clock> get_time(clock, __UTL memory_order) noexcept;
 
     value_type value_;
 };
 
 struct system_clock_t {
     explicit constexpr system_clock_t() noexcept = default;
-    friend time_point<system_clock_t> get_time(system_clock_t) noexcept;
+    __UTL_HIDE_FROM_ABI friend time_point<system_clock_t> get_time(system_clock_t) noexcept;
 };
 
 struct steady_clock_t {
     explicit constexpr steady_clock_t() noexcept = default;
-    friend time_point<steady_clock_t> get_time(steady_clock_t) noexcept;
+    __UTL_HIDE_FROM_ABI friend time_point<steady_clock_t> get_time(steady_clock_t) noexcept;
 };
 
 struct high_resolution_clock_t {
 public:
     explicit constexpr high_resolution_clock_t() noexcept = default;
-    friend time_point<high_resolution_clock_t> get_time(high_resolution_clock_t) noexcept;
+    __UTL_HIDE_FROM_ABI friend time_point<high_resolution_clock_t> get_time(
+        high_resolution_clock_t) noexcept;
 };
 
 struct hardware_clock_t {
     explicit constexpr hardware_clock_t() noexcept = default;
-    friend time_point<hardware_clock_t> get_time(hardware_clock_t) noexcept;
+    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+        hardware_clock_t, __UTL memory_order) noexcept;
+    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(hardware_clock_t c) noexcept;
 };
 
-constexpr ::time_t to_posix_time(time_point<system_clock_t>) noexcept;
+__UTL_HIDE_FROM_ABI constexpr ::time_t to_posix_time(time_point<system_clock_t>) noexcept;
 
 UTL_INLINE_CXX17 constexpr system_clock_t system_clock{};
 
