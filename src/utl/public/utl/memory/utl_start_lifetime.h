@@ -19,7 +19,11 @@
 #if UTL_HAS_BUILTIN(__builtin_memcpy)
 #  define __UTL_MEMCPY(...) __builtin_memcpy(__VA_ARGS__)
 #else
-#  include <string.h>
+#  if UTL_COMPILER_MSVC
+extern "C" void* memcpy(void* __restrict, void const* __restrict, decltype(sizeof(0)));
+#  else
+#    include <string.h>
+#  endif
 #  define __UTL_MEMCPY(...) ::memcpy(__VA_ARGS__)
 #endif
 
@@ -102,6 +106,9 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, LIFETIME_API) inline void* entangle_storage(void*
 #  error Undefined implementation
 #endif
 }
+#if UTL_COMPILER_MSVC
+#  pragma function(memcpy)
+#endif
 #undef __UTL_MEMMOVE
 #undef __UTL_MEMCPY
 #if defined(__UTL_ENTANGLE_MEMCPY_IMPL)

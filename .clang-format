@@ -125,3 +125,5 @@ Macros:
 - UTL_ATTRIBUTES(X,Y,Z,W)=[[X,Y,Z,W]]
 - UTL_NODISCARD=[[nodiscard]]
 - UTL_LIFETIMEBOUND=[[clang::lifetimebound]]
+- UTL_UNLIKELY=[[unlikely]]
+- UTL_LIKELY=[[likely]]
