@@ -35,11 +35,17 @@ public:
     }
 
 #if UTL_CXX20
+    template <same_as<std::strong_ordering> T>
+    __UTL_HIDE_FROM_ABI constexpr weak_ordering(T p) noexcept
+        : value(p == T::less        ? less.value
+                  : p == T::greater ? greater.value
+                                    : equivalent.value) {}
+
     template <same_as<std::weak_ordering> T>
     __UTL_HIDE_FROM_ABI constexpr weak_ordering(T p) noexcept
-        : value(p == T::less           ? less
-                  : p == T::equivalent ? equivalent
-                                       : greater) {}
+        : value(p == T::less           ? less.value
+                  : p == T::equivalent ? equivalent.value
+                                       : greater.value) {}
 
     template <same_as<std::weak_ordering> T>
     __UTL_HIDE_FROM_ABI constexpr operator T() noexcept {

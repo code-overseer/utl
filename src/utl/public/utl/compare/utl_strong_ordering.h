@@ -41,10 +41,10 @@ public:
 #if UTL_CXX20
     template <same_as<std::strong_ordering> T>
     __UTL_HIDE_FROM_ABI constexpr strong_ordering(T p) noexcept
-        : value(p == T::less           ? less
-                  : p == T::equivalent ? equivalent
-                  : p == T::equal      ? equal
-                                       : greater) {}
+        : value(p == T::less           ? less.value
+                  : p == T::equivalent ? equivalent.value
+                  : p == T::equal      ? equal.value
+                                       : greater.value) {}
 
     template <same_as<std::strong_ordering> T>
     __UTL_HIDE_FROM_ABI constexpr operator T() noexcept {
@@ -64,9 +64,6 @@ public:
         strong_ordering l, strong_ordering r) noexcept {
         return l.value == r.value;
     }
-    UTL_ATTRIBUTE(COMPARE_API) friend constexpr bool operator==(strong_ordering l, zero_t) noexcept {
-        return l.value == 0;
-    }
 
 #define UTL_ORDERING_COMPARISONS(SYMBOL)                                        \
     UTL_ATTRIBUTE(COMPARE_API)                                                  \
@@ -78,12 +75,12 @@ public:
         return l.value SYMBOL 0;                                                \
     }
 
+    UTL_ORDERING_COMPARISONS(==)
+    UTL_ORDERING_COMPARISONS(!=)
     UTL_ORDERING_COMPARISONS(<)
     UTL_ORDERING_COMPARISONS(>)
     UTL_ORDERING_COMPARISONS(<=)
     UTL_ORDERING_COMPARISONS(>=)
-
-#undef UTL_ORDERING_COMPARISONS
 
 #if UTL_CXX20
     UTL_ATTRIBUTE(COMPARE_API) friend constexpr strong_ordering operator<=>(
@@ -96,6 +93,8 @@ public:
         return strong_ordering(order_t(-r.value));
     }
 #endif
+
+#undef UTL_ORDERING_COMPARISONS
 
 private:
     __UTL_HIDE_FROM_ABI constexpr explicit strong_ordering(order_t value) noexcept

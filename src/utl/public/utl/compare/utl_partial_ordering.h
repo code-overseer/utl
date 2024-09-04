@@ -37,12 +37,18 @@ public:
     using details::compare::unordered_value<partial_ordering>::unordered;
 
 #if UTL_CXX20
+    template <same_as<std::strong_ordering> T>
+    __UTL_HIDE_FROM_ABI constexpr partial_ordering(T p) noexcept
+        : value(p == T::less        ? less.value
+                  : p == T::greater ? greater.value
+                                    : equivalent.value) {}
+
     template <same_as<std::partial_ordering> T>
     __UTL_HIDE_FROM_ABI constexpr partial_ordering(T p) noexcept
-        : value(p == T::less           ? less
-                  : p == T::equivalent ? equivalent
-                  : p == T::greater    ? greater
-                                       : unordered) {}
+        : value(p == T::less           ? less.value
+                  : p == T::equivalent ? equivalent.value
+                  : p == T::greater    ? greater.value
+                                       : unordered.value) {}
 
     template <same_as<std::partial_ordering> T>
     __UTL_HIDE_FROM_ABI constexpr operator T() noexcept {

@@ -2,6 +2,7 @@
 
 #include "utl/assert/utl_assert.h"
 #include "utl/platform/utl_clock.h"
+#include "utl/type_traits/utl_is_same.h"
 
 #if UTL_ARCH_AARCH64
 
@@ -28,8 +29,15 @@
 UTL_NAMESPACE_BEGIN
 namespace platform {
 
+static unsigned int clock_frequency() noexcept {
+    static unsigned int const value =
+        (unsigned int)(__builtin_arm_rsr64("CNTFRQ_EL0") & 0xffffffff);
+    return value;
+}
+
 auto clock_traits<hardware_clock_t>::get_time(__UTL memory_order o) noexcept -> value_type {
-    unsigned long long res;
+    static_assert(is_same<value_type, unsigned long long>::value, "Invalid implementation");
+    value_type res;
     switch (o) {
     case __UTL memory_order_relaxed:
         __builtin_arm_isb(ISB_SY);
@@ -61,7 +69,13 @@ auto clock_traits<hardware_clock_t>::get_time(__UTL memory_order o) noexcept -> 
 
     return res;
 }
+
+bool hardware_ticks::invariant_frequency() noexcept {
+    return true;
+}
+
 } // namespace platform
+
 UTL_NAMESPACE_END
 #    undef DMB_NSH
 #    undef DMB_ISHLD
@@ -74,6 +88,16 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 namespace platform {
+static unsigned int clock_frequency() noexcept {
+    static unsigned int const value = []() {
+        unsigned long long res;
+        __asm__ volatile("mrs %0, CNTFRQ_EL0\n\t" : "=r"(res) : : "memory");
+        return (unsigned int)(res & 0xffffffff);
+    }();
+
+    return value;
+}
+
 auto clock_traits<hardware_clock_t>::get_time(__UTL memory_order o) noexcept -> value_type {
     unsigned long long res;
     switch (o) {
@@ -123,32 +147,36 @@ auto clock_traits<hardware_clock_t>::get_time(__UTL memory_order o) noexcept -> 
     return res;
 }
 
+bool hardware_ticks::invariant_frequency() noexcept {
+    return true;
+}
+
 } // namespace platform
 UTL_NAMESPACE_END
 
 #  elif UTL_TARGET_MICROSOFT
 
+#    define NOMINMAX
+#    define NODRAWTEXT
+#    define NOGDI
+#    define NOBITMAP
+#    define NOMCX
+#    define NOSERVICE
+#    define NOHELP
+#    ifndef WIN32_LEAN_AND_MEAN
+#      define WIN32_LEAN_AND_MEAN
+#    endif
+
+#    include <Windows.h>
 #    include <intrin.h>
+#    include <winnt.h>
 
-// From winnt.h
-#    define ARM64_SYSREG(op0, op1, crn, crm, op2)                                        \
-        (((op0 & 1) << 14) | ((op1 & 7) << 11) | ((crn & 15) << 7) | ((crm & 15) << 3) | \
-            ((op2 & 7) << 0))
+#    define ARM64_CNTFRQ ARM64_SYSREG(3, 3, 14, 0, 0)
 
-#    define ARM64_CNTVCT ARM64_SYSREG(3, 3, 14, 0, 2)      // Generic Timer counter register
-#    define ARM64_PMCCNTR_EL0 ARM64_SYSREG(3, 3, 9, 13, 0) // Cycle Count Register [CP15_PMCCNTR]
-#    define ARM64_PMSELR_EL0 \
-        ARM64_SYSREG(3, 3, 9, 12, 5) // Event Counter Selection Register [CP15_PMSELR]
-#    define ARM64_PMXEVCNTR_EL0 \
-        ARM64_SYSREG(3, 3, 9, 13, 2) // Event Count Register [CP15_PMXEVCNTR]
-#    define ARM64_PMXEVCNTRn_EL0(n) \
-        ARM64_SYSREG(3, 3, 14, 8 + ((n) / 8), (n) % 8) // Direct Event Count Register [n/a]
-#    define ARM64_TPIDR_EL0 \
-        ARM64_SYSREG(3, 3, 13, 0, 2) // Thread ID Register, User Read/Write [CP15_TPIDRURW]
-#    define ARM64_TPIDRRO_EL0 \
-        ARM64_SYSREG(3, 3, 13, 0, 3) // Thread ID Register, User Read Only [CP15_TPIDRURO]
-#    define ARM64_TPIDR_EL1 \
-        ARM64_SYSREG(3, 0, 13, 0, 4) // Thread ID Register, Privileged Only [CP15_TPIDRPRW]
+static unsigned int clock_frequency() noexcept {
+    static unsigned int const value = (unsigned int)(_ReadStatusReg(ARM64_CNTFRQ) & 0xffffffff);
+    return value;
+}
 
 UTL_NAMESPACE_BEGIN
 namespace platform {
@@ -184,10 +212,16 @@ auto time_point<hardware_clock_t>::get_time(__UTL memory_order o) noexcept -> va
 
     return res;
 }
+
+bool hardware_ticks::invariant_frequency() noexcept {
+    return true;
+}
 } // namespace platform
 UTL_NAMESPACE_END
 
 #  else
+
+UTL_PRAGMA_WARN("Unrecognized target/compiler");
 
 UTL_NAMESPACE_BEGIN
 namespace platform {
@@ -195,7 +229,32 @@ auto time_point<hardware_clock_t>::get_time(__UTL memory_order o) noexcept -> va
     UTL_ASSERT(false);
     UTL_BUILTIN_unreachable();
 }
+bool hardware_ticks::invariant_frequency() noexcept {
+    return false;
+}
+static unsigned int clock_frequency() noexcept {
+    return 1;
+}
 } // namespace platform
 UTL_NAMESPACE_END
 #  endif
+
+UTL_NAMESPACE_BEGIN
+namespace platform {
+
+time_duration to_time_duration(hardware_ticks t) noexcept {
+    if (!hardware_ticks::invariant_frequency()) {
+        return time_duration::invalid();
+    }
+
+    if (t.value() < 0) {
+        return time_duration::invalid();
+    }
+
+    static constexpr unsigned int nano = 1000000000;
+    return time_duration{0, t.value() * nano / clock_frequency()};
+}
+
+} // namespace platform
+UTL_NAMESPACE_END
 #endif

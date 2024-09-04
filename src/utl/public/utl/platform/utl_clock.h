@@ -86,15 +86,16 @@ public:
     }
 
 #if UTL_CXX20
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) bool operator<=>(time_point const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) __UTL strong_ordering operator<=>(
+        time_point const& other) const noexcept {
         static_assert(noexcept(traits::compare(value_, other.value_)), "Invalid clock");
-        return traits::compare(value_, other.value_) < 0;
+        return traits::compare(value_, other.value_) <=> 0;
     }
 #else
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) bool operator<(time_point const& other) const noexcept {
         static_assert(noexcept(traits::compare(value_, other.value_)), "Invalid clock");
-        return static_cast<__UTL strong_ordering>(traits::compare(value_, other.value_) <=> 0);
+        return traits::compare(value_, other.value_) < 0;
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) bool operator!=(time_point const& other) const noexcept {

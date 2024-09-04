@@ -31,8 +31,6 @@ public:
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration difference(
         value_type l, value_type r) noexcept {
-        // static auto const freq = (unsigned int)__builtin_arm_rsr64("CNTFRQ_EL0");
-        // static auto const ns_per_tick = 1000000000u / frequency;
         auto const diff = l - r;
         return duration{(long long)diff};
     }

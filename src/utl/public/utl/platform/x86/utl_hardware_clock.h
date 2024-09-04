@@ -33,7 +33,7 @@ public:
         return duration(t.tick - 0ll);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration difference(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, PURE, ALWAYS_INLINE) static inline constexpr duration difference(
         value_type l, value_type r) noexcept {
         return duration(__UTL sub_sat(l.tick, r.tick));
     }
