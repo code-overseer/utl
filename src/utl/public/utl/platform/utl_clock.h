@@ -59,6 +59,7 @@ UTL_INLINE_CXX17 constexpr bool is_clock_v = is_clock<T>::value;
 template <UTL_CONCEPT_CXX20(clock_type) Clock>
 class __UTL_PUBLIC_TEMPLATE time_point<Clock> {
     static_assert(UTL_TRAIT_is_platform_clock(Clock));
+    friend clock_traits<Clock>;
     using traits = clock_traits<Clock>;
 
 public:
@@ -126,10 +127,6 @@ private:
         UTL_TRAIT_is_nothrow_copy_constructible(value_type))
         : value_(v){};
 
-    friend time_point<clock> get_time(clock) noexcept;
-    // Only defined by hardware_clock if supported
-    friend time_point<clock> get_time(clock, __UTL memory_order) noexcept;
-
     value_type value_;
 };
 
@@ -173,6 +170,8 @@ UTL_NAMESPACE_END
 
 #define UTL_PLATFORM_CLOCK_PRIVATE_HEADER_GUARD
 #include "utl/platform/apple/utl_clock.h"
+#include "utl/platform/arm/utl_hardware_clock.h"
 #include "utl/platform/posix/utl_clock.h"
 #include "utl/platform/winapi/utl_clock.h"
+#include "utl/platform/x86/utl_hardware_clock.h"
 #undef UTL_PLATFORM_CLOCK_PRIVATE_HEADER_GUARD

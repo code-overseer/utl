@@ -8,7 +8,7 @@
 
 #include "utl/utl_config.h"
 
-#if UTL_ARCH_AARCH64
+#if UTL_ARCH_x86_64
 
 #  include "utl/numeric/utl_sub_sat.h"
 

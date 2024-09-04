@@ -57,13 +57,6 @@ auto time_point<high_resolution_clock_t>::difference(value_type l, value_type r)
     auto const diff = l - r;
     return duration{0, diff * ns_per_tick};
 }
-
-auto time_point<hardware_clock_t>::get_time() noexcept -> value_type {
-    rdtscp_t result;
-    // TODO support older processors
-    result.tick = __rdtscp(&result.aux);
-    return result;
-}
 } // namespace platform
 
 UTL_NAMESPACE_END

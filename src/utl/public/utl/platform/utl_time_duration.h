@@ -39,6 +39,8 @@ class time_duration {
         , nanoseconds_(nanoseconds) {}
 
 public:
+    static constexpr time_duration invalid() noexcept { return {construct_t{}, -1, -1}; }
+
     template <typename R, typename P>
     explicit time_duration(::std::chrono::duration<R, P> const& t) noexcept
         : time_duration(from_chrono(t)) {}
@@ -54,6 +56,14 @@ public:
 
     UTL_ATTRIBUTES(PURE, ALWAYS_INLINE) long long seconds() const { return seconds_; }
     UTL_ATTRIBUTES(PURE, ALWAYS_INLINE) long long nanoseconds() const { return nanoseconds_; }
+
+    UTL_ATTRIBUTES(PURE, ALWAYS_INLINE) explicit constexpr operator bool() const noexcept {
+        return seconds_ == -1 && (seconds_ == nanoseconds_);
+    }
+
+    UTL_ATTRIBUTES(PURE, ALWAYS_INLINE) constexpr bool empty() const noexcept { return !bool(*this); }
+
+    // cmp
 
 private:
     long long seconds_;
