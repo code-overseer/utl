@@ -411,7 +411,7 @@ template <typename T0, typename T1, typename U0, typename U1>
 requires (requires(pair<T0, T1> const& l, pair<U0, U1> const& r) { r < l; })
 UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator<=(
     pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(noexcept(!(r < l))) {
-    return !(r < l) && true;
+    return !(r < l);
 }
 
 template <typename T0, typename T1, typename U0, typename U1>
