@@ -141,10 +141,21 @@ public:
     __UTL_HIDE_FROM_ABI void emplace(message_format fmt, ...) UTL_THROWS {
         va_list args;
         va_start(args, fmt);
-        auto header = message_header::create(__UTL move(fmt), args);
-        va_end(args);
-        set_next(*header, head_);
+        UTL_TRY {
+            emplace(fmt, args);
+            va_end(args);
+        } UTL_CATCH(...) {
+            va_end(args);
+            UTL_RETHROW();
+        }
+    }
 
+    __UTL_HIDE_FROM_ABI void emplace(message_format fmt, va_list args) UTL_THROWS {
+        // could throw
+        auto header = message_header::create(__UTL move(fmt), args);
+
+        // noexcept
+        set_next(*header, head_);
         if (tail_ == nullptr) {
             UTL_ASSERT(head_ == nullptr && empty());
             tail_ = header;

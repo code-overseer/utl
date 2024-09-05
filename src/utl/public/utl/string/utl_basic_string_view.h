@@ -398,7 +398,7 @@ UTL_NAMESPACE_END
 
 #if UTL_CXX20
 
-#  include "utl/compare/utl_strong_ordering.h"
+#  include "utl/compare/utl_compare_fwd.h"
 
 UTL_NAMESPACE_BEGIN
 
