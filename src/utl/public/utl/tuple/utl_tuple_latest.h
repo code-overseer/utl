@@ -898,6 +898,28 @@ UTL_ATTRIBUTES(FLATTEN, _HIDE_FROM_ABI) inline constexpr bool equals(T const& l,
     return equals<0>(l, r);
 }
 
+template <size_t I, tuple_like T, tuple_like U>
+requires (I == tuple_size_v<T>)
+UTL_ATTRIBUTES(CONST, _HIDE_FROM_ABI) constexpr bool less(T const& l, U const& r) noexcept {
+    return false;
+}
+
+template <size_t I, tuple_like T, tuple_like U>
+requires (I < tuple_size_v<T>)
+__UTL_HIDE_FROM_ABI constexpr bool less(T const& l, U const& r) noexcept(
+    conjunction_v<compare_ops::all_have_nothrow_eq<T, U>, compare_ops::all_have_nothrow_lt<T, U>>) {
+    return (__UTL get_element<I - 1>(l) == __UTL get_element<I - 1>(r)) &&
+        ((__UTL get_element<I>(l) < __UTL get_element<I>(r)) || less<I + 1>(l, r));
+}
+
+template <tuple_like T, tuple_like U>
+UTL_ATTRIBUTES(FLATTEN, _HIDE_FROM_ABI) constexpr bool less(T const& l, U const& r) noexcept(
+    conjunction_v<compare_ops::all_have_nothrow_eq<T, U>, compare_ops::all_have_nothrow_lt<T, U>>) {
+    static_assert(compare_ops::all_have_eq<T, U>::value, "All elements must be comparable");
+    static_assert(compare_ops::all_have_lt<T, U>::value, "All elements must be comparable");
+    return (__UTL get_element<0>(l) < __UTL get_element<0>(r)) || less<1>(l, r);
+}
+
 } // namespace tuple
 } // namespace details
 
@@ -908,6 +930,60 @@ UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator==(
 }
 
 UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator==(tuple<> const&, tuple<> const&) noexcept {
+    return true;
+}
+
+template <typename... Ts, equality_comparable_with<Ts>... Us>
+requires requires { (..., (__UTL declval<Ts const&>() < __UTL declval<Us const&>())); }
+UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) constexpr bool operator<(
+    tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(details::tuple::less(l, r)) {
+    return details::tuple::less(l, r);
+}
+
+template <typename... Ts, equality_comparable_with<Ts>... Us>
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator!=(
+    tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(noexcept(!(l == r))) {
+    return !(l == r);
+}
+
+template <typename... Ts, typename... Us>
+requires (requires(tuple<Ts...> const& l, tuple<Us...> const& r) { r < l; })
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator<=(
+    tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(noexcept(!(r < l))) {
+    return !(r < l) && true;
+}
+
+template <typename... Ts, typename... Us>
+requires (requires(tuple<Ts...> const& l, tuple<Us...> const& r) { r < l; })
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator>(
+    tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(noexcept(r < l)) {
+    return r < l;
+}
+
+template <typename... Ts, typename... Us>
+requires (requires(tuple<Ts...> const& l, tuple<Us...> const& r) { l < r; })
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator>=(
+    tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(noexcept(!(l < r))) {
+    return !(l < r);
+}
+
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator!=(tuple<> const&, tuple<> const&) noexcept {
+    return false;
+}
+
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator<(tuple<> const&, tuple<> const&) noexcept {
+    return false;
+}
+
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator>(tuple<> const&, tuple<> const&) noexcept {
+    return false;
+}
+
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator<=(tuple<> const&, tuple<> const&) noexcept {
+    return true;
+}
+
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator>=(tuple<> const&, tuple<> const&) noexcept {
     return true;
 }
 

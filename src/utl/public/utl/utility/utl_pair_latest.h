@@ -387,9 +387,45 @@ __UTL_HIDE_FROM_ABI constexpr three_way_result_t<T, U> three_way(T const& l, U c
 template <typename T0, typename T1, equality_comparable_with<T0> U0,
     equality_comparable_with<T1> U1>
 UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator==(pair<T0, T1> const& l,
-    pair<U0, U1> const& r) noexcept(conjunction_v<is_nothrow_equality_comparable_with<T0, U0>,
-    is_nothrow_equality_comparable_with<T1, U1>>) {
-    return static_cast<bool>(l.first == r.first) && static_cast<bool>(l.second == r.second);
+    pair<U0, U1> const& r) noexcept(noexcept(l.first == r.first && l.second == r.second)) {
+    return l.first == r.first && l.second == r.second;
+}
+
+template <typename T0, typename T1, equality_comparable_with<T0> U0,
+    equality_comparable_with<T1> U1>
+requires (
+    requires(T0 const& l, U0 const& r) { l < r; } && requires(T1 const& l, U1 const& r) { l < r; })
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator<(pair<T0, T1> const& l,
+    pair<U0, U1> const& r) noexcept(noexcept(l.first == r.first && l.second == r.second)) {
+    return l.first < r.first || (l.first == r.first && l.second < r.second);
+}
+
+template <typename T0, typename T1, equality_comparable_with<T0> U0,
+    equality_comparable_with<T1> U1>
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator!=(
+    pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(noexcept(!(l == r))) {
+    return !(l == r);
+}
+
+template <typename T0, typename T1, typename U0, typename U1>
+requires (requires(pair<T0, T1> const& l, pair<U0, U1> const& r) { r < l; })
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator<=(
+    pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(noexcept(!(r < l))) {
+    return !(r < l) && true;
+}
+
+template <typename T0, typename T1, typename U0, typename U1>
+requires (requires(pair<T0, T1> const& l, pair<U0, U1> const& r) { r < l; })
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator>(
+    pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(noexcept(r < l)) {
+    return r < l;
+}
+
+template <typename T0, typename T1, typename U0, typename U1>
+requires (requires(pair<T0, T1> const& l, pair<U0, U1> const& r) { l < r; })
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr bool operator>=(
+    pair<T0, T1> const& l, pair<U0, U1> const& r) noexcept(noexcept(!(l < r))) {
+    return !(l < r);
 }
 
 template <typename T0, typename T1, three_way_comparable_with<T0> U0,
