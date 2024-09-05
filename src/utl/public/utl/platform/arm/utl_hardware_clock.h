@@ -40,9 +40,9 @@ public:
         return l == r;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr int compare(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr clock_order compare(
         value_type const& l, value_type const& r) noexcept {
-        return l < r ? -1 : l > r ? 1 : 0;
+        return static_cast<clock_order>((l > r) - (l < r));
     }
 
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(

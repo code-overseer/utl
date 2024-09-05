@@ -46,7 +46,7 @@ public:
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr clock_order compare(
         value_type l, value_type r) noexcept {
-        return static_cast<clock_order>((l > r) - (r < l));
+        return static_cast<clock_order>((l > r) - (l < r));
     }
 
     friend __UTL_HIDE_FROM_ABI time_point<system_clock_t> get_time(system_clock_t) noexcept {
@@ -90,7 +90,7 @@ public:
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr clock_order compare(
         value_type l, value_type r) noexcept {
-        return static_cast<clock_order>((l > r) - (r < l));
+        return static_cast<clock_order>((l > r) - (l < r));
     }
 
     friend __UTL_HIDE_FROM_ABI time_point<steady_clock_t> get_time(steady_clock_t) noexcept {
@@ -122,7 +122,7 @@ public:
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr clock_order compare(
         value_type l, value_type r) noexcept {
-        return static_cast<clock_order>((l > r) - (r < l));
+        return static_cast<clock_order>((l > r) - (l < r));
     }
 
     friend __UTL_HIDE_FROM_ABI time_point<high_resolution_clock_t> get_time(

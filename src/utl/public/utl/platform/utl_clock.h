@@ -69,10 +69,12 @@ class __UTL_PUBLIC_TEMPLATE time_point<Clock> {
     friend clock_traits<Clock>;
     using traits = clock_traits<Clock>;
 
+#if UTL_CXX20
     template <same_as<::std::partial_ordering> R>
     struct order_table {
         static constexpr R values[] = {R::less, R::equal, R::greater, R::unordered};
     };
+#endif
 
 public:
     using clock = typename traits::clock;
@@ -81,6 +83,9 @@ public:
 
     static_assert(UTL_TRAIT_is_default_constructible(value_type), "Invalid implementation");
     static_assert(UTL_TRAIT_is_copy_constructible(value_type), "Invalid implementation");
+    static_assert(noexcept(traits::compare(value_type{}, value_type{})), "Invalid implementation");
+    static_assert(same_as<clock_order, decltype(traits::compare(value_type{}, value_type{}))>,
+        "Invalid implementation");
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) duration time_since_epoch() const noexcept {
         static_assert(noexcept(traits::time_since_epoch(value_)), "Invalid clock");
@@ -143,9 +148,6 @@ public:
 #if UTL_CXX20
     template <same_as<time_point> T, same_as<::std::partial_ordering> R = ::std::partial_ordering>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) constexpr R operator<=>(T const& other) const noexcept {
-        static_assert(noexcept(traits::compare(value_, other.value_)), "Invalid clock");
-        static_assert(same_as<clock_order, decltype(traits::compare(value_, other.value_))>,
-            "Invalid implementation");
         auto const idx = static_cast<int>(traits::compare(value_, other.value_));
         return order_table<R>::values[idx + 1];
     }
