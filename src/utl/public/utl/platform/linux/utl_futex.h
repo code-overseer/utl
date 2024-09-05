@@ -2,72 +2,79 @@
 
 #pragma once
 
-#if !defined(UTL_PLATFORM_CLOCK_PRIVATE_HEADER_GUARD)
+#if !defined(UTL_PLATFORM_FUTEX_PRIVATE_HEADER_GUARD)
 #  error "Private header accessed"
 #endif
 
 #include "utl/utl_config.h"
 
-#if UTL_ARCH_AARCH64
+#if UTL_TARGET_LINUX
 
-#  include "utl/numeric/utl_sub_sat.h"
+#  include "utl/chrono/utl_chrono_fwd.h"
+
+#  include "utl/platform/utl_time_duration.h"
+#  include "utl/type_traits/utl_is_trivially_copyable.h"
+#  include "utl/utility/utl_intcmp.h"
+
+#  include <errno.h>
+#  include <linux/futex.h>
+#  include <stdint.h>
+#  include <sys/syscall.h>
+#  include <unistd.h>
 
 UTL_NAMESPACE_BEGIN
 
-namespace platform {
+namespace details {
+namespace futex {
 
-struct timestamp_counter_t {
-    long long tick;
-    int aux;
-};
+UTL_INLINE_CXX17 constexpr size_t max_size = 4;
+UTL_INLINE_CXX17 constexpr size_t min_size = 4;
+#  define __UTL_UNUSED 0
 
-template <>
-struct __UTL_PUBLIC_TEMPLATE clock_traits<hardware_clock_t> {
-public:
-    using clock = hardware_clock_t;
-    using value_type = timestamp_counter_t;
-    using duration = hardware_ticks;
+template <typename T>
+UTL_CONSTRAINT_CXX20(sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable_v<T>)
+auto wait(T* address, T value, platform::time_duration t) noexcept -> UTL_ENABLE_IF_CXX11(
+    int, sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable<T>::value) {
+    static constexpr uint32_t op = FUTEX_WAIT_PRIVATE;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
-        value_type t) noexcept {
-        return duration(t.tick - 0ll);
+    timespec timeout{t};
+    uint32_t readable_value = 0;
+    __builtin_memcpy(&readable_value, value, sizeof(value));
+    auto timeout_ptr = (t.seconds | t.nanoseconds) == 0 ? nullptr : &timeout;
+    if (!syscall(SYS_futex, (uint32_t*)address, op, readable_value, timeout_ptr)) {
+        return 0;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration difference(
-        value_type l, value_type r) noexcept {
-        return duration(__UTL sub_sat(l.tick, r.tick));
+    auto const error = errno;
+    if (error == EAGAIN) {
+        return 0;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr bool equal(
-        value_type l, value_type r) noexcept {
-        return l.aux == r.aux && l.tick == r.tick;
-    }
+    return error;
+}
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr int compare(
-        value_type const& l, value_type const& r) noexcept {
+template <typename T>
+UTL_CONSTRAINT_CXX20(sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable_v<T>)
+auto notify_one(T* address) noexcept -> UTL_ENABLE_IF_CXX11(
+    int, sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable<T>::value) {
+    static constexpr uint32_t op = FUTEX_WAKE_PRIVATE;
+    static constexpr uint64_t thread_count = 1;
+    return syscall(SYS_futex, op, (uint32_t*)address, 1, __UTL_UNUSED);
+}
 
-        if (l.aux == r.aux) {
-            return l.tick < r.tick ? -1 : l.tick > r.tick ? 1 : 0;
-        }
+template <typename T>
+UTL_CONSTRAINT_CXX20(sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable_v<T>)
+auto notify_all(T* address) noexcept -> UTL_ENABLE_IF_CXX11(
+    int, sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable<T>::value) {
+    static constexpr uint32_t op = FUTEX_WAKE_PRIVATE;
+    static constexpr uint64_t thread_count = 1;
+    return syscall(SYS_futex, op, (uint32_t*)address, INT_MAX, __UTL_UNUSED);
+}
+} // namespace futex
+} // namespace details
 
-        return l.aux < r.aux ? -1 : 1;
-    }
-
-    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(hardware_clock_t c) noexcept {
-        return get_time(c, __UTL memory_order_seq_cst);
-    }
-
-    friend __UTL_HIDE_FROM_ABI time_point<hardware_clock_t> get_time(
-        hardware_clock_t, __UTL memory_order) noexcept {
-        return time_point<hardware_clock_t>{get_time(o)};
-    }
-
-private:
-    __UTL_ABI_PUBLIC static value_type get_time(__UTL memory_order o) noexcept;
-};
-
-} // namespace platform
+#  undef __UTL_UNUSED
 
 UTL_NAMESPACE_END
 
-#endif //  UTL_ARCH_x86_64
+#endif // UTL_TARGET_LINUX
