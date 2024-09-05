@@ -3,9 +3,8 @@
 #pragma once
 
 #include "utl/utl_config.h"
-#if UTL_CXX20
-#  include "utl_strong_ordering.h"
-#endif
+
+#include "utl_compare_fwd.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -35,16 +34,18 @@ class __UTL_PUBLIC_TEMPLATE pointer_comparable {
     }
 
 #if UTL_CXX20
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) friend constexpr strong_ordering operator<=>(
-        T const& lhs, T const& rhs) noexcept {
+    template <same_as<T> U>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) friend constexpr auto operator<=>(
+        T const& lhs, U const& rhs) noexcept {
         return lhs.get() <=> rhs.get();
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) friend constexpr strong_ordering operator<=>(
-        T const& lhs, null_type) noexcept {
+    template <same_as<null_type> U>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) friend constexpr auto operator<=>(
+        T const& lhs, U) noexcept {
         return lhs.get() <=> nullptr;
     }
-#else
+#endif
     /**
      * Comparison operators for pre-C++20 compilers
      */
@@ -128,8 +129,6 @@ class __UTL_PUBLIC_TEMPLATE pointer_comparable {
         null_type, T const& rhs) noexcept {
         return !(nullptr > rhs);
     }
-
-#endif
 };
 
 UTL_NAMESPACE_END
