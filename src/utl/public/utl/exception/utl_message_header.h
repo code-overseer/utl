@@ -94,14 +94,36 @@ public:
      * @throws std::bad_alloc on memory allocation failure.
      */
     UTL_NODISCARD static message_header* create(message_format fmt, ...) UTL_THROWS {
-        static constexpr auto header_size = sizeof(message_header);
-        va_list args1;
-        va_list args2;
+        va_list args;
+        va_start(args, fmt);
+        UTL_TRY {
+            auto ptr = create(fmt, args);
+            va_end(args);
+            return ptr;
+        } UTL_CATCH(...) {
+            va_end(args);
+            UTL_RETHROW();
+        }
+    }
 
-        va_start(args1, fmt);
+    /**
+     * @brief Creates a new message using a pre-initialized va_list.
+     *
+     * This static function creates a new message by accepting a `message_format` object and a
+     * `va_list` of arguments. The provided arguments are used to generate the message string, which
+     * is then stored alongside a message header. This function allows for more controlled argument
+     * forwarding using an existing `va_list`.
+     *
+     * @param fmt The message format object containing the format string and source location.
+     * @param args1 A pre-initialized `va_list` containing the arguments for the format string.
+     * @return A pointer to the newly created message's header.
+     * @throws std::bad_alloc if memory allocation fails.
+     */
+    UTL_NODISCARD static message_header* create(message_format fmt, va_list args1) UTL_THROWS {
+        static constexpr auto header_size = sizeof(message_header);
+        va_list args2;
         va_copy(args2, args1);
         auto const str_size = vsnprintf(nullptr, 0, fmt.format, args1);
-        va_end(args1);
         auto const buffer_size = str_size + 1;
         auto const count = (buffer_size + header_size - 1) / header_size + 1;
 
