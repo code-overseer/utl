@@ -29,6 +29,8 @@ class time_duration;
 
 class hardware_ticks;
 
+enum class clock_order : signed char;
+
 } // namespace platform
 
 UTL_NAMESPACE_END

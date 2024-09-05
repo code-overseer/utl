@@ -5,10 +5,10 @@
 #include "utl/utl_config.h"
 
 #include "utl/chrono/utl_chrono_fwd.h"
+#include "utl/compare/utl_compare_fwd.h"
 #include "utl/platform/utl_clock_fwd.h"
 
 #include "utl/atomic.h"
-#include "utl/compare/utl_strong_ordering.h"
 #include "utl/platform/utl_hardware_ticks.h"
 #include "utl/platform/utl_time_duration.h"
 #include "utl/type_traits/utl_constants.h"
@@ -29,6 +29,13 @@
 UTL_NAMESPACE_BEGIN
 
 namespace platform {
+
+enum class clock_order : signed char {
+    less = -1,
+    equal = 0,
+    greater = 1,
+    unordered = 2
+};
 
 template <typename>
 struct __UTL_PUBLIC_TEMPLATE is_clock : false_type {};
@@ -62,6 +69,11 @@ class __UTL_PUBLIC_TEMPLATE time_point<Clock> {
     friend clock_traits<Clock>;
     using traits = clock_traits<Clock>;
 
+    template <same_as<::std::partial_ordering> R>
+    struct order_table {
+        static constexpr R values[] = {R::less, R::equal, R::greater, R::unordered};
+    };
+
 public:
     using clock = typename traits::clock;
     using value_type = typename traits::value_type;
@@ -75,50 +87,69 @@ public:
         return traits::time_since_epoch(value_);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) duration operator-(time_point const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) constexpr duration operator-(
+        time_point const& other) const noexcept {
         static_assert(noexcept(traits::difference(value_, other.value_)), "Invalid clock");
         return traits::difference(value_, other.value_);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) bool operator==(time_point const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) constexpr bool operator==(
+        time_point const& other) const noexcept {
         static_assert(noexcept(traits::equal(value_, other.value_)), "Invalid clock");
         return traits::equal(value_, other.value_);
     }
 
-#if UTL_CXX20
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) __UTL strong_ordering operator<=>(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) constexpr bool operator<(
         time_point const& other) const noexcept {
         static_assert(noexcept(traits::compare(value_, other.value_)), "Invalid clock");
-        return traits::compare(value_, other.value_) <=> 0;
+        static_assert(same_as<clock_order, decltype(traits::compare(value_, other.value_))>,
+            "Invalid implementation");
+        return traits::compare(value_, other.value_) == clock_order::less;
     }
-#else
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) bool operator<(time_point const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) constexpr bool operator!=(
+        time_point const& other) const noexcept {
         static_assert(noexcept(traits::compare(value_, other.value_)), "Invalid clock");
-        return traits::compare(value_, other.value_) < 0;
+        static_assert(same_as<clock_order, decltype(traits::compare(value_, other.value_))>,
+            "Invalid implementation");
+        auto const result = traits::compare(value_, other.value_);
+        return result != clock_order::equal && result != clock_order::unordered;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) bool operator!=(time_point const& other) const noexcept {
-        return !(*this == other);
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) constexpr bool operator>=(
+        time_point const& other) const noexcept {
+        static_assert(noexcept(traits::compare(value_, other.value_)), "Invalid clock");
+        static_assert(same_as<clock_order, decltype(traits::compare(value_, other.value_))>,
+            "Invalid implementation");
+        auto const result = traits::compare(value_, other.value_);
+        return result != clock_order::less && result != clock_order::unordered;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) bool operator>=(time_point const& other) const noexcept {
-        return !(*this < other);
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) constexpr bool operator>(
+        time_point const& other) const noexcept {
+        return traits::compare(value_, other.value_) == clock_order::greater;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) bool operator>(time_point const& other) const noexcept {
-        return other < *this;
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) constexpr bool operator<=(
+        time_point const& other) const noexcept {
+        auto const result = traits::compare(value_, other.value_);
+        return result != clock_order::greater && result != clock_order::unordered;
     }
-
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) bool operator<=(time_point const& other) const noexcept {
-        return !(other < *this);
-    }
-
-#endif
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) constexpr value_type const& value() const noexcept {
         return value_;
     }
+
+#if UTL_CXX20
+    template <same_as<time_point> T, same_as<::std::partial_ordering> R = ::std::partial_ordering>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) constexpr R operator<=>(T const& other) const noexcept {
+        static_assert(noexcept(traits::compare(value_, other.value_)), "Invalid clock");
+        static_assert(same_as<clock_order, decltype(traits::compare(value_, other.value_))>,
+            "Invalid implementation");
+        auto const idx = static_cast<int>(traits::compare(value_, other.value_));
+        return order_table<R>::values[idx + 1];
+    }
+#endif
 
     constexpr explicit time_point() noexcept(
         UTL_TRAIT_is_nothrow_default_constructible(value_type)) = default;

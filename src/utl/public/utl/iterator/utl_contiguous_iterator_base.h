@@ -137,8 +137,9 @@ public:
     }
 
 #ifdef UTL_CXX20
+    template <same_as<It> R>
     UTL_ATTRIBUTES(NODISCARD, PURE, FLATTEN, _HIDE_FROM_ABI) friend constexpr auto operator<=>(
-        It const& left, It const& right) noexcept {
+        It const& left, R const& right) noexcept {
         return get_ptr(left) <=> get_ptr(right);
     }
 #endif

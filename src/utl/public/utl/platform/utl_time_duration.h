@@ -5,8 +5,8 @@
 #include "utl/utl_config.h"
 
 #include "utl/chrono/utl_chrono_fwd.h"
+#include "utl/compare/utl_compare_fwd.h"
 
-#include "utl/compare/utl_partial_ordering.h"
 #include "utl/concepts/utl_same_as.h"
 #include "utl/platform/utl_time_duration.h"
 #include "utl/type_traits/utl_is_same.h"
@@ -67,19 +67,6 @@ public:
         return *this && other && seconds_ == other.seconds_ && nanoseconds_ == other.nanoseconds_;
     }
 
-#if UTL_CXX20
-
-    constexpr __UTL partial_ordering operator<=>(time_duration const& other) const noexcept {
-        if (!*this || !other) {
-            return __UTL partial_ordering::unordered;
-        }
-
-        auto const s = seconds_ <=> other.seconds_;
-        return s != 0 ? s : nanoseconds_ <=> other.nanoseconds_;
-    }
-
-#else
-
     constexpr bool operator!=(time_duration const& other) const noexcept {
         return *this && other && !(*this == other);
     }
@@ -98,6 +85,19 @@ public:
 
     constexpr bool operator>=(time_duration const& other) const noexcept {
         return *this && other && !(*this < other);
+    }
+
+#if UTL_CXX20
+
+    template <same_as<time_duration> D,
+        same_as<::std::partial_ordering> R = ::std::partial_ordering>
+    constexpr R operator<=>(D const& other) const noexcept {
+        if (!*this || !other) {
+            return R::unordered;
+        }
+
+        auto const s = seconds_ <=> other.seconds_;
+        return s != 0 ? s : nanoseconds_ <=> other.nanoseconds_;
     }
 
 #endif

@@ -4,7 +4,9 @@
 
 #include "utl/utl_config.h"
 
-#include "utl/compare/utl_partial_ordering.h"
+#include "utl/platform/utl_clock_fwd.h"
+
+#include "utl/concepts/utl_same_as.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -73,32 +75,30 @@ public:
         return ticks_ == other.ticks_ && ticks_ >= 0;
     }
 
-#if UTL_CXX20
-
-    constexpr __UTL partial_ordering operator<=>(hardware_ticks const& other) const noexcept {
-        return *this && other ? ticks_ <=> other.ticks_ : __UTL partial_ordering::unordered;
-    }
-
-#else
-
-    constexpr bool operator!=(time_duration const& other) const noexcept {
+    constexpr bool operator!=(hardware_ticks const& other) const noexcept {
         return *this && other && !(*this == other);
     }
 
-    constexpr bool operator<(time_duration const& other) const noexcept {
+    constexpr bool operator<(hardware_ticks const& other) const noexcept {
         return *this && other && ticks_ < other.ticks_;
     }
 
-    constexpr bool operator>(time_duration const& other) const noexcept { return other < *this; }
+    constexpr bool operator>(hardware_ticks const& other) const noexcept { return other < *this; }
 
-    constexpr bool operator<=(time_duration const& other) const noexcept {
+    constexpr bool operator<=(hardware_ticks const& other) const noexcept {
         return *this && other && !(other < *this);
     }
 
-    constexpr bool operator>=(time_duration const& other) const noexcept {
+    constexpr bool operator>=(hardware_ticks const& other) const noexcept {
         return *this && other && !(*this < other);
     }
 
+#if UTL_CXX20
+    template <same_as<hardware_ticks> T,
+        same_as<::std::partial_ordering> R = ::std::partial_ordering>
+    constexpr R operator<=>(T const& other) const noexcept {
+        return *this && other ? ticks_ <=> other.ticks_ : R::unordered;
+    }
 #endif
 
 private:

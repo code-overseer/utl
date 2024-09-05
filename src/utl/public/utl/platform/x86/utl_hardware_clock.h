@@ -8,6 +8,8 @@
 
 #include "utl/utl_config.h"
 
+#include "utl/platform/utl_clock.h"
+
 #if UTL_ARCH_x86_64
 
 #  include "utl/numeric/utl_sub_sat.h"
@@ -43,14 +45,14 @@ public:
         return l.aux == r.aux && l.tick == r.tick;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr int compare(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr clock_order compare(
         value_type const& l, value_type const& r) noexcept {
 
         if (l.aux == r.aux) {
-            return l.tick < r.tick ? -1 : l.tick > r.tick ? 1 : 0;
+            return return static_cast<clock_order>((l.tick > r.tick) - (r.tick < l.tick));
         }
 
-        return l.aux < r.aux ? -1 : 1;
+        return clock_order::unordered;
     }
 
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(hardware_clock_t c) noexcept {
