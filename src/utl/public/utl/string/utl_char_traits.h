@@ -27,7 +27,7 @@ struct __UTL_PUBLIC_TEMPLATE char_traits {
     using pos_type = size_t;
     using state_type = mbstate_t;
 #if UTL_CXX20
-    using comparison_category = strong_ordering;
+    using comparison_category = ::std::strong_ordering;
 #endif
 
     UTL_ATTRIBUTE(PURE_API) static inline constexpr int compare(

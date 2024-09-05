@@ -16,8 +16,9 @@
 
 #include "utl/utl_config.h"
 
+#include "utl/compare/utl_compare_fwd.h"
+
 #include "utl/compare/utl_compare_traits.h"
-#include "utl/compare/utl_strong_ordering.h"
 #include "utl/concepts/utl_allocator_type.h"
 #include "utl/concepts/utl_assignable_from.h"
 #include "utl/concepts/utl_assignable_to.h"
@@ -846,12 +847,12 @@ __UTL_HIDE_FROM_ABI auto is_nothrow_three_way(
     -> bool_constant<(...&& noexcept(__UTL get_element<Is>(l) <=> __UTL get_element<Is>(r)))>;
 
 template <typename T, typename U>
-requires tuple_like<remove_reference_t<T>> && tuple_like<remove_reference_t<U>>
+requires (tuple_like<remove_reference_t<T>> && tuple_like<remove_reference_t<U>>)
 using three_way_result_t UTL_NODEBUG =
     decltype(three_way_result(__UTL declval<T>(), __UTL declval<U>(), tuple_index_sequence<T>{}));
 
 template <typename T, typename U>
-requires tuple_like<remove_reference_t<T>> && tuple_like<remove_reference_t<U>>
+requires (tuple_like<remove_reference_t<T>> && tuple_like<remove_reference_t<U>>)
 UTL_INLINE_CXX17 constexpr bool is_nothrow_three_way_v = decltype(is_nothrow_three_way(
     __UTL declval<T>(), __UTL declval<U>(), tuple_index_sequence<T>{}))::value;
 
@@ -916,9 +917,9 @@ UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr auto operator<=>(tuple<Ts...
     return details::tuple::three_way(l, r);
 }
 
-UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr __UTL strong_ordering operator<=>(
-    tuple<> const&, tuple<> const&) noexcept {
-    return __UTL strong_ordering::equal;
+template <same_as<tuple<>> U, same_as<::std::strong_ordering> R = ::std::strong_ordering>
+UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) constexpr R operator<=>(U, U) noexcept {
+    return R::equal;
 }
 
 UTL_NAMESPACE_END

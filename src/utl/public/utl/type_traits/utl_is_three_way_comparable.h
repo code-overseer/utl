@@ -47,17 +47,17 @@ using nothrow_t UTL_NODEBUG = decltype(nothrow_check<T, U, Cat>(0));
 } // namespace three_way_comparable
 } // namespace details
 
-template <typename T, typename U, typename Cat = __UTL partial_ordering>
+template <typename T, typename U, typename Cat = ::std::partial_ordering>
 struct __UTL_PUBLIC_TEMPLATE is_three_way_comparable_with :
     details::three_way_comparable::impl_t<T, U, Cat> {};
-template <typename T, typename Cat = __UTL partial_ordering>
+template <typename T, typename Cat = ::std::partial_ordering>
 struct __UTL_PUBLIC_TEMPLATE is_three_way_comparable :
     details::three_way_comparable::impl_t<T, T, Cat> {};
 
-template <typename T, typename U, typename Cat = __UTL partial_ordering>
+template <typename T, typename U, typename Cat = ::std::partial_ordering>
 struct __UTL_PUBLIC_TEMPLATE is_nothrow_three_way_comparable_with :
     details::three_way_comparable::nothrow_t<T, U, Cat> {};
-template <typename T, typename Cat = __UTL partial_ordering>
+template <typename T, typename Cat = ::std::partial_ordering>
 struct __UTL_PUBLIC_TEMPLATE is_nothrow_three_way_comparable :
     details::three_way_comparable::nothrow_t<T, T, Cat> {};
 
