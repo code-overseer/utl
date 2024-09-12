@@ -77,4 +77,51 @@ auto notify_all(T* address) noexcept -> UTL_ENABLE_IF_CXX11(
 
 UTL_NAMESPACE_END
 
+namespace platform {
+template <typename T>
+class waitable_obect<T*> {
+    static_assert(!UTL_TRAIT_is_function(T), "Invalid type");
+
+public:
+    using value_type = T*;
+    constexpr explicit waitable_obect(value_type& t) : address(__UTL addressof(t)) {}
+    waitable_obect(waitable_obect const&) = delete;
+    waitable_obect(waitable_obect&&) = delete;
+    waitable_obect& operator=(waitable_obect const&) = delete;
+    waitable_obect& operator=(waitable_obect&&) = delete;
+    UTL_CONSTEXPR_CXX20 ~waitable_obect() noexcept = default;
+
+    template <typename R, typename P>
+    void wait(value_type old, ::std::chrono::duration<R, P> timeout,
+        __UTL memory_order o = __UTL memory_order_seq_cst) const noexcept {
+        wait(old, time_duration{timeout}, o);
+    }
+
+    void wait(value_type old, __UTL memory_order o = __UTL memory_order_seq_cst) const noexcept {
+        return wait(old, time_duration::invalid(), o);
+    }
+
+    void set_and_notify_one(value_type value, __UTL memory_order o) noexcept {
+        __UTL atomic_ref<value_type>(address).store(value, o);
+        notify_one();
+    }
+
+    void set_and_notify_all(value_type value, __UTL memory_order o) noexcept {
+        __UTL atomic_ref<value_type>(address).store(value, o);
+        notify_all();
+    }
+
+    void wait(value_type old, time_duration,
+        __UTL memory_order o = __UTL memory_order_seq_cst) const noexcept;
+
+    void notify_one() noexcept;
+
+    void notify_all() noexcept;
+
+private:
+    value_type address;
+    unsigned waiting;
+};
+} // namespace platform
+
 #endif // UTL_TARGET_LINUX

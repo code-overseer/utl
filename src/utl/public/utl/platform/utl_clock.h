@@ -186,6 +186,9 @@ struct hardware_clock_t {
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
         hardware_clock_t, __UTL memory_order) noexcept;
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(hardware_clock_t c) noexcept;
+    __UTL_HIDE_FROM_ABI static bool invariant_frequency() noexcept {
+        return hardware_ticks::invariant_frequency();
+    }
 };
 
 __UTL_HIDE_FROM_ABI constexpr ::time_t to_posix_time(time_point<system_clock_t>) noexcept;

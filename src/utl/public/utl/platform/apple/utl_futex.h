@@ -13,6 +13,7 @@
 #  include "utl/chrono/utl_chrono_fwd.h"
 
 #  include "utl/numeric/utl_add_sat.h"
+#  include "utl/type_traits/utl_constants.h"
 #  include "utl/utility/utl_intcmp.h"
 
 #  include <errno.h>
@@ -47,6 +48,23 @@ namespace futex {
 
 UTL_INLINE_CXX17 constexpr size_t max_size = 8;
 UTL_INLINE_CXX17 constexpr size_t min_size = 4;
+
+#  if UTL_CXX14
+
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_waitable_v =
+    (sizeof(T) <= max_size) && (sizeof(T) <= min_size) && alignof(T) == sizeof(T);
+
+template <typename T>
+struct is_waitable : bool_constant<is_waitable_v<T>> {};
+
+#  else
+
+template <typename T>
+struct is_waitable :
+    bool_constant<(sizeof(T) <= max_size) && (sizeof(T) <= min_size) && alignof(T) == sizeof(T)> {};
+
+#  endif
 
 template <typename T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable_v<T>)

@@ -123,9 +123,7 @@ static timestamp_counter_t rdtscp(__UTL memory_order o) noexcept {
         result.tick = __rdtscp(&result.aux);
         break;
     case __UTL memory_order_acq_rel:
-        _mm_mfence();
-        result.tick = __rdtscp(&result.aux);
-        _mm_lfence();
+        UTL_FALLTHROUGH;
     case __UTL memory_order_seq_cst:
         _mm_mfence();
         result.tick = __rdtscp(&result.aux);

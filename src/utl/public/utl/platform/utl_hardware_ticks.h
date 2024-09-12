@@ -116,7 +116,7 @@ private:
  * @param ht The `hardware_ticks` object to convert.
  * @return The corresponding `time_duration`.
  */
-UTL_ATTRIBUTES(_ABI_PUBLIC, PURE) time_duration to_time_duration(hardware_ticks) noexcept;
+UTL_ATTRIBUTES(_ABI_PUBLIC) time_duration to_time_duration(hardware_ticks) noexcept;
 } // namespace platform
 
 UTL_NAMESPACE_END

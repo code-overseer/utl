@@ -40,29 +40,29 @@ auto clock_traits<hardware_clock_t>::get_time(__UTL memory_order o) noexcept -> 
     value_type res;
     switch (o) {
     case __UTL memory_order_relaxed:
-        __builtin_arm_isb(ISB_SY);
-        res = __builtin_arm_rsr64("CNTVCT_EL0");
-        __builtin_arm_isb(ISB_SY);
-        break;
+        UTL_FALLTHROUGH;
     case __UTL memory_order_consume:
         UTL_FALLTHROUGH;
     case __UTL memory_order_acquire:
         __builtin_arm_isb(ISB_SY);
         res = __builtin_arm_rsr64("CNTVCT_EL0");
-        __builtin_arm_dmb(DMB_SY);
+        __builtin_arm_dmb(DMB_ISHST);
         __builtin_arm_isb(ISB_SY);
         break;
     case __UTL memory_order_release:
+        UTL_FALLTHROUGH;
+    case __UTL memory_order_acq_rel:
         __builtin_arm_isb(ISB_SY);
-        __builtin_arm_dmb(DMB_SY);
+        __builtin_arm_dmb(DMB_ISH);
         res = __builtin_arm_rsr64("CNTVCT_EL0");
         __builtin_arm_isb(ISB_SY);
         break;
+
     default:
         __builtin_arm_isb(ISB_SY);
-        __builtin_arm_dmb(DMB_SY);
+        __builtin_arm_dmb(DMB_ISH);
         res = __builtin_arm_rsr64("CNTVCT_EL0");
-        __builtin_arm_dmb(DMB_SY);
+        __builtin_arm_dmb(DMB_ISHST);
         __builtin_arm_isb(ISB_SY);
         break;
     }
@@ -115,28 +115,24 @@ auto clock_traits<hardware_clock_t>::get_time(__UTL memory_order o) noexcept -> 
     case __UTL memory_order_acquire:
         __asm__ volatile("isb sy\n\t"
                          "mrs %0, CNTVCT_EL0\n\t"
-                         "dmb sy\n\t"
-                         "isb sy"
+                         "isb sy\n\t"
+                         "dsb ishld"
                          : "=r"(res)
                          :
                          : "memory");
         break;
 
     case __UTL memory_order_release:
-        __asm__ volatile("isb sy\n\t"
-                         "dmb sy\n\t"
+    UTL_FALLTHROUGH:
+    case __UTL memory_order_acq_rel:
+    UTL_FALLTHROUGH:
+    case __UTL memory_order_seq_cst:
+        // MRS is not a memory operation
+        // So a DMB after it does nothing if there is already
+        // a full DMB before it
+        __asm__ volatile("dsb sy\n\t"
+                         "isb sy\n\t"
                          "mrs %0, CNTVCT_EL0\n\t"
-                         "isb sy"
-                         : "=r"(res)
-                         :
-                         : "memory");
-        break;
-
-    default:
-        __asm__ volatile("isb sy\n\t"
-                         "dmb sy\n\t"
-                         "mrs %0, CNTVCT_EL0\n\t"
-                         "dmb sy\n\t"
                          "isb sy"
                          : "=r"(res)
                          :
@@ -193,15 +189,21 @@ auto time_point<hardware_clock_t>::get_time(__UTL memory_order o) noexcept -> va
     case __UTL memory_order_acquire:
         __isb(_ARM64_BARRIER_SY);
         res = _ReadStatusReg(ARM64_CNTVCT);
-        __dmb(_ARM64_BARRIER_SY);
+        __dmb(_ARM64_BARRIER_ISH);
         __isb(_ARM64_BARRIER_SY);
         break;
     case __UTL memory_order_release:
         __isb(_ARM64_BARRIER_SY);
-        __dmb(_ARM64_BARRIER_SY);
+        __dmb(_ARM64_BARRIER_ISH);
         res = _ReadStatusReg(ARM64_CNTVCT);
         __isb(_ARM64_BARRIER_SY);
         break;
+    case __UTL memory_order_acq_rel:
+        __isb(_ARM64_BARRIER_SY);
+        __dmb(_ARM64_BARRIER_ISH);
+        res = _ReadStatusReg(ARM64_CNTVCT);
+        __dmb(_ARM64_BARRIER_ISH);
+        __isb(_ARM64_BARRIER_SY);
     default:
         __isb(_ARM64_BARRIER_SY);
         __dmb(_ARM64_BARRIER_SY);

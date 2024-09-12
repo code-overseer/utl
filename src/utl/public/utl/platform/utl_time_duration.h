@@ -8,6 +8,7 @@
 #include "utl/compare/utl_compare_fwd.h"
 
 #include "utl/concepts/utl_same_as.h"
+#include "utl/numeric/utl_sub_sat.h"
 #include "utl/platform/utl_time_duration.h"
 #include "utl/type_traits/utl_is_same.h"
 
@@ -17,23 +18,22 @@ UTL_NAMESPACE_BEGIN
 
 namespace platform {
 class time_duration {
-    static constexpr long long nano_divisor = 1000000000ll;
+    static constexpr long long nano_multiple = 1000000000ll;
     struct construct_t {};
 
     template <typename R, typename P>
     __UTL_HIDE_FROM_ABI static constexpr time_duration from_chrono(
         ::std::chrono::duration<R, P> const& t) noexcept {
-        using nano_ratio = ::std::ratio<1, nano_divisor>;
+        using nano_ratio = ::std::ratio<1, nano_multiple>;
         using nano_duration = ::std::chrono::duration<long long, nano_ratio>;
         auto const time = ::std::chrono::duration_cast<nano_duration>(t).count();
-        auto const divisor = 1000000000ll;
-        auto const seconds = time / divisor;
-        return {construct_t{}, seconds, time - seconds * divisor};
+        auto const seconds = time / nano_multiple;
+        return {construct_t{}, seconds, time - seconds * nano_multiple};
     }
 
     static constexpr time_duration adjust(long long s, long long ns) noexcept {
-        auto const extra = ns / nano_divisor;
-        return {construct_t{}, s + extra, ns - extra * nano_divisor};
+        auto const extra = ns / nano_multiple;
+        return {construct_t{}, s + extra, ns - extra * nano_multiple};
     }
 
     constexpr time_duration(construct_t, long long seconds, long long nanoseconds) noexcept
@@ -61,6 +61,12 @@ public:
 
     UTL_ATTRIBUTES(PURE, ALWAYS_INLINE) explicit constexpr operator bool() const noexcept {
         return seconds_ < 0 && (seconds_ == nanoseconds_);
+    }
+
+    constexpr time_duration operator-(time_duration const& other) const noexcept {
+        auto const l = seconds_ * nano_multiple + nanoseconds_;
+        auto const r = other.seconds_ * nano_multiple + other.nanoseconds_;
+        return time_duration{0, __UTL sub_sat(l, r)};
     }
 
     constexpr bool operator==(time_duration const& other) const noexcept {
