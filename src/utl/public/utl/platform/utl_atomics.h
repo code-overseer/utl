@@ -101,13 +101,16 @@ T kill_dependency(T v) noexcept {
 }
 
 template <memory_order O>
-struct compare_exchange_failure_order : value_constant<memory_order, O> {
-    constexpr explicit compare_exchange_failure_order() noexcept = default;
+using memory_order_type = value_constant<memory_order, O>;
+
+template <memory_order O>
+struct compare_exchange_failure : memory_order_type<O> {
+    constexpr explicit compare_exchange_failure() noexcept = default;
 };
 
-using relaxed_on_failed_t = compare_exchange_failure_order<memory_order::relaxed>;
-using acquire_on_failed_t = compare_exchange_failure_order<memory_order::acquire>;
-using seq_cst_on_failed_t = compare_exchange_failure_order<memory_order::seq_cst>;
+using relaxed_on_failed_t = compare_exchange_failure<memory_order::relaxed>;
+using acquire_on_failed_t = compare_exchange_failure<memory_order::acquire>;
+using seq_cst_on_failed_t = compare_exchange_failure<memory_order::seq_cst>;
 UTL_INLINE_CXX17 constexpr relaxed_on_failed_t relaxed_on_failed{};
 UTL_INLINE_CXX17 constexpr acquire_on_failed_t acquire_on_failed{};
 UTL_INLINE_CXX17 constexpr seq_cst_on_failed_t seq_cst_on_failed{};

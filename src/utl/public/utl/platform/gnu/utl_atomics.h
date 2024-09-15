@@ -55,11 +55,6 @@ public:
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T load(T const* ctx) noexcept {
         return (T)load((underlying_type_t<T> const*)ctx);
     }
-
-    template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T load(T const* ctx) noexcept {
-        return (T)load((underlying_type_t<T> const*)ctx);
-    }
 };
 
 template <memory_order O>
@@ -235,7 +230,7 @@ public:
     UTL_CONSTRAINT_CXX20(requires(T* ctx, T* expected, T value) { compare_exchange_strong(ctx, expected, value);
     })
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline auto compare_exchange_strong(
-        T* ctx, T* expected, T value, compare_exchange_failure_order<F>)
+        T* ctx, T* expected, T value, compare_exchange_failure<F>)
         -> decltype(compare_exchange_strong(ctx, expected, value)) {
         return compare_exchange_strong(ctx, expected, value);
     }
@@ -244,7 +239,7 @@ public:
     UTL_CONSTRAINT_CXX20(requires(T* ctx, T* expected, T value) { compare_exchange_weak(ctx, expected, value);
     })
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline auto compare_exchange_weak(
-        T* ctx, T* expected, T value, compare_exchange_failure_order<F>)
+        T* ctx, T* expected, T value, compare_exchange_failure<F>)
         -> decltype(compare_exchange_weak(ctx, expected, value)) {
         return compare_exchange_weak(ctx, expected, value);
     }

@@ -14,6 +14,7 @@
 
 extern "C" char _InterlockedExchange8(char volatile*, char);
 extern "C" char _InterlockedCompareExchange8(char volatile*, char, char);
+extern "C" short _InterlockedExchangeAdd8(char volatile*, char);
 extern "C" char _InterlockedAnd8(char volatile*, char);
 extern "C" char _InterlockedOr8(char volatile*, char);
 extern "C" char _InterlockedXor8(char volatile*, char);
@@ -21,6 +22,7 @@ extern "C" short _InterlockedIncrement16(short volatile*);
 extern "C" short _InterlockedDecrement16(short volatile*);
 extern "C" short _InterlockedExchange16(short volatile*, short);
 extern "C" short _InterlockedCompareExchange16(short volatile*, short, short);
+extern "C" short _InterlockedExchangeAdd16(short volatile*, short);
 extern "C" short _InterlockedAnd16(short volatile*, short);
 extern "C" short _InterlockedOr16(short volatile*, short);
 extern "C" short _InterlockedXor16(short volatile*, short);
@@ -76,11 +78,119 @@ extern "C" unsigned char _InterlockedCompareExchange128(
 #pragma intrinsic(_InterlockedCompareExchangePointer)
 #pragma intrinsic(_InterlockedCompareExchange128)
 
-#if UTL_ARCH_ARM
+#if UTL_ARCH_X86
+#  define _InterlockedExchange8_acq _InterlockedExchange8
+#  define _InterlockedCompareExchange8_acq _InterlockedCompareExchange8
+#  define _InterlockedExchangeAdd8_acq _InterlockedExchangeAdd8
+#  define _InterlockedAnd8_acq _InterlockedAnd8
+#  define _InterlockedOr8_acq _InterlockedOr8
+#  define _InterlockedXor8_acq _InterlockedXor8
+#  define _InterlockedIncrement16_acq _InterlockedIncrement16
+#  define _InterlockedDecrement16_acq _InterlockedDecrement16
+#  define _InterlockedExchange16_acq _InterlockedExchange16
+#  define _InterlockedCompareExchange16_acq _InterlockedCompareExchange16
+#  define _InterlockedExchangeAdd16_acq _InterlockedExchangeAdd16
+#  define _InterlockedAnd16_acq _InterlockedAnd16
+#  define _InterlockedOr16_acq _InterlockedOr16
+#  define _InterlockedXor16_acq _InterlockedXor16
+#  define _InterlockedIncrement_acq _InterlockedIncrement
+#  define _InterlockedDecrement_acq _InterlockedDecrement
+#  define _InterlockedAdd_acq _InterlockedAdd
+#  define _InterlockedExchange_acq _InterlockedExchange
+#  define _InterlockedCompareExchange_acq _InterlockedCompareExchange
+#  define _InterlockedExchangeAdd_acq _InterlockedExchangeAdd
+#  define _InterlockedAnd_acq _InterlockedAnd
+#  define _InterlockedOr_acq _InterlockedOr
+#  define _InterlockedXor_acq _InterlockedXor
+#  define _InterlockedIncrement64_acq _InterlockedIncrement64
+#  define _InterlockedDecrement64_acq _InterlockedDecrement64
+#  define _InterlockedAdd64_acq _InterlockedAdd64
+#  define _InterlockedExchange64_acq _InterlockedExchange64
+#  define _InterlockedCompareExchange64_acq _InterlockedCompareExchange64
+#  define _InterlockedExchangeAdd64_acq _InterlockedExchangeAdd64
+#  define _InterlockedAnd64_acq _InterlockedAnd64
+#  define _InterlockedOr64_acq _InterlockedOr64
+#  define _InterlockedXor64_acq _InterlockedXor64
+#  define _InterlockedExchangePointer_acq _InterlockedExchangePointer
+#  define _InterlockedCompareExchangePointer_acq _InterlockedCompareExchangePointer
+#  define _InterlockedCompareExchange128_acq _InterlockedCompareExchange128
+#  define _InterlockedExchange8_rel _InterlockedExchange8
+#  define _InterlockedCompareExchange8_rel _InterlockedCompareExchange8
+#  define _InterlockedExchangeAdd8_rel _InterlockedExchangeAdd8
+#  define _InterlockedAnd8_rel _InterlockedAnd8
+#  define _InterlockedOr8_rel _InterlockedOr8
+#  define _InterlockedXor8_rel _InterlockedXor8
+#  define _InterlockedIncrement16_rel _InterlockedIncrement16
+#  define _InterlockedDecrement16_rel _InterlockedDecrement16
+#  define _InterlockedExchange16_rel _InterlockedExchange16
+#  define _InterlockedCompareExchange16_rel _InterlockedCompareExchange16
+#  define _InterlockedExchangeAdd16_rel _InterlockedExchangeAdd16
+#  define _InterlockedAnd16_rel _InterlockedAnd16
+#  define _InterlockedOr16_rel _InterlockedOr16
+#  define _InterlockedXor16_rel _InterlockedXor16
+#  define _InterlockedIncrement_rel _InterlockedIncrement
+#  define _InterlockedDecrement_rel _InterlockedDecrement
+#  define _InterlockedAdd_rel _InterlockedAdd
+#  define _InterlockedExchange_rel _InterlockedExchange
+#  define _InterlockedCompareExchange_rel _InterlockedCompareExchange
+#  define _InterlockedExchangeAdd_rel _InterlockedExchangeAdd
+#  define _InterlockedAnd_rel _InterlockedAnd
+#  define _InterlockedOr_rel _InterlockedOr
+#  define _InterlockedXor_rel _InterlockedXor
+#  define _InterlockedIncrement64_rel _InterlockedIncrement64
+#  define _InterlockedDecrement64_rel _InterlockedDecrement64
+#  define _InterlockedAdd64_rel _InterlockedAdd64
+#  define _InterlockedExchange64_rel _InterlockedExchange64
+#  define _InterlockedCompareExchange64_rel _InterlockedCompareExchange64
+#  define _InterlockedExchangeAdd64_rel _InterlockedExchangeAdd64
+#  define _InterlockedAnd64_rel _InterlockedAnd64
+#  define _InterlockedOr64_rel _InterlockedOr64
+#  define _InterlockedXor64_rel _InterlockedXor64
+#  define _InterlockedExchangePointer_rel _InterlockedExchangePointer
+#  define _InterlockedCompareExchangePointer_rel _InterlockedCompareExchangePointer
+#  define _InterlockedCompareExchange128_rel _InterlockedCompareExchange128
+#  define _InterlockedExchange8_nf _InterlockedExchange8
+#  define _InterlockedCompareExchange8_nf _InterlockedCompareExchange8
+#  define _InterlockedExchangeAdd8_nf _InterlockedExchangeAdd8
+#  define _InterlockedAnd8_nf _InterlockedAnd8
+#  define _InterlockedOr8_nf _InterlockedOr8
+#  define _InterlockedXor8_nf _InterlockedXor8
+#  define _InterlockedIncrement16_nf _InterlockedIncrement16
+#  define _InterlockedDecrement16_nf _InterlockedDecrement16
+#  define _InterlockedExchange16_nf _InterlockedExchange16
+#  define _InterlockedCompareExchange16_nf _InterlockedCompareExchange16
+#  define _InterlockedExchangeAdd16_nf _InterlockedExchangeAdd16
+#  define _InterlockedAnd16_nf _InterlockedAnd16
+#  define _InterlockedOr16_nf _InterlockedOr16
+#  define _InterlockedXor16_nf _InterlockedXor16
+#  define _InterlockedIncrement_nf _InterlockedIncrement
+#  define _InterlockedDecrement_nf _InterlockedDecrement
+#  define _InterlockedAdd_nf _InterlockedAdd
+#  define _InterlockedExchange_nf _InterlockedExchange
+#  define _InterlockedCompareExchange_nf _InterlockedCompareExchange
+#  define _InterlockedExchangeAdd_nf _InterlockedExchangeAdd
+#  define _InterlockedAnd_nf _InterlockedAnd
+#  define _InterlockedOr_nf _InterlockedOr
+#  define _InterlockedXor_nf _InterlockedXor
+#  define _InterlockedIncrement64_nf _InterlockedIncrement64
+#  define _InterlockedDecrement64_nf _InterlockedDecrement64
+#  define _InterlockedAdd64_nf _InterlockedAdd64
+#  define _InterlockedExchange64_nf _InterlockedExchange64
+#  define _InterlockedCompareExchange64_nf _InterlockedCompareExchange64
+#  define _InterlockedExchangeAdd64_nf _InterlockedExchangeAdd64
+#  define _InterlockedAnd64_nf _InterlockedAnd64
+#  define _InterlockedOr64_nf _InterlockedOr64
+#  define _InterlockedXor64_nf _InterlockedXor64
+#  define _InterlockedExchangePointer_nf _InterlockedExchangePointer
+#  define _InterlockedCompareExchangePointer_nf _InterlockedCompareExchangePointer
+#  define _InterlockedCompareExchange128_nf _InterlockedCompareExchange128
+
+#elif UTL_ARCH_ARM
 extern "C" long _InterlockedAdd(long volatile*, long);
 extern "C" long long _InterlockedAdd64(long long volatile*, long long);
 extern "C" char _InterlockedExchange8_acq(char volatile*, char);
 extern "C" char _InterlockedCompareExchange8_acq(char volatile*, char, char);
+extern "C" short _InterlockedExchangeAdd8_acq(char volatile*, char);
 extern "C" char _InterlockedAnd8_acq(char volatile*, char);
 extern "C" char _InterlockedOr8_acq(char volatile*, char);
 extern "C" char _InterlockedXor8_acq(char volatile*, char);
@@ -88,6 +198,7 @@ extern "C" short _InterlockedIncrement16_acq(short volatile*);
 extern "C" short _InterlockedDecrement16_acq(short volatile*);
 extern "C" short _InterlockedExchange16_acq(short volatile*, short);
 extern "C" short _InterlockedCompareExchange16_acq(short volatile*, short, short);
+extern "C" short _InterlockedExchangeAdd16_acq(short volatile*, short);
 extern "C" short _InterlockedAnd16_acq(short volatile*, short);
 extern "C" short _InterlockedOr16_acq(short volatile*, short);
 extern "C" short _InterlockedXor16_acq(short volatile*, short);
@@ -115,6 +226,7 @@ extern "C" unsigned char _InterlockedCompareExchange128_acq(
     __int64 volatile*, __int64, __int64, __int64*);
 extern "C" char _InterlockedExchange8_rel(char volatile*, char);
 extern "C" char _InterlockedCompareExchange8_rel(char volatile*, char, char);
+extern "C" short _InterlockedExchangeAdd8_rel(char volatile*, char);
 extern "C" char _InterlockedAnd8_rel(char volatile*, char);
 extern "C" char _InterlockedOr8_rel(char volatile*, char);
 extern "C" char _InterlockedXor8_rel(char volatile*, char);
@@ -122,6 +234,7 @@ extern "C" short _InterlockedIncrement16_rel(short volatile*);
 extern "C" short _InterlockedDecrement16_rel(short volatile*);
 extern "C" short _InterlockedExchange16_rel(short volatile*, short);
 extern "C" short _InterlockedCompareExchange16_rel(short volatile*, short, short);
+extern "C" short _InterlockedExchangeAdd16_rel(short volatile*, short);
 extern "C" short _InterlockedAnd16_rel(short volatile*, short);
 extern "C" short _InterlockedOr16_rel(short volatile*, short);
 extern "C" short _InterlockedXor16_rel(short volatile*, short);
@@ -149,6 +262,7 @@ extern "C" unsigned char _InterlockedCompareExchange128_rel(
     __int64 volatile*, __int64, __int64, __int64*);
 extern "C" char _InterlockedExchange8_nf(char volatile*, char);
 extern "C" char _InterlockedCompareExchange8_nf(char volatile*, char, char);
+extern "C" short _InterlockedExchangeAdd8_nf(char volatile*, char);
 extern "C" char _InterlockedAnd8_nf(char volatile*, char);
 extern "C" char _InterlockedOr8_nf(char volatile*, char);
 extern "C" char _InterlockedXor8_nf(char volatile*, char);
@@ -156,6 +270,7 @@ extern "C" short _InterlockedIncrement16_nf(short volatile*);
 extern "C" short _InterlockedDecrement16_nf(short volatile*);
 extern "C" short _InterlockedExchange16_nf(short volatile*, short);
 extern "C" short _InterlockedCompareExchange16_nf(short volatile*, short, short);
+extern "C" short _InterlockedExchangeAdd16_nf(short volatile*, short);
 extern "C" short _InterlockedAnd16_nf(short volatile*, short);
 extern "C" short _InterlockedOr16_nf(short volatile*, short);
 extern "C" short _InterlockedXor16_nf(short volatile*, short);
@@ -185,6 +300,7 @@ extern "C" unsigned char _InterlockedCompareExchange128_nf(
 #  pragma intrinsic(_InterlockedAdd64)
 #  pragma intrinsic(_InterlockedExchange8_acq)
 #  pragma intrinsic(_InterlockedCompareExchange8_acq)
+#  pragma intrinsic(_InterlockedExchangeAdd8_acq)
 #  pragma intrinsic(_InterlockedAnd8_acq)
 #  pragma intrinsic(_InterlockedOr8_acq)
 #  pragma intrinsic(_InterlockedXor8_acq)
@@ -192,6 +308,7 @@ extern "C" unsigned char _InterlockedCompareExchange128_nf(
 #  pragma intrinsic(_InterlockedDecrement16_acq)
 #  pragma intrinsic(_InterlockedExchange16_acq)
 #  pragma intrinsic(_InterlockedCompareExchange16_acq)
+#  pragma intrinsic(_InterlockedExchangeAdd16_acq)
 #  pragma intrinsic(_InterlockedAnd16_acq)
 #  pragma intrinsic(_InterlockedOr16_acq)
 #  pragma intrinsic(_InterlockedXor16_acq)
@@ -218,6 +335,7 @@ extern "C" unsigned char _InterlockedCompareExchange128_nf(
 #  pragma intrinsic(_InterlockedCompareExchange128_acq)
 #  pragma intrinsic(_InterlockedExchange8_rel)
 #  pragma intrinsic(_InterlockedCompareExchange8_rel)
+#  pragma intrinsic(_InterlockedExchangeAdd8_rel)
 #  pragma intrinsic(_InterlockedAnd8_rel)
 #  pragma intrinsic(_InterlockedOr8_rel)
 #  pragma intrinsic(_InterlockedXor8_rel)
@@ -225,6 +343,7 @@ extern "C" unsigned char _InterlockedCompareExchange128_nf(
 #  pragma intrinsic(_InterlockedDecrement16_rel)
 #  pragma intrinsic(_InterlockedExchange16_rel)
 #  pragma intrinsic(_InterlockedCompareExchange16_rel)
+#  pragma intrinsic(_InterlockedExchangeAdd16_rel)
 #  pragma intrinsic(_InterlockedAnd16_rel)
 #  pragma intrinsic(_InterlockedOr16_rel)
 #  pragma intrinsic(_InterlockedXor16_rel)
@@ -251,6 +370,7 @@ extern "C" unsigned char _InterlockedCompareExchange128_nf(
 #  pragma intrinsic(_InterlockedCompareExchange128_rel)
 #  pragma intrinsic(_InterlockedExchange8_nf)
 #  pragma intrinsic(_InterlockedCompareExchange8_nf)
+#  pragma intrinsic(_InterlockedExchangeAdd8_nf)
 #  pragma intrinsic(_InterlockedAnd8_nf)
 #  pragma intrinsic(_InterlockedOr8_nf)
 #  pragma intrinsic(_InterlockedXor8_nf)
@@ -258,6 +378,7 @@ extern "C" unsigned char _InterlockedCompareExchange128_nf(
 #  pragma intrinsic(_InterlockedDecrement16_nf)
 #  pragma intrinsic(_InterlockedExchange16_nf)
 #  pragma intrinsic(_InterlockedCompareExchange16_nf)
+#  pragma intrinsic(_InterlockedExchangeAdd16_nf)
 #  pragma intrinsic(_InterlockedAnd16_nf)
 #  pragma intrinsic(_InterlockedOr16_nf)
 #  pragma intrinsic(_InterlockedXor16_nf)
@@ -282,4 +403,6 @@ extern "C" unsigned char _InterlockedCompareExchange128_nf(
 #  pragma intrinsic(_InterlockedExchangePointer_nf)
 #  pragma intrinsic(_InterlockedCompareExchangePointer_nf)
 #  pragma intrinsic(_InterlockedCompareExchange128_nf)
+#else
+#  error "Unsupported architecture"
 #endif
