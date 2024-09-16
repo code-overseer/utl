@@ -10,8 +10,12 @@
 
 #include "utl/numeric/utl_sized_integral.h"
 #include "utl/type_traits/utl_constants.h"
+#include "utl/type_traits/utl_copy_cv.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_make_unsigned.h"
+#include "utl/type_traits/utl_underlying_type.h"
+
+#include <cstdint>
 
 #if !UTL_COMPILER_GNU_BASED
 #  error Invalid compiler
@@ -53,12 +57,17 @@ public:
 
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T load(T const* ctx) noexcept {
-        return (T)load((underlying_type_t<T> const*)ctx);
+        using type = copy_cv_t<T const, underlying_type_t<T>>;
+        return (T)load((type*)ctx);
     }
 };
 
 template <memory_order O>
 struct store_operations {
+private:
+    template <typename T>
+    using value_type = remove_cv_t<T>;
+
 protected:
     static_assert(is_store_order<O>(), "Invalid order");
     static constexpr int order = (int)O;
@@ -66,41 +75,54 @@ protected:
 
 public:
     template <UTL_CONCEPT_CXX20(native_atomic_type) T UTL_CONSTRAINT_CXX11(is_native_atomic_type<T>::value)>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(T* ctx, T value) noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
+        T* ctx, value_type<T> value) noexcept {
         __atomic_store(ctx, __UTL addressof(value), order);
     }
 
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(T* ctx, T value) noexcept {
-        store((underlying_type_t<T>*)ctx, (underlying_type_t<T>)value, order);
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
+        T* ctx, value_type<T> value) noexcept {
+        using type = copy_cv_t<T, underlying_type_t<T>>;
+        store((type*)ctx, (underlying_type_t<T>)value, order);
     }
 };
 
 template <memory_order O>
 struct exchange_operations {
+private:
+    template <typename T>
+    using value_type = remove_cv_t<T>;
+
 protected:
     static constexpr int order = (int)O;
     UTL_CONSTEXPR_CXX20 ~exchange_operations() noexcept = default;
 
 public:
     template <UTL_CONCEPT_CXX20(native_atomic_type) T UTL_CONSTRAINT_CXX11(is_native_atomic_type<T>::value)>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T exchange(T* ctx, T value) noexcept {
-        return __atomic_exchange_n(ctx, __UTL addressof(val), order);
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T exchange(
+        T* ctx, value_type<T> value) noexcept {
+        return __atomic_exchange_n(ctx, val, order);
     }
 
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T exchange(T* ctx, T value) noexcept {
-        return (T)exchange((underlying_type_t<T>*)ctx, (underlying_type_t<T>)value);
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T exchange(
+        T* ctx, value_type<T> value) noexcept {
+        using type = copy_cv_t<T, underlying_type_t<T>>;
+        return (T)exchange((type*)ctx, (underlying_type_t<T>)value);
     }
 
     template <integral T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_add(T* ctx, T delta) noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_add(
+        T* ctx, value_type<T> delta) noexcept {
         return __atomic_fetch_add(ctx, delta, order);
     }
 
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_add(T* ctx, T delta) noexcept {
-        return (T)fetch_add((underlying_type_t<T>*)ctx, (underlying_type_t<T>)delta);
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_add(
+        T* ctx, underlying_type_t<T> delta) noexcept {
+        using type = copy_cv_t<T, underlying_type_t<T>>;
+        return (T)fetch_add((type*)ctx, (underlying_type_t<T>)delta);
     }
 
     template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
@@ -109,14 +131,17 @@ public:
         return __atomic_fetch_add(ctx, offset * sizeof(T), order);
     }
 
-    template <integral T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_sub(T* ctx, T delta) noexcept {
+    template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_sub(
+        T* ctx, value_type<T> delta) noexcept {
         return __atomic_fetch_sub(ctx, delta, order);
     }
 
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_sub(T* ctx, T delta) noexcept {
-        return (T)fetch_sub((underlying_type_t<T>*)ctx, (underlying_type_t<T>)delta);
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_sub(
+        T* ctx, underlying_type_t<T> delta) noexcept {
+        using type = copy_cv_t<T, underlying_type_t<T>>;
+        return (T)fetch_sub((type*)ctx, delta);
     }
 
     template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
@@ -125,20 +150,22 @@ public:
         return __atomic_fetch_sub(ctx, offset * sizeof(T), order);
     }
 
-    template <integral T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
+    template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_and(T* ctx, T mask) noexcept {
         return __atomic_fetch_and(ctx, mask, order);
     }
 
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_and(T* ctx, T mask) noexcept {
-        return (T)fetch_and((underlying_type_t<T>*)ctx, (underlying_type_t<T>)mask);
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_and(
+        T* ctx, underlying_type_t<T> mask) noexcept {
+        using type = copy_cv_t<T, underlying_type_t<T>>;
+        return (T)fetch_and((type*)ctx, mask);
     }
 
     template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
     UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_and(T* ctx, intptr_t mask) noexcept {
-        return __atomic_fetch_and((intptr_t*)ctx, mask, order);
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_and(T* ctx, uintptr_t mask) noexcept {
+        return __atomic_fetch_and(ctx, mask, order);
     }
 
     template <integral T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
@@ -147,14 +174,16 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_or(T* ctx, T mask) noexcept {
-        return (T)fetch_or((underlying_type_t<T>*)ctx, (underlying_type_t<T>)mask);
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_or(
+        T* ctx, underlying_type_t<T> mask) noexcept {
+        using type = copy_cv_t<T, underlying_type_t<T>>;
+        return (T)fetch_or((type*)ctx, (underlying_type_t<T>)mask);
     }
 
     template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
     UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_or(T* ctx, intptr_t mask) noexcept {
-        return __atomic_fetch_or((intptr_t*)ctx, mask, order);
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_or(T* ctx, uintptr_t mask) noexcept {
+        return __atomic_fetch_or(ctx, mask, order);
     }
 
     template <integral T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
@@ -163,19 +192,27 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_xor(T* ctx, T mask) noexcept {
-        return (T)fetch_xor((underlying_type_t<T>*)ctx, (underlying_type_t<T>)mask);
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_xor(
+        T* ctx, underlying_type_t<T> mask) noexcept {
+        using type = copy_cv_t<T, underlying_type_t<T>>;
+        return (T)fetch_xor((type*)ctx, mask);
     }
 
     template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
     UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_xor(T* ctx, intptr_t mask) noexcept {
-        return __atomic_fetch_xor((intptr_t*)ctx, mask, order);
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline T fetch_xor(T* ctx, uintptr_t mask) noexcept {
+        return __atomic_fetch_xor(ctx, mask, order);
     }
 };
 
 template <memory_order S, memory_order F>
 struct compare_exchange_operations {
+private:
+    template <typename T>
+    using value_type = remove_cv_t<T>;
+    template <typename T>
+    using pointer = value_type<T>;
+
 protected:
     static_assert(is_load_order<F>(), "Invalid order");
     static constexpr int success = (int)S;
@@ -187,59 +224,57 @@ protected:
 private:
     template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_strong(
-        T* ctx, T* expected, T value) noexcept {
+        T* ctx, pointer<T> expected, value_type<T> value) noexcept {
         return __atomic_compare_exchange_n(ctx, expected, value, strong, success, fail);
     }
 
     template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak(
-        T* ctx, T* expected, T value) noexcept {
+        T* ctx, pointer<T> expected, value_type<T> value) noexcept {
         return __atomic_compare_exchange_n(ctx, expected, value, weak, success, fail);
     }
 
     template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
     UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_pointer(T))
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_strong(
-        T* ctx, T* expected, T value) noexcept {
+        T* ctx, pointer<T> expected, value_type<T> value) noexcept {
         return __atomic_compare_exchange_n(ctx, expected, value, strong, success, fail);
     }
 
     template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
     UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_pointer(T))
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak(
-        T* ctx, T* expected, T value) noexcept {
+        T* ctx, pointer<T> expected, value_type<T> value) noexcept {
         return __atomic_compare_exchange_n(ctx, expected, value, weak, success, fail);
     }
 
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_strong(
-        T* ctx, T* expected, T value) noexcept {
-        return compare_exchange_strong((underlying_type_t<T>*)ctx, (underlying_type_t<T>*)expected,
-            (underlying_type_t<T>)value);
+        T* ctx, pointer<T> expected, value_type<T> value) noexcept {
+        using type = copy_cv_t<T, underlying_type_t<T>>;
+        return compare_exchange_strong(
+            (type*)ctx, (underlying_type_t<T>*)expected, (underlying_type_t<T>)value);
     }
 
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak(
-        T* ctx, T* expected, T value) noexcept {
-        return compare_exchange_weak((underlying_type_t<T>*)ctx, (underlying_type_t<T>*)expected,
-            (underlying_type_t<T>)value);
+        T* ctx, pointer<T> expected, value_type<T> value) noexcept {
+        using type = copy_cv_t<T, underlying_type_t<T>>;
+        return compare_exchange_weak(
+            (type*)ctx, (underlying_type_t<T>*)expected, (underlying_type_t<T>)value);
     }
 
 public:
     template <typename T>
-    UTL_CONSTRAINT_CXX20(requires(T* ctx, T* expected, T value) { compare_exchange_strong(ctx, expected, value);
-    })
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline auto compare_exchange_strong(
-        T* ctx, T* expected, T value, compare_exchange_failure<F>)
+        T* ctx, pointer<T> expected, value_type<T> value, compare_exchange_failure<F>)
         -> decltype(compare_exchange_strong(ctx, expected, value)) {
         return compare_exchange_strong(ctx, expected, value);
     }
 
     template <typename T>
-    UTL_CONSTRAINT_CXX20(requires(T* ctx, T* expected, T value) { compare_exchange_weak(ctx, expected, value);
-    })
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline auto compare_exchange_weak(
-        T* ctx, T* expected, T value, compare_exchange_failure<F>)
+        T* ctx, pointer<T> expected, value_type<T> value, compare_exchange_failure<F>)
         -> decltype(compare_exchange_weak(ctx, expected, value)) {
         return compare_exchange_weak(ctx, expected, value);
     }
