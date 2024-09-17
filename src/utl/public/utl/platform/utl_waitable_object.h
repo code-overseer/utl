@@ -7,6 +7,7 @@
 #include "utl/platform/utl_clock_fwd.h"
 
 #include "utl/algorithm/utl_min.h"
+#include "utl/atomics/utl_atomics.h"
 #include "utl/platform/utl_time_duration.h"
 #include "utl/type_traits/utl_is_function.h"
 #include "utl/type_traits/utl_is_has_unique_object_representations.h"

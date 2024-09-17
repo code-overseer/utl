@@ -1634,6 +1634,8 @@ public:
         UTL_CONSTRAINT_CXX20(integral<T> || is_pointer_v<T>)
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak(T* ctx,
             pointer<T> expected, value_type<T> desired, compare_exchange_failure<F> f) noexcept {
+            // Only < ARMv8.1-a has no dedicated CAS instruction
+            // But it requires exclusive load/store intrinsics to be exposed by MSVC to be supported
             return compare_exchange(ctx, expected, desired, success_v, f);
         }
 
