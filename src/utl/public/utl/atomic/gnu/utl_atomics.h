@@ -25,7 +25,6 @@
 
 UTL_NAMESPACE_BEGIN
 
-namespace platform {
 namespace atomics {
 template <memory_order O>
 struct fence_operations {
@@ -281,6 +280,5 @@ public:
 };
 
 } // namespace atomics
-} // namespace platform
 
 UTL_NAMESPACE_END

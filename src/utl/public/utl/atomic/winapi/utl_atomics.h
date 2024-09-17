@@ -24,7 +24,6 @@
 
 UTL_NAMESPACE_BEGIN
 
-namespace platform {
 namespace atomics {
 #if UTL_CXX20
 template <typename T>
@@ -1617,14 +1616,14 @@ public:
         template <typename T UTL_CONSTRAINT_CXX11(
             UTL_TRAIT_is_integral(T) || UTL_TRAIT_is_pointer(T))>
         UTL_CONSTRAINT_CXX20(integral<T> || is_pointer_v<T>)
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_strong(
-            T* ctx, pointer<T> expected, value_type<T> desired, memory_order_type<F> f) noexcept {
+        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_strong(T* ctx,
+            pointer<T> expected, value_type<T> desired, compare_exchange_failure<F> f) noexcept {
             return compare_exchange(ctx, expected, desired, success_v, f);
         }
 
         template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_strong(
-            T* ctx, pointer<T> expected, value_type<T> desired, memory_order_type<F> f) noexcept {
+        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_strong(T* ctx,
+            pointer<T> expected, value_type<T> desired, compare_exchange_failure<F> f) noexcept {
             using type = copy_cv_t<T, underlying_type_t<T>>;
             return compare_exchange((type*)ctx, (underlying_type_t<T>*)expected,
                 (underlying_type_t<T>)desired, success_v, f);
@@ -1633,14 +1632,14 @@ public:
         template <typename T UTL_CONSTRAINT_CXX11(
             UTL_TRAIT_is_integral(T) || UTL_TRAIT_is_pointer(T))>
         UTL_CONSTRAINT_CXX20(integral<T> || is_pointer_v<T>)
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak(
-            T* ctx, pointer<T> expected, value_type<T> desired, memory_order_type<F> f) noexcept {
+        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak(T* ctx,
+            pointer<T> expected, value_type<T> desired, compare_exchange_failure<F> f) noexcept {
             return compare_exchange(ctx, expected, desired, success_v, f);
         }
 
         template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak(
-            T* ctx, pointer<T> expected, value_type<T> desired, memory_order_type<F> f) noexcept {
+        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak(T* ctx,
+            pointer<T> expected, value_type<T> desired, compare_exchange_failure<F> f) noexcept {
             using type = copy_cv_t<T, underlying_type_t<T>>;
             return compare_exchange((type*)ctx, (underlying_type_t<T>*)expected,
                 (underlying_type_t<T>)desired, success_v, f);
@@ -1652,6 +1651,5 @@ template <memory_order S, memory_order F>
 using compare_exchange_operations = compare_exchange_traits::operations<S, F>;
 
 } // namespace atomics
-} // namespace platform
 
 UTL_NAMESPACE_END
