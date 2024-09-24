@@ -13,6 +13,8 @@
 // todo intrusive_ptr
 // todo atomic_reference_counter
 
+// See https://godbolt.org/z/hWY84489E for test
+
 UTL_NAMESPACE_BEGIN
 
 //     A
