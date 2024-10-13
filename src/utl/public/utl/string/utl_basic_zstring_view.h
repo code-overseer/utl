@@ -138,8 +138,9 @@ public:
 private:
     UTL_ATTRIBUTES(NORETURN, NOINLINE, _HIDE_FROM_ABI) static basic_zstring_view substr_throw(
         __UTL source_location src, size_t pos, size_t size) UTL_THROWS {
-        exceptions::message_format format = {"[UTL] `basic_zstring_view::substr` operation failed, "
-                                             "Reason=[index out of range], pos=[%zu], size=[%zu]",
+        exceptions::message_vformat format = {
+            "[UTL] `basic_zstring_view::substr` operation failed, "
+            "Reason=[index out of range], pos=[%zu], size=[%zu]",
             src};
         UTL_THROW(out_of_range(format, pos, size));
     }

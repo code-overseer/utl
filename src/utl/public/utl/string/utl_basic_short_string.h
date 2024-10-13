@@ -1414,7 +1414,7 @@ private:
                 grow_heap(new_capacity);
             }
         } UTL_CATCH(program_exception& exception) {
-            exception.emplace_message(
+            exception.emplace_messagef(
                 UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::reserve` operation failed, "
                                    "Reason=[Allocation failed]"));
             UTL_RETHROW();
@@ -1436,7 +1436,7 @@ private:
             traits_type::copy(heap.data_, src.data(), src.size() + 1);
             return heap;
         } UTL_CATCH(program_exception& exception) {
-            exception.emplace_message(UTL_MESSAGE_FORMAT(
+            exception.emplace_messagef(UTL_MESSAGE_FORMAT(
                 "[UTL] basic_short_string operation failed, Reason=[Allocation failed]"));
             UTL_RETHROW();
         }
