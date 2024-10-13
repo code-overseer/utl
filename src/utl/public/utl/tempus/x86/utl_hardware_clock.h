@@ -49,7 +49,7 @@ public:
         value_type const& l, value_type const& r) noexcept {
 
         if (l.aux == r.aux) {
-            return return static_cast<clock_order>((l.tick > r.tick) - (r.tick < l.tick));
+            return static_cast<clock_order>((l.tick > r.tick) - (r.tick < l.tick));
         }
 
         return clock_order::unordered;
@@ -60,12 +60,12 @@ public:
     }
 
     friend __UTL_HIDE_FROM_ABI time_point<hardware_clock_t> get_time(
-        hardware_clock_t, __UTL memory_order) noexcept {
+        hardware_clock_t, instruction_order) noexcept {
         return time_point<hardware_clock_t>{get_time(o)};
     }
 
 private:
-    __UTL_ABI_PUBLIC static value_type get_time(__UTL memory_order o) noexcept;
+    __UTL_ABI_PUBLIC static value_type get_time(instruction_order o) noexcept;
 };
 
 } // namespace tempus

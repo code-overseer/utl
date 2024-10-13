@@ -7,8 +7,10 @@
 #include "utl/chrono/utl_chrono_fwd.h"
 #include "utl/compare/utl_compare_fwd.h"
 #include "utl/tempus/utl_clock_fwd.h"
+#include "utl/tuple/utl_tuple_fwd.h"
 
 #include "utl/atomic/utl_atomic.h"
+#include "utl/functional/utl_invoke.h"
 #include "utl/tempus/utl_hardware_ticks.h"
 #include "utl/tempus/utl_time_duration.h"
 #include "utl/type_traits/utl_constants.h"
@@ -27,6 +29,8 @@
  */
 
 UTL_NAMESPACE_BEGIN
+
+using instruction_order = memory_order;
 
 namespace tempus {
 
@@ -181,11 +185,18 @@ public:
         high_resolution_clock_t) noexcept;
 };
 
+struct process_clock_t {
+    explicit constexpr process_clock_t() noexcept = default;
+    __UTL_HIDE_FROM_ABI friend time_point<process_clock_t> get_time(
+        process_clock_t, instruction_order) noexcept;
+    __UTL_HIDE_FROM_ABI friend time_point<process_clock_t> get_time(process_clock_t) noexcept;
+};
+
 struct hardware_clock_t {
     explicit constexpr hardware_clock_t() noexcept = default;
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, __UTL memory_order) noexcept;
-    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(hardware_clock_t c) noexcept;
+        hardware_clock_t, instruction_order) noexcept;
+    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(hardware_clock_t) noexcept;
     __UTL_HIDE_FROM_ABI static bool invariant_frequency() noexcept {
         return hardware_ticks::invariant_frequency();
     }
@@ -198,6 +209,8 @@ UTL_INLINE_CXX17 constexpr system_clock_t system_clock{};
 UTL_INLINE_CXX17 constexpr steady_clock_t steady_clock{};
 
 UTL_INLINE_CXX17 constexpr high_resolution_clock_t high_resolution_clock{};
+
+UTL_INLINE_CXX17 constexpr process_clock_t process_clock{};
 
 UTL_INLINE_CXX17 constexpr hardware_clock_t hardware_clock{};
 

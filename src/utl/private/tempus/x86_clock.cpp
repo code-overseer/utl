@@ -38,30 +38,30 @@ static cpuid_t run_cpuid() noexcept {
     return value;
 }
 
-static timestamp_counter_t rdtscp(__UTL memory_order o) noexcept {
+static timestamp_counter_t rdtscp(instruction_order o) noexcept {
     unsigned long long high;
     unsigned long long low;
     unsigned int aux;
 
     switch (o) {
-    case __UTL memory_order::relaxed:
+    case instruction_order::relaxed:
         __asm__("rdtscp" : "=a"(low), "=d"(high), "=c"(aux) : :);
         break;
-    case __UTL memory_order::consume:
+    case instruction_order::consume:
         UTL_FALLTHROUGH;
-    case __UTL memory_order::acquire:
+    case instruction_order::acquire:
         __asm__("rdtscp" : "=a"(low), "=d"(high), "=c"(aux) : :);
         _mm_lfence();
         break;
-    case __UTL memory_order::release:
+    case instruction_order::release:
         _mm_mfence();
         __asm__("rdtscp" : "=a"(low), "=d"(high), "=c"(aux) : :);
         break;
-    case __UTL memory_order::acq_rel:
+    case instruction_order::acq_rel:
         _mm_mfence();
         __asm__("rdtscp" : "=a"(low), "=d"(high), "=c"(aux) : :);
         _mm_lfence();
-    case __UTL memory_order::seq_cst:
+    case instruction_order::seq_cst:
         _mm_mfence();
         __asm__ volatile("rdtscp" : "=a"(low), "=d"(high), "=c"(aux) : : "memory");
         _mm_lfence();
@@ -70,31 +70,31 @@ static timestamp_counter_t rdtscp(__UTL memory_order o) noexcept {
     return timestamp_counter_t{tick, aux};
 }
 
-static timestamp_counter_t rdtsc(__UTL memory_order o) noexcept {
+static timestamp_counter_t rdtsc(instruction_order o) noexcept {
     unsigned long long high;
     unsigned long long low;
 
     switch (o) {
-    case __UTL memory_order::relaxed:
+    case instruction_order::relaxed:
         __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
         break;
-    case __UTL memory_order::consume:
+    case instruction_order::consume:
         UTL_FALLTHROUGH;
-    case __UTL memory_order::acquire:
+    case instruction_order::acquire:
         __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
         _mm_lfence();
         break;
-    case __UTL memory_order::release:
+    case instruction_order::release:
         _mm_mfence();
         _mm_lfence();
         __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
         break;
-    case __UTL memory_order::acq_rel:
+    case instruction_order::acq_rel:
         _mm_mfence();
         _mm_lfence();
         __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
         _mm_lfence();
-    case __UTL memory_order::seq_cst:
+    case instruction_order::seq_cst:
         _mm_mfence();
         _mm_lfence();
         __asm__ volatile("rdtsc" : "=a"(low), "=d"(high) : : "memory");
@@ -107,25 +107,25 @@ static timestamp_counter_t rdtsc(__UTL memory_order o) noexcept {
 
 #  elif UTL_TARGET_MICROSOFT
 
-static timestamp_counter_t rdtscp(__UTL memory_order o) noexcept {
+static timestamp_counter_t rdtscp(instruction_order o) noexcept {
     timestamp_counter_t result;
     switch (o) {
-    case __UTL memory_order::relaxed:
+    case instruction_order::relaxed:
         result.tick = __rdtscp(&result.aux);
         break;
-    case __UTL memory_order::consume:
+    case instruction_order::consume:
         UTL_FALLTHROUGH;
-    case __UTL memory_order::acquire:
+    case instruction_order::acquire:
         result.tick = __rdtscp(&result.aux);
         _mm_lfence();
         break;
-    case __UTL memory_order::release:
+    case instruction_order::release:
         _mm_mfence();
         result.tick = __rdtscp(&result.aux);
         break;
-    case __UTL memory_order::acq_rel:
+    case instruction_order::acq_rel:
         UTL_FALLTHROUGH;
-    case __UTL memory_order::seq_cst:
+    case instruction_order::seq_cst:
         _mm_mfence();
         result.tick = __rdtscp(&result.aux);
         _mm_lfence();
@@ -134,27 +134,27 @@ static timestamp_counter_t rdtscp(__UTL memory_order o) noexcept {
     return result;
 }
 
-static timestamp_counter_t rdtsc(__UTL memory_order o) noexcept {
+static timestamp_counter_t rdtsc(instruction_order o) noexcept {
     timestamp_counter_t result{0, -1};
 
     switch (o) {
-    case __UTL memory_order::relaxed:
+    case instruction_order::relaxed:
         result.tick = __rdtsc();
         break;
-    case __UTL memory_order::consume:
+    case instruction_order::consume:
         UTL_FALLTHROUGH;
-    case __UTL memory_order::acquire:
+    case instruction_order::acquire:
         result.tick = __rdtsc();
         _mm_lfence();
         break;
-    case __UTL memory_order::release:
+    case instruction_order::release:
         _mm_mfence();
         _mm_lfence();
         result.tick = __rdtsc();
         break;
-    case __UTL memory_order::acq_rel:
+    case instruction_order::acq_rel:
         UTL_FALLTHROUGH;
-    case __UTL memory_order::seq_cst:
+    case instruction_order::seq_cst:
         _mm_mfence();
         _mm_lfence();
         result.tick = __rdtsc();
@@ -184,12 +184,12 @@ static constexpr cpuid_t run_cpuid() noexcept {
     return {};
 }
 
-static timestamp_counter_t rdtscp(__UTL memory_order o) noexcept {
+static timestamp_counter_t rdtscp(instruction_order o) noexcept {
     ULT_ASSERT(false);
     UTL_BUILTIN_unreachable();
 }
 
-static timestamp_counter_t rdtsc(__UTL memory_order o) noexcept {
+static timestamp_counter_t rdtsc(instruction_order o) noexcept {
     ULT_ASSERT(false);
     UTL_BUILTIN_unreachable();
 }
@@ -328,7 +328,7 @@ time_duration to_time_duration(hardware_ticks t) noexcept {
     return t.value() * nano / tsc_frequency().value;
 }
 
-auto clock_traits<hardware_clock_t>::get_time(__UTL memory_order o) noexcept -> value_type {
+auto clock_traits<hardware_clock_t>::get_time(instruction_order o) noexcept -> value_type {
 #  if UTL_USE_RDTSCP_HARDWARE_CLOCK
 
     UTL_ASSERT(supports_rdtscp());

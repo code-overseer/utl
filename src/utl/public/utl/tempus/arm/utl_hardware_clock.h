@@ -47,12 +47,12 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, __UTL memory_order o) noexcept {
+        hardware_clock_t, instruction_order o) noexcept {
         return time_point<hardware_clock_t>{get_time(o)};
     }
 
 private:
-    __UTL_ABI_PUBLIC static value_type get_time(__UTL memory_order o) noexcept;
+    __UTL_ABI_PUBLIC static value_type get_time(instruction_order o) noexcept;
 };
 
 } // namespace tempus
