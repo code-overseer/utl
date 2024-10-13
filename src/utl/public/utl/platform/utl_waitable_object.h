@@ -9,212 +9,313 @@
 #include "utl/algorithm/utl_min.h"
 #include "utl/atomics/utl_atomics.h"
 #include "utl/platform/utl_time_duration.h"
-#include "utl/type_traits/utl_is_function.h"
+#include "utl/type_traits/utl_enable_if.h"
+#include "utl/type_traits/utl_is_explicit_constructible.h"
 #include "utl/type_traits/utl_is_has_unique_object_representations.h"
-#include "utl/type_traits/utl_is_reference.h"
+#include "utl/type_traits/utl_is_inequality_comparable.h"
+#include "utl/type_traits/utl_is_nothrow_default_constructible.h"
 #include "utl/type_traits/utl_is_trivially_copyable.h"
-#include "utl/type_traits/utl_remove_pointer.h"
+#include "utl/utility/utl_forward.h"
+#include "utl/utility/utl_move.h"
 
 #if UTL_TARGET_APPLE
-#  include "darwin/utl_futex.h"
+#  include "apple/utl_futex.h"
+#elif UTL_TARGET_LINUX
+#  include "linux/utl_futex.h"
+#elif UTL_TARGET_MICROSOFT
+#  include "winapi/utl_futex.h"
+#else
+#  error Unsupported target
 #endif
 
 UTL_NAMESPACE_BEGIN
 
 namespace platform {
-template <typename T>
-class waitable_obect;
-template <typename T>
-class single_waitable_obect;
 
+/**
+ * A waitable object that allows a single consumer to wait on a value of type T.
+ * The type T must meet certain requirements, including being trivially copyable
+ * or having a unique object representation, being an object type, and being
+ * inequality comparable.
+ *
+ * @tparam T The type of the value to be stored in the waitable object.
+ *
+ * @note This class is not copyable or movable.
+ */
 template <typename T>
-class waitable_obect {
+class waitable_object {
 #if UTL_TRAIT_SUPPORTED_has_unique_object_representations
     static_assert(UTL_TRAIT_has_unique_object_representations(T), "Invalid type");
 #else
     static_assert(UTL_TRAIT_is_trivially_copyable(T), "Invalid type");
 #endif
     static_assert(UTL_TRAIT_is_object(T), "Invalid type");
-    static_assert(details::futex::is_waitable<T>::value, "Invalid type");
+    static_assert(UTL_TRAIT_is_inequality_comparable(T), "Invalid type");
 
 public:
-    constexpr explicit waitable_obect(T& t) : address(__UTL addressof(t)) {}
-    waitable_obect(waitable_obect const&) = delete;
-    waitable_obect(waitable_obect&&) = delete;
-    waitable_obect& operator=(waitable_obect const&) = delete;
-    waitable_obect& operator=(waitable_obect&&) = delete;
-    UTL_CONSTEXPR_CXX20 ~waitable_obect() noexcept = default;
+#if UTL_CXX20
+    /**
+     * Constructs a waitable object with the default constructor of T.
+     * This constructor is explicit if T is explicitly constructible.
+     */
+    constexpr explicit(UTL_TRAIT_is_explicit_constructible(T))
+        waitable_object() noexcept(UTL_TRAIT_is_nothrow_default_constructible(T)) = default;
 
-    template <typename R, typename P>
-    void wait(value_type old, ::std::chrono::duration<R, P> timeout,
-        __UTL memory_order o = __UTL memory_order_seq_cst) const noexcept {
-        wait(old, time_duration{timeout}, o);
+    /**
+     * Constructs a waitable object with the provided arguments, which are forwarded to T's
+     * constructor. This constructor is explicit if T is explicitly constructible with the given
+     * arguments.
+     *
+     * @tparam Args The types of the arguments to forward to T's constructor.
+     * @param args The arguments to forward to T's constructor.
+     */
+    template <typename... Args>
+    UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_constructible(T, Args...))
+    constexpr explicit(UTL_TRAIT_is_explicit_constructible(T, Args...))
+        waitable_object(Args&&... args) noexcept(UTL_TRAIT_is_nothrow_constructible(T, Args...))
+        : data_{__UTL forward<Args>(args)} {}
+#else
+    /**
+     * Constructs a waitable object with the default constructor of T.
+     * This constructor is explicit if T is explicitly constructible.
+     */
+    template <bool Object = __UTL always_true<T>()
+                  UTL_CONSTRAINT_CXX11(Object && UTL_TRAIT_is_explicit_constructible(T))>
+    constexpr explicit waitable_object() noexcept(UTL_TRAIT_is_nothrow_default_constructible(T)) {}
+    template <bool Object = __UTL always_true<T>()
+                  UTL_CONSTRAINT_CXX11(Object && !UTL_TRAIT_is_explicit_constructible(T))>
+    constexpr waitable_object() noexcept(UTL_TRAIT_is_nothrow_default_constructible(T)) {}
+
+    /**
+     * Constructs a waitable object with the provided arguments, which are forwarded to T's
+     * constructor. This constructor is explicit if T is explicitly constructible with the given
+     * arguments.
+     *
+     * @tparam Args The types of the arguments to forward to T's constructor.
+     * @param args The arguments to forward to T's constructor.
+     */
+    template <typename... Args UTL_CONSTRAINT_CXX11( UTL_TRAIT_is_constructible(T, Args...) &&
+            UTL_TRAIT_is_explicit_constructible(T, Args...))>
+    constexpr explicit waitable_object(Args&&... args) noexcept(
+        UTL_TRAIT_is_nothrow_constructible(T, Args...))
+        : data_{__UTL forward<Args>(args)} {}
+    template <typename... Args UTL_CONSTRAINT_CXX11( UTL_TRAIT_is_constructible(T, Args...) &&
+            !UTL_TRAIT_is_explicit_constructible(T, Args...))>
+    constexpr waitable_object(Args&&... args) noexcept(
+        UTL_TRAIT_is_nothrow_constructible(T, Args...))
+        : data_{__UTL forward<Args>(args)} {}
+
+#endif
+    waitable_object(waitable_object const&) = delete;
+    waitable_object(waitable_object&&) = delete;
+    waitable_object& operator=(waitable_object const&) = delete;
+    waitable_object& operator=(waitable_object&&) = delete;
+    UTL_CONSTEXPR_CXX20 ~waitable_object() noexcept = default;
+
+    /**
+     * Waits for the value of the object to change from the given old value.
+     * The wait is performed with a timeout and a specified memory order.
+     *
+     * @tparam R The representation of the duration.
+     * @tparam P The period of the duration.
+     * @tparam O The memory order to use for the operation.
+     *
+     * @param old The value to compare against the current value of the object.
+     * @param timeout The maximum time to wait before returning.
+     */
+    template <typename R, typename P, memory_order O>
+    void wait(value_type old, ::std::chrono::duration<R, P> timeout) const noexcept {
+        wait<O>(old, time_duration{timeout});
     }
+    template <memory_order O>
+    void wait(value_type old, time_duration timeout) const noexcept;
 
-    void wait(value_type old, __UTL memory_order o = __UTL memory_order_seq_cst) const noexcept {
-        return wait(old, time_duration::invalid(), o);
-    }
+    /**
+     * Waits for the value of the object to change from the given old value.
+     * The wait is performed with a specified memory order.
+     *
+     * @tparam O The memory order to use for the operation.
+     * @param old The value to compare against the current value of the object.
+     */
+    template <memory_order O>
+    void wait(value_type old) const noexcept;
 
-    void wait(value_type old, time_duration,
-        __UTL memory_order o = __UTL memory_order_seq_cst) const noexcept;
-
+    /**
+     * Notifies a single waiting thread that the object has changed.
+     */
     void notify_one() noexcept;
 
-    void notify_all() noexcept;
+    /**
+     * Deleted. Notifies all waiting threads. This operation is not allowed for this class.
+     */
+    void notify_all() noexcept = delete;
 
-    UTL_ATRRIBUTE(ALWAYS_INLINE)
-    T load(__UTL memory_order o = __UTL memory_order_seq_cst) const noexcept {
-        return __UTL atomic_ref<value_type>(*address).load(o);
+    /**
+     * Gets a reference to the stored value.
+     *
+     * @return A reference to the stored value.
+     */
+    UTL_ATTRIBUTE(ALWAYS_INLINE) T& value() & noexcept {
+        return data_;
     }
-
-    UTL_ATRRIBUTE(ALWAYS_INLINE)
-    void store(T value, __UTL memory_order o = __UTL memory_order_seq_cst) noexcept {
-        return __UTL atomic_ref<value_type>(*address).store(value, o);
-    }
-
-    UTL_ATRRIBUTE(ALWAYS_INLINE)
-    T exchange(T value, __UTL memory_order o = __UTL memory_order_seq_cst) noexcept {
-        return __UTL atomic_ref<value_type>(*address).exchange(value, o);
-    }
-
-    UTL_ATRRIBUTE(ALWAYS_INLINE)
-    T fetch_add(T value, __UTL memory_order o = __UTL memory_order_seq_cst) noexcept {
-        return __UTL atomic_ref<value_type>(*address).fetch_add(value, o);
-    }
-
-    UTL_ATRRIBUTE(ALWAYS_INLINE)
-    T fetch_sub(T value, __UTL memory_order o = __UTL memory_order_seq_cst) noexcept {
-        return __UTL atomic_ref<value_type>(*address).fetch_sub(value, o);
-    }
-
-    UTL_ATRRIBUTE(ALWAYS_INLINE)
-    T fetch_and(T value, __UTL memory_order o = __UTL memory_order_seq_cst) noexcept {
-        return __UTL atomic_ref<value_type>(*address).fetch_and(value, o);
-    }
-
-    UTL_ATRRIBUTE(ALWAYS_INLINE)
-    T fetch_or(T value, __UTL memory_order o = __UTL memory_order_seq_cst) noexcept {
-        return __UTL atomic_ref<value_type>(*address).fetch_or(value, o);
-    }
-
-    UTL_ATRRIBUTE(ALWAYS_INLINE)
-    T fetch_xor(T value, __UTL memory_order o = __UTL memory_order_seq_cst) noexcept {
-        return __UTL atomic_ref<value_type>(*address).fetch_xor(value, o);
-    }
-
-    UTL_ATRRIBUTE(ALWAYS_INLINE)
-    bool comapre_exchange_strong(
-        T& expected, T desired, __UTL memory_order o = __UTL memory_order_seq_cst) noexcept {
-        return __UTL atomic_ref<value_type>(*address).comapre_exchange_strong(expected, desired, o);
-    }
-
-    UTL_ATRRIBUTE(ALWAYS_INLINE)
-    bool comapre_exchange_strong(
-        T& expected, T desired, __UTL memory_order success, __UTL memory_order failure) noexcept {
-        return __UTL atomic_ref<value_type>(*address).comapre_exchange_strong(
-            expected, desired, success, failure);
-    }
-
-    UTL_ATRRIBUTE(ALWAYS_INLINE)
-    bool comapre_exchange_weak(
-        T& expected, T desired, __UTL memory_order o = __UTL memory_order_seq_cst) noexcept {
-        return __UTL atomic_ref<value_type>(*address).comapre_exchange_weak(expected, desired, o);
-    }
-
-    UTL_ATRRIBUTE(ALWAYS_INLINE)
-    bool comapre_exchange_weak(
-        T& expected, T desired, __UTL memory_order success, __UTL memory_order failure) noexcept {
-        return __UTL atomic_ref<value_type>(*address).comapre_exchange_weak(
-            expected, desired, success, failure);
-    }
+    UTL_ATTRIBUTE(ALWAYS_INLINE) T&& value() && noexcept { return __UTL move(data_); }
+    UTL_ATTRIBUTE(ALWAYS_INLINE) T const& value() const& noexcept { return data_; }
+    UTL_ATTRIBUTE(ALWAYS_INLINE) T const&& value() const&& noexcept { return __UTL move(data_); }
 
 private:
-    T* address;
-    unsigned int wait_count = 0;
-    signed int notify_flag = 0;
+    enum class notification : unsigned int {
+        none = 0,
+        notify = 1,
+        deep_sleep = 2,
+    };
+    static constexpr time_duration sleep_slices[]{
+        {0,  500},
+        {0, 1000},
+        {0, 2000}
+    };
+    static constexpr size_t spin_cycles = 1000;
+    static constexpr hardware_ticks elapsed_ticks(time_duration start) noexcept {
+        return get_time(__UTL platform::hardware_clock, __UTL memory_order_relaxed) - start;
+    }
+
+    constexpr bool is_notified() const noexcept {
+        auto const flag = __UTL atomic_relaxed::load(&flag_);
+        return ((unsigned int)flag & (unsigned int)notification::notify) > 0;
+    }
+
+    static void ensure_hardware() noexcept {
+        static int const _ = []() {
+            // Anything post-Nehalem
+            UTL_ASSERT(hardware_ticks::invariant_frequency());
+            return 0;
+        }();
+        (void)_;
+    }
+
+    static constexpr bool has_spin_timeout(hardware_ticks start, time_duration timeout) noexcept {
+        auto const elapsed = elapsed_ticks(start);
+        return timeout < to_time_duration(elapsed) && spin_cycles < elapsed.value();
+    }
+
+    static constexpr bool has_spin_timeout(hardware_ticks start) noexcept {
+        return spin_cycles < elapsed_ticks(start).value();
+    }
+
+    T data_;
+    notification flag_ = notification::none;
+
+    static_assert(details::futex::is_waitable<notification>::value, "Invalid type");
 };
 
 template <typename T>
-void waitable_obect<T>::wait(
-    value_type const old, time_duration const t, __UTL memory_order const o) const noexcept {
-    static int const _ = []() {
-        // Anything post-Nehalem
-        UTL_ASSERT(hardware_ticks::invariant_frequency());
-        return 0;
-    }();
-
-    auto const has_changed = [&]() { return __UTL platform::atomic_load(address, o) == old; };
-    auto const elapsed_tick = [start = get_time(hardware_clock, __UTL memory_order_relaxed)]() {
-        return get_time(__UTL platform::hardware_clock, __UTL memory_order_relaxed) - start;
-    };
-    auto const on_complete = [&]() {
-        __UTL platform::thread_fence(__UTL memory_order_release);
-        auto waits = __UTL platform::atomic_fetch_sub(&wait_count, 1, __UTL memory_order_relaxed);
-        if (waits == 1) {
-            __UTL platform::atomic_store(&notify_flag, 0, __UTL memory_order_relaxed);
-        }
-    };
-    auto const on_notified = [&]() {
-        __UTL platform::atomic_fetch_sub(&notify_flag, 1, __UTL memory_order_relaxed);
-        on_complete();
-    };
-    auto const is_spin_timeout = [&]() {
-        static constexpr size_t spin_cycles = 1000;
-        auto const elapsed = elapsed_tick();
-        return to_time_duration(elapsed) > t && elapsed.value() > spin_cycles;
-    };
-
-    __UTL platform::atomic_fetch_add(&wait_count, 1, __UTL memory_order_release);
-    do {
-        if (has_changed()) {
-            on_complete();
-            return;
-        }
-
-        __UTL platform::pause();
-    } while (!is_spin_timeout());
-
-    auto const should_poll = [&]() {
-        return !has_changed() && to_time_duration(elapsed_tick()) < t;
-    };
-
-    while (should_poll()) {
-        auto const notified = __UTL platform::atomic_load(&notify_flag, __UTL memory_order_acquire);
-        if (notified < 0) {
-            on_complete();
-            return;
-        }
-        if (notified != 0) {
-            on_notified();
-            return;
-        }
-
-        static constexpr time_duration sleep_slice(0, 64000);
-        auto const remaining = t - to_time_duration(elapsed_tick());
-        // We cannot put a permanent sleep here, otherwise we cannot guarantee
-        // a notify call will wake the futex, setting a max sleep will ensure
-        // that the maximum latency will be ~64us.
-        details::futex::wait(address, old, __UTL min(remaining, sleep_slice));
-    }
-
-    on_complete();
-}
-
-template <typename T>
-T waitable_obect::notify_one() const noexcept {
-    if (__UTL platform::atomic_load(&wait_count, __UTL memory_order_acquire) > 0) {
-        __UTL platform::atomic_fetch_add(&notify_flag, 1, __UTL memory_order_relaxed);
+void waitable_object<T>::notify_one() noexcept {
+    auto const flag = atomic_release::exchange(&flag_, notification::notify);
+    if (flag == notification::deep_sleep) {
         details::futex::notify_one(address);
     }
 }
 
 template <typename T>
-T waitable_obect::notify_all() const noexcept {
-    if (__UTL platform::atomic_load(&wait_count, __UTL memory_order_acquire) > 0) {
-        __UTL platform::atomic_fetch_or(&notify_flag, 1 << 31, __UTL memory_order_relaxed);
-        details::futex::notify_all(address);
+template <memory_order O>
+void waitable_object<T>::wait(value_type old) const noexcept {
+    ensure_hardware();
+    UTL_ATTRIBUTE(MAYBE_UNUSED) auto const _ = atomic_acquire::exchange(&flag_, notification::none);
+    if (__UTL atomic_operations<O>::load(&data_) != old) {
+        return;
     }
+
+    auto const start_tick = get_time(__UTL platform::hardware_clock, __UTL memory_order_relaxed);
+    UTL_COMPILER_BARRIER();
+    do {
+        if (is_notified()) {
+            goto complete;
+        }
+
+        __UTL platform::pause();
+    } while (!has_spin_timeout(start_tick));
+
+    for (auto slice : sleep_slices) {
+        if (is_notified()) {
+            goto complete;
+        }
+
+        platform::sleep(slice);
+    }
+    auto const flag = atomic_relaxed::exchange(&flag_, notification::deep_sleep);
+    if (((unsigned int)flag & (unsigned int)notification::notify) > 0) {
+        goto complete;
+    }
+
+    while (true) {
+        details::futex::wait(&flag_, notification::deep_sleep, time_duration::invalid());
+        if (is_notified()) {
+            goto complete;
+        }
+    }
+complete:
+    auto const volatile final_flag = atomic_acquire::exchange(&flag_, notification::none);
+    UTL_ATTRIBUTE(MAYBE_UNUSED) auto const result =
+        ((unsigned int)final_flag & (unsigned int)notification::notify) != 0;
+    UTL_BUILTIN_assume(result);
+    UTL_ASSERT(result);
 }
+
+template <typename T>
+template <memory_order O>
+void waitable_object<T>::wait(
+    value_type const old, time_duration const timeout, memory_order_type<O>) const noexcept {
+    ensure_hardware();
+    if (__UTL atomic_operations<O>::load(&data_) != old) {
+        return;
+    }
+
+    auto const start_tick = get_time(__UTL platform::hardware_clock, __UTL memory_order_relaxed);
+    atomic_relaxed::store(&flag_, notification::none);
+    UTL_COMPILER_BARRIER();
+    do {
+        if (is_notified()) {
+            goto complete;
+        }
+
+        __UTL platform::pause();
+    } while (!has_spin_timeout(start_tick, timeout));
+
+    for (auto slice : sleep_slices) {
+        if (is_notified()) {
+            goto complete;
+        }
+
+        auto const duration = to_time_duration(elapsed_ticks(start_tick));
+        if (timeout < duration) {
+            return;
+        }
+
+        auto const remaining = timeout - duration + time_duration{0, 10};
+        platform::sleep(__UTL min(slice, remaining));
+    }
+    auto const flag = atomic_relaxed::exchange(&flag_, notification::deep_sleep);
+    if (((unsigned int)flag & (unsigned int)notification::notify) > 0) {
+        goto complete;
+    }
+
+    while (true) {
+        auto const duration = to_time_duration(elapsed_ticks(start_tick));
+        if (timeout < duration) {
+            return;
+        }
+
+        auto const remaining = timeout - duration + time_duration{0, 10};
+        details::futex::wait(&flag_, notification::deep_sleep, remaining);
+        if (is_notified()) {
+            goto complete;
+        }
+    }
+complete:
+    auto const volatile final_flag = atomic_acquire::exchange(&flag_, notification::none);
+    auto const result = ((unsigned int)final_flag & (unsigned int)notification::notify) != 0;
+    UTL_ASSERT(result);
+}
+
 } // namespace platform
 
 UTL_NAMESPACE_END

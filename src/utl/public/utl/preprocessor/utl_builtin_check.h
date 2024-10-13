@@ -12,7 +12,8 @@
 #endif
 
 #ifdef __has_builtin
-#  define UTL_HAS_BUILTIN(BUILTIN) __has_builtin(BUILTIN)
+#  define UTL_HAS_BUILTIN(BUILTIN) \
+      (__has_builtin(BUILTIN) || UTL_IS_RESERVED_IDENTIFIER(__##BUILTIN))
 #else
 #  define UTL_HAS_BUILTIN(...) 0
 #endif /* ifdef __has_builtin */

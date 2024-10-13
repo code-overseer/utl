@@ -40,29 +40,21 @@ auto clock_traits<hardware_clock_t>::get_time(__UTL memory_order o) noexcept -> 
     value_type res;
     switch (o) {
     case __UTL memory_order_relaxed:
-        UTL_FALLTHROUGH;
+        res = __builtin_arm_rsr64("CNTVCT_EL0");
     case __UTL memory_order_consume:
         UTL_FALLTHROUGH;
     case __UTL memory_order_acquire:
         __builtin_arm_isb(ISB_SY);
         res = __builtin_arm_rsr64("CNTVCT_EL0");
-        __builtin_arm_dmb(DMB_ISHST);
-        __builtin_arm_isb(ISB_SY);
         break;
     case __UTL memory_order_release:
-        UTL_FALLTHROUGH;
-    case __UTL memory_order_acq_rel:
-        __builtin_arm_isb(ISB_SY);
-        __builtin_arm_dmb(DMB_ISH);
         res = __builtin_arm_rsr64("CNTVCT_EL0");
         __builtin_arm_isb(ISB_SY);
-        break;
-
+    case __UTL memory_order_acq_rel:
+        UTL_FALLTHROUGH;
     default:
         __builtin_arm_isb(ISB_SY);
-        __builtin_arm_dmb(DMB_ISH);
         res = __builtin_arm_rsr64("CNTVCT_EL0");
-        __builtin_arm_dmb(DMB_ISHST);
         __builtin_arm_isb(ISB_SY);
         break;
     }
@@ -102,38 +94,32 @@ auto clock_traits<hardware_clock_t>::get_time(__UTL memory_order o) noexcept -> 
     unsigned long long res;
     switch (o) {
     case __UTL memory_order_relaxed:
-        __asm__ volatile("isb sy\n\t"
-                         "mrs %0, CNTVCT_EL0\n\t"
-                         "isb sy"
-                         : "=r"(res)
-                         :
-                         : "memory");
+        __asm__ volatile("mrs %0, CNTVCT_EL0\n\t" : "=r"(res) : : "memory");
         break;
 
     case __UTL memory_order_consume:
         [[fallthrough]];
     case __UTL memory_order_acquire:
         __asm__ volatile("isb sy\n\t"
-                         "mrs %0, CNTVCT_EL0\n\t"
-                         "isb sy\n\t"
-                         "dsb ishld"
+                         "mrs %0, CNTVCT_EL0"
                          : "=r"(res)
                          :
                          : "memory");
         break;
 
     case __UTL memory_order_release:
-    UTL_FALLTHROUGH:
-    case __UTL memory_order_acq_rel:
-    UTL_FALLTHROUGH:
-    case __UTL memory_order_seq_cst:
-        // MRS is not a memory operation
-        // So a DMB after it does nothing if there is already
-        // a full DMB before it
-        __asm__ volatile("dsb sy\n\t"
-                         "isb sy\n\t"
-                         "mrs %0, CNTVCT_EL0\n\t"
+        __asm__ volatile("mrs %0, CNTVCT_EL0\n\t"
                          "isb sy"
+                         : "=r"(res)
+                         :
+                         : "memory");
+        break;
+    case __UTL memory_order_acq_rel:
+        UTL_FALLTHROUGH;
+    case __UTL memory_order_seq_cst:
+        __asm__ volatile("isb sy\n\t"
+                         "mrs %0, CNTVCT_EL0\n\t"
+                         "isb sy\n\t"
                          : "=r"(res)
                          :
                          : "memory");
@@ -180,35 +166,23 @@ auto time_point<hardware_clock_t>::get_time(__UTL memory_order o) noexcept -> va
     unsigned long long res;
     switch (o) {
     case __UTL memory_order_relaxed:
-        __isb(_ARM64_BARRIER_SY);
         res = _ReadStatusReg(ARM64_CNTVCT);
-        __isb(_ARM64_BARRIER_SY);
         break;
     case __UTL memory_order_consume:
         UTL_FALLTHROUGH;
     case __UTL memory_order_acquire:
         __isb(_ARM64_BARRIER_SY);
         res = _ReadStatusReg(ARM64_CNTVCT);
-        __dmb(_ARM64_BARRIER_ISH);
-        __isb(_ARM64_BARRIER_SY);
         break;
     case __UTL memory_order_release:
-        __isb(_ARM64_BARRIER_SY);
-        __dmb(_ARM64_BARRIER_ISH);
         res = _ReadStatusReg(ARM64_CNTVCT);
         __isb(_ARM64_BARRIER_SY);
         break;
     case __UTL memory_order_acq_rel:
-        __isb(_ARM64_BARRIER_SY);
-        __dmb(_ARM64_BARRIER_ISH);
-        res = _ReadStatusReg(ARM64_CNTVCT);
-        __dmb(_ARM64_BARRIER_ISH);
-        __isb(_ARM64_BARRIER_SY);
+        UTL_FALLTHROUGH;
     default:
         __isb(_ARM64_BARRIER_SY);
-        __dmb(_ARM64_BARRIER_SY);
         res = _ReadStatusReg(ARM64_CNTVCT);
-        __dmb(_ARM64_BARRIER_SY);
         __isb(_ARM64_BARRIER_SY);
     }
 

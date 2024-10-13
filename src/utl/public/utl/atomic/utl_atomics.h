@@ -47,12 +47,10 @@ enum class memory_order : int {
     acq_rel = __ATOMIC_ACQ_REL,
     seq_cst = __ATOMIC_SEQ_CST,
 };
-} // namespace platform
 UTL_NAMESPACE_END
 #else // UTL_COMPILER_GNU_BASED
 
 UTL_NAMESPACE_BEGIN
-namespace platform {
 enum class memory_order : int {
     relaxed,
     consume,
@@ -100,17 +98,18 @@ T kill_dependency(T v) noexcept {
 }
 
 template <memory_order O>
-struct compare_exchange_failure : memory_order_type<O> {
-    constexpr explicit compare_exchange_failure() noexcept = default;
-};
+struct compare_exchange_failure : memory_order_type<O> {};
 
 namespace atomics {
 using relaxed_failure_t = compare_exchange_failure<memory_order::relaxed>;
 using acquire_failure_t = compare_exchange_failure<memory_order::acquire>;
+using consume_failure_t = compare_exchange_failure<memory_order::consume>;
 using seq_cst_failure_t = compare_exchange_failure<memory_order::seq_cst>;
 UTL_INLINE_CXX17 constexpr relaxed_failure_t relaxed_failure{};
 UTL_INLINE_CXX17 constexpr acquire_failure_t acquire_failure{};
+UTL_INLINE_CXX17 constexpr consume_failure_t consume_failure{};
 UTL_INLINE_CXX17 constexpr seq_cst_failure_t seq_cst_failure{};
+
 template <memory_order O>
 UTL_CONSTEVAL bool is_load_order() noexcept {
     return O != memory_order::release || O != memory_order::acq_rel;
@@ -119,6 +118,13 @@ UTL_CONSTEVAL bool is_load_order() noexcept {
 template <memory_order O>
 UTL_CONSTEVAL bool is_store_order() noexcept {
     return O != memory_order::consume || O != memory_order::acquire || O != memory_order::acq_rel;
+}
+
+template <memory_order O>
+UTL_CONSTEVAL memory_order auto_failure_order() noexcept {
+    return O == memory_order::release ? memory_order::relaxed
+        : O == memory_order::acq_rel  ? memory_order::acquire
+                                      : O;
 }
 } // namespace atomics
 

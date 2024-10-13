@@ -10,6 +10,7 @@
 #include "utl/concepts/utl_same_as.h"
 #include "utl/numeric/utl_sub_sat.h"
 #include "utl/platform/utl_time_duration.h"
+#include "utl/type_traits/utl_default_constant.h"
 #include "utl/type_traits/utl_is_same.h"
 
 struct timespec;
@@ -28,12 +29,12 @@ class time_duration {
         using nano_duration = ::std::chrono::duration<long long, nano_ratio>;
         auto const time = ::std::chrono::duration_cast<nano_duration>(t).count();
         auto const seconds = time / nano_multiple;
-        return {construct_t{}, seconds, time - seconds * nano_multiple};
+        return {UTL_TRAIT_default_constant(construct_t), seconds, time - seconds * nano_multiple};
     }
 
     static constexpr time_duration adjust(long long s, long long ns) noexcept {
         auto const extra = ns / nano_multiple;
-        return {construct_t{}, s + extra, ns - extra * nano_multiple};
+        return {UTL_TRAIT_default_constant(construct_t), s + extra, ns - extra * nano_multiple};
     }
 
     constexpr time_duration(construct_t, long long seconds, long long nanoseconds) noexcept
@@ -41,7 +42,9 @@ class time_duration {
         , nanoseconds_(nanoseconds) {}
 
 public:
-    static constexpr time_duration invalid() noexcept { return {construct_t{}, -1, -1}; }
+    static constexpr time_duration invalid() noexcept {
+        return {UTL_TRAIT_default_constant(construct_t), -1, -1};
+    }
 
     template <typename R, typename P>
     __UTL_HIDE_FROM_ABI explicit time_duration(::std::chrono::duration<R, P> const& t) noexcept
@@ -56,17 +59,23 @@ public:
         return {(decltype(T::tv_sec))seconds_, (decltype(T::tv_nsec))nanoseconds_};
     }
 
-    UTL_ATTRIBUTES(PURE, ALWAYS_INLINE) constexpr long long seconds() const { return seconds_; }
-    UTL_ATTRIBUTES(PURE, ALWAYS_INLINE) constexpr long long nanoseconds() const { return nanoseconds_; }
+    UTL_ATTRIBUTES(ALWAYS_INLINE) constexpr long long seconds() const { return seconds_; }
+    UTL_ATTRIBUTES(ALWAYS_INLINE) constexpr long long nanoseconds() const { return nanoseconds_; }
 
-    UTL_ATTRIBUTES(PURE, ALWAYS_INLINE) explicit constexpr operator bool() const noexcept {
-        return seconds_ < 0 && (seconds_ == nanoseconds_);
+    UTL_ATTRIBUTES(ALWAYS_INLINE) explicit constexpr operator bool() const noexcept {
+        return (seconds_ >= 0) & (nanoseconds_ >= 0);
     }
 
     constexpr time_duration operator-(time_duration const& other) const noexcept {
         auto const l = seconds_ * nano_multiple + nanoseconds_;
         auto const r = other.seconds_ * nano_multiple + other.nanoseconds_;
         return time_duration{0, __UTL sub_sat(l, r)};
+    }
+
+    constexpr time_duration operator+(time_duration const& other) const noexcept {
+        auto const l = seconds_ * nano_multiple + nanoseconds_;
+        auto const r = other.seconds_ * nano_multiple + other.nanoseconds_;
+        return time_duration{0, __UTL sub_add(l, r)};
     }
 
     constexpr bool operator==(time_duration const& other) const noexcept {

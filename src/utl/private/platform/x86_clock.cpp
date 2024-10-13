@@ -324,7 +324,7 @@ time_duration to_time_duration(hardware_ticks t) noexcept {
     }
 
     static constexpr unsigned int nano = 1000000000;
-    return t.value() * nano / tsc_frequency();
+    return t.value() * nano / tsc_frequency().value;
 }
 
 auto clock_traits<hardware_clock_t>::get_time(__UTL memory_order o) noexcept -> value_type {

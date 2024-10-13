@@ -22,6 +22,14 @@
 #  include <sys/syscall.h>
 #  include <unistd.h>
 
+#  if UTL_HAS_BUILTIN(__builtin_memcpy)
+#    define __UTL_FUTEX_MEMCPY(...) __builtin_memcpy(__VA_ARGS__)
+#  else
+#    include <string.h>
+#    define __UTL_FUTEX_MEMCPY(...) ::memcpy(__VA_ARGS__)
+#  endif
+#  define __UTL_UNUSED 0
+
 UTL_NAMESPACE_BEGIN
 
 namespace details {
@@ -29,17 +37,17 @@ namespace futex {
 
 UTL_INLINE_CXX17 constexpr size_t max_size = 4;
 UTL_INLINE_CXX17 constexpr size_t min_size = 4;
-#  define __UTL_UNUSED 0
 
 template <typename T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable_v<T>)
-auto wait(T* address, T value, platform::time_duration t) noexcept -> UTL_ENABLE_IF_CXX11(
-    int, sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable<T>::value) {
+auto wait(T* address, T value, platform::time_duration t) noexcept
+    -> UTL_ENABLE_IF_CXX11(
+        int, sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable<T>::value) {
     static constexpr uint32_t op = FUTEX_WAIT_PRIVATE;
 
-    timespec timeout{t};
+    timespec timeout = static_cast<timespec>(t);
     uint32_t readable_value = 0;
-    __builtin_memcpy(&readable_value, value, sizeof(value));
+    __UTL_FUTEX_MEMCPY(&readable_value, &value, sizeof(value));
     auto timeout_ptr = (t.seconds | t.nanoseconds) == 0 ? nullptr : &timeout;
     if (!syscall(SYS_futex, (uint32_t*)address, op, readable_value, timeout_ptr)) {
         return 0;
@@ -55,73 +63,29 @@ auto wait(T* address, T value, platform::time_duration t) noexcept -> UTL_ENABLE
 
 template <typename T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable_v<T>)
-auto notify_one(T* address) noexcept -> UTL_ENABLE_IF_CXX11(
-    int, sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable<T>::value) {
+auto notify_one(T* address) noexcept
+    -> UTL_ENABLE_IF_CXX11(
+        int, sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable<T>::value) {
     static constexpr uint32_t op = FUTEX_WAKE_PRIVATE;
     static constexpr uint64_t thread_count = 1;
-    return syscall(SYS_futex, op, (uint32_t*)address, 1, __UTL_UNUSED);
+    return syscall(SYS_futex, (uint32_t*)address, op, 1);
 }
 
 template <typename T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable_v<T>)
-auto notify_all(T* address) noexcept -> UTL_ENABLE_IF_CXX11(
-    int, sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable<T>::value) {
+auto notify_all(T* address) noexcept
+    -> UTL_ENABLE_IF_CXX11(
+        int, sizeof(T) == 4 && alignof(T) == 4 && is_trivially_copyable<T>::value) {
     static constexpr uint32_t op = FUTEX_WAKE_PRIVATE;
     static constexpr uint64_t thread_count = 1;
-    return syscall(SYS_futex, op, (uint32_t*)address, INT_MAX, __UTL_UNUSED);
+    return syscall(SYS_futex, (uint32_t*)address, op, INT_MAX);
 }
 } // namespace futex
 } // namespace details
 
 #  undef __UTL_UNUSED
+#  undef __UTL_FUTEX_MEMCPY
 
 UTL_NAMESPACE_END
-
-namespace platform {
-template <typename T>
-class waitable_obect<T*> {
-    static_assert(!UTL_TRAIT_is_function(T), "Invalid type");
-
-public:
-    using value_type = T*;
-    constexpr explicit waitable_obect(value_type& t) : address(__UTL addressof(t)) {}
-    waitable_obect(waitable_obect const&) = delete;
-    waitable_obect(waitable_obect&&) = delete;
-    waitable_obect& operator=(waitable_obect const&) = delete;
-    waitable_obect& operator=(waitable_obect&&) = delete;
-    UTL_CONSTEXPR_CXX20 ~waitable_obect() noexcept = default;
-
-    template <typename R, typename P>
-    void wait(value_type old, ::std::chrono::duration<R, P> timeout,
-        __UTL memory_order o = __UTL memory_order_seq_cst) const noexcept {
-        wait(old, time_duration{timeout}, o);
-    }
-
-    void wait(value_type old, __UTL memory_order o = __UTL memory_order_seq_cst) const noexcept {
-        return wait(old, time_duration::invalid(), o);
-    }
-
-    void set_and_notify_one(value_type value, __UTL memory_order o) noexcept {
-        __UTL atomic_ref<value_type>(address).store(value, o);
-        notify_one();
-    }
-
-    void set_and_notify_all(value_type value, __UTL memory_order o) noexcept {
-        __UTL atomic_ref<value_type>(address).store(value, o);
-        notify_all();
-    }
-
-    void wait(value_type old, time_duration,
-        __UTL memory_order o = __UTL memory_order_seq_cst) const noexcept;
-
-    void notify_one() noexcept;
-
-    void notify_all() noexcept;
-
-private:
-    value_type address;
-    unsigned waiting;
-};
-} // namespace platform
 
 #endif // UTL_TARGET_LINUX
