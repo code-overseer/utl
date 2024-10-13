@@ -138,11 +138,11 @@ public:
         return const_iterator();
     }
 
-    __UTL_HIDE_FROM_ABI void emplace(message_format fmt, ...) UTL_THROWS {
+    __UTL_HIDE_FROM_ABI void emplacef(message_vformat fmt, ...) UTL_THROWS {
         va_list args;
         va_start(args, fmt);
         UTL_TRY {
-            emplace(fmt, args);
+            vemplacef(fmt, args);
             va_end(args);
         } UTL_CATCH(...) {
             va_end(args);
@@ -150,9 +150,9 @@ public:
         }
     }
 
-    __UTL_HIDE_FROM_ABI void emplace(message_format fmt, va_list args) UTL_THROWS {
+    __UTL_HIDE_FROM_ABI void vemplacef(message_vformat fmt, va_list args) UTL_THROWS {
         // could throw
-        auto header = message_header::create(__UTL move(fmt), args);
+        auto header = message_header::vcreatef(__UTL move(fmt), args);
 
         // noexcept
         set_next(*header, head_);
