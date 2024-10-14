@@ -30,22 +30,22 @@ public:
     using value_type = timestamp_counter_t;
     using duration = hardware_ticks;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
         value_type t) noexcept {
         return duration(t.tick - 0ll);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, PURE, ALWAYS_INLINE) static inline constexpr duration difference(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration difference(
         value_type l, value_type r) noexcept {
         return duration(__UTL sub_sat(l.tick, r.tick));
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr bool equal(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr bool equal(
         value_type l, value_type r) noexcept {
         return l.aux == r.aux && l.tick == r.tick;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr clock_order compare(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr clock_order compare(
         value_type const& l, value_type const& r) noexcept {
 
         if (l.aux == r.aux) {
@@ -56,7 +56,7 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(hardware_clock_t c) noexcept {
-        return get_time(c, __UTL memory_order_seq_cst);
+        return get_time(c, __UTL instruction_order::seq_cst);
     }
 
     friend __UTL_HIDE_FROM_ABI time_point<hardware_clock_t> get_time(

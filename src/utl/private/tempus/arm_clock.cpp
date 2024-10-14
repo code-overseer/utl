@@ -17,13 +17,6 @@
           UTL_HAS_BUILTIN(__builtin_arm_rsr64)
 
 #  if __UTL_SUPPORTS_REQUIRED_BUILTINS
-// Parameter for __builtin_arm_dmb
-#    define DMB_NSH 0x7
-#    define DMB_ISHLD 0x9
-#    define DMB_ISHST 0xa
-#    define DMB_ISH 0xb
-#    define DMB_SY 0xf
-
 // Parameter for __builtin_arm_isb
 #    define ISB_SY 0xf
 
@@ -70,11 +63,6 @@ bool hardware_ticks::invariant_frequency() noexcept {
 } // namespace tempus
 
 UTL_NAMESPACE_END
-#    undef DMB_NSH
-#    undef DMB_ISHLD
-#    undef DMB_ISHST
-#    undef DMB_ISH
-#    undef DMB_SY
 #    undef ISB_SY
 
 #  elif UTL_SUPPORTS_GNU_ASM
