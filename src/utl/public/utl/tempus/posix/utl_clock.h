@@ -132,11 +132,6 @@ __UTL_HIDE_FROM_ABI constexpr ::time_t to_posix_time(time_point<system_clock_t> 
     return t.value() / conversion::value;
 }
 
-struct usage_time_t {
-    long long kernel;
-    long long user;
-};
-
 template <>
 struct __UTL_PUBLIC_TEMPLATE clock_traits<process_clock_t> : private clock_traits<system_clock_t> {
 private:
