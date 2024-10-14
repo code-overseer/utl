@@ -57,6 +57,10 @@ void abort(void);
 #  define UTL_BUILTIN_is_constant_evaluated() __builtin_is_constant_evaluated()
 #endif /* UTL_HAS_BUILTIN(__builtin_is_constant_evaluated) */
 
+#if UTL_HAS_BUILTIN(__builtin_bit_cast)
+#  define UTL_BUILTIN_bit_cast(...) __builtin_bit_cast(__VA_ARGS__)
+#endif /* UTL_HAS_BUILTIN(__builtin_is_constant_evaluated) */
+
 #if UTL_HAS_BUILTIN(__builtin_assume)
 #  define UTL_BUILTIN_assume(...) __builtin_assume(__VA_ARGS__)
 #elif UTL_COMPILER_MSVC /* UTL_HAS_BUILTIN(__builtin_unreachable) */

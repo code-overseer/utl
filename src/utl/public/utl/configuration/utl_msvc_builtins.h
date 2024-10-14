@@ -26,6 +26,10 @@
 #    define __UTL_MSVC_BUILTIN__builtin_is_constant_evaluated
 #  endif
 
+#  if UTL_COMPILER_MSVC_AT_LEAST(1926) /* UTL_HAS_BUILTIN(__builtin_is_constant_evaluated) */
+#    define __UTL_MSVC_BUILTIN__builtin_bit_cast
+#  endif
+
 #  if UTL_COMPILER_MSVC_AT_LEAST(1927)
 #    define __UTL_MSVC_BUILTIN__builtin_FILE
 #    define __UTL_MSVC_BUILTIN__builtin_FUNCTION
