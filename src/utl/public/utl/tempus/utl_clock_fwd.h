@@ -29,7 +29,7 @@ struct clock_traits;
 template <typename>
 class time_point;
 
-class time_duration;
+class duration;
 
 class hardware_ticks;
 

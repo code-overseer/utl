@@ -24,7 +24,7 @@ struct __UTL_PUBLIC_TEMPLATE clock_traits<steady_clock_t> {
 public:
     using clock = steady_clock_t;
     using value_type = unsigned long long;
-    using duration = time_duration;
+    using duration = duration;
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
         value_type t) noexcept {

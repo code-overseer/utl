@@ -221,17 +221,17 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 namespace tempus {
 
-time_duration to_time_duration(hardware_ticks t) noexcept {
+duration to_duration(hardware_ticks t) noexcept {
     if (!hardware_ticks::invariant_frequency()) {
-        return time_duration::invalid();
+        return duration::invalid();
     }
 
     if (t.value() < 0) {
-        return time_duration::invalid();
+        return duration::invalid();
     }
 
     static constexpr unsigned int nano = 1000000000;
-    return time_duration{0, t.value() * nano / clock_frequency()};
+    return duration{0, t.value() * nano / clock_frequency()};
 }
 
 } // namespace tempus

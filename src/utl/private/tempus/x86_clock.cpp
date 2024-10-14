@@ -313,15 +313,15 @@ static auto const init_supports_rdtscp = supports_rdtscp();
 static auto const init_tsc_frequency = tsc_frequency();
 static auto const init_invariant_hardware_clock = hardware_ticks::invariant_frequency();
 
-time_duration to_time_duration(hardware_ticks t) noexcept {
+duration to_duration(hardware_ticks t) noexcept {
     (void)&init_supports_rdtsc;
     (void)&init_supports_rdtscp;
     if (!hardware_ticks::invariant_frequency()) {
-        return time_duration::invalid();
+        return duration::invalid();
     }
 
     if (t) {
-        return time_duration::invalid();
+        return duration::invalid();
     }
 
     static constexpr unsigned int nano = 1000000000;

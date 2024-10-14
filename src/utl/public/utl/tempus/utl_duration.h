@@ -10,7 +10,7 @@
 #include "utl/concepts/utl_same_as.h"
 #include "utl/numeric/utl_add_sat.h"
 #include "utl/numeric/utl_sub_sat.h"
-#include "utl/tempus/utl_time_duration.h"
+#include "utl/tempus/utl_duration.h"
 #include "utl/type_traits/utl_default_constant.h"
 #include "utl/type_traits/utl_is_same.h"
 
@@ -19,12 +19,12 @@ struct timespec;
 UTL_NAMESPACE_BEGIN
 
 namespace tempus {
-class time_duration {
+class duration {
     static constexpr long long nano_multiple = 1000000000ll;
     struct construct_tag {};
 
     template <typename R, typename P>
-    __UTL_HIDE_FROM_ABI static constexpr time_duration from_chrono(
+    __UTL_HIDE_FROM_ABI static constexpr duration from_chrono(
         ::std::chrono::duration<R, P> const& t) noexcept {
         using nano_ratio = ::std::ratio<1, nano_multiple>;
         using nano_duration = ::std::chrono::duration<long long, nano_ratio>;
@@ -33,26 +33,26 @@ class time_duration {
         return {UTL_TRAIT_default_constant(construct_tag), seconds, time - seconds * nano_multiple};
     }
 
-    static constexpr time_duration adjust(long long s, long long ns) noexcept {
+    static constexpr duration adjust(long long s, long long ns) noexcept {
         auto const extra = ns / nano_multiple;
         return {UTL_TRAIT_default_constant(construct_tag), s + extra, ns - extra * nano_multiple};
     }
 
-    constexpr time_duration(construct_tag, long long seconds, long long nanoseconds) noexcept
+    constexpr duration(construct_tag, long long seconds, long long nanoseconds) noexcept
         : seconds_(seconds)
         , nanoseconds_(nanoseconds) {}
 
 public:
-    static constexpr time_duration invalid() noexcept {
+    static constexpr duration invalid() noexcept {
         return {UTL_TRAIT_default_constant(construct_tag), -1, -1};
     }
 
     template <typename R, typename P>
-    __UTL_HIDE_FROM_ABI explicit time_duration(::std::chrono::duration<R, P> const& t) noexcept
-        : time_duration(from_chrono(t)) {}
-    constexpr explicit time_duration(long long seconds, long long nanoseconds = 0) noexcept
-        : time_duration(adjust(seconds, nanoseconds)) {}
-    constexpr explicit time_duration() noexcept : seconds_(0), nanoseconds_(0) {}
+    __UTL_HIDE_FROM_ABI explicit duration(::std::chrono::duration<R, P> const& t) noexcept
+        : duration(from_chrono(t)) {}
+    constexpr explicit duration(long long seconds, long long nanoseconds = 0) noexcept
+        : duration(adjust(seconds, nanoseconds)) {}
+    constexpr explicit duration() noexcept : seconds_(0), nanoseconds_(0) {}
 
     template <typename R, typename P>
     explicit operator ::std::chrono::duration<R, P>() const noexcept {
@@ -78,46 +78,45 @@ public:
         return (seconds_ >= 0) & (nanoseconds_ >= 0);
     }
 
-    constexpr time_duration operator-(time_duration const& other) const noexcept {
+    constexpr duration operator-(duration const& other) const noexcept {
         auto const l = seconds_ * nano_multiple + nanoseconds_;
         auto const r = other.seconds_ * nano_multiple + other.nanoseconds_;
-        return time_duration{0, __UTL sub_sat(l, r)};
+        return duration{0, __UTL sub_sat(l, r)};
     }
 
-    constexpr time_duration operator+(time_duration const& other) const noexcept {
+    constexpr duration operator+(duration const& other) const noexcept {
         auto const l = seconds_ * nano_multiple + nanoseconds_;
         auto const r = other.seconds_ * nano_multiple + other.nanoseconds_;
-        return time_duration{0, __UTL add_sat(l, r)};
+        return duration{0, __UTL add_sat(l, r)};
     }
 
-    constexpr bool operator==(time_duration const& other) const noexcept {
+    constexpr bool operator==(duration const& other) const noexcept {
         return *this && other && seconds_ == other.seconds_ && nanoseconds_ == other.nanoseconds_;
     }
 
-    constexpr bool operator!=(time_duration const& other) const noexcept {
+    constexpr bool operator!=(duration const& other) const noexcept {
         return *this && other && !(*this == other);
     }
 
-    constexpr bool operator<(time_duration const& other) const noexcept {
+    constexpr bool operator<(duration const& other) const noexcept {
         return *this && other &&
             (seconds_ < other.seconds_ ||
                 (seconds_ == other.seconds_ && nanoseconds_ < other.nanoseconds_));
     }
 
-    constexpr bool operator>(time_duration const& other) const noexcept { return other < *this; }
+    constexpr bool operator>(duration const& other) const noexcept { return other < *this; }
 
-    constexpr bool operator<=(time_duration const& other) const noexcept {
+    constexpr bool operator<=(duration const& other) const noexcept {
         return *this && other && !(other < *this);
     }
 
-    constexpr bool operator>=(time_duration const& other) const noexcept {
+    constexpr bool operator>=(duration const& other) const noexcept {
         return *this && other && !(*this < other);
     }
 
 #if UTL_CXX20
 
-    template <same_as<time_duration> D,
-        same_as<::std::partial_ordering> R = ::std::partial_ordering>
+    template <same_as<duration> D, same_as<::std::partial_ordering> R = ::std::partial_ordering>
     constexpr R operator<=>(D const& other) const noexcept {
         if (!*this || !other) {
             return R::unordered;
@@ -137,7 +136,7 @@ private:
 
 template <UTL_CONCEPT_CXX20(same_as<::timespec>) T UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_same(T, ::timespec))>
-UTL_ATTRIBUTES(CONST, ALWAYS_INLINE) bool in_range(tempus::time_duration d) noexcept {
+UTL_ATTRIBUTES(CONST, ALWAYS_INLINE) bool in_range(tempus::duration d) noexcept {
     return in_range<decltype(T::tv_sec)>(d.seconds()) &&
         in_range<decltype(T::tv_nsec)>(d.nanoseconds());
 }

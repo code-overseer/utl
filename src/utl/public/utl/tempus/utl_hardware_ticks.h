@@ -107,16 +107,16 @@ private:
 };
 
 /**
- * @brief Converts `hardware_ticks` to `time_duration`.
+ * @brief Converts `hardware_ticks` to `duration`.
  *
- * Converts the given `hardware_ticks` object to a `time_duration`. The conversion depends on the
+ * Converts the given `hardware_ticks` object to a `duration`. The conversion depends on the
  * specific implementation and the hardware's timekeeping capabilities. This function may terminate
  * the program on unsupported platforms; use `invariant_frequency` to check for support.
  *
  * @param ht The `hardware_ticks` object to convert.
- * @return The corresponding `time_duration`.
+ * @return The corresponding `duration`.
  */
-UTL_ATTRIBUTES(_ABI_PUBLIC) time_duration to_time_duration(hardware_ticks) noexcept;
+UTL_ATTRIBUTES(_ABI_PUBLIC) duration to_duration(hardware_ticks) noexcept;
 } // namespace tempus
 
 UTL_NAMESPACE_END

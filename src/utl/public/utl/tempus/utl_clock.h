@@ -10,8 +10,8 @@
 
 #include "utl/atomic/utl_atomic.h"
 #include "utl/functional/utl_invoke.h"
+#include "utl/tempus/utl_duration.h"
 #include "utl/tempus/utl_hardware_ticks.h"
-#include "utl/tempus/utl_time_duration.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_is_copy_constructible.h"
 #include "utl/type_traits/utl_is_default_constructible.h"
