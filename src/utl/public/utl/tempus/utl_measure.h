@@ -19,7 +19,7 @@ inline auto measure(F&& f, Clock clock) noexcept(noexcept(__UTL invoke(f))) ->
     typename clock_traits<Clock>::duration {
     static_assert(is_clock<Clock>::value, "Invalid arguments");
     auto const begin = get_time(clock);
-    return f(), (get_time(clock) - begin);
+    return __UTL invoke(f), (get_time(clock) - begin);
 }
 
 namespace details {

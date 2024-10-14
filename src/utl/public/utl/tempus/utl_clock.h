@@ -7,7 +7,6 @@
 #include "utl/chrono/utl_chrono_fwd.h"
 #include "utl/compare/utl_compare_fwd.h"
 #include "utl/tempus/utl_clock_fwd.h"
-#include "utl/tuple/utl_tuple_fwd.h"
 
 #include "utl/atomic/utl_atomic.h"
 #include "utl/functional/utl_invoke.h"
