@@ -9,55 +9,15 @@
 #include "utl/utl_config.h"
 
 #if UTL_TARGET_APPLE
-#  include <mach/clock.h>
-#  include <mach/mach.h>
-#  include <mach/mach_time.h>
-#  include <sys/time.h>
+#  include "utl/tempus/posix/utl_clock.h"
+
+#  include <stdint.h>
+
+extern "C" uint64_t mach_continuous_time(void);
 
 UTL_NAMESPACE_BEGIN
 
 namespace tempus {
-template <>
-struct __UTL_PUBLIC_TEMPLATE clock_traits<system_clock_t> {
-public:
-    using clock = system_clock_t;
-    using value_type = long long;
-    using duration = time_duration;
-
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
-        value_type t) noexcept {
-        static_assert(sizeof(size_t) >= 8, "Unsupported architecture");
-        return difference(t, 0);
-    }
-
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration difference(
-        value_type l, value_type r) noexcept {
-        auto const diff = l - r;
-        auto const seconds = diff / 1000000;
-        return duration{seconds, diff * 1000 - seconds * 1000000000};
-    }
-
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr bool equal(
-        value_type l, value_type r) noexcept {
-        return l == r;
-    }
-
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr clock_order compare(
-        value_type l, value_type r) noexcept {
-        return static_cast<clock_order>((l > r) - (l < r));
-    }
-
-    __UTL_HIDE_FROM_ABI friend time_point<system_clock_t> get_time(system_clock_t) noexcept {
-        timeval t;
-        gettimeofday(&t, nullptr);
-        return time_point<system_clock_t>{value_type(t.tv_sec * 1000000) + value_type(t.tv_usec)};
-    }
-};
-
-__UTL_HIDE_FROM_ABI constexpr ::time_t to_posix_time(time_point<system_clock_t> t) noexcept {
-    // microseconds to seconds
-    return t.value() / 1000000LL;
-}
 
 template <>
 struct __UTL_PUBLIC_TEMPLATE clock_traits<steady_clock_t> {
@@ -68,24 +28,10 @@ public:
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
         value_type t) noexcept {
-        static_assert(sizeof(size_t) >= 8, "Unsupported architecture");
         return difference(t, 0);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline duration difference(
-        value_type l, value_type r) noexcept {
-        static mach_timebase_info_data_t const timebase = []() {
-            mach_timebase_info_data_t t;
-            mach_timebase_info(&t);
-            return t;
-        }();
-
-        auto const diff = (l - r) * timebase.numer / timebase.denom;
-        auto const seconds = diff / 1000000000;
-        auto const nanoseconds = diff - seconds * 1000000000;
-        using diff_type = long long;
-        return duration{diff_type(seconds), diff_type(nanoseconds)};
-    }
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, PURE) static duration difference(value_type l, value_type r) noexcept;
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr bool equal(
         value_type l, value_type r) noexcept {
@@ -123,6 +69,32 @@ public:
     }
 };
 
+template <>
+struct __UTL_PUBLIC_TEMPLATE clock_traits<thread_clock_t> : private clock_traits<system_clock_t> {
+private:
+    using base_type = clock_traits<system_clock_t>;
+
+public:
+    using clock = thread_clock_t;
+    using typename base_type::duration;
+    using typename base_type::value_type;
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+        value_type t) noexcept {
+        return duration::invalid();
+    }
+
+    using base_type::compare;
+    using base_type::difference;
+    using base_type::equal;
+
+    __UTL_HIDE_FROM_ABI friend time_point<thread_clock_t> get_time(thread_clock_t) noexcept {
+        return time_point<thread_clock_t>{get_time()};
+    }
+
+private:
+    __UTL_ABI_PUBLIC static value_type get_time() noexcept;
+};
 } // namespace tempus
 
 UTL_NAMESPACE_END

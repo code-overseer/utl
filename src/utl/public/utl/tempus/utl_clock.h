@@ -48,6 +48,10 @@ struct __UTL_PUBLIC_TEMPLATE is_clock<system_clock_t> : true_type {};
 template <>
 struct __UTL_PUBLIC_TEMPLATE is_clock<steady_clock_t> : true_type {};
 template <>
+struct __UTL_PUBLIC_TEMPLATE is_clock<process_clock_t> : true_type {};
+template <>
+struct __UTL_PUBLIC_TEMPLATE is_clock<thread_clock_t> : true_type {};
+template <>
 struct __UTL_PUBLIC_TEMPLATE is_clock<high_resolution_clock_t> : true_type {};
 template <>
 struct __UTL_PUBLIC_TEMPLATE is_clock<hardware_clock_t> : true_type {};
@@ -186,9 +190,12 @@ public:
 
 struct process_clock_t {
     explicit constexpr process_clock_t() noexcept = default;
-    __UTL_HIDE_FROM_ABI friend time_point<process_clock_t> get_time(
-        process_clock_t, instruction_order) noexcept;
     __UTL_HIDE_FROM_ABI friend time_point<process_clock_t> get_time(process_clock_t) noexcept;
+};
+
+struct thread_clock_t {
+    explicit constexpr thread_clock_t() noexcept = default;
+    __UTL_HIDE_FROM_ABI friend time_point<thread_clock_t> get_time(thread_clock_t) noexcept;
 };
 
 struct hardware_clock_t {
@@ -210,6 +217,8 @@ UTL_INLINE_CXX17 constexpr steady_clock_t steady_clock{};
 UTL_INLINE_CXX17 constexpr high_resolution_clock_t high_resolution_clock{};
 
 UTL_INLINE_CXX17 constexpr process_clock_t process_clock{};
+
+UTL_INLINE_CXX17 constexpr thread_clock_t thread_clock{};
 
 UTL_INLINE_CXX17 constexpr hardware_clock_t hardware_clock{};
 

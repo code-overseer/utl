@@ -4,6 +4,8 @@
 
 #include "utl/utl_config.h"
 
+#include "utl/preprocessor/utl_unique_var.h"
+
 #include "utl/concepts/utl_constructible_as.h"
 #include "utl/exception.h"
 #include "utl/scope/utl_scope_impl.h"
@@ -72,6 +74,6 @@ UTL_DEFINE_CUSTOMIZATION_POINT(exit_factory_t, exit_factory);
 } // namespace details
 
 #define UTL_ON_SCOPE_EXIT \
-    const auto UTL_UNIQUE_VAR(ScopeFail) = __UTL details::scope::exit_factory->*[&]()
+    const auto UTL_UNIQUE_VAR(ScopeExit) = __UTL details::scope::exit_factory->*[&]()
 
 UTL_NAMESPACE_END

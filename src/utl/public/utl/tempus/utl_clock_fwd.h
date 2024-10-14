@@ -19,6 +19,8 @@ struct high_resolution_clock_t;
 
 struct process_clock_t;
 
+struct thread_clock_t;
+
 struct hardware_clock_t;
 
 template <typename>
