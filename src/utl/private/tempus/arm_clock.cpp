@@ -38,12 +38,12 @@ auto clock_traits<hardware_clock_t>::get_time(instruction_order o) noexcept -> v
     case instruction_order::consume:
         UTL_FALLTHROUGH;
     case instruction_order::acquire:
-        __builtin_arm_isb(ISB_SY);
         res = __builtin_arm_rsr64("CNTVCT_EL0");
+        __builtin_arm_isb(ISB_SY);
         break;
     case instruction_order::release:
-        res = __builtin_arm_rsr64("CNTVCT_EL0");
         __builtin_arm_isb(ISB_SY);
+        res = __builtin_arm_rsr64("CNTVCT_EL0");
     case instruction_order::acq_rel:
         UTL_FALLTHROUGH;
     default:
@@ -89,16 +89,16 @@ auto clock_traits<hardware_clock_t>::get_time(instruction_order o) noexcept -> v
     case instruction_order::consume:
         [[fallthrough]];
     case instruction_order::acquire:
-        __asm__ volatile("isb sy\n\t"
-                         "mrs %0, CNTVCT_EL0"
+        __asm__ volatile("mrs %0, CNTVCT_EL0\n\t"
+                         "isb sy"
                          : "=r"(res)
                          :
                          : "memory");
         break;
 
     case instruction_order::release:
-        __asm__ volatile("mrs %0, CNTVCT_EL0\n\t"
-                         "isb sy"
+        __asm__ volatile("isb sy\n\t"
+                         "mrs %0, CNTVCT_EL0"
                          : "=r"(res)
                          :
                          : "memory");
@@ -157,12 +157,12 @@ auto time_point<hardware_clock_t>::get_time(instruction_order o) noexcept -> val
     case instruction_order::consume:
         UTL_FALLTHROUGH;
     case instruction_order::acquire:
-        __isb(__UTL_BARRIER_SY);
         res = _ReadStatusReg(ARM64_CNTVCT);
+        __isb(__UTL_BARRIER_SY);
         break;
     case instruction_order::release:
-        res = _ReadStatusReg(ARM64_CNTVCT);
         __isb(__UTL_BARRIER_SY);
+        res = _ReadStatusReg(ARM64_CNTVCT);
         break;
     case instruction_order::acq_rel:
         UTL_FALLTHROUGH;
