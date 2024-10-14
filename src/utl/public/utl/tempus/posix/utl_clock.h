@@ -88,6 +88,35 @@ public:
         return time_point<high_resolution_clock_t>{get_time(steady_clock).value()};
     }
 };
+
+template <>
+struct __UTL_PUBLIC_TEMPLATE clock_traits<thread_clock_t> : private clock_traits<system_clock_t> {
+private:
+    using base_type = clock_traits<system_clock_t>;
+
+public:
+    using clock = thread_clock_t;
+    using typename base_type::duration;
+    using typename base_type::value_type;
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+        value_type t) noexcept {
+        return duration::invalid();
+    }
+
+    using base_type::compare;
+    using base_type::difference;
+    using base_type::equal;
+
+    __UTL_HIDE_FROM_ABI friend time_point<thread_clock_t> get_time(thread_clock_t) noexcept {
+        rusage usage;
+        ::getrusage(RUSAGE_THREAD, &usage);
+        auto const user_time = details::timeval_to_usec(usage.ru_utime);
+        auto const kernel_time = details::timeval_to_usec(usage.ru_stime);
+        return time_point<thread_clock_t>{user_time + kernel_time};
+    }
+};
+
 #  endif // !UTL_TARGET_APPLE
 
 template <>
@@ -160,35 +189,6 @@ public:
     }
 };
 
-#  if !UTL_TARGET_APPLE
-template <>
-struct __UTL_PUBLIC_TEMPLATE clock_traits<thread_clock_t> : private clock_traits<system_clock_t> {
-private:
-    using base_type = clock_traits<system_clock_t>;
-
-public:
-    using clock = thread_clock_t;
-    using typename base_type::duration;
-    using typename base_type::value_type;
-
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
-        value_type t) noexcept {
-        return duration::invalid();
-    }
-
-    using base_type::compare;
-    using base_type::difference;
-    using base_type::equal;
-
-    __UTL_HIDE_FROM_ABI friend time_point<thread_clock_t> get_time(thread_clock_t) noexcept {
-        rusage usage;
-        ::getrusage(RUSAGE_THREAD, &usage);
-        auto const user_time = details::timeval_to_usec(usage.ru_utime);
-        auto const kernel_time = details::timeval_to_usec(usage.ru_stime);
-        return time_point<thread_clock_t>{user_time + kernel_time};
-    }
-};
-#  endif // !UTL_TARGET_APPLE
 } // namespace tempus
 
 UTL_NAMESPACE_END

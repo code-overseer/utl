@@ -6,6 +6,7 @@
 
 #include "utl/tuple/utl_tuple_fwd.h"
 
+#include "utl/functional/utl_invoke.h"
 #include "utl/tempus/utl_clock.h"
 #include "utl/tuple/utl_tuple_get_element.h"
 #include "utl/utility/utl_sequence.h"
