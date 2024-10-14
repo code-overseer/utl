@@ -54,6 +54,17 @@ public:
         : time_duration(adjust(seconds, nanoseconds)) {}
     constexpr explicit time_duration() noexcept : seconds_(0), nanoseconds_(0) {}
 
+    template <typename R, typename P>
+    explicit operator ::std::chrono::duration<R, P>() const noexcept {
+        using result_type = ::std::chrono::duration<R, P>;
+        using nano_ratio = ::std::ratio<1, nano_multiple>;
+        // defer instantiation
+        using nano_duration = enable_if_t<__UTL always_true<result_type>(),
+            ::std::chrono::duration<long long, nano_ratio>>;
+        return ::std::chrono::duration_cast<result_type>(
+            nano_duration(seconds_ * nano_multiple + nanoseconds_));
+    }
+
     template <UTL_CONCEPT_CXX20(same_as<::timespec>) T UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_same(T, ::timespec))>
     constexpr operator T() const noexcept {
