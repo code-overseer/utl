@@ -5,93 +5,86 @@
 #include "utl/tempus/utl_clock.h"
 #include "utl/type_traits/utl_is_same.h"
 
-// TODO Investigate using PMU counter
+// TODO Investigate using PMU counter (which is not invariant)
 #if UTL_ARCH_AARCH64
 
-// TODO push macro
-#  ifdef __UTL_SUPPORTS_REQUIRED_BUILTINS
-#    undef __UTL_SUPPORTS_REQUIRED_BUILTINS
-#  endif
+#  define __UTL_SUPPORTS_ARM_STATUS_REGISTER_BUILTINS \
+      (UTL_HAS_BUILTIN(__builtin_arm64_isb) && UTL_HAS_BUILTIN(__builtin_arm64_rsr64))
+#  define __UTL_BARRIER_SY 0xF
 
-#  define __UTL_SUPPORTS_REQUIRED_BUILTINS                                        \
-      UTL_HAS_BUILTIN(__builtin_arm_isb) && UTL_HAS_BUILTIN(__builtin_arm_dmb) && \
-          UTL_HAS_BUILTIN(__builtin_arm_rsr64)
-
-#  if __UTL_SUPPORTS_REQUIRED_BUILTINS
+#  if __UTL_SUPPORTS_ARM_STATUS_REGISTER_BUILTINS
 UTL_NAMESPACE_BEGIN
-namespace tempus {
-
-static unsigned int clock_frequency() noexcept {
-    static unsigned int const value =
-        (unsigned int)(__builtin_arm_rsr64("CNTFRQ_EL0") & 0xffffffff);
-    return value;
+namespace {
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntfrq_el0() noexcept {
+    return __builtin_arm64_rsr64("CNTFRQ_EL0");
 }
 
-static_assert(is_same<typename clock_traits<hardware_clock_t>::value_type,
-                  decltype(__builtin_arm_rsr64("CNTVCT_EL0"))>::value,
-    "Invalid implementation");
-
-#    define __UTL_BARRIER_SY 0xF
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_relaxed)) noexcept
-    -> value_type {
-    return __builtin_arm_rsr64("CNTVCT_EL0");
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_relaxed)) noexcept {
+    return __builtin_arm64_rsr64("CNTVCT_EL0");
 }
 
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_acquire)) noexcept
-    -> value_type {
-    value_type const res = __builtin_arm_rsr64("CNTVCT_EL0");
-    __builtin_arm_isb(__UTL_BARRIER_SY);
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_acquire)) noexcept {
+    uint64_t const res = __builtin_arm64_rsr64("CNTVCT_EL0");
+    __builtin_arm64_isb(__UTL_BARRIER_SY);
     return res;
 }
 
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_release)) noexcept
-    -> value_type {
-    __builtin_arm_isb(__UTL_BARRIER_SY);
-    return __builtin_arm_rsr64("CNTVCT_EL0");
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_release)) noexcept {
+    __builtin_arm64_isb(__UTL_BARRIER_SY);
+    return __builtin_arm64_rsr64("CNTVCT_EL0");
 }
 
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_acq_rel)) noexcept
-    -> value_type {
-    __builtin_arm_isb(__UTL_BARRIER_SY);
-    value_type const res = __builtin_arm_rsr64("CNTVCT_EL0");
-    __builtin_arm_isb(__UTL_BARRIER_SY);
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_acq_rel)) noexcept {
+    __builtin_arm64_isb(__UTL_BARRIER_SY);
+    uint64_t const res = __builtin_arm64_rsr64("CNTVCT_EL0");
+    __builtin_arm64_isb(__UTL_BARRIER_SY);
     return res;
 }
+
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_relaxed)) noexcept {
+    return __builtin_arm64_rsr64("PMCCTR_EL0");
+}
+
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_acquire)) noexcept {
+    uint64_t const res = __builtin_arm64_rsr64("PMCCTR_EL0");
+    __builtin_arm64_isb(__UTL_BARRIER_SY);
+    return res;
+}
+
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_release)) noexcept {
+    __builtin_arm64_isb(__UTL_BARRIER_SY);
+    return __builtin_arm64_rsr64("PMCCTR_EL0");
+}
+
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_acq_rel)) noexcept {
+    __builtin_arm64_isb(__UTL_BARRIER_SY);
+    uint64_t const res = __builtin_arm64_rsr64("PMCCTR_EL0");
+    __builtin_arm64_isb(__UTL_BARRIER_SY);
+    return res;
+}
+} // namespace
+UTL_NAMESPACE_END
 
 #    undef __UTL_BARRIER_SY
 
-bool hardware_ticks::invariant_frequency() noexcept {
-    return true;
-}
-
-} // namespace tempus
-
-UTL_NAMESPACE_END
-
-#  elif UTL_SUPPORTS_GNU_ASM
+#  elif UTL_SUPPORTS_GNU_ASM // __UTL_SUPPORTS_ARM_STATUS_REGISTER_BUILTINS
 
 UTL_NAMESPACE_BEGIN
-namespace tempus {
-static unsigned int clock_frequency() noexcept {
-    static unsigned int const value = []() {
-        unsigned long long res;
-        __asm__ volatile("mrs %0, CNTFRQ_EL0\n\t" : "=r"(res) : : "memory");
-        return (unsigned int)(res & 0xffffffff);
-    }();
-
-    return value;
+namespace {
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntfrq_el0() noexcept {
+    uint64_t res;
+    __asm__ volatile("mrs %0, CNTFRQ_EL0\n\t" : "=r"(res) : : "memory");
+    return res;
 }
 
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_relaxed)) noexcept
-    -> value_type {
-    value_type res;
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_relaxed)) noexcept {
+    uint64_t res;
     __asm__ volatile("mrs %0, CNTVCT_EL0\n\t" : "=r"(res) : : "memory");
     return res;
 }
 
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_acquire)) noexcept
-    -> value_type {
-    value_type res;
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_acquire)) noexcept {
+    uint64_t res;
     __asm__ volatile("mrs %0, CNTVCT_EL0\n\t"
                      "isb sy"
                      : "=r"(res)
@@ -100,9 +93,8 @@ auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_acquire)) noe
     return res;
 }
 
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_release)) noexcept
-    -> value_type {
-    value_type res;
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_release)) noexcept {
+    uint64_t res;
     __asm__ volatile("isb sy\n\t"
                      "mrs %0, CNTVCT_EL0"
                      : "=r"(res)
@@ -111,9 +103,8 @@ auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_release)) noe
     return res;
 }
 
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_acq_rel)) noexcept
-    -> value_type {
-    value_type res;
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_acq_rel)) noexcept {
+    uint64_t res;
     __asm__ volatile("isb sy\n\t"
                      "mrs %0, CNTVCT_EL0\n\t"
                      "isb sy\n\t"
@@ -123,112 +114,179 @@ auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_acq_rel)) noe
     return res;
 }
 
-bool hardware_ticks::invariant_frequency() noexcept {
-    return true;
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_relaxed)) noexcept {
+    uint64_t res;
+    __asm__ volatile("mrs %0, PMCCNTR_EL0\n\t" : "=r"(res) : : "memory");
+    return res;
 }
-} // namespace tempus
+
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_acquire)) noexcept {
+    uint64_t res;
+    __asm__ volatile("mrs %0, PMCCNTR_EL0\n\t"
+                     "isb sy"
+                     : "=r"(res)
+                     :
+                     : "memory");
+    return res;
+}
+
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_release)) noexcept {
+    uint64_t res;
+    __asm__ volatile("isb sy\n\t"
+                     "mrs %0, PMCCNTR_EL0"
+                     : "=r"(res)
+                     :
+                     : "memory");
+    return res;
+}
+
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_acq_rel)) noexcept {
+    uint64_t res;
+    __asm__ volatile("isb sy\n\t"
+                     "mrs %0, PMCCNTR_EL0\n\t"
+                     "isb sy\n\t"
+                     : "=r"(res)
+                     :
+                     : "memory");
+    return res;
+}
+} // namespace
 UTL_NAMESPACE_END
 
-#  elif UTL_TARGET_MICROSOFT
-
-// From winnt.h
-#    define __UTL_ARM64_SYSREG(op0, op1, crn, crm, op2)                                  \
-        (((op0 & 1) << 14) | ((op1 & 7) << 11) | ((crn & 15) << 7) | ((crm & 15) << 3) | \
-            ((op2 & 7) << 0))
+#  elif UTL_TARGET_MICROSOFT // __UTL_SUPPORTS_ARM_STATUS_REGISTER_BUILTINS
 
 extern "C" __int64 _ReadStatusReg(int);
 extern "C" void __isb(unsigned int);
 #    pragma intrinsic(_ReadStatusReg)
 #    pragma intrinsic(__isb)
 
+// From winnt.h
+#    define __UTL_ARM64_SYSREG(op0, op1, crn, crm, op2)                                  \
+        (((op0 & 1) << 14) | ((op1 & 7) << 11) | ((crn & 15) << 7) | ((crm & 15) << 3) | \
+            ((op2 & 7) << 0))
+
 #    define __UTL_ARM64_CNTFRQ __UTL_ARM64_SYSREG(3, 3, 14, 0, 0)
 #    define __UTL_ARM64_CNTVCT __UTL_ARM64_SYSREG(3, 3, 14, 0, 2)
+#    define __UTL_ARM64_PMCCNTR __UTL_ARM64_SYSREG(3, 3, 9, 13, 0)
 #    define __UTL_BARRIER_SY 0xF
 
-static unsigned int clock_frequency() noexcept {
-    static unsigned int const value =
-        (unsigned int)(_ReadStatusReg(__UTL_ARM64_CNTFRQ) & 0xffffffff);
-    return value;
-}
+#    undef __UTL_ARM64_SYSREG
 
 UTL_NAMESPACE_BEGIN
-namespace tempus {
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_relaxed)) noexcept
-    -> value_type {
-    return _ReadStatusReg(ARM64_CNTVCT);
+namespace {
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntfrq_el0() noexcept {
+    return _ReadStatusReg(__UTL_ARM64_CNTFRQ);
 }
 
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_acquire)) noexcept
-    -> value_type {
-    value_type const res = _ReadStatusReg(ARM64_CNTVCT);
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_relaxed)) noexcept {
+    return _ReadStatusReg(__UTL_ARM64_CNTVCT);
+}
+
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_acquire)) noexcept {
+    value_type const res = _ReadStatusReg(__UTL_ARM64_CNTVCT);
     __isb(__UTL_BARRIER_SY);
     return res;
 }
 
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_release)) noexcept
-    -> value_type {
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_release)) noexcept {
     __isb(__UTL_BARRIER_SY);
-    return _ReadStatusReg(ARM64_CNTVCT);
+    return _ReadStatusReg(__UTL_ARM64_CNTVCT);
 }
 
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_acq_rel)) noexcept
-    -> value_type {
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_acq_rel)) noexcept {
     __isb(__UTL_BARRIER_SY);
-    value_type const res = _ReadStatusReg(ARM64_CNTVCT);
+    value_type const res = _ReadStatusReg(__UTL_ARM64_CNTVCT);
     __isb(__UTL_BARRIER_SY);
     return res;
 }
+
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_relaxed)) noexcept {
+    return _ReadStatusReg(__UTL_ARM64_PMCCNTR);
+}
+
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_acquire)) noexcept {
+    value_type const res = _ReadStatusReg(__UTL_ARM64_PMCCNTR);
+    __isb(__UTL_BARRIER_SY);
+    return res;
+}
+
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_release)) noexcept {
+    __isb(__UTL_BARRIER_SY);
+    return _ReadStatusReg(__UTL_ARM64_PMCCNTR);
+}
+
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_acq_rel)) noexcept {
+    __isb(__UTL_BARRIER_SY);
+    value_type const res = _ReadStatusReg(__UTL_ARM64_PMCCNTR);
+    __isb(__UTL_BARRIER_SY);
+    return res;
+}
+} // namespace
+UTL_NAMESPACE_END
 
 #    undef __UTL_BARRIER_SY
 #    undef __UTL_ARM64_CNTVCT
 #    undef __UTL_ARM64_CNTFRQ
 #    undef __UTL_ARM64_SYSREG
 
-bool hardware_ticks::invariant_frequency() noexcept {
-    return true;
-}
-} // namespace tempus
-UTL_NAMESPACE_END
-
-#  else
+#  else // __UTL_SUPPORTS_ARM_STATUS_REGISTER_BUILTINS
 
 UTL_PRAGMA_WARN("Unrecognized target/compiler");
 
-UTL_NAMESPACE_BEGIN
-namespace tempus {
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_relaxed)) noexcept
-    -> value_type {
-    UTL_ASSERT(false);
-    UTL_BUILTIN_unreachable();
-}
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_acquire)) noexcept
-    -> value_type {
-    UTL_ASSERT(false);
-    UTL_BUILTIN_unreachable();
-}
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_release)) noexcept
-    -> value_type {
-    UTL_ASSERT(false);
-    UTL_BUILTIN_unreachable();
-}
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_acq_rel)) noexcept
-    -> value_type {
-    UTL_ASSERT(false);
-    UTL_BUILTIN_unreachable();
-}
+#    define __UTL_NO_INVARIANT_CNT_FREQ
 
-bool hardware_ticks::invariant_frequency() noexcept {
-    return false;
+UTL_NAMESPACE_BEGIN
+namespace {
+template <instruction_order O>
+UTL_ATTRIBUTES(NORETURN, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(instr_order_t<O>) noexcept {
+    UTL_ASSERT(false);
+    UTL_BUILTIN_unreachable();
 }
-static unsigned int clock_frequency() noexcept {
-    return 1;
+template <instruction_order O>
+UTL_ATTRIBUTES(NORETURN, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(instr_order_t<O>) noexcept {
+    UTL_ASSERT(false);
+    UTL_BUILTIN_unreachable();
 }
-} // namespace tempus
+UTL_ATTRIBUTES(NORETURN, MAYBE_UNUSED) uint64_t arm64_cntfrq_el0() noexcept {
+    UTL_ASSERT(false);
+    UTL_BUILTIN_unreachable();
+}
+} // namespace
 UTL_NAMESPACE_END
-#  endif
+#  endif // __UTL_SUPPORTS_ARM_STATUS_REGISTER_BUILTINS
 
 UTL_NAMESPACE_BEGIN
+namespace {
+
+uint32_t clock_frequency() noexcept {
+    static uint32_t value = []() { return (arm64_cntfrq_el0() & 0xffffffffu); }();
+    return value;
+}
+
+template <instruction_order O>
+uint64_t get_timestamp(instr_order_t<O> o) noexcept {
+#  ifndef UTL_USE_PMU_HARDWARE_CLOCK
+    return arm64_cntvct_el0(o);
+#  else
+    return arm64_pmccntr_el0(o);
+#  endif
+}
+
+template <>
+uint64_t get_timestamp(decltype(instr_order_seq_cst)) noexcept {
+    return get_timestamp(instr_order_acq_rel);
+}
+
+} // namespace
+
 namespace tempus {
+bool hardware_ticks::invariant_frequency() noexcept {
+#  if !defined(__UTL_NO_INVARIANT_CNT_FREQ) && !defined(UTL_USE_PMU_HARDWARE_CLOCK)
+    return true;
+#  else
+    return false;
+#  endif
+}
 
 duration to_duration(hardware_ticks t) noexcept {
     if (!hardware_ticks::invariant_frequency()) {
@@ -243,10 +301,18 @@ duration to_duration(hardware_ticks t) noexcept {
     return duration{0, t.value() * nano / clock_frequency()};
 }
 
-auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_seq_cst)) noexcept
-    -> value_type {
-    return get_time(instr_order_acq_rel);
-}
+#  define __UTL_DEFINE_GET_TIME(ORDER)                                                        \
+      auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_##ORDER) o) noexcept \
+          -> value_type {                                                                     \
+          return get_timestamp(o);                                                            \
+      }
+__UTL_DEFINE_GET_TIME(relaxed);
+__UTL_DEFINE_GET_TIME(acquire);
+__UTL_DEFINE_GET_TIME(release);
+__UTL_DEFINE_GET_TIME(acq_rel);
+__UTL_DEFINE_GET_TIME(seq_cst);
+
+#  undef __UTL_DEFINE_GET_TIME
 
 } // namespace tempus
 UTL_NAMESPACE_END

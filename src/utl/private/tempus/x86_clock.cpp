@@ -40,7 +40,7 @@ cpuid_t run_cpuid() noexcept {
     return value;
 }
 
-timestamp_counter_t rdtscp(decltype(instr_order_relaxed)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtscp(decltype(instr_order_relaxed)) noexcept {
     unsigned long long high;
     unsigned long long low;
     unsigned int aux;
@@ -49,7 +49,7 @@ timestamp_counter_t rdtscp(decltype(instr_order_relaxed)) noexcept {
     return timestamp_counter_t{tick, aux};
 }
 
-timestamp_counter_t rdtscp(decltype(instr_order_acquire)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtscp(decltype(instr_order_acquire)) noexcept {
     unsigned long long high;
     unsigned long long low;
     unsigned int aux;
@@ -59,7 +59,7 @@ timestamp_counter_t rdtscp(decltype(instr_order_acquire)) noexcept {
     return timestamp_counter_t{tick, aux};
 }
 
-timestamp_counter_t rdtscp(decltype(instr_order_release)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtscp(decltype(instr_order_release)) noexcept {
     unsigned long long high;
     unsigned long long low;
     unsigned int aux;
@@ -69,7 +69,7 @@ timestamp_counter_t rdtscp(decltype(instr_order_release)) noexcept {
     return timestamp_counter_t{tick, aux};
 }
 
-timestamp_counter_t rdtscp(decltype(instr_order_acq_rel)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtscp(decltype(instr_order_acq_rel)) noexcept {
     unsigned long long high;
     unsigned long long low;
     unsigned int aux;
@@ -80,7 +80,7 @@ timestamp_counter_t rdtscp(decltype(instr_order_acq_rel)) noexcept {
     return timestamp_counter_t{tick, aux};
 }
 
-timestamp_counter_t rdtsc(decltype(instr_order_relaxed)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtsc(decltype(instr_order_relaxed)) noexcept {
     unsigned long long high;
     unsigned long long low;
     __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
@@ -88,7 +88,7 @@ timestamp_counter_t rdtsc(decltype(instr_order_relaxed)) noexcept {
     return timestamp_counter_t{tick, -1};
 }
 
-timestamp_counter_t rdtsc(decltype(instr_order_acquire)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtsc(decltype(instr_order_acquire)) noexcept {
     unsigned long long high;
     unsigned long long low;
     __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
@@ -97,7 +97,7 @@ timestamp_counter_t rdtsc(decltype(instr_order_acquire)) noexcept {
     return timestamp_counter_t{tick, -1};
 }
 
-timestamp_counter_t rdtsc(decltype(instr_order_release)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtsc(decltype(instr_order_release)) noexcept {
     unsigned long long high;
     unsigned long long low;
     _mm_mfence();
@@ -107,7 +107,7 @@ timestamp_counter_t rdtsc(decltype(instr_order_release)) noexcept {
     return timestamp_counter_t{tick, -1};
 }
 
-timestamp_counter_t rdtsc(decltype(instr_order_acq_rel)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtsc(decltype(instr_order_acq_rel)) noexcept {
     unsigned long long high;
     unsigned long long low;
     _mm_mfence();
@@ -120,27 +120,27 @@ timestamp_counter_t rdtsc(decltype(instr_order_acq_rel)) noexcept {
 
 #  elif UTL_TARGET_MICROSOFT
 
-timestamp_counter_t rdtscp(decltype(instr_order_relaxed)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtscp(decltype(instr_order_relaxed)) noexcept {
     timestamp_counter_t result;
     result.tick = __rdtscp(&result.aux);
     return result;
 }
 
-timestamp_counter_t rdtscp(decltype(instr_order_acquire)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtscp(decltype(instr_order_acquire)) noexcept {
     timestamp_counter_t result;
     result.tick = __rdtscp(&result.aux);
     _mm_lfence();
     return result;
 }
 
-timestamp_counter_t rdtscp(decltype(instr_order_release)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtscp(decltype(instr_order_release)) noexcept {
     timestamp_counter_t result;
     _mm_mfence();
     result.tick = __rdtscp(&result.aux);
     return result;
 }
 
-timestamp_counter_t rdtscp(decltype(instr_order_acq_rel)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtscp(decltype(instr_order_acq_rel)) noexcept {
     timestamp_counter_t result;
     _mm_mfence();
     result.tick = __rdtscp(&result.aux);
@@ -148,20 +148,20 @@ timestamp_counter_t rdtscp(decltype(instr_order_acq_rel)) noexcept {
     return result;
 }
 
-timestamp_counter_t rdtsc(decltype(instr_order_relaxed)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtsc(decltype(instr_order_relaxed)) noexcept {
     timestamp_counter_t result{0, -1};
     result.tick = __rdtsc();
     return result;
 }
 
-timestamp_counter_t rdtsc(decltype(instr_order_acquire)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtsc(decltype(instr_order_acquire)) noexcept {
     timestamp_counter_t result{0, -1};
     result.tick = __rdtsc();
     _mm_lfence();
     return result;
 }
 
-timestamp_counter_t rdtsc(decltype(instr_order_release)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtsc(decltype(instr_order_release)) noexcept {
     timestamp_counter_t result{0, -1};
     _mm_mfence();
     _mm_lfence();
@@ -170,7 +170,7 @@ timestamp_counter_t rdtsc(decltype(instr_order_release)) noexcept {
     return result;
 }
 
-timestamp_counter_t rdtsc(decltype(instr_order_acq_rel)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) timestamp_counter_t rdtsc(decltype(instr_order_acq_rel)) noexcept {
     timestamp_counter_t result{0, -1};
     _mm_mfence();
     _mm_lfence();
