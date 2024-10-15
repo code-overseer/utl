@@ -9,11 +9,9 @@
 // TODO Investigate using PMU counter (which is not invariant)
 #if UTL_ARCH_AARCH64
 
-#  define __UTL_SUPPORTS_ARM_STATUS_REGISTER_BUILTINS \
-      (UTL_HAS_BUILTIN(__builtin_arm_isb) && UTL_HAS_BUILTIN(__builtin_arm_rsr64))
 #  define __UTL_BARRIER_SY 0xF
 
-#  if __UTL_SUPPORTS_ARM_STATUS_REGISTER_BUILTINS
+#  if UTL_HAS_BUILTIN(__builtin_arm_isb) && UTL_HAS_BUILTIN(__builtin_arm_rsr64)
 UTL_NAMESPACE_BEGIN
 namespace {
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntfrq_el0() noexcept {
@@ -68,7 +66,8 @@ UTL_NAMESPACE_END
 
 #    undef __UTL_BARRIER_SY
 
-#  elif UTL_SUPPORTS_GNU_ASM // __UTL_SUPPORTS_ARM_STATUS_REGISTER_BUILTINS
+#  elif UTL_SUPPORTS_GNU_ASM // UTL_HAS_BUILTIN(__builtin_arm_isb) &&
+                             // UTL_HAS_BUILTIN(__builtin_arm_rsr64)
 
 UTL_NAMESPACE_BEGIN
 namespace {
@@ -154,7 +153,8 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(
 } // namespace
 UTL_NAMESPACE_END
 
-#  elif UTL_TARGET_MICROSOFT // __UTL_SUPPORTS_ARM_STATUS_REGISTER_BUILTINS
+#  elif UTL_TARGET_MICROSOFT // UTL_HAS_BUILTIN(__builtin_arm_isb) &&
+                             // UTL_HAS_BUILTIN(__builtin_arm_rsr64)
 
 extern "C" __int64 _ReadStatusReg(int);
 extern "C" void __isb(unsigned int);
@@ -230,7 +230,7 @@ UTL_NAMESPACE_END
 #    undef __UTL_ARM64_CNTFRQ
 #    undef __UTL_ARM64_SYSREG
 
-#  else // __UTL_SUPPORTS_ARM_STATUS_REGISTER_BUILTINS
+#  else // UTL_HAS_BUILTIN(__builtin_arm_isb) && UTL_HAS_BUILTIN(__builtin_arm_rsr64)
 
 UTL_PRAGMA_WARN("Unrecognized target/compiler");
 
@@ -254,7 +254,7 @@ UTL_ATTRIBUTES(NORETURN, MAYBE_UNUSED) uint64_t arm64_cntfrq_el0() noexcept {
 }
 } // namespace
 UTL_NAMESPACE_END
-#  endif // __UTL_SUPPORTS_ARM_STATUS_REGISTER_BUILTINS
+#  endif // UTL_HAS_BUILTIN(__builtin_arm_isb) && UTL_HAS_BUILTIN(__builtin_arm_rsr64)
 
 UTL_NAMESPACE_BEGIN
 namespace {
