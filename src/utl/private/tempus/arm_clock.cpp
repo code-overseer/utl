@@ -3,6 +3,7 @@
 #include "utl/assert/utl_assert.h"
 #include "utl/atomic/utl_atomic.h"
 #include "utl/tempus/utl_clock.h"
+#include "utl/type_traits/utl_is_convertible.h"
 #include "utl/type_traits/utl_is_same.h"
 
 // TODO Investigate using PMU counter (which is not invariant)
@@ -259,9 +260,16 @@ UTL_NAMESPACE_BEGIN
 namespace {
 
 uint32_t clock_frequency() noexcept {
+// Provide escape hatch for systems with broken frequencies
+#  ifndef UTL_ARM_CNTFRQ
     // TODO Prescaler?
     static uint32_t value = []() { return (arm64_cntfrq_el0() & 0xffffffffu); }();
     return value;
+#  else
+    static_assert(
+        is_convertible<decltype(UTL_ARM_CNTFRQ), uint32_t>::value, "Invalid `UTL_ARM_CNTFRQ`");
+    return UTL_ARM_CNTFRQ;
+#  endif
 }
 
 template <instruction_order O>
