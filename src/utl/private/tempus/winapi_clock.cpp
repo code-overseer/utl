@@ -17,6 +17,7 @@
 
 #  include <Windows.h>
 #  include <intrin.h>
+#  include <processthreadsapi.h>
 #  include <string.h>
 #  include <sysinfoapi.h>
 
@@ -34,6 +35,34 @@ auto time_point<system_clock_t>::get_time() noexcept -> value_type {
     GetSystemTimeAsFileTime(&f);
     ::memcpy(&out_value, f, 8);
     return out_value;
+}
+
+auto time_point<thread_clock_t>::get_time() noexcept -> value_type {
+    static_assert(sizeof(FILETIME) == sizeof(value_type), "Invalid implementation");
+    FILETIME kernel;
+    FILETIME user;
+    if (GetThreadTimes(GetCurrentThread(), nullptr, nullptr, &kernel, &user)) {
+        value_type k, u;
+        ::memcpy(&k, f, 8);
+        ::memcpy(&u, f, 8);
+        return k + u;
+    }
+
+    return static_cast<value_type>(-1);
+}
+
+auto time_point<process_clock_t>::get_time() noexcept -> value_type {
+    static_assert(sizeof(FILETIME) == sizeof(value_type), "Invalid implementation");
+    FILETIME kernel;
+    FILETIME user;
+    if (GetProcessTimes(GetCurrentProcess(), nullptr, nullptr, &kernel, &user)) {
+        value_type k, u;
+        ::memcpy(&k, f, 8);
+        ::memcpy(&u, f, 8);
+        return k + u;
+    }
+
+    return static_cast<value_type>(-1);
 }
 
 auto time_point<steady_clock_t>::get_time() noexcept -> value_type {
@@ -57,6 +86,7 @@ auto time_point<high_resolution_clock_t>::difference(value_type l, value_type r)
     auto const diff = l - r;
     return duration{0, diff * ns_per_tick};
 }
+
 } // namespace tempus
 
 UTL_NAMESPACE_END
