@@ -9,9 +9,10 @@
 // TODO Investigate using PMU counter (which is not invariant)
 #if UTL_ARCH_AARCH64
 
-#  define __UTL_BARRIER_SY 0xF
-
 #  if UTL_HAS_BUILTIN(__builtin_arm_isb) && UTL_HAS_BUILTIN(__builtin_arm_rsr64)
+
+#    define __UTL_BARRIER_SY 0xF
+
 UTL_NAMESPACE_BEGIN
 namespace {
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntfrq_el0() noexcept {
