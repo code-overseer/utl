@@ -259,11 +259,17 @@ unsigned int crystal_clock_frequency() noexcept {
             // From intel software manual
             switch (id.model) {
             case 0x55:
+                UTL_FALLTHROUGH;
+            case 0x5f:
                 // Intel Xeon Scalable Processor Family with CPUID signature 06_55H
                 return 25000000; // 25 MHz
             case 0x4e:
                 UTL_FALLTHROUGH;
             case 0x5e:
+                UTL_FALLTHROUGH;
+            case 0xa5:
+                UTL_FALLTHROUGH;
+            case 0xa6:
                 UTL_FALLTHROUGH;
             case 0x8e:
                 UTL_FALLTHROUGH;
@@ -272,6 +278,7 @@ unsigned int crystal_clock_frequency() noexcept {
                 // Family
                 return 24000000; // 24 MHz
             case 0x5c:
+            case 0x7a:
                 // Next Generation Intel Atom processors based on Goldmont Microarchitecture
                 // with CPUID signature 06_5CH (excluding Intel Xeon processors)
                 return 19200000; // 19.2 MHz
