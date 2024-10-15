@@ -283,7 +283,7 @@ uint64_t get_timestamp(decltype(instr_order_seq_cst)) noexcept {
 namespace tempus {
 bool hardware_ticks::invariant_frequency() noexcept {
 #  if !defined(__UTL_NO_INVARIANT_CNT_FREQ) && !defined(UTL_USE_PMU_HARDWARE_CLOCK)
-    return true;
+    return clock_frequency() != 0;
 #  else
     return false;
 #  endif
