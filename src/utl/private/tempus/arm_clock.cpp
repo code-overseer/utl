@@ -19,24 +19,24 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntfrq_el0() noexcept
     return __builtin_arm64_rsr64("CNTFRQ_EL0");
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_relaxed)) noexcept {
-    return __builtin_arm64_rsr64("CNTVCT_EL0");
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_relaxed)) noexcept {
+    return __builtin_arm64_rsr64("CNTPCT_EL0");
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_acquire)) noexcept {
-    uint64_t const res = __builtin_arm64_rsr64("CNTVCT_EL0");
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_acquire)) noexcept {
+    uint64_t const res = __builtin_arm64_rsr64("CNTPCT_EL0");
     __builtin_arm64_isb(__UTL_BARRIER_SY);
     return res;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_release)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_release)) noexcept {
     __builtin_arm64_isb(__UTL_BARRIER_SY);
-    return __builtin_arm64_rsr64("CNTVCT_EL0");
+    return __builtin_arm64_rsr64("CNTPCT_EL0");
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_acq_rel)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_acq_rel)) noexcept {
     __builtin_arm64_isb(__UTL_BARRIER_SY);
-    uint64_t const res = __builtin_arm64_rsr64("CNTVCT_EL0");
+    uint64_t const res = __builtin_arm64_rsr64("CNTPCT_EL0");
     __builtin_arm64_isb(__UTL_BARRIER_SY);
     return res;
 }
@@ -77,15 +77,15 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntfrq_el0() noexcept
     return res;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_relaxed)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_relaxed)) noexcept {
     uint64_t res;
-    __asm__ volatile("mrs %0, CNTVCT_EL0\n\t" : "=r"(res) : : "memory");
+    __asm__ volatile("mrs %0, CNTPCT_EL0\n\t" : "=r"(res) : : "memory");
     return res;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_acquire)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_acquire)) noexcept {
     uint64_t res;
-    __asm__ volatile("mrs %0, CNTVCT_EL0\n\t"
+    __asm__ volatile("mrs %0, CNTPCT_EL0\n\t"
                      "isb sy"
                      : "=r"(res)
                      :
@@ -93,20 +93,20 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(i
     return res;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_release)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_release)) noexcept {
     uint64_t res;
     __asm__ volatile("isb sy\n\t"
-                     "mrs %0, CNTVCT_EL0"
+                     "mrs %0, CNTPCT_EL0"
                      : "=r"(res)
                      :
                      : "memory");
     return res;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_acq_rel)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_acq_rel)) noexcept {
     uint64_t res;
     __asm__ volatile("isb sy\n\t"
-                     "mrs %0, CNTVCT_EL0\n\t"
+                     "mrs %0, CNTPCT_EL0\n\t"
                      "isb sy\n\t"
                      : "=r"(res)
                      :
@@ -166,7 +166,7 @@ extern "C" void __isb(unsigned int);
             ((op2 & 7) << 0))
 
 #    define __UTL_ARM64_CNTFRQ __UTL_ARM64_SYSREG(3, 3, 14, 0, 0)
-#    define __UTL_ARM64_CNTVCT __UTL_ARM64_SYSREG(3, 3, 14, 0, 2)
+#    define __UTL_ARM64_CNTPCT __UTL_ARM64_SYSREG(3, 3, 14, 0, 2)
 #    define __UTL_ARM64_PMCCNTR __UTL_ARM64_SYSREG(3, 3, 9, 13, 0)
 #    define __UTL_BARRIER_SY 0xF
 
@@ -178,24 +178,24 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntfrq_el0() noexcept
     return _ReadStatusReg(__UTL_ARM64_CNTFRQ);
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_relaxed)) noexcept {
-    return _ReadStatusReg(__UTL_ARM64_CNTVCT);
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_relaxed)) noexcept {
+    return _ReadStatusReg(__UTL_ARM64_CNTPCT);
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_acquire)) noexcept {
-    value_type const res = _ReadStatusReg(__UTL_ARM64_CNTVCT);
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_acquire)) noexcept {
+    value_type const res = _ReadStatusReg(__UTL_ARM64_CNTPCT);
     __isb(__UTL_BARRIER_SY);
     return res;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_release)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_release)) noexcept {
     __isb(__UTL_BARRIER_SY);
-    return _ReadStatusReg(__UTL_ARM64_CNTVCT);
+    return _ReadStatusReg(__UTL_ARM64_CNTPCT);
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(decltype(instr_order_acq_rel)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_acq_rel)) noexcept {
     __isb(__UTL_BARRIER_SY);
-    value_type const res = _ReadStatusReg(__UTL_ARM64_CNTVCT);
+    value_type const res = _ReadStatusReg(__UTL_ARM64_CNTPCT);
     __isb(__UTL_BARRIER_SY);
     return res;
 }
@@ -225,7 +225,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(
 UTL_NAMESPACE_END
 
 #    undef __UTL_BARRIER_SY
-#    undef __UTL_ARM64_CNTVCT
+#    undef __UTL_ARM64_CNTPCT
 #    undef __UTL_ARM64_CNTFRQ
 #    undef __UTL_ARM64_SYSREG
 
@@ -238,7 +238,7 @@ UTL_PRAGMA_WARN("Unrecognized target/compiler");
 UTL_NAMESPACE_BEGIN
 namespace {
 template <instruction_order O>
-UTL_ATTRIBUTES(NORETURN, MAYBE_UNUSED) uint64_t arm64_cntvct_el0(instr_order_t<O>) noexcept {
+UTL_ATTRIBUTES(NORETURN, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(instr_order_t<O>) noexcept {
     UTL_ASSERT(false);
     UTL_BUILTIN_unreachable();
 }
@@ -259,6 +259,7 @@ UTL_NAMESPACE_BEGIN
 namespace {
 
 uint32_t clock_frequency() noexcept {
+    // TODO Prescaler?
     static uint32_t value = []() { return (arm64_cntfrq_el0() & 0xffffffffu); }();
     return value;
 }
@@ -266,7 +267,7 @@ uint32_t clock_frequency() noexcept {
 template <instruction_order O>
 uint64_t get_timestamp(instr_order_t<O> o) noexcept {
 #  ifndef UTL_USE_PMU_HARDWARE_CLOCK
-    return arm64_cntvct_el0(o);
+    return arm64_cntpct_el0(o);
 #  else
     return arm64_pmccntr_el0(o);
 #  endif
