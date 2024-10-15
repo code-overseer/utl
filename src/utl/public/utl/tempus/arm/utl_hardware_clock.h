@@ -47,12 +47,39 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, instruction_order o) noexcept {
+        hardware_clock_t, instr_order_t<instruction_order::relaxed> o) noexcept {
         return time_point<hardware_clock_t>{get_time(o)};
     }
 
+    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+        hardware_clock_t, instr_order_t<instruction_order::acquire> o) noexcept {
+        return time_point<hardware_clock_t>{get_time(o)};
+    }
+    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+        hardware_clock_t, instr_order_t<instruction_order::release> o) noexcept {
+        return time_point<hardware_clock_t>{get_time(o)};
+    }
+    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+        hardware_clock_t, instr_order_t<instruction_order::acq_rel> o) noexcept {
+        return time_point<hardware_clock_t>{get_time(o)};
+    }
+
+    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+        hardware_clock_t, instr_order_t<instruction_order::seq_cst> o) noexcept {
+        return time_point<hardware_clock_t>{get_time(o)};
+    }
+
+    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+        hardware_clock_t clock) noexcept {
+        return time_point<hardware_clock_t>{get_time(instr_order_seq_cst)};
+    }
+
 private:
-    __UTL_ABI_PUBLIC static value_type get_time(instruction_order o) noexcept;
+    __UTL_ABI_PUBLIC static value_type get_time(instr_order_t<instruction_order::relaxed>) noexcept;
+    __UTL_ABI_PUBLIC static value_type get_time(instr_order_t<instruction_order::acquire>) noexcept;
+    __UTL_ABI_PUBLIC static value_type get_time(instr_order_t<instruction_order::release>) noexcept;
+    __UTL_ABI_PUBLIC static value_type get_time(instr_order_t<instruction_order::acq_rel>) noexcept;
+    __UTL_ABI_PUBLIC static value_type get_time(instr_order_t<instruction_order::seq_cst>) noexcept;
 };
 
 } // namespace tempus

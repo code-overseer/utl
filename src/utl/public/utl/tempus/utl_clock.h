@@ -31,7 +31,22 @@
 
 UTL_NAMESPACE_BEGIN
 
-using instruction_order = memory_order;
+enum class instruction_order : int {
+    relaxed,
+    acquire,
+    release,
+    acq_rel,
+    seq_cst,
+};
+
+template <instruction_order O>
+struct instr_order_t : value_constant<instruction_order, O> {};
+
+UTL_INLINE_CXX17 constexpr instr_order_t<instruction_order::relaxed> instr_order_relaxed{};
+UTL_INLINE_CXX17 constexpr instr_order_t<instruction_order::acquire> instr_order_acquire{};
+UTL_INLINE_CXX17 constexpr instr_order_t<instruction_order::release> instr_order_release{};
+UTL_INLINE_CXX17 constexpr instr_order_t<instruction_order::acq_rel> instr_order_acq_rel{};
+UTL_INLINE_CXX17 constexpr instr_order_t<instruction_order::seq_cst> instr_order_seq_cst{};
 
 namespace tempus {
 
@@ -226,8 +241,18 @@ struct thread_clock_t {
 struct hardware_clock_t {
     explicit constexpr hardware_clock_t() noexcept = default;
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, instruction_order) noexcept;
+        hardware_clock_t, instr_order_t<instruction_order::relaxed>) noexcept;
+    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+        hardware_clock_t, instr_order_t<instruction_order::acquire>) noexcept;
+    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+        hardware_clock_t, instr_order_t<instruction_order::release>) noexcept;
+    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+        hardware_clock_t, instr_order_t<instruction_order::acq_rel>) noexcept;
+    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+        hardware_clock_t, instr_order_t<instruction_order::seq_cst>) noexcept;
+
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(hardware_clock_t) noexcept;
+
     __UTL_HIDE_FROM_ABI static bool invariant_frequency() noexcept {
         return hardware_ticks::invariant_frequency();
     }

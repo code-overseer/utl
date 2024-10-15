@@ -14,6 +14,8 @@
 UTL_NAMESPACE_BEGIN
 namespace tempus {
 
+namespace {
+
 // TODO move to own library
 struct cpuid_t {
     unsigned int eax;
@@ -25,7 +27,7 @@ struct cpuid_t {
 #  if UTL_SUPPORTS_GNU_ASM
 
 template <unsigned int X>
-static cpuid_t run_cpuid() noexcept {
+cpuid_t run_cpuid() noexcept {
     static cpuid_t const value = []() {
         cpuid_t result;
         result.eax = X;
@@ -38,134 +40,148 @@ static cpuid_t run_cpuid() noexcept {
     return value;
 }
 
-static timestamp_counter_t rdtscp(instruction_order o) noexcept {
+timestamp_counter_t rdtscp(decltype(instr_order_relaxed)) noexcept {
     unsigned long long high;
     unsigned long long low;
     unsigned int aux;
-
-    switch (o) {
-    case instruction_order::relaxed:
-        __asm__("rdtscp" : "=a"(low), "=d"(high), "=c"(aux) : :);
-        break;
-    case instruction_order::consume:
-        UTL_FALLTHROUGH;
-    case instruction_order::acquire:
-        __asm__("rdtscp" : "=a"(low), "=d"(high), "=c"(aux) : :);
-        _mm_lfence();
-        break;
-    case instruction_order::release:
-        _mm_mfence();
-        __asm__("rdtscp" : "=a"(low), "=d"(high), "=c"(aux) : :);
-        break;
-    case instruction_order::acq_rel:
-        _mm_mfence();
-        __asm__("rdtscp" : "=a"(low), "=d"(high), "=c"(aux) : :);
-        _mm_lfence();
-    case instruction_order::seq_cst:
-        _mm_mfence();
-        __asm__ volatile("rdtscp" : "=a"(low), "=d"(high), "=c"(aux) : : "memory");
-        _mm_lfence();
-    }
+    __asm__("rdtscp" : "=a"(low), "=d"(high), "=c"(aux) : :);
     auto const tick = (high << 32) | low;
     return timestamp_counter_t{tick, aux};
 }
 
-static timestamp_counter_t rdtsc(instruction_order o) noexcept {
+timestamp_counter_t rdtscp(decltype(instr_order_acquire)) noexcept {
     unsigned long long high;
     unsigned long long low;
+    unsigned int aux;
+    __asm__("rdtscp" : "=a"(low), "=d"(high), "=c"(aux) : :);
+    _mm_lfence();
+    auto const tick = (high << 32) | low;
+    return timestamp_counter_t{tick, aux};
+}
 
-    switch (o) {
-    case instruction_order::relaxed:
-        __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
-        break;
-    case instruction_order::consume:
-        UTL_FALLTHROUGH;
-    case instruction_order::acquire:
-        __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
-        _mm_lfence();
-        break;
-    case instruction_order::release:
-        _mm_mfence();
-        _mm_lfence();
-        __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
-        break;
-    case instruction_order::acq_rel:
-        _mm_mfence();
-        _mm_lfence();
-        __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
-        _mm_lfence();
-    case instruction_order::seq_cst:
-        _mm_mfence();
-        _mm_lfence();
-        __asm__ volatile("rdtsc" : "=a"(low), "=d"(high) : : "memory");
-        _mm_lfence();
-    }
+timestamp_counter_t rdtscp(decltype(instr_order_release)) noexcept {
+    unsigned long long high;
+    unsigned long long low;
+    unsigned int aux;
+    _mm_mfence();
+    __asm__("rdtscp" : "=a"(low), "=d"(high), "=c"(aux) : :);
+    auto const tick = (high << 32) | low;
+    return timestamp_counter_t{tick, aux};
+}
 
+timestamp_counter_t rdtscp(decltype(instr_order_acq_rel)) noexcept {
+    unsigned long long high;
+    unsigned long long low;
+    unsigned int aux;
+    _mm_mfence();
+    __asm__("rdtscp" : "=a"(low), "=d"(high), "=c"(aux) : :);
+    _mm_lfence();
+    auto const tick = (high << 32) | low;
+    return timestamp_counter_t{tick, aux};
+}
+
+timestamp_counter_t rdtsc(decltype(instr_order_relaxed)) noexcept {
+    unsigned long long high;
+    unsigned long long low;
+    __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
+    auto const tick = (high << 32) | low;
+    return timestamp_counter_t{tick, -1};
+}
+
+timestamp_counter_t rdtsc(decltype(instr_order_acquire)) noexcept {
+    unsigned long long high;
+    unsigned long long low;
+    __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
+    _mm_lfence();
+    auto const tick = (high << 32) | low;
+    return timestamp_counter_t{tick, -1};
+}
+
+timestamp_counter_t rdtsc(decltype(instr_order_release)) noexcept {
+    unsigned long long high;
+    unsigned long long low;
+    _mm_mfence();
+    _mm_lfence();
+    __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
+    auto const tick = (high << 32) | low;
+    return timestamp_counter_t{tick, -1};
+}
+
+timestamp_counter_t rdtsc(decltype(instr_order_acq_rel)) noexcept {
+    unsigned long long high;
+    unsigned long long low;
+    _mm_mfence();
+    _mm_lfence();
+    __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
+    _mm_lfence();
     auto const tick = (high << 32) | low;
     return timestamp_counter_t{tick, -1};
 }
 
 #  elif UTL_TARGET_MICROSOFT
 
-static timestamp_counter_t rdtscp(instruction_order o) noexcept {
+timestamp_counter_t rdtscp(decltype(instr_order_relaxed)) noexcept {
     timestamp_counter_t result;
-    switch (o) {
-    case instruction_order::relaxed:
-        result.tick = __rdtscp(&result.aux);
-        break;
-    case instruction_order::consume:
-        UTL_FALLTHROUGH;
-    case instruction_order::acquire:
-        result.tick = __rdtscp(&result.aux);
-        _mm_lfence();
-        break;
-    case instruction_order::release:
-        _mm_mfence();
-        result.tick = __rdtscp(&result.aux);
-        break;
-    case instruction_order::acq_rel:
-        UTL_FALLTHROUGH;
-    case instruction_order::seq_cst:
-        _mm_mfence();
-        result.tick = __rdtscp(&result.aux);
-        _mm_lfence();
-    }
-
+    result.tick = __rdtscp(&result.aux);
     return result;
 }
 
-static timestamp_counter_t rdtsc(instruction_order o) noexcept {
+timestamp_counter_t rdtscp(decltype(instr_order_acquire)) noexcept {
+    timestamp_counter_t result;
+    result.tick = __rdtscp(&result.aux);
+    _mm_lfence();
+    return result;
+}
+
+timestamp_counter_t rdtscp(decltype(instr_order_release)) noexcept {
+    timestamp_counter_t result;
+    _mm_mfence();
+    result.tick = __rdtscp(&result.aux);
+    return result;
+}
+
+timestamp_counter_t rdtscp(decltype(instr_order_acq_rel)) noexcept {
+    timestamp_counter_t result;
+    _mm_mfence();
+    result.tick = __rdtscp(&result.aux);
+    _mm_lfence();
+    return result;
+}
+
+timestamp_counter_t rdtsc(decltype(instr_order_relaxed)) noexcept {
     timestamp_counter_t result{0, -1};
+    result.tick = __rdtsc();
+    return result;
+}
 
-    switch (o) {
-    case instruction_order::relaxed:
-        result.tick = __rdtsc();
-        break;
-    case instruction_order::consume:
-        UTL_FALLTHROUGH;
-    case instruction_order::acquire:
-        result.tick = __rdtsc();
-        _mm_lfence();
-        break;
-    case instruction_order::release:
-        _mm_mfence();
-        _mm_lfence();
-        result.tick = __rdtsc();
-        break;
-    case instruction_order::acq_rel:
-        UTL_FALLTHROUGH;
-    case instruction_order::seq_cst:
-        _mm_mfence();
-        _mm_lfence();
-        result.tick = __rdtsc();
-        _mm_lfence();
-    }
+timestamp_counter_t rdtsc(decltype(instr_order_acquire)) noexcept {
+    timestamp_counter_t result{0, -1};
+    result.tick = __rdtsc();
+    _mm_lfence();
+    return result;
+}
 
+timestamp_counter_t rdtsc(decltype(instr_order_release)) noexcept {
+    timestamp_counter_t result{0, -1};
+    _mm_mfence();
+    _mm_lfence();
+    result.tick = __rdtsc();
+    auto const tick = (high << 32) | low;
+    return result;
+}
+
+timestamp_counter_t rdtsc(decltype(instr_order_acq_rel)) noexcept {
+    timestamp_counter_t result{0, -1};
+    _mm_mfence();
+    _mm_lfence();
+    result.tick = __rdtsc();
+    _mm_lfence();
+    auto const tick = (high << 32) | low;
     return result;
 }
 
 template <unsigned int X>
-static cpuid_t run_cpuid() noexcept {
+cpuid_t run_cpuid() noexcept {
     static cpuid_t const value = []() {
         cpuid_t result;
         __cpuid((unsigned int*)&result, X);
@@ -175,26 +191,28 @@ static cpuid_t run_cpuid() noexcept {
     return value;
 }
 
-#  else
+#  else // UTL_SUPPORTS_GNU_ASM
 
 UTL_PRAGMA_WARN("Unrecognized target/compiler");
 
 template <unsigned int X>
-static constexpr cpuid_t run_cpuid() noexcept {
+constexpr cpuid_t run_cpuid() noexcept {
     return {};
 }
 
-static timestamp_counter_t rdtscp(instruction_order o) noexcept {
+template <instruction_order O>
+[[noreturn]] timestamp_counter_t rdtscp(instr_order_t<O>) noexcept {
     ULT_ASSERT(false);
     UTL_BUILTIN_unreachable();
 }
 
-static timestamp_counter_t rdtsc(instruction_order o) noexcept {
+template <instruction_order O>
+[[noreturn]] timestamp_counter_t rdtsc(instr_order_t<O>) noexcept {
     ULT_ASSERT(false);
     UTL_BUILTIN_unreachable();
 }
 
-#  endif
+#  endif // UTL_SUPPORTS_GNU_ASM
 
 struct tsc_frequency_t {
     unsigned int value;
@@ -206,7 +224,7 @@ struct cpu_identity_t {
     unsigned int model;
 };
 
-static bool supports_rdtscp() noexcept {
+bool supports_rdtscp() noexcept {
     static bool value = []() {
         if (run_cpuid<0x80000000>().eax < 0x80000001) {
             return false;
@@ -218,12 +236,12 @@ static bool supports_rdtscp() noexcept {
     return true;
 }
 
-static bool supports_rdtsc() noexcept {
+bool supports_rdtsc() noexcept {
     static bool value = []() { return run_cpuid<0x1>().edx & (1 << 4); }();
     return true;
 }
 
-static cpu_identity_t identify_cpu() noexcept {
+cpu_identity_t identify_cpu() noexcept {
     static cpu_identity_t const value = []() {
         auto const eax = run_cpuid<1>().eax;
         unsigned int family = ((eax >> 8) & 0xf) + ((eax >> 20) & 0xff);
@@ -234,7 +252,7 @@ static cpu_identity_t identify_cpu() noexcept {
     return value;
 }
 
-static unsigned int crystal_clock_frequency() noexcept {
+unsigned int crystal_clock_frequency() noexcept {
     static unsigned int const value = []() {
         auto const id = identify_cpu();
         if (id.family == 0x6) {
@@ -268,7 +286,7 @@ static unsigned int crystal_clock_frequency() noexcept {
     return value;
 }
 
-static tsc_frequency_t tsc_frequency() noexcept {
+tsc_frequency_t tsc_frequency() noexcept {
     static tsc_frequency_t const value = []() {
         if (run_cpuid<0>().eax < 0x15) {
             return {0, false};
@@ -294,6 +312,33 @@ static tsc_frequency_t tsc_frequency() noexcept {
 
     return value;
 }
+/* Initialization */
+auto const init_supports_rdtsc = supports_rdtsc();
+auto const init_supports_rdtscp = supports_rdtscp();
+auto const init_tsc_frequency = tsc_frequency();
+auto const init_invariant_hardware_clock = hardware_ticks::invariant_frequency();
+
+template <instruction_order O>
+timestamp_counter_t get_timestamp(instr_order_t<O> o) noexcept {
+#  if UTL_USE_RDTSCP_HARDWARE_CLOCK
+    UTL_ASSERT(supports_rdtscp());
+    return rdtscp(o);
+#  else
+    if (supports_rdtscp()) {
+        return rdtscp(o);
+    }
+
+    ULT_ASSERT(supports_rdtsc());
+    return rdtsc(o);
+#  endif
+}
+
+template <>
+timestamp_counter_t get_timestamp(decltype(instr_order_seq_cst)) noexcept {
+    return get_timestamp(instr_order_acq_rel);
+}
+
+} // namespace
 
 bool hardware_ticks::invariant_frequency() noexcept {
     static bool const value = []() {
@@ -306,12 +351,6 @@ bool hardware_ticks::invariant_frequency() noexcept {
 
     return value && tsc_frequency().supported;
 }
-
-/* Initialization */
-static auto const init_supports_rdtsc = supports_rdtsc();
-static auto const init_supports_rdtscp = supports_rdtscp();
-static auto const init_tsc_frequency = tsc_frequency();
-static auto const init_invariant_hardware_clock = hardware_ticks::invariant_frequency();
 
 duration to_duration(hardware_ticks t) noexcept {
     (void)&init_supports_rdtsc;
@@ -328,25 +367,20 @@ duration to_duration(hardware_ticks t) noexcept {
     return t.value() * nano / tsc_frequency().value;
 }
 
-auto clock_traits<hardware_clock_t>::get_time(instruction_order o) noexcept -> value_type {
-#  if UTL_USE_RDTSCP_HARDWARE_CLOCK
+#  define __UTL_DEFINE_GET_TIME(ORDER)                                                        \
+      auto clock_traits<hardware_clock_t>::get_time(decltype(instr_order_##ORDER) o) noexcept \
+          -> value_type {                                                                     \
+          return get_timestamp(o);                                                            \
+      }
+__UTL_DEFINE_GET_TIME(relaxed);
+__UTL_DEFINE_GET_TIME(acquire);
+__UTL_DEFINE_GET_TIME(release);
+__UTL_DEFINE_GET_TIME(acq_rel);
+__UTL_DEFINE_GET_TIME(seq_cst);
 
-    UTL_ASSERT(supports_rdtscp());
-    return rdtscp();
-
-#  else
-
-    if (supports_rdtscp()) {
-        return rdtscp();
-    }
-
-    ULT_ASSERT(supports_rdtsc());
-    return rdtsc();
-
-#  endif
-}
+#  undef __UTL_DEFINE_GET_TIME
 } // namespace tempus
 
 UTL_NAMESPACE_END
 
-#endif // UTL_TARGET_MICROSOFT
+#endif // UTL_ARCH_x86_64
