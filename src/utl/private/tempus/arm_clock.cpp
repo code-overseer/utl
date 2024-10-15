@@ -10,57 +10,57 @@
 #if UTL_ARCH_AARCH64
 
 #  define __UTL_SUPPORTS_ARM_STATUS_REGISTER_BUILTINS \
-      (UTL_HAS_BUILTIN(__builtin_arm64_isb) && UTL_HAS_BUILTIN(__builtin_arm64_rsr64))
+      (UTL_HAS_BUILTIN(__builtin_arm_isb) && UTL_HAS_BUILTIN(__builtin_arm_rsr64))
 #  define __UTL_BARRIER_SY 0xF
 
 #  if __UTL_SUPPORTS_ARM_STATUS_REGISTER_BUILTINS
 UTL_NAMESPACE_BEGIN
 namespace {
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntfrq_el0() noexcept {
-    return __builtin_arm64_rsr64("CNTFRQ_EL0");
+    return __builtin_arm_rsr64("CNTFRQ_EL0");
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_relaxed)) noexcept {
-    return __builtin_arm64_rsr64("CNTPCT_EL0");
+    return __builtin_arm_rsr64("CNTPCT_EL0");
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_acquire)) noexcept {
-    uint64_t const res = __builtin_arm64_rsr64("CNTPCT_EL0");
-    __builtin_arm64_isb(__UTL_BARRIER_SY);
+    uint64_t const res = __builtin_arm_rsr64("CNTPCT_EL0");
+    __builtin_arm_isb(__UTL_BARRIER_SY);
     return res;
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_release)) noexcept {
-    __builtin_arm64_isb(__UTL_BARRIER_SY);
-    return __builtin_arm64_rsr64("CNTPCT_EL0");
+    __builtin_arm_isb(__UTL_BARRIER_SY);
+    return __builtin_arm_rsr64("CNTPCT_EL0");
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_cntpct_el0(decltype(instr_order_acq_rel)) noexcept {
-    __builtin_arm64_isb(__UTL_BARRIER_SY);
-    uint64_t const res = __builtin_arm64_rsr64("CNTPCT_EL0");
-    __builtin_arm64_isb(__UTL_BARRIER_SY);
+    __builtin_arm_isb(__UTL_BARRIER_SY);
+    uint64_t const res = __builtin_arm_rsr64("CNTPCT_EL0");
+    __builtin_arm_isb(__UTL_BARRIER_SY);
     return res;
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_relaxed)) noexcept {
-    return __builtin_arm64_rsr64("PMCCTR_EL0");
+    return __builtin_arm_rsr64("PMCCTR_EL0");
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_acquire)) noexcept {
-    uint64_t const res = __builtin_arm64_rsr64("PMCCTR_EL0");
-    __builtin_arm64_isb(__UTL_BARRIER_SY);
+    uint64_t const res = __builtin_arm_rsr64("PMCCTR_EL0");
+    __builtin_arm_isb(__UTL_BARRIER_SY);
     return res;
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_release)) noexcept {
-    __builtin_arm64_isb(__UTL_BARRIER_SY);
-    return __builtin_arm64_rsr64("PMCCTR_EL0");
+    __builtin_arm_isb(__UTL_BARRIER_SY);
+    return __builtin_arm_rsr64("PMCCTR_EL0");
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) uint64_t arm64_pmccntr_el0(decltype(instr_order_acq_rel)) noexcept {
-    __builtin_arm64_isb(__UTL_BARRIER_SY);
-    uint64_t const res = __builtin_arm64_rsr64("PMCCTR_EL0");
-    __builtin_arm64_isb(__UTL_BARRIER_SY);
+    __builtin_arm_isb(__UTL_BARRIER_SY);
+    uint64_t const res = __builtin_arm_rsr64("PMCCTR_EL0");
+    __builtin_arm_isb(__UTL_BARRIER_SY);
     return res;
 }
 } // namespace
