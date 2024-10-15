@@ -123,11 +123,9 @@ public:
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr clock_order compare(
         value_type l, value_type r) noexcept {
-        auto const lt =
-            static_cast<int>(l.tv_sec < r.tv_sec) | static_cast<int>(l.tv_nsec < r.tv_nsec);
-        auto const gt =
-            static_cast<int>(l.tv_sec > r.tv_sec) | static_cast<int>(l.tv_nsec > r.tv_nsec);
-        return static_cast<clock_order>(gt - lt);
+        auto const lt = l.tv_sec < r.tv_sec || (l.tv_sec == r.tv_sec && l.tv_nsec < r.tv_nsec);
+        auto const gt = r.tv_sec < l.tv_sec || (l.tv_sec == r.tv_sec && r.tv_nsec < l.tv_nsec);
+        return static_cast<clock_order>(static_cast<int>(gt) - static_cast<int>(lt));
     }
 
     __UTL_HIDE_FROM_ABI friend time_point<steady_clock_t> get_time(steady_clock_t) noexcept {

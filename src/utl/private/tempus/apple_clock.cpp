@@ -22,10 +22,8 @@ auto clock_traits<steady_clock_t>::difference(value_type l, value_type r) noexce
     }();
 
     auto const diff = (l - r) * timebase.numer / timebase.denom;
-    auto const seconds = diff / 1000000000;
-    auto const nanoseconds = diff - seconds * 1000000000;
     using diff_type = long long;
-    return duration{diff_type(seconds), diff_type(nanoseconds)};
+    return duration{0, diff_type(diff)};
 }
 
 auto clock_traits<thread_clock_t>::get_time() noexcept -> value_type {
