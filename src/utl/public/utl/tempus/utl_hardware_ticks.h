@@ -33,6 +33,13 @@ public:
     UTL_ATTRIBUTES(_ABI_PUBLIC, PURE) static bool invariant_frequency() noexcept;
 
     /**
+     * @brief Returns the hardware clock tick frequency if invariant
+     *
+     * @return valid frequency if invariant, -1 if unsupported or otherwise
+     */
+    UTL_ATTRIBUTES(_ABI_PUBLIC, PURE) static uint64_t frequency() noexcept;
+
+    /**
      * @brief Returns an invalid `hardware_ticks` object.
      *
      * This static method returns a `hardware_ticks` object that represents an invalid or unusable

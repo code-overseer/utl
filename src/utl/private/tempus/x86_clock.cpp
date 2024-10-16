@@ -148,6 +148,16 @@ timestamp_counter_t get_timestamp(instruction_order_type<O> o) noexcept {
 }
 } // namespace
 
+uint64_t hardware_ticks::frequency() noexcept {
+    static constexpr uint64_t invalid = uint64_t(-1);
+    if (!invariant_frequency()) {
+        return invalid;
+    }
+
+    auto const freq = tsc_frequency();
+    return freq.supported ? freq.value : invalid;
+}
+
 bool hardware_ticks::invariant_frequency() noexcept {
     static bool const value = []() {
         if (cached_cpuid<0x80000000>().eax < 0x80000007) {

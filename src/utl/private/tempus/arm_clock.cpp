@@ -1,7 +1,6 @@
 // Copyright 2023-2024 Bryan Wong
 
 #include "utl/assert/utl_assert.h"
-#include "utl/atomic/utl_atomic.h"
 #include "utl/hardware/aarch64/utl_cntfrq.h"
 #include "utl/hardware/aarch64/utl_cntpct.h"
 #include "utl/hardware/aarch64/utl_pmccntr.h"
@@ -47,6 +46,14 @@ bool hardware_ticks::invariant_frequency() noexcept {
 #  else
     return false;
 #  endif
+}
+
+uint64_t hardware_ticks::frequency() noexcept {
+    if (invariant_frequency()) {
+        return clock_frequency();
+    }
+
+    return uint64_t(-1);
 }
 
 duration to_duration(hardware_ticks t) noexcept {
