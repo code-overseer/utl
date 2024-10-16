@@ -8,7 +8,6 @@
 #include "utl/compare/utl_compare_fwd.h"
 #include "utl/tempus/utl_clock_fwd.h"
 
-#include "utl/atomic/utl_atomic.h"
 #include "utl/concepts/utl_boolean_testable.h"
 #include "utl/concepts/utl_same_as.h"
 #include "utl/concepts/utl_semiregular.h"

@@ -11,7 +11,6 @@
 
 #if UTL_ARCH_AARCH64
 
-#  include "utl/atomic/utl_atomic.h"
 #  include "utl/numeric/utl_sub_sat.h"
 
 UTL_NAMESPACE_BEGIN
