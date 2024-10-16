@@ -8,6 +8,8 @@
 
 #include "utl/concepts/utl_same_as.h"
 
+#include <stdint.h>
+
 UTL_NAMESPACE_BEGIN
 
 namespace tempus {
@@ -63,16 +65,16 @@ public:
      *
      * @param t The tick value to initialize the `hardware_ticks` object with.
      */
-    constexpr explicit hardware_ticks(long long t) noexcept : ticks_(t) {}
+    constexpr explicit hardware_ticks(int64_t t) noexcept : ticks_(t) {}
 
     /**
      * @brief Retrieves the tick value.
      *
      * Returns the current tick value stored in the `hardware_ticks` object.
      *
-     * @return The tick value as a `long long`.
+     * @return The tick value as a `int64_t`.
      */
-    __UTL_HIDE_FROM_ABI constexpr long long value() const noexcept { return ticks_; }
+    __UTL_HIDE_FROM_ABI constexpr int64_t value() const noexcept { return ticks_; }
 
     UTL_ATTRIBUTES(PURE, ALWAYS_INLINE) explicit constexpr operator bool() const noexcept {
         return ticks_ >= 0;
@@ -110,7 +112,7 @@ public:
 
 private:
     /** Stores the tick value. */
-    long long ticks_;
+    int64_t ticks_;
 };
 
 /**

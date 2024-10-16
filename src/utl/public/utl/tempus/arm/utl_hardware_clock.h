@@ -21,18 +21,22 @@ template <>
 struct __UTL_PUBLIC_TEMPLATE clock_traits<hardware_clock_t> {
 public:
     using clock = hardware_clock_t;
-    using value_type = unsigned long long;
-    using duration = hardware_ticks;
+    using value_type = uint64_t;
+    using duration_type = hardware_ticks;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
         value_type t) noexcept {
-        return duration(t - 0);
+        return duration_type(t - 0);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration difference(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration_type difference(
         value_type l, value_type r) noexcept {
-        auto const diff = l - r;
-        return duration{(long long)diff};
+        auto const val = __UTL sub_sat(l, r);
+        if (!val && l == r) {
+            return duration_type::invalid();
+        }
+
+        return duration_type((int64_t)val);
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr bool equal(

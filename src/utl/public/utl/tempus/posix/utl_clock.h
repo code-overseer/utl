@@ -8,6 +8,8 @@
 
 #include "utl/utl_config.h"
 
+#include <stdint.h>
+
 #if UTL_TARGET_UNIX
 
 #  include <sys/resource.h>
@@ -18,9 +20,9 @@ UTL_NAMESPACE_BEGIN
 
 namespace tempus {
 namespace details {
-constexpr long long timeval_to_usec(::timeval const& val) noexcept {
-    using value_type = long long;
-    using sec_to_usec = integral_constant<value_type, 1000000LL>;
+constexpr int64_t timeval_to_usec(::timeval const& val) noexcept {
+    using value_type = int64_t;
+    using sec_to_usec = integral_constant<value_type, 1000000>;
     return value_type(val.tv_sec * sec_to_usec::value) + value_type(val.tv_usec);
 }
 } // namespace details
@@ -29,18 +31,18 @@ template <>
 struct __UTL_PUBLIC_TEMPLATE clock_traits<system_clock_t> {
 public:
     using clock = system_clock_t;
-    using value_type = long long;
-    using duration = duration;
+    using value_type = int64_t;
+    using duration_type = duration;
 
 public:
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
         value_type t) noexcept {
         return difference(t, 0);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration difference(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type difference(
         value_type l, value_type r) noexcept {
-        return duration{0, (l - r) * 1000};
+        return duration_type{0, (l - r) * 1000};
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr bool equal(
@@ -74,12 +76,12 @@ private:
 
 public:
     using clock = process_clock_t;
-    using typename base_type::duration;
+    using typename base_type::duration_type;
     using typename base_type::value_type;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
         value_type t) noexcept {
-        return duration::invalid();
+        return duration_type::invalid();
     }
 
     using base_type::compare;
@@ -101,19 +103,19 @@ struct __UTL_PUBLIC_TEMPLATE clock_traits<steady_clock_t> {
 public:
     using clock = steady_clock_t;
     using value_type = ::timespec;
-    using duration = duration;
+    using duration_type = duration;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
         value_type t) noexcept {
         return difference(t, 0);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline duration difference(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline duration_type difference(
         value_type l, value_type r) noexcept {
         using diff_type = long long;
         auto const dsec = diff_type(l.tv_sec) - diff_type(r.tv_sec);
         auto const dnsec = diff_type(l.tv_nsec) - diff_type(r.tv_nsec);
-        return duration{0, dsec * 1000000000ll + dnsec};
+        return duration_type{0, dsec * 1000000000ll + dnsec};
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr bool equal(
@@ -143,7 +145,7 @@ private:
 
 public:
     using clock = high_resolution_clock_t;
-    using typename base_type::duration;
+    using typename base_type::duration_type;
     using typename base_type::value_type;
 
     using base_type::compare;
@@ -164,12 +166,12 @@ private:
 
 public:
     using clock = thread_clock_t;
-    using typename base_type::duration;
+    using typename base_type::duration_type;
     using typename base_type::value_type;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
         value_type t) noexcept {
-        return duration::invalid();
+        return duration_type::invalid();
     }
 
     using base_type::compare;

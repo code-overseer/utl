@@ -28,16 +28,21 @@ struct __UTL_PUBLIC_TEMPLATE clock_traits<hardware_clock_t> {
 public:
     using clock = hardware_clock_t;
     using value_type = timestamp_counter_t;
-    using duration = hardware_ticks;
+    using duration_type = hardware_ticks;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
         value_type t) noexcept {
-        return duration(t.tick - 0ll);
+        return duration_type(t.tick - 0ll);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration difference(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type difference(
         value_type l, value_type r) noexcept {
-        return duration(__UTL sub_sat(l.tick, r.tick));
+        auto const val = __UTL sub_sat(l.tick, r.tick);
+        if (!val && l.tick == r.tick) {
+            return duration_type::invalid();
+        }
+
+        return duration_type((int64_t)val);
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr bool equal(

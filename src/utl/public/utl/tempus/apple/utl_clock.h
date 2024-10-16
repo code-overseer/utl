@@ -23,15 +23,15 @@ template <>
 struct __UTL_PUBLIC_TEMPLATE clock_traits<steady_clock_t> {
 public:
     using clock = steady_clock_t;
-    using value_type = unsigned long long;
-    using duration = duration;
+    using value_type = uint64_t;
+    using duration_type = duration;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
         value_type t) noexcept {
         return difference(t, 0);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, PURE) static duration difference(value_type l, value_type r) noexcept;
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, PURE) static duration_type difference(value_type l, value_type r) noexcept;
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr bool equal(
         value_type l, value_type r) noexcept {
@@ -55,7 +55,7 @@ struct __UTL_PUBLIC_TEMPLATE clock_traits<high_resolution_clock_t> :
 
 public:
     using clock = high_resolution_clock_t;
-    using typename base_type::duration;
+    using typename base_type::duration_type;
     using typename base_type::value_type;
 
     using base_type::compare;
@@ -76,12 +76,12 @@ private:
 
 public:
     using clock = thread_clock_t;
-    using typename base_type::duration;
+    using typename base_type::duration_type;
     using typename base_type::value_type;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
         value_type t) noexcept {
-        return duration::invalid();
+        return duration_type::invalid();
     }
 
     using base_type::compare;

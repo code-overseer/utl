@@ -14,7 +14,8 @@ UTL_NAMESPACE_BEGIN
 
 namespace tempus {
 
-auto clock_traits<steady_clock_t>::difference(value_type l, value_type r) noexcept -> duration {
+auto clock_traits<steady_clock_t>::difference(value_type l, value_type r) noexcept
+    -> duration_type {
     static mach_timebase_info_data_t const timebase = []() {
         mach_timebase_info_data_t t;
         mach_timebase_info(&t);
@@ -23,7 +24,7 @@ auto clock_traits<steady_clock_t>::difference(value_type l, value_type r) noexce
 
     auto const diff = (l - r) * timebase.numer / timebase.denom;
     using diff_type = long long;
-    return duration{0, diff_type(diff)};
+    return duration_type{0, diff_type(diff)};
 }
 
 auto clock_traits<thread_clock_t>::get_time() noexcept -> value_type {

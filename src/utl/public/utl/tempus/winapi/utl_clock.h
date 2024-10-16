@@ -20,23 +20,23 @@ struct __UTL_PUBLIC_TEMPLATE clock_traits<system_clock_t> {
 public:
     using clock = system_clock_t;
     using value_type = long long;
-    using duration = duration;
+    using duration_type = duration;
     using epoch_conversion = integral_constant<value_type, 11644473600LL>;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
         value_type t) noexcept {
         // Epoch is 1601-01-01 00:00:00 UTC
         static_assert(sizeof(value_type) >= 8, "Unsupported architecture");
         return difference(t, 0);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration difference(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type difference(
         value_type l, value_type r) noexcept {
         auto const diff = l - r;
         // 100 nanoseconds to seconds
         auto const seconds = diff / 10000000;
         auto const nanoseconds = diff * 100 - seconds * 1000000000;
-        return duration{seconds, nanoseconds};
+        return duration_type{seconds, nanoseconds};
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr bool equal(
@@ -70,12 +70,12 @@ private:
 
 public:
     using clock = process_clock_t;
-    using typename base_type::duration;
+    using typename base_type::duration_type;
     using typename base_type::value_type;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
         value_type t) noexcept {
-        return duration::invalid();
+        return duration_type::invalid();
     }
 
     using base_type::compare;
@@ -97,12 +97,12 @@ private:
 
 public:
     using clock = thread_clock_t;
-    using typename base_type::duration;
+    using typename base_type::duration_type;
     using typename base_type::value_type;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
         value_type t) noexcept {
-        return duration::invalid();
+        return duration_type::invalid();
     }
 
     using base_type::compare;
@@ -122,19 +122,19 @@ struct __UTL_PUBLIC_TEMPLATE clock_traits<steady_clock_t> {
 public:
     using clock = steady_clock_t;
     using value_type = long long;
-    using duration = duration;
+    using duration_type = duration;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
         value_type t) noexcept {
         static_assert(sizeof(size_t) >= 8, "Unsupported architecture");
         return difference(t, 0);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration difference(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type difference(
         value_type l, value_type r) noexcept {
         auto const diff = l - r;
         auto const seconds = diff / 1000;
-        return duration{seconds, diff * 1000000 - seconds * 1000000000};
+        return duration_type{seconds, diff * 1000000 - seconds * 1000000000};
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr bool equal(
@@ -160,9 +160,9 @@ struct __UTL_PUBLIC_TEMPLATE clock_traits<high_resolution_clock_t> {
 public:
     using clock = high_resolution_clock_t;
     using value_type = long long;
-    using duration = duration;
+    using duration_type = duration;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
         value_type t) noexcept {
         return difference(t, 0);
     }
@@ -182,7 +182,8 @@ public:
         return time_point<high_resolution_clock_t>{get_time()};
     }
 
-    UTL_ATTRIBUTES(__UTL_ABI_PUBLIC, CONST) static duration difference(value_type l, value_type r) noexcept;
+    UTL_ATTRIBUTES(__UTL_ABI_PUBLIC, CONST) static duration_type difference(
+        value_type l, value_type r) noexcept;
 
 private:
     __UTL_ABI_PUBLIC static value_type get_time() noexcept;

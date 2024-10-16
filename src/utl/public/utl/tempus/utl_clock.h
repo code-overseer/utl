@@ -45,16 +45,16 @@ template <typename Clock>
 concept clock_type =
     requires {
         typename clock_traits<Clock>::clock;
-        typename clock_traits<Clock>::duration;
+        typename clock_traits<Clock>::duration_type;
         typename clock_traits<Clock>::value_type;
     } && semiregular<typename clock_traits<Clock>::value_type> &&
     requires(clock_traits<Clock>::value_type l, clock_traits<Clock>::value_type r) {
         {
             clock_traits<Clock>::difference(l, r)
-        } noexcept -> same_as<typename clock_traits<Clock>::duration>;
+        } noexcept -> same_as<typename clock_traits<Clock>::duration_type>;
         {
             clock_traits<Clock>::time_since_epoch(l)
-        } noexcept -> same_as<typename clock_traits<Clock>::duration>;
+        } noexcept -> same_as<typename clock_traits<Clock>::duration_type>;
         { clock_traits<Clock>::equal(l, r) } noexcept -> boolean_testable;
         { clock_traits<Clock>::compare(l, r) } noexcept -> same_as<clock_order>;
     };
@@ -71,7 +71,7 @@ template <typename T>
 auto is_clock_impl(float) noexcept -> false_type;
 template <typename Clock>
 auto is_clock_impl(int) noexcept -> bool_constant<
-    always_true<typename clock_traits<Clock>::clock, typename clock_traits<Clock>::duration,
+    always_true<typename clock_traits<Clock>::clock, typename clock_traits<Clock>::duration_type,
         typename clock_traits<Clock>::value_type>() &&
     UTL_TRAIT_is_default_constructible(typename clock_traits<Clock>::value_type) &&
     UTL_TRAIT_is_copy_constructible(typename clock_traits<Clock>::value_type) &&
@@ -127,13 +127,13 @@ class __UTL_PUBLIC_TEMPLATE time_point {
 public:
     using clock = typename traits::clock;
     using value_type = typename traits::value_type;
-    using duration = typename traits::duration;
+    using duration_type = typename traits::duration_type;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) duration time_since_epoch() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) duration_type time_since_epoch() const noexcept {
         return traits::time_since_epoch(value_);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) constexpr duration operator-(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) constexpr duration_type operator-(
         time_point const& other) const noexcept {
         return traits::difference(value_, other.value_);
     }
