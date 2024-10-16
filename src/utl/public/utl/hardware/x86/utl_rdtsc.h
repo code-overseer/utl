@@ -16,7 +16,7 @@
 #  if UTL_COMPILER_MSVC
 
 UTL_EXTERN_C_BEGIN
-unsigned __int64 __rdtsc(unsigned int*);
+unsigned __int64 __rdtsc();
 void _mm_sfence(void);
 void _mm_lfence(void);
 void _mm_mfence(void);
