@@ -12,6 +12,7 @@
 #include "utl/concepts/utl_boolean_testable.h"
 #include "utl/concepts/utl_same_as.h"
 #include "utl/concepts/utl_semiregular.h"
+#include "utl/hardware/utl_instruction_order.h"
 #include "utl/tempus/utl_duration.h"
 #include "utl/tempus/utl_hardware_ticks.h"
 #include "utl/type_traits/utl_constants.h"
@@ -30,23 +31,6 @@
  */
 
 UTL_NAMESPACE_BEGIN
-
-enum class instruction_order : int {
-    relaxed,
-    acquire,
-    release,
-    acq_rel,
-    seq_cst,
-};
-
-template <instruction_order O>
-struct instr_order_t : value_constant<instruction_order, O> {};
-
-UTL_INLINE_CXX17 constexpr instr_order_t<instruction_order::relaxed> instr_order_relaxed{};
-UTL_INLINE_CXX17 constexpr instr_order_t<instruction_order::acquire> instr_order_acquire{};
-UTL_INLINE_CXX17 constexpr instr_order_t<instruction_order::release> instr_order_release{};
-UTL_INLINE_CXX17 constexpr instr_order_t<instruction_order::acq_rel> instr_order_acq_rel{};
-UTL_INLINE_CXX17 constexpr instr_order_t<instruction_order::seq_cst> instr_order_seq_cst{};
 
 namespace tempus {
 
@@ -241,15 +225,15 @@ struct thread_clock_t {
 struct hardware_clock_t {
     explicit constexpr hardware_clock_t() noexcept = default;
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, instr_order_t<instruction_order::relaxed>) noexcept;
+        hardware_clock_t, decltype(instruction_order_relaxed)) noexcept;
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, instr_order_t<instruction_order::acquire>) noexcept;
+        hardware_clock_t, decltype(instruction_order_acquire)) noexcept;
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, instr_order_t<instruction_order::release>) noexcept;
+        hardware_clock_t, decltype(instruction_order_release)) noexcept;
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, instr_order_t<instruction_order::acq_rel>) noexcept;
+        hardware_clock_t, decltype(instruction_order_acq_rel)) noexcept;
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, instr_order_t<instruction_order::seq_cst>) noexcept;
+        hardware_clock_t, decltype(instruction_order_seq_cst)) noexcept;
 
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(hardware_clock_t) noexcept;
 

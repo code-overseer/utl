@@ -37,9 +37,4 @@ enum class clock_order : signed char;
 
 } // namespace tempus
 
-enum class instruction_order : int;
-
-template <instruction_order O>
-struct instr_order_t;
-
 UTL_NAMESPACE_END
