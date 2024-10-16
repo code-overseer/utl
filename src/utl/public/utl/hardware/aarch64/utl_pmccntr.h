@@ -125,9 +125,9 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
 UTL_PRAGMA_WARN("Unrecognized target/compiler");
 
 template <instruction_order N>
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(instruction_order_type<N>) noexcept {
+UTL_ATTRIBUTE(NORETURN) uint64_t pmccntr(instruction_order_type<N>) noexcept {
     static_assert(__UTL always_false<instruction_order_type<N>>(), "Unrecognized target/compiler");
-    return -1;
+    UTL_BUILTIN_unreachable();
 }
 
 #  endif // UTL_HAS_BUILTIN(__builtin_arm_isb) && UTL_HAS_BUILTIN(__builtin_arm_rsr64)

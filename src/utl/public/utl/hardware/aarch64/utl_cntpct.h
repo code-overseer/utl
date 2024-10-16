@@ -21,49 +21,42 @@ inline namespace el0 {
 namespace {
 #  if UTL_HAS_BUILTIN(__builtin_arm_isb) && UTL_HAS_BUILTIN(__builtin_arm_rsr64)
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_relaxed)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_relaxed)) noexcept {
     return __builtin_arm_rsr64("CNTPCT_EL0");
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_acquire)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_acquire)) noexcept {
     uint64_t const res = __builtin_arm_rsr64("CNTPCT_EL0");
     __builtin_arm_isb(arm::barrier::SY);
     return res;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_release)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_release)) noexcept {
     __builtin_arm_isb(arm::barrier::SY);
     return __builtin_arm_rsr64("CNTPCT_EL0");
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_acq_rel)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_acq_rel)) noexcept {
     __builtin_arm_isb(arm::barrier::SY);
     uint64_t const res = __builtin_arm_rsr64("CNTPCT_EL0");
     __builtin_arm_isb(arm::barrier::SY);
     return res;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_seq_cst)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_seq_cst)) noexcept {
     return cntpct(instruction_order_acq_rel);
 }
 
 #  elif UTL_SUPPORTS_GNU_ASM // UTL_HAS_BUILTIN(__builtin_arm_isb) &&
                              // UTL_HAS_BUILTIN(__builtin_arm_rsr64)
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_relaxed)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_relaxed)) noexcept {
     uint64_t res;
     __asm__ volatile("mrs %0, CNTPCT_EL0\n\t" : "=r"(res) : : "memory");
     return res;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_acquire)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_acquire)) noexcept {
     uint64_t res;
     __asm__ volatile("mrs %0, CNTPCT_EL0\n\t"
                      "isb sy"
@@ -73,8 +66,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
     return res;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_release)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_release)) noexcept {
     uint64_t res;
     __asm__ volatile("isb sy\n\t"
                      "mrs %0, CNTPCT_EL0"
@@ -84,8 +76,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
     return res;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_acq_rel)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_acq_rel)) noexcept {
     uint64_t res;
     __asm__ volatile("isb sy\n\t"
                      "mrs %0, CNTPCT_EL0\n\t"
@@ -96,42 +87,36 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
     return res;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_seq_cst)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_seq_cst)) noexcept {
     return cntpct(instruction_order_acq_rel);
 }
 
 #  elif UTL_COMPILER_MSVC // UTL_HAS_BUILTIN(__builtin_arm_isb) &&
                           // UTL_HAS_BUILTIN(__builtin_arm_rsr64)
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_relaxed)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_relaxed)) noexcept {
     return _ReadStatusReg(system_register::CNTPCT);
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_acquire)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_acquire)) noexcept {
     value_type const res = _ReadStatusReg(system_register::CNTPCT);
     __isb(arm::barrier::SY);
     return res;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_release)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_release)) noexcept {
     __isb(arm::barrier::SY);
     return _ReadStatusReg(system_register::CNTPCT);
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_acq_rel)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_acq_rel)) noexcept {
     __isb(arm::barrier::SY);
     value_type const res = _ReadStatusReg(system_register::CNTPCT);
     __isb(arm::barrier::SY);
     return res;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
-    decltype(instruction_order_seq_cst)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_seq_cst)) noexcept {
     return cntpct(instruction_order_acq_rel);
 }
 
@@ -140,9 +125,9 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(
 UTL_PRAGMA_WARN("Unrecognized target/compiler");
 
 template <instruction_order N>
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntpct(instruction_order_type<N>) noexcept {
+UTL_ATTRIBUTE(NORETURN) uint64_t cntpct(instruction_order_type<N>) noexcept {
     static_assert(__UTL always_false<instruction_order_type<N>>(), "Unrecognized target/compiler");
-    return -1;
+    UTL_BUILTIN_unreachable();
 }
 
 #  endif // UTL_HAS_BUILTIN(__builtin_arm_isb) && UTL_HAS_BUILTIN(__builtin_arm_rsr64)

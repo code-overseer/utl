@@ -31,7 +31,7 @@ struct cpuid_t {
 #  if UTL_SUPPORTS_GNU_ASM
 
 template <uint32_t Arg>
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline cpuid_t cpuid() noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline cpuid_t cpuid() noexcept {
     cpuid_t result;
     result.eax = Arg;
     __asm__ volatile("cpuid"
@@ -44,7 +44,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline cpuid_t cpuid() noexcept {
 #  elif UTL_COMPILER_MSVC // UTL_SUPPORTS_GNU_ASM
 
 template <uint32_t Arg>
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline cpuid_t cpuid() noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline cpuid_t cpuid() noexcept {
     cpuid_t result;
     __cpuid(reinterpret_cast<uint32_t*>(&result), Arg);
     return result;
@@ -55,9 +55,9 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline cpuid_t cpuid() noexcept {
 UTL_PRAGMA_WARN("Unrecognized target/compiler");
 
 template <int Arg>
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline cpuid_t cpuid() noexcept {
+UTL_ATTRIBUTE(NORETURN) cpuid_t cpuid() noexcept {
     static_assert(always_false<value_constant<Arg>>(), "Unrecognized target/compiler");
-    return {};
+    UTL_BUILTIN_unreachable();
 }
 
 #  endif // UTL_SUPPORTS_GNU_ASM

@@ -121,9 +121,9 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_order_s
 UTL_PRAGMA_WARN("Unrecognized target/compiler");
 
 template <instruction_order N>
-UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t rdtsc(instruction_order_type<N>) noexcept {
+UTL_ATTRIBUTE(NORETURN) inline uint64_t rdtsc(instruction_order_type<N>) noexcept {
     static_assert(__UTL always_false<instruction_order_type<N>>(), "Unrecognized target/compiler");
-    return {};
+    UTL_BUILTIN_unreachable();
 }
 
 #  endif // UTL_SUPPORTS_GNU_ASM
