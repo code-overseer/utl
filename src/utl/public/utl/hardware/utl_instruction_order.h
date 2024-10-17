@@ -8,12 +8,24 @@
 
 UTL_NAMESPACE_BEGIN
 
+/**
+ * Analogue to memory_order; provides a hint to introduce appropriate instruction fences to prevent
+ * instruction reorder on hardware with out-of-order execution pipelines. The hint may introduce
+ * memory fences depending on hardware and may resolve to no-op on hardware with in-order pipelines.
+ */
 enum class instruction_order : int {
+    /* No constraints on instruction reordering. */
     relaxed,
+    /* Prevents later (in-program order) instructions from executing before the affected instruction
+     */
     acquire,
+    /* Prevents prior (in-program order) instructions from executing after the affected instruction
+     */
     release,
+    /* Full barrier, prevents instructions from reordering around the affected instruction  */
     acq_rel,
-    seq_cst
+    /* Strongest semantics, full barrier  */
+    seq_cst = acq_rel
 };
 
 template <instruction_order N>

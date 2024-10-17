@@ -86,10 +86,6 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_order_
     return rdtcp_t{(high << 32) | low, aux};
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_order_seq_cst)) noexcept {
-    return rdtscp(instruction_order_acq_rel);
-}
-
 #  elif UTL_COMPILER_MSVC // UTL_SUPPORTS_GNU_ASM
 
 UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_order_relaxed)) noexcept {
@@ -120,9 +116,6 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_order_
     return result;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_order_seq_cst)) noexcept {
-    return rdtscp(instruction_order_acq_rel);
-}
 #  else
 
 UTL_PRAGMA_WARN("Unrecognized target/compiler");

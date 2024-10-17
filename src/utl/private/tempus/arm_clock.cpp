@@ -78,7 +78,6 @@ __UTL_DEFINE_GET_TIME(relaxed);
 __UTL_DEFINE_GET_TIME(acquire);
 __UTL_DEFINE_GET_TIME(release);
 __UTL_DEFINE_GET_TIME(acq_rel);
-__UTL_DEFINE_GET_TIME(seq_cst);
 
 #  undef __UTL_DEFINE_GET_TIME
 

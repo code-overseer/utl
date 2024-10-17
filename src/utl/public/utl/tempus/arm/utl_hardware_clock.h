@@ -68,11 +68,6 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, decltype(instruction_order_seq_cst) o) noexcept {
-        return time_point<hardware_clock_t>{get_time(o)};
-    }
-
-    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
         hardware_clock_t clock) noexcept {
         return time_point<hardware_clock_t>{get_time(instruction_order_seq_cst)};
     }
@@ -82,7 +77,6 @@ private:
     __UTL_ABI_PUBLIC static value_type get_time(decltype(instruction_order_acquire)) noexcept;
     __UTL_ABI_PUBLIC static value_type get_time(decltype(instruction_order_release)) noexcept;
     __UTL_ABI_PUBLIC static value_type get_time(decltype(instruction_order_acq_rel)) noexcept;
-    __UTL_ABI_PUBLIC static value_type get_time(decltype(instruction_order_seq_cst)) noexcept;
 };
 
 } // namespace tempus

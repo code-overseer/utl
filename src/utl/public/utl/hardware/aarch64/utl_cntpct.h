@@ -43,16 +43,12 @@ UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_a
     return res;
 }
 
-UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_seq_cst)) noexcept {
-    return cntpct(instruction_order_acq_rel);
-}
-
 #  elif UTL_SUPPORTS_GNU_ASM // UTL_HAS_BUILTIN(__builtin_arm_isb) &&
                              // UTL_HAS_BUILTIN(__builtin_arm_rsr64)
 
 UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_relaxed)) noexcept {
     uint64_t res;
-    __asm__ volatile("mrs %0, CNTPCT_EL0\n\t" : "=r"(res) : : "memory");
+    __asm__("mrs %0, CNTPCT_EL0\n\t" : "=r"(res) : :);
     return res;
 }
 
@@ -87,10 +83,6 @@ UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_a
     return res;
 }
 
-UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_seq_cst)) noexcept {
-    return cntpct(instruction_order_acq_rel);
-}
-
 #  elif UTL_COMPILER_MSVC // UTL_HAS_BUILTIN(__builtin_arm_isb) &&
                           // UTL_HAS_BUILTIN(__builtin_arm_rsr64)
 
@@ -114,10 +106,6 @@ UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_a
     value_type const res = _ReadStatusReg(system_register::CNTPCT);
     __isb(arm::barrier::SY);
     return res;
-}
-
-UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntpct(decltype(instruction_order_seq_cst)) noexcept {
-    return cntpct(instruction_order_acq_rel);
 }
 
 #  else // UTL_HAS_BUILTIN(__builtin_arm_isb) && UTL_HAS_BUILTIN(__builtin_arm_rsr64)

@@ -53,7 +53,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
     decltype(instruction_order_relaxed)) noexcept {
     uint64_t res;
-    __asm__ volatile("mrs %0, PMCCNTR_EL0\n\t" : "=r"(res) : : "memory");
+    __asm__("mrs %0, PMCCNTR_EL0\n\t" : "=r"(res) : :);
     return res;
 }
 
