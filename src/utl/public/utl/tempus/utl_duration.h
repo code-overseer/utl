@@ -28,6 +28,7 @@ class __UTL_ABI_PUBLIC duration {
     static constexpr auto nano_multiple = 1000000000ull;
     static constexpr auto invalid_value = static_cast<uint64_t>(-1);
     struct direct_tag {};
+    struct invalid_tag {};
     static constexpr uint64_t reinterpret(duration const& d) noexcept {
         return (d.seconds_ << 30) | d.nanoseconds_;
     }
@@ -57,9 +58,13 @@ class __UTL_ABI_PUBLIC duration {
         UTL_ASSERT(seconds < (1 << (seconds_bitwidth - 1)));
     }
 
+    constexpr duration(invalid_tag) noexcept
+        : nanoseconds_((1ull << nanoseconds_bitwidth) - 1)
+        , seconds_((1ull << seconds_bitwidth) - 1) {}
+
 public:
     static constexpr duration invalid() noexcept {
-        return {UTL_TRAIT_default_constant(direct_tag), invalid_value, invalid_value};
+        return {UTL_TRAIT_default_constant(invalid_tag)};
     }
 
     template <typename R, typename P>
@@ -86,10 +91,10 @@ public:
         return {(decltype(T::tv_sec))seconds_, (decltype(T::tv_nsec))nanoseconds_};
     }
 
-    UTL_ATTRIBUTES(ALWAYS_INLINE) constexpr uint64_t seconds() const { return seconds_; }
-    UTL_ATTRIBUTES(ALWAYS_INLINE) constexpr uint32_t nanoseconds() const { return nanoseconds_; }
+    UTL_ATTRIBUTES(ALWAYS_INLINE) inline constexpr uint64_t seconds() const { return seconds_; }
+    UTL_ATTRIBUTES(ALWAYS_INLINE) inline constexpr uint32_t nanoseconds() const { return nanoseconds_; }
 
-    UTL_ATTRIBUTES(ALWAYS_INLINE) explicit constexpr operator bool() const noexcept {
+    UTL_ATTRIBUTES(ALWAYS_INLINE) inline explicit constexpr operator bool() const noexcept {
         return reinterpret(*this) != invalid_value;
     }
 
