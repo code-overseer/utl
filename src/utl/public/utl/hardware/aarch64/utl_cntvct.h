@@ -30,20 +30,24 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntvct(
     decltype(instruction_barrier_after)) noexcept {
     uint64_t const res = __builtin_arm_rsr64("CNTVCT_EL0");
     __builtin_arm_isb(arm::barrier::SY);
+    UTL_COMPILER_BARRIER();
     return res;
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntvct(
     decltype(instruction_barrier_before)) noexcept {
+    UTL_COMPILER_BARRIER();
     __builtin_arm_isb(arm::barrier::SY);
     return __builtin_arm_rsr64("CNTVCT_EL0");
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntvct(
     decltype(instruction_barrier_enclose)) noexcept {
+    UTL_COMPILER_BARRIER();
     __builtin_arm_isb(arm::barrier::SY);
     uint64_t const res = __builtin_arm_rsr64("CNTVCT_EL0");
     __builtin_arm_isb(arm::barrier::SY);
+    UTL_COMPILER_BARRIER();
     return res;
 }
 
@@ -103,20 +107,24 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntvct(
     decltype(instruction_barrier_after)) noexcept {
     value_type const res = _ReadStatusReg(system_register::CNTVCT);
     __isb(arm::barrier::SY);
+    UTL_COMPILER_BARRIER();
     return res;
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntvct(
     decltype(instruction_barrier_before)) noexcept {
+    UTL_COMPILER_BARRIER();
     __isb(arm::barrier::SY);
     return _ReadStatusReg(system_register::CNTVCT);
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t cntvct(
     decltype(instruction_barrier_enclose)) noexcept {
+    UTL_COMPILER_BARRIER();
     __isb(arm::barrier::SY);
     value_type const res = _ReadStatusReg(system_register::CNTVCT);
     __isb(arm::barrier::SY);
+    UTL_COMPILER_BARRIER();
     return res;
 }
 

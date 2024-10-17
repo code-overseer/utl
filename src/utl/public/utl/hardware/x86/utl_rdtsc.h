@@ -92,20 +92,24 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier
 UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_after)) noexcept {
     uint64_t const result = __rdtsc();
     _mm_lfence();
+    UTL_COMPILER_BARRIER();
     return result;
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_before)) noexcept {
+    UTL_COMPILER_BARRIER();
     _mm_mfence();
     _mm_lfence();
     return __rdtsc();
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_enclose)) noexcept {
+    UTL_COMPILER_BARRIER();
     _mm_mfence();
     _mm_lfence();
     uint64_t const result = __rdtsc();
     _mm_lfence();
+    UTL_COMPILER_BARRIER();
     return result;
 }
 

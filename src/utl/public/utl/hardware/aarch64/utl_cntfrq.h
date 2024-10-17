@@ -28,18 +28,22 @@ UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntfrq(decltype(instruction_barrier
 UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntfrq(decltype(instruction_barrier_after)) noexcept {
     uint64_t const res = __builtin_arm_rsr64("CNTFRQ_EL0");
     __builtin_arm_isb(arm::barrier::SY);
+    UTL_COMPILER_BARRIER();
     return res;
 }
 
 UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntfrq(decltype(instruction_barrier_before)) noexcept {
+    UTL_COMPILER_BARRIER();
     __builtin_arm_isb(arm::barrier::SY);
     return __builtin_arm_rsr64("CNTFRQ_EL0");
 }
 
 UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntfrq(decltype(instruction_barrier_enclose)) noexcept {
+    UTL_COMPILER_BARRIER();
     __builtin_arm_isb(arm::barrier::SY);
     uint64_t const res = __builtin_arm_rsr64("CNTFRQ_EL0");
     __builtin_arm_isb(arm::barrier::SY);
+    UTL_COMPILER_BARRIER();
     return res;
 }
 
@@ -48,7 +52,7 @@ UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntfrq(decltype(instruction_barrier
 
 UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntfrq(decltype(instruction_barrier_none)) noexcept {
     uint64_t res;
-    __asm__ volatile("mrs %0, CNTFRQ_EL0\n\t" : "=r"(res) : : "memory");
+    __asm__("mrs %0, CNTFRQ_EL0\n\t" : "=r"(res) : :);
     return res;
 }
 
@@ -93,18 +97,22 @@ UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntfrq(decltype(instruction_barrier
 UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntfrq(decltype(instruction_barrier_after)) noexcept {
     value_type const res = _ReadStatusReg(system_register::CNTFRQ);
     __isb(arm::barrier::SY);
+    UTL_COMPILER_BARRIER();
     return res;
 }
 
 UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntfrq(decltype(instruction_barrier_before)) noexcept {
+    UTL_COMPILER_BARRIER();
     __isb(arm::barrier::SY);
     return _ReadStatusReg(system_register::CNTFRQ);
 }
 
 UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t cntfrq(decltype(instruction_barrier_enclose)) noexcept {
+    UTL_COMPILER_BARRIER();
     __isb(arm::barrier::SY);
     value_type const res = _ReadStatusReg(system_register::CNTFRQ);
     __isb(arm::barrier::SY);
+    UTL_COMPILER_BARRIER();
     return res;
 }
 

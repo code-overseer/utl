@@ -98,11 +98,13 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrie
     rdtscp_t result;
     result.timestamp = __rdtscp(&result.aux);
     _mm_lfence();
+    UTL_COMPILER_BARRIER();
     return result;
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_before)) noexcept {
     rdtscp_t result;
+    UTL_COMPILER_BARRIER();
     _mm_mfence();
     result.timestamp = __rdtscp(&result.aux);
     return result;
@@ -110,9 +112,11 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrie
 
 UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_enclose)) noexcept {
     rdtscp_t result;
+    UTL_COMPILER_BARRIER();
     _mm_mfence();
     result.timestamp = __rdtscp(&result.aux);
     _mm_lfence();
+    UTL_COMPILER_BARRIER();
     return result;
 }
 
