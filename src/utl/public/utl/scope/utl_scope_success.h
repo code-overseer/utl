@@ -4,6 +4,8 @@
 
 #include "utl/utl_config.h"
 
+#include "utl/preprocessor/utl_unique_var.h"
+
 #include "utl/concepts/utl_constructible_as.h"
 #include "utl/exception.h"
 #include "utl/scope/utl_scope_impl.h"

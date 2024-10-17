@@ -9,6 +9,7 @@
 #include "utl/configuration/utl_build_type.h"
 #include "utl/configuration/utl_builtins.h"
 #include "utl/configuration/utl_compiler.h"
+#include "utl/configuration/utl_compiler_barrier.h"
 #include "utl/configuration/utl_exceptions.h"
 #include "utl/configuration/utl_keywords.h"
 #include "utl/configuration/utl_namespace.h"
