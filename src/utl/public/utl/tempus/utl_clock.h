@@ -13,6 +13,7 @@
 #include "utl/concepts/utl_semiregular.h"
 #include "utl/hardware/utl_instruction_barrier.h"
 #include "utl/tempus/utl_duration.h"
+#include "utl/tempus/utl_duration_literals.h"
 #include "utl/tempus/utl_hardware_ticks.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_is_copy_constructible.h"
@@ -32,6 +33,8 @@
 UTL_NAMESPACE_BEGIN
 
 namespace tempus {
+
+using namespace __UTL literals::tempus_literals;
 
 enum class clock_order : signed char {
     less = -1,

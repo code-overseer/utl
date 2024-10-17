@@ -7,6 +7,7 @@
 #include "utl/chrono/utl_chrono_fwd.h"
 #include "utl/compare/utl_compare_fwd.h"
 
+#include "utl/assert/utl_assert.h"
 #include "utl/concepts/utl_same_as.h"
 #include "utl/numeric/utl_add_sat.h"
 #include "utl/numeric/utl_sub_sat.h"
@@ -22,6 +23,8 @@ UTL_NAMESPACE_BEGIN
 
 namespace tempus {
 class __UTL_ABI_PUBLIC duration {
+    static constexpr auto nanoseconds_bitwidth = 30;
+    static constexpr auto seconds_bitwidth = 34;
     static constexpr auto nano_multiple = 1000000000ull;
     static constexpr auto invalid_value = static_cast<uint64_t>(-1);
     struct direct_tag {};
@@ -50,7 +53,9 @@ class __UTL_ABI_PUBLIC duration {
 
     constexpr duration(direct_tag, uint64_t seconds, uint64_t nanoseconds) noexcept
         : nanoseconds_(nanoseconds)
-        , seconds_(seconds) {}
+        , seconds_(seconds) {
+        UTL_ASSERT(seconds < (1 << (seconds_bitwidth - 1)));
+    }
 
 public:
     static constexpr duration invalid() noexcept {
@@ -143,8 +148,8 @@ public:
 
 private:
     using value_type = uint64_t;
-    value_type nanoseconds_ : 30;
-    value_type seconds_ : 34;
+    value_type nanoseconds_ : nanoseconds_bitwidth;
+    value_type seconds_ : seconds_bitwidth;
 };
 static_assert(sizeof(duration) == sizeof(uint64_t), "Invalid implementation");
 } // namespace tempus
