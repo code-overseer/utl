@@ -22,6 +22,25 @@ struct timespec;
 UTL_NAMESPACE_BEGIN
 
 namespace tempus {
+
+/**
+ * @class duration
+ * @brief A class that encapsulates a time duration represented by seconds and nanoseconds
+ *
+ * This class provides a compact representation of time using a fixed bit-width for nanoseconds and
+ * seconds. It supports arithmetic operations, comparison, and conversion to and from
+ * `std::chrono::duration` and `timespec` types.
+ *
+ * Duration values must always be positive, any arithmetic/construction that results in negative
+ * time will return an invalid value.
+ *
+ * Simular to std::chrono, a set of literals is defined in utl::tempus_literals using the same
+ * convention.
+ *
+ * ### Bit-Width Details:
+ * - 30 bits for storing nanoseconds.
+ * - 34 bits for storing seconds, allowing durations of ~544 years
+ */
 class __UTL_ABI_PUBLIC duration {
     static constexpr auto nanoseconds_bitwidth = 30;
     static constexpr auto seconds_bitwidth = 34;
