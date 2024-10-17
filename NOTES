@@ -1,5 +1,5 @@
 * Supporting modules will probably be a massive PITA
-# TODO: Moduels doesn't play well with forward declarations, of using modules, just import std modules we need
+# TODO: Moduels doesn't play well with forward declarations, if using modules, just import std modules that we need
 * TODO: Maybe move all the type_traits builtins to a single file?
 # TODO: Fix for C++11 T.T
 # TODO: define CONSTEXPR_ASSERT for C++11
