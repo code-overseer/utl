@@ -14,7 +14,7 @@ namespace {
 
 template <unsigned int X>
 x86::cpuid_t cached_cpuid() noexcept {
-    static cpuid_t const value = x86::cpuid<X>();
+    static x86::cpuid_t const value = x86::cpuid<X>();
     return value;
 }
 
@@ -130,8 +130,8 @@ auto const init_supports_rdtscp = supports_rdtscp();
 auto const init_tsc_frequency = tsc_frequency();
 auto const init_invariant_hardware_clock = hardware_ticks::invariant_frequency();
 
-template <instruction_order O>
-timestamp_counter_t get_timestamp(instruction_order_type<O> o) noexcept {
+template <instruction_barrier O>
+timestamp_counter_t get_timestamp(instruction_barrier_type<O> o) noexcept {
 #  if UTL_USE_RDTSCP_HARDWARE_CLOCK
     UTL_ASSERT(supports_rdtscp());
     auto const result = rdtscp(o);
@@ -185,15 +185,15 @@ duration to_duration(hardware_ticks t) noexcept {
     return t.value() * nano / tsc_frequency().value;
 }
 
-#  define __UTL_DEFINE_GET_TIME(ORDER)                                    \
-      auto clock_traits<hardware_clock_t>::get_time(                      \
-          decltype(instruction_order_##ORDER) o) noexcept -> value_type { \
-          return get_timestamp(o);                                        \
+#  define __UTL_DEFINE_GET_TIME(ORDER)                                      \
+      auto clock_traits<hardware_clock_t>::get_time(                        \
+          decltype(instruction_barrier_##ORDER) o) noexcept -> value_type { \
+          return get_timestamp(o);                                          \
       }
-__UTL_DEFINE_GET_TIME(relaxed);
-__UTL_DEFINE_GET_TIME(acquire);
-__UTL_DEFINE_GET_TIME(release);
-__UTL_DEFINE_GET_TIME(acq_rel);
+__UTL_DEFINE_GET_TIME(none);
+__UTL_DEFINE_GET_TIME(after);
+__UTL_DEFINE_GET_TIME(before);
+__UTL_DEFINE_GET_TIME(enclose);
 
 #  undef __UTL_DEFINE_GET_TIME
 } // namespace tempus

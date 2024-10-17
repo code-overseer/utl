@@ -50,33 +50,28 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, decltype(instruction_order_relaxed) o) noexcept {
+        hardware_clock_t, decltype(instruction_barrier_none) o) noexcept {
         return time_point<hardware_clock_t>{get_time(o)};
     }
 
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, decltype(instruction_order_acquire) o) noexcept {
+        hardware_clock_t, decltype(instruction_barrier_after) o) noexcept {
         return time_point<hardware_clock_t>{get_time(o)};
     }
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, decltype(instruction_order_release) o) noexcept {
+        hardware_clock_t, decltype(instruction_barrier_before) o) noexcept {
         return time_point<hardware_clock_t>{get_time(o)};
     }
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, decltype(instruction_order_acq_rel) o) noexcept {
+        hardware_clock_t, decltype(instruction_barrier_enclose) o) noexcept {
         return time_point<hardware_clock_t>{get_time(o)};
-    }
-
-    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t clock) noexcept {
-        return time_point<hardware_clock_t>{get_time(instruction_order_seq_cst)};
     }
 
 private:
-    __UTL_ABI_PUBLIC static value_type get_time(decltype(instruction_order_relaxed)) noexcept;
-    __UTL_ABI_PUBLIC static value_type get_time(decltype(instruction_order_acquire)) noexcept;
-    __UTL_ABI_PUBLIC static value_type get_time(decltype(instruction_order_release)) noexcept;
-    __UTL_ABI_PUBLIC static value_type get_time(decltype(instruction_order_acq_rel)) noexcept;
+    __UTL_ABI_PUBLIC static value_type get_time(decltype(instruction_barrier_none)) noexcept;
+    __UTL_ABI_PUBLIC static value_type get_time(decltype(instruction_barrier_after)) noexcept;
+    __UTL_ABI_PUBLIC static value_type get_time(decltype(instruction_barrier_before)) noexcept;
+    __UTL_ABI_PUBLIC static value_type get_time(decltype(instruction_barrier_enclose)) noexcept;
 };
 
 } // namespace tempus

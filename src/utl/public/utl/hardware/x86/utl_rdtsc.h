@@ -8,7 +8,7 @@
 
 #  include "utl/configuration/utl_pragma.h"
 
-#  include "utl/hardware/utl_instruction_order.h"
+#  include "utl/hardware/utl_instruction_barrier.h"
 #  include "utl/type_traits/utl_constants.h"
 
 #  include <stdint.h>
@@ -36,14 +36,14 @@ namespace {
 
 #  if UTL_SUPPORTS_GNU_ASM
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_order_relaxed)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_none)) noexcept {
     uint64_t high;
     uint64_t low;
     __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
     return (high << 32) | low;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_order_acquire)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_after)) noexcept {
     uint64_t high;
     uint64_t low;
     uint32_t aux;
@@ -56,7 +56,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_order_a
     return (high << 32) | low;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_order_release)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_before)) noexcept {
     uint64_t high;
     uint64_t low;
     uint32_t aux;
@@ -69,7 +69,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_order_r
     return (high << 32) | low;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_order_acq_rel)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_enclose)) noexcept {
     uint64_t high;
     uint64_t low;
     uint32_t aux;
@@ -85,23 +85,23 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_order_a
 
 #  elif UTL_COMPILER_MSVC // UTL_SUPPORTS_GNU_ASM
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_order_relaxed)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_none)) noexcept {
     return __rdtsc();
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_order_acquire)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_after)) noexcept {
     uint64_t const result = __rdtsc();
     _mm_lfence();
     return result;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_order_release)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_before)) noexcept {
     _mm_mfence();
     _mm_lfence();
     return __rdtsc();
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_order_acq_rel)) noexcept {
+UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_enclose)) noexcept {
     _mm_mfence();
     _mm_lfence();
     uint64_t const result = __rdtsc();
@@ -113,9 +113,10 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_order_a
 
 UTL_PRAGMA_WARN("Unrecognized target/compiler");
 
-template <instruction_order N>
-UTL_ATTRIBUTE(NORETURN) inline uint64_t rdtsc(instruction_order_type<N>) noexcept {
-    static_assert(__UTL always_false<instruction_order_type<N>>(), "Unrecognized target/compiler");
+template <instruction_barrier N>
+UTL_ATTRIBUTE(NORETURN) inline uint64_t rdtsc(instruction_barrier_type<N>) noexcept {
+    static_assert(
+        __UTL always_false<instruction_barrier_type<N>>(), "Unrecognized target/compiler");
     UTL_BUILTIN_unreachable();
 }
 

@@ -18,7 +18,7 @@ uint32_t clock_frequency() noexcept {
 #  ifndef UTL_ARM_CNTFRQ
     // TODO Prescaler?
     static uint32_t value = []() {
-        return (aarch64::cntfrq(instruction_order_relaxed) & 0xffffffffu);
+        return (aarch64::cntfrq(instruction_barrier_none) & 0xffffffffu);
     }();
     return value;
 #  else
@@ -28,8 +28,8 @@ uint32_t clock_frequency() noexcept {
 #  endif
 }
 
-template <instruction_order O>
-uint64_t get_timestamp(instruction_order_type<O> o) noexcept {
+template <instruction_barrier O>
+uint64_t get_timestamp(instruction_barrier_type<O> o) noexcept {
 #  ifndef UTL_USE_PMU_HARDWARE_CLOCK
     return aarch64::cntpct(o);
 #  else
@@ -69,15 +69,15 @@ duration to_duration(hardware_ticks t) noexcept {
     return duration{0, t.value() * nano / clock_frequency()};
 }
 
-#  define __UTL_DEFINE_GET_TIME(ORDER)                                    \
-      auto clock_traits<hardware_clock_t>::get_time(                      \
-          decltype(instruction_order_##ORDER) o) noexcept -> value_type { \
-          return get_timestamp(o);                                        \
+#  define __UTL_DEFINE_GET_TIME(ORDER)                                      \
+      auto clock_traits<hardware_clock_t>::get_time(                        \
+          decltype(instruction_barrier_##ORDER) o) noexcept -> value_type { \
+          return get_timestamp(o);                                          \
       }
-__UTL_DEFINE_GET_TIME(relaxed);
-__UTL_DEFINE_GET_TIME(acquire);
-__UTL_DEFINE_GET_TIME(release);
-__UTL_DEFINE_GET_TIME(acq_rel);
+__UTL_DEFINE_GET_TIME(none);
+__UTL_DEFINE_GET_TIME(after);
+__UTL_DEFINE_GET_TIME(before);
+__UTL_DEFINE_GET_TIME(enclose);
 
 #  undef __UTL_DEFINE_GET_TIME
 

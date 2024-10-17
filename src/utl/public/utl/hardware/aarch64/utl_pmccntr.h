@@ -10,7 +10,7 @@
 
 #  include "utl/hardware/aarch64/utl_system_register.h"
 #  include "utl/hardware/arm/utl_barrier.h"
-#  include "utl/hardware/utl_instruction_order.h"
+#  include "utl/hardware/utl_instruction_barrier.h"
 #  include "utl/type_traits/utl_constants.h"
 
 #  include <stdint.h>
@@ -22,25 +22,25 @@ namespace {
 #  if UTL_HAS_BUILTIN(__builtin_arm_isb) && UTL_HAS_BUILTIN(__builtin_arm_rsr64)
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
-    decltype(instruction_order_relaxed)) noexcept {
+    decltype(instruction_barrier_none)) noexcept {
     return __builtin_arm_rsr64("PMCCNTR_EL0");
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
-    decltype(instruction_order_acquire)) noexcept {
+    decltype(instruction_barrier_after)) noexcept {
     uint64_t const res = __builtin_arm_rsr64("PMCCNTR_EL0");
     __builtin_arm_isb(arm::barrier::SY);
     return res;
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
-    decltype(instruction_order_release)) noexcept {
+    decltype(instruction_barrier_before)) noexcept {
     __builtin_arm_isb(arm::barrier::SY);
     return __builtin_arm_rsr64("PMCCNTR_EL0");
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
-    decltype(instruction_order_acq_rel)) noexcept {
+    decltype(instruction_barrier_enclose)) noexcept {
     __builtin_arm_isb(arm::barrier::SY);
     uint64_t const res = __builtin_arm_rsr64("PMCCNTR_EL0");
     __builtin_arm_isb(arm::barrier::SY);
@@ -51,14 +51,14 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
                              // UTL_HAS_BUILTIN(__builtin_arm_rsr64)
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
-    decltype(instruction_order_relaxed)) noexcept {
+    decltype(instruction_barrier_none)) noexcept {
     uint64_t res;
     __asm__("mrs %0, PMCCNTR_EL0\n\t" : "=r"(res) : :);
     return res;
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
-    decltype(instruction_order_acquire)) noexcept {
+    decltype(instruction_barrier_after)) noexcept {
     uint64_t res;
     __asm__ volatile("mrs %0, PMCCNTR_EL0\n\t"
                      "isb sy"
@@ -69,7 +69,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
-    decltype(instruction_order_release)) noexcept {
+    decltype(instruction_barrier_before)) noexcept {
     uint64_t res;
     __asm__ volatile("isb sy\n\t"
                      "mrs %0, PMCCNTR_EL0"
@@ -80,7 +80,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
-    decltype(instruction_order_acq_rel)) noexcept {
+    decltype(instruction_barrier_enclose)) noexcept {
     uint64_t res;
     __asm__ volatile("isb sy\n\t"
                      "mrs %0, PMCCNTR_EL0\n\t"
@@ -95,25 +95,25 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
                           // UTL_HAS_BUILTIN(__builtin_arm_rsr64)
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
-    decltype(instruction_order_relaxed)) noexcept {
+    decltype(instruction_barrier_none)) noexcept {
     return _ReadStatusReg(system_register::PMCCNTR);
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
-    decltype(instruction_order_acquire)) noexcept {
+    decltype(instruction_barrier_after)) noexcept {
     value_type const res = _ReadStatusReg(system_register::PMCCNTR);
     __isb(arm::barrier::SY);
     return res;
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
-    decltype(instruction_order_release)) noexcept {
+    decltype(instruction_barrier_before)) noexcept {
     __isb(arm::barrier::SY);
     return _ReadStatusReg(system_register::PMCCNTR);
 }
 
 UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
-    decltype(instruction_order_acq_rel)) noexcept {
+    decltype(instruction_barrier_enclose)) noexcept {
     __isb(arm::barrier::SY);
     value_type const res = _ReadStatusReg(system_register::PMCCNTR);
     __isb(arm::barrier::SY);
@@ -124,9 +124,10 @@ UTL_ATTRIBUTES(ALWAYS_INLINE, MAYBE_UNUSED) inline uint64_t pmccntr(
 
 UTL_PRAGMA_WARN("Unrecognized target/compiler");
 
-template <instruction_order N>
-UTL_ATTRIBUTE(NORETURN) uint64_t pmccntr(instruction_order_type<N>) noexcept {
-    static_assert(__UTL always_false<instruction_order_type<N>>(), "Unrecognized target/compiler");
+template <instruction_barrier N>
+UTL_ATTRIBUTE(NORETURN) uint64_t pmccntr(instruction_barrier_type<N>) noexcept {
+    static_assert(
+        __UTL always_false<instruction_barrier_type<N>>(), "Unrecognized target/compiler");
     UTL_BUILTIN_unreachable();
 }
 

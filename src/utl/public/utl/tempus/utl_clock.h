@@ -11,7 +11,7 @@
 #include "utl/concepts/utl_boolean_testable.h"
 #include "utl/concepts/utl_same_as.h"
 #include "utl/concepts/utl_semiregular.h"
-#include "utl/hardware/utl_instruction_order.h"
+#include "utl/hardware/utl_instruction_barrier.h"
 #include "utl/tempus/utl_duration.h"
 #include "utl/tempus/utl_hardware_ticks.h"
 #include "utl/type_traits/utl_constants.h"
@@ -224,15 +224,13 @@ struct thread_clock_t {
 struct hardware_clock_t {
     explicit constexpr hardware_clock_t() noexcept = default;
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, decltype(instruction_order_relaxed)) noexcept;
+        hardware_clock_t, decltype(instruction_barrier_none)) noexcept;
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, decltype(instruction_order_acquire)) noexcept;
+        hardware_clock_t, decltype(instruction_barrier_after)) noexcept;
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, decltype(instruction_order_release)) noexcept;
+        hardware_clock_t, decltype(instruction_barrier_before)) noexcept;
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, decltype(instruction_order_acq_rel)) noexcept;
-    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
-        hardware_clock_t, decltype(instruction_order_seq_cst)) noexcept;
+        hardware_clock_t, decltype(instruction_barrier_enclose)) noexcept;
 
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(hardware_clock_t) noexcept;
 
