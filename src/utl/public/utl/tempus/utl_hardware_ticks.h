@@ -32,14 +32,14 @@ public:
      *
      * @return `true` if ticks can be converted to a duration, `false` otherwise.
      */
-    UTL_ATTRIBUTES(_ABI_PUBLIC, PURE) static bool invariant_frequency() noexcept;
+    UTL_ATTRIBUTE(PURE) static bool invariant_frequency() noexcept;
 
     /**
      * @brief Returns the hardware clock tick frequency if invariant
      *
      * @return valid frequency if invariant, -1 if unsupported or otherwise
      */
-    UTL_ATTRIBUTES(_ABI_PUBLIC, PURE) static uint64_t frequency() noexcept;
+    UTL_ATTRIBUTE(PURE) static uint64_t frequency() noexcept;
 
     /**
      * @brief Returns an invalid `hardware_ticks` object.
