@@ -49,14 +49,16 @@ public:
      *
      * @return A `hardware_ticks` object with a value of -1, indicating an invalid state.
      */
-    static constexpr hardware_ticks invalid() noexcept { return hardware_ticks(-1); }
+    __UTL_HIDE_FROM_ABI static constexpr hardware_ticks invalid() noexcept {
+        return hardware_ticks(-1);
+    }
 
     /**
      * @brief Default constructor for `hardware_ticks`.
      *
      * Initializes a `hardware_ticks` object with a default value of 0.
      */
-    constexpr explicit hardware_ticks() noexcept : ticks_(0) {}
+    __UTL_HIDE_FROM_ABI constexpr explicit hardware_ticks() noexcept : ticks_(0) {}
 
     /**
      * @brief Constructor for `hardware_ticks` with a specific tick value.
@@ -65,7 +67,7 @@ public:
      *
      * @param t The tick value to initialize the `hardware_ticks` object with.
      */
-    constexpr explicit hardware_ticks(int64_t t) noexcept : ticks_(t) {}
+    __UTL_HIDE_FROM_ABI constexpr explicit hardware_ticks(int64_t t) noexcept : ticks_(t) {}
 
     /**
      * @brief Retrieves the tick value.
@@ -74,38 +76,42 @@ public:
      *
      * @return The tick value as a `int64_t`.
      */
-    __UTL_HIDE_FROM_ABI constexpr int64_t value() const noexcept { return ticks_; }
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) constexpr int64_t value() const noexcept {
+        return ticks_;
+    }
 
-    UTL_ATTRIBUTES(PURE, ALWAYS_INLINE) explicit constexpr operator bool() const noexcept {
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) explicit constexpr operator bool() const noexcept {
         return ticks_ >= 0;
     }
 
-    constexpr bool operator==(hardware_ticks const& other) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr bool operator==(hardware_ticks const& other) const noexcept {
         return ticks_ == other.ticks_ && ticks_ >= 0;
     }
 
-    constexpr bool operator!=(hardware_ticks const& other) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr bool operator!=(hardware_ticks const& other) const noexcept {
         return *this && other && !(*this == other);
     }
 
-    constexpr bool operator<(hardware_ticks const& other) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr bool operator<(hardware_ticks const& other) const noexcept {
         return *this && other && ticks_ < other.ticks_;
     }
 
-    constexpr bool operator>(hardware_ticks const& other) const noexcept { return other < *this; }
+    __UTL_HIDE_FROM_ABI constexpr bool operator>(hardware_ticks const& other) const noexcept {
+        return other < *this;
+    }
 
-    constexpr bool operator<=(hardware_ticks const& other) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr bool operator<=(hardware_ticks const& other) const noexcept {
         return *this && other && !(other < *this);
     }
 
-    constexpr bool operator>=(hardware_ticks const& other) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr bool operator>=(hardware_ticks const& other) const noexcept {
         return *this && other && !(*this < other);
     }
 
 #if UTL_CXX20
     template <same_as<hardware_ticks> T,
         same_as<::std::partial_ordering> R = ::std::partial_ordering>
-    constexpr R operator<=>(T const& other) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr R operator<=>(T const& other) const noexcept {
         return *this && other ? ticks_ <=> other.ticks_ : R::unordered;
     }
 #endif

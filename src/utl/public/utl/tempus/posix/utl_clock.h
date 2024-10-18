@@ -20,7 +20,7 @@ UTL_NAMESPACE_BEGIN
 
 namespace tempus {
 namespace details {
-constexpr int64_t timeval_to_usec(::timeval const& val) noexcept {
+__UTL_HIDE_FROM_ABI constexpr int64_t timeval_to_usec(::timeval const& val) noexcept {
     using value_type = int64_t;
     using sec_to_usec = integral_constant<value_type, 1000000>;
     return value_type(val.tv_sec * sec_to_usec::value) + value_type(val.tv_usec);

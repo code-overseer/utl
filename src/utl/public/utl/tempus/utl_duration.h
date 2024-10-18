@@ -48,17 +48,21 @@ class __UTL_ABI_PUBLIC duration {
     static constexpr auto invalid_value = static_cast<uint64_t>(-1);
     struct direct_tag {};
     struct invalid_tag {};
-    static constexpr uint64_t reinterpret(duration const& d) noexcept {
+
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) static constexpr uint64_t reinterpret(
+        duration const& d) noexcept {
         return (d.seconds_ << 30) | d.nanoseconds_;
     }
 
-    static constexpr duration adjust_ns(int64_t total_ns) noexcept {
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) static constexpr duration adjust_ns(
+        int64_t total_ns) noexcept {
         return total_ns >= 0 ? duration{UTL_TRAIT_default_constant(direct_tag),
                                    total_ns / nano_multiple, total_ns % nano_multiple}
                              : invalid();
     }
 
-    static constexpr duration adjust(int64_t s, int64_t ns) noexcept {
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) static constexpr duration adjust(
+        int64_t s, int64_t ns) noexcept {
         return adjust_ns(s * nano_multiple + ns);
     }
 
@@ -71,27 +75,29 @@ class __UTL_ABI_PUBLIC duration {
         return adjust(0, time);
     }
 
-    constexpr duration(direct_tag, uint64_t seconds, uint64_t nanoseconds) noexcept
+    __UTL_HIDE_FROM_ABI constexpr duration(
+        direct_tag, uint64_t seconds, uint64_t nanoseconds) noexcept
         : nanoseconds_(nanoseconds)
         , seconds_(seconds) {
         UTL_ASSERT(seconds < (1 << (seconds_bitwidth - 1)));
     }
 
-    constexpr duration(invalid_tag) noexcept
+    __UTL_HIDE_FROM_ABI constexpr duration(invalid_tag) noexcept
         : nanoseconds_((1ull << nanoseconds_bitwidth) - 1)
         , seconds_((1ull << seconds_bitwidth) - 1) {}
 
 public:
-    static constexpr duration invalid() noexcept {
+    __UTL_HIDE_FROM_ABI static constexpr duration invalid() noexcept {
         return {UTL_TRAIT_default_constant(invalid_tag)};
     }
 
     template <typename R, typename P>
     __UTL_HIDE_FROM_ABI explicit UTL_CONSTEXPR_CXX14 duration(::std::chrono::duration<R, P> const& t) noexcept
         : duration(from_chrono(t)) {}
-    constexpr explicit duration(int64_t seconds, int64_t nanoseconds = 0) noexcept
+    __UTL_HIDE_FROM_ABI constexpr explicit duration(
+        int64_t seconds, int64_t nanoseconds = 0) noexcept
         : duration(adjust(seconds, nanoseconds)) {}
-    constexpr explicit duration() noexcept : nanoseconds_(0), seconds_(0) {}
+    __UTL_HIDE_FROM_ABI constexpr explicit duration() noexcept : nanoseconds_(0), seconds_(0) {}
 
     template <typename R, typename P>
     __UTL_HIDE_FROM_ABI explicit UTL_CONSTEXPR_CXX14 operator ::std::chrono::duration<R, P>() const noexcept {
@@ -110,14 +116,16 @@ public:
         return {(decltype(T::tv_sec))seconds_, (decltype(T::tv_nsec))nanoseconds_};
     }
 
-    UTL_ATTRIBUTES(ALWAYS_INLINE) inline constexpr uint64_t seconds() const { return seconds_; }
-    UTL_ATTRIBUTES(ALWAYS_INLINE) inline constexpr uint32_t nanoseconds() const { return nanoseconds_; }
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr uint64_t seconds() const { return seconds_; }
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr uint32_t nanoseconds() const {
+        return nanoseconds_;
+    }
 
-    UTL_ATTRIBUTES(ALWAYS_INLINE) inline explicit constexpr operator bool() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline explicit constexpr operator bool() const noexcept {
         return reinterpret(*this) != invalid_value;
     }
 
-    constexpr duration operator-(duration const& other) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr duration operator-(duration const& other) const noexcept {
         return *this && other
             ? duration{0,
                   static_cast<int64_t>(__UTL sub_sat(seconds_ * nano_multiple + nanoseconds_,
@@ -125,7 +133,7 @@ public:
             : invalid();
     }
 
-    constexpr duration operator+(duration const& other) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr duration operator+(duration const& other) const noexcept {
         return *this && other
             ? duration{0,
                   static_cast<int64_t>(__UTL add_sat(seconds_ * nano_multiple + nanoseconds_,
@@ -133,27 +141,27 @@ public:
             : invalid();
     }
 
-    constexpr bool operator==(duration const& other) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr bool operator==(duration const& other) const noexcept {
         return reinterpret(*this) == reinterpret(other) && *this;
     }
 
-    constexpr bool operator!=(duration const& other) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr bool operator!=(duration const& other) const noexcept {
         return *this && other && reinterpret(*this) != reinterpret(other);
     }
 
-    constexpr bool operator<(duration const& other) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr bool operator<(duration const& other) const noexcept {
         return *this && other && reinterpret(*this) < reinterpret(other);
     }
 
-    constexpr bool operator>(duration const& other) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr bool operator>(duration const& other) const noexcept {
         return *this && other && reinterpret(*this) > reinterpret(other);
     }
 
-    constexpr bool operator<=(duration const& other) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr bool operator<=(duration const& other) const noexcept {
         return *this && other && reinterpret(*this) <= reinterpret(other);
     }
 
-    constexpr bool operator>=(duration const& other) const noexcept {
+    __UTL_HIDE_FROM_ABI constexpr bool operator>=(duration const& other) const noexcept {
         return *this && other && reinterpret(*this) >= reinterpret(other);
     }
 
@@ -180,7 +188,7 @@ static_assert(sizeof(duration) == sizeof(uint64_t), "Invalid implementation");
 
 template <UTL_CONCEPT_CXX20(same_as<::timespec>) T UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_same(T, ::timespec))>
-UTL_ATTRIBUTES(CONST, ALWAYS_INLINE) bool in_range(tempus::duration d) noexcept {
+UTL_ATTRIBUTES(CONST, ALWAYS_INLINE, _HIDE_FROM_ABI) bool in_range(tempus::duration d) noexcept {
     return in_range<decltype(T::tv_sec)>(d.seconds());
 }
 

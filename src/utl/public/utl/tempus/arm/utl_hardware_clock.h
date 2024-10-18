@@ -24,12 +24,12 @@ public:
     using value_type = uint64_t;
     using duration_type = hardware_ticks;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
         value_type t) noexcept {
         return duration_type(t - 0);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr duration_type difference(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type difference(
         value_type l, value_type r) noexcept {
         auto const val = __UTL sub_sat(l, r);
         if (!val && l == r) {
@@ -39,12 +39,12 @@ public:
         return duration_type((int64_t)val);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr bool equal(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr bool equal(
         value_type l, value_type r) noexcept {
         return l == r;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, CONST, ALWAYS_INLINE) static inline constexpr clock_order compare(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr clock_order compare(
         value_type const& l, value_type const& r) noexcept {
         return static_cast<clock_order>((l > r) - (l < r));
     }
