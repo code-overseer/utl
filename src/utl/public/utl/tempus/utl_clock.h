@@ -132,37 +132,42 @@ public:
     using value_type = typename traits::value_type;
     using duration_type = typename traits::duration_type;
 
-    __UTL_HIDE_FROM_ABI constexpr duration_type time_since_epoch() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr duration_type time_since_epoch() const noexcept {
         return traits::time_since_epoch(value_);
     }
 
-    __UTL_HIDE_FROM_ABI constexpr duration_type operator-(time_point const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr duration_type operator-(
+        time_point const& other) const noexcept {
         return traits::difference(value_, other.value_);
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator==(time_point const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator==(
+        time_point const& other) const noexcept {
         return traits::equal(value_, other.value_);
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator<(time_point const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator<(time_point const& other) const noexcept {
         return traits::compare(value_, other.value_) == clock_order::less;
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator!=(time_point const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator!=(
+        time_point const& other) const noexcept {
         auto const result = traits::compare(value_, other.value_);
         return result != clock_order::equal && result != clock_order::unordered;
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator>=(time_point const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator>=(
+        time_point const& other) const noexcept {
         auto const result = traits::compare(value_, other.value_);
         return result != clock_order::less && result != clock_order::unordered;
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator>(time_point const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator>(time_point const& other) const noexcept {
         return traits::compare(value_, other.value_) == clock_order::greater;
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator<=(time_point const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator<=(
+        time_point const& other) const noexcept {
         auto const result = traits::compare(value_, other.value_);
         return result != clock_order::greater && result != clock_order::unordered;
     }
@@ -173,7 +178,7 @@ public:
 
 #if UTL_CXX20
     template <same_as<time_point> T, same_as<::std::partial_ordering> R = ::std::partial_ordering>
-    __UTL_HIDE_FROM_ABI constexpr R operator<=>(T const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr R operator<=>(T const& other) const noexcept {
         auto const idx = static_cast<int>(traits::compare(value_, other.value_));
         return order_table<R>::values[idx + 1];
     }
@@ -230,14 +235,16 @@ struct __UTL_ABI_PUBLIC hardware_clock_t {
 
     __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(hardware_clock_t) noexcept;
 
-    __UTL_HIDE_FROM_ABI static bool invariant_frequency() noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) static bool invariant_frequency() noexcept {
         return hardware_ticks::invariant_frequency();
     }
 
-    __UTL_HIDE_FROM_ABI static uint64_t frequency() noexcept { return hardware_ticks::frequency(); }
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) static uint64_t frequency() noexcept {
+        return hardware_ticks::frequency();
+    }
 };
 
-__UTL_HIDE_FROM_ABI constexpr ::time_t to_posix_time(time_point<system_clock_t>) noexcept;
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr ::time_t to_posix_time(time_point<system_clock_t>) noexcept;
 
 UTL_INLINE_CXX17 constexpr system_clock_t system_clock{};
 

@@ -30,12 +30,12 @@ public:
     using value_type = timestamp_counter_t;
     using duration_type = hardware_ticks;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
-        value_type t) noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr duration_type
+    time_since_epoch(value_type t) noexcept {
         return duration_type(t.tick - 0ll);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type difference(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr duration_type difference(
         value_type l, value_type r) noexcept {
         auto const val = __UTL sub_sat(l.tick, r.tick);
         if (!val && l.tick == r.tick) {
@@ -45,12 +45,12 @@ public:
         return duration_type((int64_t)val);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr bool equal(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr bool equal(
         value_type l, value_type r) noexcept {
         return l.aux == r.aux && l.tick == r.tick;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr clock_order compare(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr clock_order compare(
         value_type const& l, value_type const& r) noexcept {
 
         if (l.aux == r.aux) {
@@ -60,25 +60,25 @@ public:
         return clock_order::unordered;
     }
 
-    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend time_point<hardware_clock_t> get_time(
         hardware_clock_t clock) noexcept {
         return get_time(clock, instruction_barrier_enclose);
     }
 
-    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend time_point<hardware_clock_t> get_time(
         hardware_clock_t, decltype(instruction_barrier_none) o) noexcept {
         return time_point<hardware_clock_t>{get_time(o)};
     }
 
-    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend time_point<hardware_clock_t> get_time(
         hardware_clock_t, decltype(instruction_barrier_after) o) noexcept {
         return time_point<hardware_clock_t>{get_time(o)};
     }
-    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend time_point<hardware_clock_t> get_time(
         hardware_clock_t, decltype(instruction_barrier_before) o) noexcept {
         return time_point<hardware_clock_t>{get_time(o)};
     }
-    __UTL_HIDE_FROM_ABI friend time_point<hardware_clock_t> get_time(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend time_point<hardware_clock_t> get_time(
         hardware_clock_t, decltype(instruction_barrier_enclose) o) noexcept {
         return time_point<hardware_clock_t>{get_time(o)};
     }

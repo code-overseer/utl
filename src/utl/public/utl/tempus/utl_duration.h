@@ -67,7 +67,7 @@ class __UTL_ABI_PUBLIC duration {
     }
 
     template <typename R, typename P>
-    __UTL_HIDE_FROM_ABI static UTL_CONSTEXPR_CXX14 duration from_chrono(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) static UTL_CONSTEXPR_CXX14 duration from_chrono(
         ::std::chrono::duration<R, P> const& t) noexcept {
         using nano_ratio = ::std::ratio<1, nano_multiple>;
         using nano_duration = ::std::chrono::duration<int64_t, nano_ratio>;
@@ -100,7 +100,8 @@ public:
     __UTL_HIDE_FROM_ABI constexpr explicit duration() noexcept : nanoseconds_(0), seconds_(0) {}
 
     template <typename R, typename P>
-    __UTL_HIDE_FROM_ABI explicit UTL_CONSTEXPR_CXX14 operator ::std::chrono::duration<R, P>() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) explicit UTL_CONSTEXPR_CXX14
+    operator ::std::chrono::duration<R, P>() const noexcept {
         using result_type = ::std::chrono::duration<R, P>;
         using nano_ratio = ::std::ratio<1, nano_multiple>;
         // defer instantiation
@@ -112,20 +113,24 @@ public:
 
     template <UTL_CONCEPT_CXX20(same_as<::timespec>) T UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_same(T, ::timespec))>
-    __UTL_HIDE_FROM_ABI constexpr operator T() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr operator T() const noexcept {
         return {(decltype(T::tv_sec))seconds_, (decltype(T::tv_nsec))nanoseconds_};
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr uint64_t seconds() const { return seconds_; }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr uint32_t nanoseconds() const {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr uint64_t seconds() const {
+        return seconds_;
+    }
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr uint32_t nanoseconds() const {
         return nanoseconds_;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline explicit constexpr operator bool() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline explicit constexpr
+    operator bool() const noexcept {
         return reinterpret(*this) != invalid_value;
     }
 
-    __UTL_HIDE_FROM_ABI constexpr duration operator-(duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr duration operator-(
+        duration const& other) const noexcept {
         return *this && other
             ? duration{0,
                   static_cast<int64_t>(__UTL sub_sat(seconds_ * nano_multiple + nanoseconds_,
@@ -133,7 +138,8 @@ public:
             : invalid();
     }
 
-    __UTL_HIDE_FROM_ABI constexpr duration operator+(duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr duration operator+(
+        duration const& other) const noexcept {
         return *this && other
             ? duration{0,
                   static_cast<int64_t>(__UTL add_sat(seconds_ * nano_multiple + nanoseconds_,
@@ -141,34 +147,34 @@ public:
             : invalid();
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator==(duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator==(duration const& other) const noexcept {
         return reinterpret(*this) == reinterpret(other) && *this;
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator!=(duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator!=(duration const& other) const noexcept {
         return *this && other && reinterpret(*this) != reinterpret(other);
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator<(duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator<(duration const& other) const noexcept {
         return *this && other && reinterpret(*this) < reinterpret(other);
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator>(duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator>(duration const& other) const noexcept {
         return *this && other && reinterpret(*this) > reinterpret(other);
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator<=(duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator<=(duration const& other) const noexcept {
         return *this && other && reinterpret(*this) <= reinterpret(other);
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator>=(duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator>=(duration const& other) const noexcept {
         return *this && other && reinterpret(*this) >= reinterpret(other);
     }
 
 #if UTL_CXX20
 
     template <same_as<duration> D, same_as<::std::partial_ordering> R = ::std::partial_ordering>
-    __UTL_HIDE_FROM_ABI constexpr R operator<=>(D const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr R operator<=>(D const& other) const noexcept {
         if (!*this || !other) {
             return R::unordered;
         }

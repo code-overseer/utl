@@ -32,14 +32,14 @@ public:
      *
      * @return `true` if ticks can be converted to a duration, `false` otherwise.
      */
-    UTL_ATTRIBUTE(PURE) static bool invariant_frequency() noexcept;
+    UTL_ATTRIBUTES(_ABI_PUBLIC, PURE, NODISCARD) static bool invariant_frequency() noexcept;
 
     /**
      * @brief Returns the hardware clock tick frequency if invariant
      *
      * @return valid frequency if invariant, -1 if unsupported or otherwise
      */
-    UTL_ATTRIBUTE(PURE) static uint64_t frequency() noexcept;
+    UTL_ATTRIBUTES(_ABI_PUBLIC, PURE, NODISCARD) static uint64_t frequency() noexcept;
 
     /**
      * @brief Returns an invalid `hardware_ticks` object.
@@ -49,7 +49,7 @@ public:
      *
      * @return A `hardware_ticks` object with a value of -1, indicating an invalid state.
      */
-    __UTL_HIDE_FROM_ABI static constexpr hardware_ticks invalid() noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) static constexpr hardware_ticks invalid() noexcept {
         return hardware_ticks(-1);
     }
 
@@ -58,7 +58,7 @@ public:
      *
      * Initializes a `hardware_ticks` object with a default value of 0.
      */
-    __UTL_HIDE_FROM_ABI constexpr explicit hardware_ticks() noexcept : ticks_(0) {}
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr explicit hardware_ticks() noexcept : ticks_(0) {}
 
     /**
      * @brief Constructor for `hardware_ticks` with a specific tick value.
@@ -67,7 +67,8 @@ public:
      *
      * @param t The tick value to initialize the `hardware_ticks` object with.
      */
-    __UTL_HIDE_FROM_ABI constexpr explicit hardware_ticks(int64_t t) noexcept : ticks_(t) {}
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr explicit hardware_ticks(int64_t t) noexcept
+        : ticks_(t) {}
 
     /**
      * @brief Retrieves the tick value.
@@ -76,42 +77,48 @@ public:
      *
      * @return The tick value as a `int64_t`.
      */
-    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) constexpr int64_t value() const noexcept {
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI, NODISCARD) constexpr int64_t value() const noexcept {
         return ticks_;
     }
 
-    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) explicit constexpr operator bool() const noexcept {
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI, NODISCARD) explicit constexpr operator bool() const noexcept {
         return ticks_ >= 0;
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator==(hardware_ticks const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator==(
+        hardware_ticks const& other) const noexcept {
         return ticks_ == other.ticks_ && ticks_ >= 0;
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator!=(hardware_ticks const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator!=(
+        hardware_ticks const& other) const noexcept {
         return *this && other && !(*this == other);
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator<(hardware_ticks const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator<(
+        hardware_ticks const& other) const noexcept {
         return *this && other && ticks_ < other.ticks_;
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator>(hardware_ticks const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator>(
+        hardware_ticks const& other) const noexcept {
         return other < *this;
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator<=(hardware_ticks const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator<=(
+        hardware_ticks const& other) const noexcept {
         return *this && other && !(other < *this);
     }
 
-    __UTL_HIDE_FROM_ABI constexpr bool operator>=(hardware_ticks const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator>=(
+        hardware_ticks const& other) const noexcept {
         return *this && other && !(*this < other);
     }
 
 #if UTL_CXX20
     template <same_as<hardware_ticks> T,
         same_as<::std::partial_ordering> R = ::std::partial_ordering>
-    __UTL_HIDE_FROM_ABI constexpr R operator<=>(T const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr R operator<=>(T const& other) const noexcept {
         return *this && other ? ticks_ <=> other.ticks_ : R::unordered;
     }
 #endif
@@ -131,7 +138,7 @@ private:
  * @param ht The `hardware_ticks` object to convert.
  * @return The corresponding `duration`.
  */
-UTL_ATTRIBUTES(_ABI_PUBLIC) duration to_duration(hardware_ticks) noexcept;
+UTL_ATTRIBUTES(_ABI_PUBLIC, NODISCARD, PURE) duration to_duration(hardware_ticks) noexcept;
 } // namespace tempus
 
 UTL_NAMESPACE_END

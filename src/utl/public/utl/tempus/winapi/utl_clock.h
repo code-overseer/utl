@@ -23,14 +23,14 @@ public:
     using duration_type = duration;
     using epoch_conversion = integral_constant<value_type, 11644473600LL>;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
-        value_type t) noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr duration_type
+    time_since_epoch(value_type t) noexcept {
         // Epoch is 1601-01-01 00:00:00 UTC
         static_assert(sizeof(value_type) >= 8, "Unsupported architecture");
         return difference(t, 0);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type difference(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr duration_type difference(
         value_type l, value_type r) noexcept {
         auto const diff = l - r;
         // 100 nanoseconds to seconds
@@ -39,17 +39,18 @@ public:
         return duration_type{seconds, nanoseconds};
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr bool equal(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr bool equal(
         value_type l, value_type r) noexcept {
         return l == r;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr clock_order compare(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr clock_order compare(
         value_type l, value_type r) noexcept {
         return static_cast<clock_order>((l > r) - (l < r));
     }
 
-    __UTL_HIDE_FROM_ABI friend time_point<system_clock_t> get_time(system_clock_t) noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend time_point<system_clock_t> get_time(
+        system_clock_t) noexcept {
         return time_point<system_clock_t>{get_time()};
     }
 
@@ -73,8 +74,8 @@ public:
     using typename base_type::duration_type;
     using typename base_type::value_type;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
-        value_type t) noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr duration_type
+    time_since_epoch(value_type t) noexcept {
         return duration_type::invalid();
     }
 
@@ -82,7 +83,8 @@ public:
     using base_type::difference;
     using base_type::equal;
 
-    __UTL_HIDE_FROM_ABI friend time_point<process_clock_t> get_time(process_clock_t) noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend time_point<process_clock_t> get_time(
+        process_clock_t) noexcept {
         return time_point<system_clock_t>{get_time()};
     }
 
@@ -100,8 +102,8 @@ public:
     using typename base_type::duration_type;
     using typename base_type::value_type;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
-        value_type t) noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr duration_type
+    time_since_epoch(value_type t) noexcept {
         return duration_type::invalid();
     }
 
@@ -109,7 +111,8 @@ public:
     using base_type::difference;
     using base_type::equal;
 
-    __UTL_HIDE_FROM_ABI friend time_point<thread_clock_t> get_time(thread_clock_t) noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend time_point<thread_clock_t> get_time(
+        thread_clock_t) noexcept {
         return time_point<system_clock_t>{get_time()};
     }
 
@@ -124,30 +127,31 @@ public:
     using value_type = long long;
     using duration_type = duration;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
-        value_type t) noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr duration_type
+    time_since_epoch(value_type t) noexcept {
         static_assert(sizeof(size_t) >= 8, "Unsupported architecture");
         return difference(t, 0);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type difference(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr duration_type difference(
         value_type l, value_type r) noexcept {
         auto const diff = l - r;
         auto const seconds = diff / 1000;
         return duration_type{seconds, diff * 1000000 - seconds * 1000000000};
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr bool equal(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr bool equal(
         value_type l, value_type r) noexcept {
         return l == r;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr clock_order compare(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr clock_order compare(
         value_type l, value_type r) noexcept {
         return static_cast<clock_order>((l > r) - (l < r));
     }
 
-    friend __UTL_HIDE_FROM_ABI time_point<steady_clock_t> get_time(steady_clock_t) noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend time_point<steady_clock_t> get_time(
+        steady_clock_t) noexcept {
         return time_point<steady_clock_t>{get_time()};
     }
 
@@ -162,22 +166,22 @@ public:
     using value_type = long long;
     using duration_type = duration;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr duration_type time_since_epoch(
-        value_type t) noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr duration_type
+    time_since_epoch(value_type t) noexcept {
         return difference(t, 0);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr bool equal(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr bool equal(
         value_type l, value_type r) noexcept {
         return l == r;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr clock_order compare(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline constexpr clock_order compare(
         value_type l, value_type r) noexcept {
         return static_cast<clock_order>((l > r) - (l < r));
     }
 
-    friend __UTL_HIDE_FROM_ABI time_point<high_resolution_clock_t> get_time(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend time_point<high_resolution_clock_t> get_time(
         high_resolution_clock_t) noexcept {
         return time_point<high_resolution_clock_t>{get_time()};
     }
