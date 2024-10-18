@@ -22,8 +22,12 @@
 #    define __UTL_MSVC_BUILTIN__builtin_launder
 #  endif
 
-#  if UTL_COMPILER_MSVC_AT_LEAST(1925) /* UTL_HAS_BUILTIN(__builtin_is_constant_evaluated) */
+#  if UTL_COMPILER_MSVC_AT_LEAST(1925)
 #    define __UTL_MSVC_BUILTIN__builtin_is_constant_evaluated
+#  endif
+
+#  if UTL_COMPILER_MSVC_AT_LEAST(1926)
+#    define __UTL_MSVC_BUILTIN__builtin_bit_cast
 #  endif
 
 #  if UTL_COMPILER_MSVC_AT_LEAST(1927)

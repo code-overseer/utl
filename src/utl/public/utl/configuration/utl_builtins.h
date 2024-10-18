@@ -2,11 +2,10 @@
 
 #pragma once
 
+#include "utl/configuration/utl_builtin_check.h"
 #include "utl/configuration/utl_compiler.h"
 #include "utl/configuration/utl_msvc_builtins.h"
 #include "utl/configuration/utl_standard.h"
-
-#include "utl/preprocessor/utl_builtin_check.h"
 
 #if UTL_HAS_BUILTIN(__builtin_launder)
 #  define UTL_BUILTIN_launder(X) __builtin_launder(X)
@@ -55,6 +54,10 @@ void abort(void);
 
 #if UTL_HAS_BUILTIN(__builtin_is_constant_evaluated)
 #  define UTL_BUILTIN_is_constant_evaluated() __builtin_is_constant_evaluated()
+#endif /* UTL_HAS_BUILTIN(__builtin_is_constant_evaluated) */
+
+#if UTL_HAS_BUILTIN(__builtin_bit_cast)
+#  define UTL_BUILTIN_bit_cast(...) __builtin_bit_cast(__VA_ARGS__)
 #endif /* UTL_HAS_BUILTIN(__builtin_is_constant_evaluated) */
 
 #if UTL_HAS_BUILTIN(__builtin_assume)

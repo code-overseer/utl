@@ -36,7 +36,7 @@ template <typename T>
 __UTL_HIDE_FROM_ABI auto trait_impl(float) noexcept -> __UTL false_type;
 
 template <typename T>
-__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept -> __UTL bool_constant<UTL_is_integral(T) &&
+__UTL_HIDE_FROM_ABI auto trait_impl(int) noexcept -> __UTL bool_constant<UTL_TRAIT_is_integral(T) &&
     !UTL_TRAIT_disjunction(__UTL is_string_char<T>, __UTL is_boolean<T>)>;
 
 template <typename T>
