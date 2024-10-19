@@ -32,7 +32,7 @@ UTL_NAMESPACE_BEGIN
 
 namespace atomics {
 
-template <typename T, size_t = sizeof(T)>
+template <typename T, size_t = (alignof(T) == sizeof(T)) * sizeof(T)>
 struct interpreted_type;
 template <typename T>
 using interpreted_type_t UTL_NODEBUG = typename interpreted_type<T>::type;
