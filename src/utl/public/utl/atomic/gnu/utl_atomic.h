@@ -19,14 +19,77 @@
 #include "utl/type_traits/utl_copy_cv.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_boolean.h"
+#include "utl/type_traits/utl_is_class.h"
+#include "utl/type_traits/utl_is_trivially_copy_constructible.h"
+#include "utl/type_traits/utl_is_trivially_destructible.h"
+#include "utl/type_traits/utl_is_trivially_move_constructible.h"
 #include "utl/type_traits/utl_make_unsigned.h"
 #include "utl/type_traits/utl_underlying_type.h"
 
-#include <cstdint>
+#include <stdint.h>
 
 UTL_NAMESPACE_BEGIN
 
 namespace atomics {
+template <typename T, size_t = sizeof(T)>
+struct interpreted_type;
+template <typename T>
+using interpreted_type_t UTL_NODEBUG = typename interpreted_type<T>::type;
+
+template <typename T>
+struct interpreted_type<T, 1> {
+    using type = uint8_t;
+};
+
+template <typename T>
+struct interpreted_type<T, 2> {
+    using type = uint16_t;
+};
+
+template <typename T>
+struct interpreted_type<T, 4> {
+    using type = uint32_t;
+};
+
+template <typename T>
+struct interpreted_type<T, 8> {
+    using type = uint64_t;
+};
+
+#if UTL_SUPPORTS_INT128
+template <typename T>
+struct interpreted_type<T, 16> {
+    using type = __uint128_t;
+};
+#endif
+
+#if UTL_CXX20
+template <typename T>
+concept interpretable_type = (UTL_TRAIT_is_class(T) && UTL_TRAIT_is_trivially_destructible(T) &&
+    (UTL_TRAIT_is_trivially_copy_constructible(T) ||
+        UTL_TRAIT_is_trivially_move_constructible(T)) &&
+    requires { typename interpreted_type<T>::type; });
+
+template <typename T>
+struct is_interpretable : bool_constant<interpretable_type<T>> {};
+
+#else  // UTL_CXX20
+namespace details {
+template <typename T>
+auto interpretable_impl(float) noexcept -> __UTL false_type;
+template <typename T>
+auto interpretable_impl(int) noexcept
+    -> __UTL bool_constant<UTL_TRAIT_is_class(T) && UTL_TRAIT_is_trivially_destructible(T) &&
+        (UTL_TRAIT_is_trivially_copy_constructible(T) ||
+            UTL_TRAIT_is_trivially_move_constructible(T)) &&
+        __UTL always_true<typename interpreted_type<T>::type>()>;
+template <typename T>
+using interpretable UTL_NODEBUG = decltype(__UTL atomics::details::interpretable_impl<T>(0));
+} // namespace details
+template <typename T>
+struct is_interpretable : details::interpretable<T> {};
+#endif // UTL_CXX20
+
 template <memory_order O>
 struct fence_operations {
 protected:
@@ -67,6 +130,15 @@ public:
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool load(T const* ctx) noexcept {
         return __atomic_load_n(ctx, order);
     }
+
+    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> load(T const* ctx) noexcept {
+        // Since the pointer isn't actually dereferenced, this __may__ not be UB
+        using type = copy_cv_t<T const, interpreted_type_t<T>>;
+        auto const val = load((type*)ctx);
+        alignas(T) unsigned char buffer[sizeof(T)];
+        return *((value_type<T>*)__UTL_MEMCPY(buffer, &val, sizeof(T)));
+    }
 };
 
 template <memory_order O>
@@ -95,8 +167,16 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(boolean_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_boolean(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(T const* ctx, bool value) noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(T* ctx, bool value) noexcept {
         __atomic_store(ctx, __UTL addressof(value), order);
+    }
+
+    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
+        T* ctx, value_type<T> value) noexcept {
+        using type = copy_cv_t<T, interpreted_type_t<T>>;
+        alignas(T) unsigned char buffer[sizeof(T)];
+        store((type*)ctx, *((interpreted_type_t<T>*)__UTL_MEMCPY(buffer, &value, sizeof(T))));
     }
 };
 
@@ -128,6 +208,16 @@ public:
         T* ctx, value_type<T> value) noexcept {
         using type = copy_cv_t<T, underlying_type_t<T>>;
         return (value_type<T>)exchange((type*)ctx, (underlying_type_t<T>)value);
+    }
+
+    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
+        T* ctx, value_type<T> value) noexcept {
+        using type = copy_cv_t<T, interpreted_type_t<T>>;
+        alignas(T) unsigned char buffer[sizeof(T)];
+        auto const val = exchange(
+            (type*)ctx, *((interpreted_type_t<T>*)__UTL_MEMCPY(buffer, &value, sizeof(T))));
+        return *((interpreted_type_t<T>*)__UTL_MEMCPY(buffer, &val, sizeof(T)));
     }
 
     template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
@@ -278,7 +368,7 @@ private:
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_strong_(
         T* ctx, pointer<T> expected, value_type<T> value) noexcept {
         using type = copy_cv_t<T, underlying_type_t<T>>;
-        return compare_exchange_strong(
+        return compare_exchange_strong_(
             (type*)ctx, (underlying_type_t<T>*)expected, (underlying_type_t<T>)value);
     }
 
@@ -286,8 +376,26 @@ private:
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak_(
         T* ctx, pointer<T> expected, value_type<T> value) noexcept {
         using type = copy_cv_t<T, underlying_type_t<T>>;
-        return compare_exchange_weak(
+        return compare_exchange_weak_(
             (type*)ctx, (underlying_type_t<T>*)expected, (underlying_type_t<T>)value);
+    }
+
+    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_strong_(
+        T* ctx, pointer<T> expected, value_type<T> value) noexcept {
+        using type = copy_cv_t<T, interpreted_type_t<T>>;
+        alignas(T) unsigned char buffer[sizeof(T)];
+        return compare_exchange_strong_((type*)ctx, (interpreted_type_t<T>*)expected,
+            *((interpreted_type_t<T>*)__UTL_MEMCPY(buffer, &value, sizeof(T))));
+    }
+
+    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak_(
+        T* ctx, pointer<T> expected, value_type<T> value) noexcept {
+        using type = copy_cv_t<T, interpreted_type_t<T>>;
+        alignas(T) unsigned char buffer[sizeof(T)];
+        return compare_exchange_weak_((type*)ctx, (interpreted_type_t<T>*)expected,
+            *((interpreted_type_t<T>*)__UTL_MEMCPY(buffer, &value, sizeof(T))));
     }
 
 public:

@@ -19,6 +19,10 @@
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_copy_cv.h"
 #include "utl/type_traits/utl_enable_if.h"
+#include "utl/type_traits/utl_is_class.h"
+#include "utl/type_traits/utl_is_trivially_copy_constructible.h"
+#include "utl/type_traits/utl_is_trivially_destructible.h"
+#include "utl/type_traits/utl_is_trivially_move_constructible.h"
 #include "utl/type_traits/utl_make_unsigned.h"
 #include "utl/type_traits/utl_remove_cv.h"
 #include "utl/type_traits/utl_underlying_type.h"
@@ -27,6 +31,92 @@
 UTL_NAMESPACE_BEGIN
 
 namespace atomics {
+
+template <typename T, size_t = sizeof(T)>
+struct interpreted_type;
+template <typename T>
+using interpreted_type_t UTL_NODEBUG = typename interpreted_type<T>::type;
+
+template <typename T>
+struct interpreted_type<T, 1> {
+    using type = char;
+};
+
+template <typename T>
+struct interpreted_type<T, 2> {
+    using type = short;
+};
+
+template <typename T>
+struct interpreted_type<T, 4> {
+    using type = long;
+};
+
+template <typename T>
+struct interpreted_type<T, 8> {
+    using type = __int64;
+};
+
+// TODO: Could we support int128?
+
+#if UTL_CXX20
+template <typename T>
+concept interpretable_type = (UTL_TRAIT_is_class(T) && UTL_TRAIT_is_trivially_destructible(T) &&
+    (UTL_TRAIT_is_trivially_copy_constructible(T) ||
+        UTL_TRAIT_is_trivially_move_constructible(T)) &&
+    requires { typename interpreted_type<T>::type; });
+
+template <typename T>
+struct is_interpretable : bool_constant<interpretable_type<T>> {};
+#else  // UTL_CXX20
+namespace details {
+template <typename T>
+auto interpretable_impl(float) noexcept -> __UTL false_type;
+template <typename T>
+auto interpretable_impl(int) noexcept
+    -> __UTL bool_constant<UTL_TRAIT_is_class(T) && UTL_TRAIT_is_trivially_destructible(T) &&
+        (UTL_TRAIT_is_trivially_copy_constructible(T) ||
+            UTL_TRAIT_is_trivially_move_constructible(T)) &&
+        __UTL always_true<typename interpreted_type<T>::type>()>;
+template <typename T>
+using interpretable UTL_NODEBUG = decltype(__UTL atomics::details::interpretable_impl<T>(0));
+} // namespace details
+template <typename T>
+struct is_interpretable : details::interpretable<T> {};
+#endif // UTL_CXX20
+
+namespace details {
+template <typename T, typename Interlock>
+struct basic_adaptor {
+    using value_type = remove_cv_t<T>;
+    using pointer = value_type*;
+    using volatile_pointer = value_type volatile*;
+    using const_pointer = value_type const*;
+    using const_volatile_pointer = value_type const volatile*;
+    using interlocked_type = Interlock;
+
+    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
+    static inline constexpr Interlock to_interlocked(value_type value) noexcept {
+        return (Interlock)value;
+    }
+
+    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
+    static inline constexpr Interlock volatile* to_interlocked(volatile_pointer value) noexcept {
+        return (Interlock volatile*)value;
+    }
+    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
+    static inline constexpr Interlock const volatile* to_interlocked(
+        const_volatile_pointer value) noexcept {
+        return (Interlock const volatile*)value;
+    }
+
+    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
+    static inline constexpr value_type to_value(interlocked_type value) noexcept {
+        return (value_type)value;
+    }
+};
+} // namespace details
+
 #if UTL_CXX20
 template <typename T>
 struct interlocked_adaptor;
@@ -37,184 +127,49 @@ struct interlocked_adaptor;
 
 #if UTL_CXX20
 template <sized_integral<1> T>
-struct interlocked_adaptor<T> {
+struct interlocked_adaptor<T> : details::basic_adaptor<T, char> {};
 #else
 template <typename T>
-struct interlocked_adaptor<T, enable_if_t<UTL_TRAIT_is_sized_integral(1, T)>> {
+struct interlocked_adaptor<T, enable_if_t<UTL_TRAIT_is_sized_integral(1, T)>> :
+    details::basic_adaptor<T, char> {};
 #endif
-    using value_type = remove_cv_t<T>;
-    using pointer = value_type*;
-    using volatile_pointer = value_type volatile*;
-    using const_pointer = value_type const*;
-    using const_volatile_pointer = value_type const volatile*;
-    using interlocked_type = char;
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr interlocked_type to_interlocked(value_type value) noexcept {
-        return (interlocked_type)value;
-    }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr interlocked_type const volatile* to_interlocked(
-        const_volatile_pointer value) noexcept {
-        return value;
-    }
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr value_type to_value(interlocked_type value) noexcept {
-        return (value_type)value;
-    }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr bool equal(value_type l, value_type r) noexcept { return l == r; }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr void assign(pointer dst, value_type src) noexcept { *dst = src; }
-};
 
 #if UTL_CXX20
 template <sized_integral<2> T>
-struct interlocked_adaptor<T> {
+struct interlocked_adaptor<T> : details::basic_adaptor<T, short> {};
 #else
 template <typename T>
-struct interlocked_adaptor<T, enable_if_t<UTL_TRAIT_is_sized_integral(2, T)>> {
+struct interlocked_adaptor<T, enable_if_t<UTL_TRAIT_is_sized_integral(2, T)>> :
+    details::basic_adaptor<T, short> {};
 #endif
-    using value_type = remove_cv_t<T>;
-    using pointer = value_type*;
-    using volatile_pointer = value_type volatile*;
-    using const_pointer = value_type const*;
-    using const_volatile_pointer = value_type const volatile*;
-    using interlocked_type = short;
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr interlocked_type to_interlocked(value_type value) noexcept {
-        return (interlocked_type)value;
-    }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr interlocked_type const volatile* to_interlocked(
-        const_volatile_pointer value) noexcept {
-        return value;
-    }
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr value_type to_value(interlocked_type value) noexcept {
-        return (value_type)value;
-    }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr bool equal(value_type l, value_type r) noexcept { return l == r; }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr void assign(pointer dst, value_type src) noexcept { *dst = src; }
-};
 
 #if UTL_CXX20
 template <sized_integral<4> T>
-struct interlocked_adaptor<T> {
+struct interlocked_adaptor<T> : details::basic_adaptor<T, long> {};
 #else
 template <typename T>
-struct interlocked_adaptor<T, enable_if_t<UTL_TRAIT_is_sized_integral(4, T)>> {
+struct interlocked_adaptor<T, enable_if_t<UTL_TRAIT_is_sized_integral(4, T)>> :
+    details::basic_adaptor<T, long> {};
 #endif
-    using value_type = remove_cv_t<T>;
-    using pointer = value_type*;
-    using volatile_pointer = value_type volatile*;
-    using const_pointer = value_type const*;
-    using const_volatile_pointer = value_type const volatile*;
-    using interlocked_type = long;
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr interlocked_type to_interlocked(value_type value) noexcept {
-        return (interlocked_type)value;
-    }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr interlocked_type const volatile* to_interlocked(
-        const_volatile_pointer value) noexcept {
-        return value;
-    }
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr value_type to_value(interlocked_type value) noexcept {
-        return (value_type)value;
-    }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr bool equal(value_type l, value_type r) noexcept { return l == r; }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr void assign(pointer dst, value_type src) noexcept { *dst = src; }
-};
 
 #if UTL_CXX20
 template <sized_integral<8> T>
-struct interlocked_adaptor<T> {
+struct interlocked_adaptor<T> : details::basic_adaptor<T, __int64> {};
 #else
 template <typename T>
-struct interlocked_adaptor<T, enable_if_t<UTL_TRAIT_is_sized_integral(8, T)>> {
+struct interlocked_adaptor<T, enable_if_t<UTL_TRAIT_is_sized_integral(8, T)>> :
+    details::basic_adaptor<T, __int64> {};
 #endif
-    using value_type = remove_cv_t<T>;
-    using pointer = value_type*;
-    using volatile_pointer = value_type volatile*;
-    using const_pointer = value_type const*;
-    using const_volatile_pointer = value_type const volatile*;
-    using interlocked_type = __int64;
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr interlocked_type to_interlocked(value_type value) noexcept {
-        return (interlocked_type)value;
-    }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr interlocked_type const volatile* to_interlocked(
-        const_volatile_pointer value) noexcept {
-        return value;
-    }
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr value_type to_value(interlocked_type value) noexcept {
-        return (value_type)value;
-    }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr bool equal(value_type l, value_type r) noexcept { return l == r; }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr void assign(pointer dst, value_type src) noexcept { *dst = src; }
-};
 
 #if UTL_CXX20
 template <typename T>
-requires is_pointer_v<T>
-struct interlocked_adaptor<T> {
+requires (is_pointer_v<T>)
+struct interlocked_adaptor<T> : details::basic_adaptor<T, void*> {};
 #else
 template <typename T>
-struct interlocked_adaptor<T, enable_if_t<UTL_TRAIT_is_pointer(T)>> {
+struct interlocked_adaptor<T, enable_if_t<UTL_TRAIT_is_pointer(T)>> :
+    details::basic_adaptor<T, void*> {};
 #endif
-    using value_type = remove_cv_t<T>;
-    using pointer = value_type*;
-    using volatile_pointer = value_type volatile*;
-    using const_pointer = value_type const*;
-    using const_volatile_pointer = value_type const volatile*;
-    using interlocked_type = void*;
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr interlocked_type to_interlocked(value_type value) noexcept {
-        return (interlocked_type)value;
-    }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr interlocked_type const volatile* to_interlocked(
-        const_volatile_pointer value) noexcept {
-        return value;
-    }
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr value_type to_value(interlocked_type value) noexcept {
-        return (value_type)value;
-    }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr bool equal(value_type l, value_type r) noexcept { return l == r; }
-
-    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr void assign(pointer dst, value_type src) noexcept { *dst = src; }
-};
 
 #if UTL_CXX20
 template <enum_type T>
@@ -241,23 +196,49 @@ public:
     }
 
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr interlocked_type const volatile* to_interlocked(
-        const_volatile_pointer value) noexcept {
-        return base_type::to_interlocked(to_underlying(value));
+    static inline constexpr interlocked_type volatile* to_interlocked(
+        volatile_pointer value) noexcept {
+        return (interlocked_type volatile*)value;
     }
 
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
     static inline constexpr value_type to_value(interlocked_type value) noexcept {
         return (value_type)base_type::to_value(value);
     }
+};
+
+#if UTL_CXX20
+template <interpretable_type T>
+struct interlocked_adaptor<T> {
+#else
+template <typename T>
+struct interlocked_adaptor<T, enable_if_t<interpretable_type<T>::value>> {
+#endif
+public:
+    using value_type = remove_cv_t<T>;
+    using pointer = value_type*;
+    using volatile_pointer = value_type volatile*;
+    using const_pointer = value_type const*;
+    using const_volatile_pointer = value_type const volatile*;
+    using interlocked_type = interpreted_type_t<T>;
 
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr bool equal(value_type l, value_type r) noexcept {
-        return base_type::equal(to_underlying(l), to_underlying(r));
+    static inline constexpr interlocked_type to_interlocked(value_type value) noexcept {
+        interlocked_type ret;
+        return *(interlocked_type*)__UTL_MEMCPY(&ret, &value, sizeof(value_type));
     }
 
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr void assign(pointer dst, value_type src) noexcept { *dst = src; }
+    static inline constexpr interlocked_type volatile* to_interlocked(
+        volatile_pointer value) noexcept {
+        return (interlocked_type volatile*)value;
+    }
+
+    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
+    static inline constexpr value_type to_value(interlocked_type value) noexcept {
+        alignas(value_type) unsigned char buffer[sizeof(value_type)];
+        return *(value_type*)__UTL_MEMCPY(buffer, &value, sizeof(value_type));
+    }
 };
 
 struct fence_traits {
@@ -406,7 +387,7 @@ private:
     template <UTL_CONCEPT_CXX20(integral) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> load(
         T const* ctx, memory_order_type<O>) noexcept {
-        auto val = load((__int64 const volatile*)ctx, memory_order_relaxed);
+        auto val = load(ctx, memory_order_relaxed);
         UTL_COMPILER_BARRIER();
         return val;
     }
@@ -421,18 +402,29 @@ public:
 
     public:
         template <UTL_CONCEPT_CXX20(native_atomic_type) T UTL_CONSTRAINT_CXX11(is_native_atomic_type<T>::value)>
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> load(T* ctx) noexcept {
+        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline value_type<T> load(
+            T const* ctx) noexcept {
             return load(ctx, this_order);
         }
 
         template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> load(T* ctx) noexcept {
-            return load((underlying_type_t<T>*)ctx);
+        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline value_type<T> load(
+            T const* ctx) noexcept {
+            using type = copy_cv_t<T const, underlying_type_t<T>>;
+            return load((type*)ctx);
         }
 
         template <UTL_CONCEPT_CXX20(boolean_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_boolean(T))>
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> load(T* ctx) noexcept {
+        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline value_type<T> load(
+            T const* ctx) noexcept {
             return load(ctx, this_order);
+        }
+
+        template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
+        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline value_type<T> load(
+            T const* ctx) noexcept {
+            using type = copy_cv_t<T const, interpreted_type_t<T>>;
+            return load((type*)ctx, this_order);
         }
     };
 };
@@ -520,13 +512,23 @@ public:
         template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
             T* ctx, value_type<T> value) noexcept {
-            store((underlying_type_t<T>*)ctx, (underlying_type_t<T>)value);
+            using type = copy_cv_t<T, underlying_type_t<T>>;
+            store((type*)ctx, (underlying_type_t<T>)value);
         }
 
         template <UTL_CONCEPT_CXX20(boolean_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_boolean(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
             T* ctx, value_type<T> value) noexcept {
             store(ctx, value, this_order);
+        }
+
+        template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
+        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
+            T* ctx, value_type<T> value) noexcept {
+            using type = copy_cv_t<T, interpreted_type_t<T>>;
+            alignas(T) unsigned char buffer[sizeof(T)];
+            store((type*)ctx, *(interpreted_type_t<T>*)__UTL_MEMCPY(buffer, &value, sizeof(T)),
+                this_order);
         }
     };
 };
@@ -1170,6 +1172,14 @@ public:
             using type = copy_cv_t<T, underlying_type_t<T>>;
             return (value_type<T>)exchange((type*)ctx, (underlying_type_t<T>)value);
         }
+        template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
+        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
+            T* ctx, value_type<T> value) noexcept {
+            using adaptor = interlocked_adaptor<T>;
+            return adaptor::to_value(
+                exchange(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value), this_order));
+        }
+
         template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
             T* ctx, value_type<T> value) noexcept {
@@ -1287,372 +1297,250 @@ private:
     static constexpr release_type release_v{};
     static constexpr acquire_type acquire_v{};
 
-    template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, relaxed_type, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev = adaptor::to_value(_InterlockedCompareExchange8_nf(adaptor::to_interlocked(ctx),
-            adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline char interlocked(
+        char volatile* ctx, char expected, char desired, relaxed_type) noexcept {
+        return _InterlockedCompareExchange8_nf(ctx, desired, comp);
     }
 
-    template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, relaxed_type, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev = adaptor::to_value(_InterlockedCompareExchange16_nf(adaptor::to_interlocked(ctx),
-            adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline char interlocked(
+        char volatile* ctx, char expected, char desired, release_type) noexcept {
+        return _InterlockedCompareExchange8_rel(ctx, desired, comp);
     }
 
-    template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, relaxed_type, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev = adaptor::to_value(_InterlockedCompareExchange32_nf(adaptor::to_interlocked(ctx),
-            adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline char interlocked(
+        char volatile* ctx, char expected, char desired, acquire_type) noexcept {
+        return _InterlockedCompareExchange8_acq(ctx, desired, comp);
     }
 
-    template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, relaxed_type, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev = adaptor::to_value(_InterlockedCompareExchange64_nf(adaptor::to_interlocked(ctx),
-            adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline char interlocked(
+        char volatile* ctx, char expected, char desired, acq_rel) noexcept {
+        return _InterlockedCompareExchange8(ctx, desired, comp);
     }
 
-    template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline short interlocked(
+        short volatile* ctx, short expected, short desired, relaxed_type) noexcept {
+        return _InterlockedCompareExchange16_nf(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline short interlocked(
+        short volatile* ctx, short expected, short desired, release_type) noexcept {
+        return _InterlockedCompareExchange16_rel(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline short interlocked(
+        short volatile* ctx, short expected, short desired, acquire_type) noexcept {
+        return _InterlockedCompareExchange16_acq(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline short interlocked(
+        short volatile* ctx, short expected, short desired, acq_rel) noexcept {
+        return _InterlockedCompareExchange16(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline long interlocked(
+        long volatile* ctx, long expected, long desired, relaxed_type) noexcept {
+        return _InterlockedCompareExchange32_nf(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline long interlocked(
+        long volatile* ctx, long expected, long desired, release_type) noexcept {
+        return _InterlockedCompareExchange32_rel(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline long interlocked(
+        long volatile* ctx, long expected, long desired, acquire_type) noexcept {
+        return _InterlockedCompareExchange32_acq(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline long interlocked(
+        long volatile* ctx, long expected, long desired, acq_rel) noexcept {
+        return _InterlockedCompareExchange32(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline __int64 interlocked(
+        __int64 volatile* ctx, __int64 expected, __int64 desired, relaxed_type) noexcept {
+        return _InterlockedCompareExchange64_nf(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline __int64 interlocked(
+        __int64 volatile* ctx, __int64 expected, __int64 desired, release_type) noexcept {
+        return _InterlockedCompareExchange64_rel(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline __int64 interlocked(
+        __int64 volatile* ctx, __int64 expected, __int64 desired, acquire_type) noexcept {
+        return _InterlockedCompareExchange64_acq(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline __int64 interlocked(
+        __int64 volatile* ctx, __int64 expected, __int64 desired, acq_rel) noexcept {
+        return _InterlockedCompareExchange64(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void* interlocked(
+        void* volatile* ctx, void* expected, void* desired, relaxed_type) noexcept {
+        return _InterlockedCompareExchangePointer_nf(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void* interlocked(
+        void* volatile* ctx, void* expected, void* desired, release_type) noexcept {
+        return _InterlockedCompareExchangePointer_rel(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void* interlocked(
+        void* volatile* ctx, void* expected, void* desired, acquire_type) noexcept {
+        return _InterlockedCompareExchangePointer_acq(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void* interlocked(
+        void* volatile* ctx, void* expected, void* desired, acq_rel_type) noexcept {
+        return _InterlockedCompareExchangePointer(ctx, desired, comp);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool interlocked128(
+        __int64 volatile* ctx, __int64* expected, __int64 hi, __int64 lo, relaxed_type) noexcept {
+        return _InterlockedCompareExchange128_nf(ctx, hi, lo, expected);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void* interlocked128(
+        __int64 volatile* ctx, __int64* expected, __int64 hi, __int64 lo, release_type) noexcept {
+        return _InterlockedCompareExchange128_rel(ctx, hi, lo, expected);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void* interlocked128(
+        __int64 volatile* ctx, __int64* expected, __int64 hi, __int64 lo, acquire_type) noexcept {
+        return _InterlockedCompareExchange128_acq(ctx, hi, lo, expected);
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void* interlocked128(
+        __int64 volatile* ctx, __int64* expected, __int64 hi, __int64 lo, acq_rel_type) noexcept {
+        return _InterlockedCompareExchange128(ctx, hi, lo, expected);
+    }
+
+    template <memory_order F>
+    static UTL_CONSTEVAL void interlock_order(relaxed_type, memory_order_type<F>) noexcept = delete;
+    static UTL_CONSTEVAL void interlock_order(consume_type, acquire_type) noexcept = delete;
+    template <memory_order S>
+    static UTL_CONSTEVAL void interlock_order(memory_order_type<S>, seq_cst_type) noexcept = delete;
+
+    static UTL_CONSTEVAL acq_rel_type interlock_order(seq_cst_type, seq_cst_type) noexcept {
+        return {};
+    }
+    static UTL_CONSTEVAL relaxed_type interlock_order(relaxed_type, relaxed_type) noexcept {
+        return {};
+    }
+    static UTL_CONSTEVAL release_type interlock_order(release_type, relaxed_type) noexcept {
+        return {};
+    }
+    template <memory_order F>
+    static UTL_CONSTEVAL acquire_type interlock_order(acquire_type, memory_order_type<F>) noexcept {
+        static_assert(is_load_order<F>(), "Invalid failure order");
+        return {};
+    }
+    template <memory_order F>
+    static UTL_CONSTEVAL acquire_type interlock_order(consume_type, memory_order_type<F>) noexcept {
+        static_assert(is_load_order<F>(), "Invalid failure order");
+        return {};
+    }
+    template <memory_order F>
+    static UTL_CONSTEVAL acq_rel_type interlock_order(release_type, memory_order_type<F>) noexcept {
+        static_assert(is_load_order<F>(), "Invalid failure order");
+        return {};
+    }
+    template <memory_order F>
+    static UTL_CONSTEVAL acq_rel_type interlock_order(acq_rel_type, memory_order_type<F>) noexcept {
+        static_assert(is_load_order<F>(), "Invalid failure order");
+        return {};
+    }
+    template <memory_order F>
+    static UTL_CONSTEVAL acq_rel_type interlock_order(seq_cst_type, memory_order_type<F>) noexcept {
+        static_assert(is_load_order<F>(), "Invalid failure order");
+        return {};
+    }
+
+    template <UTL_CONCEPT_CXX20(integral) T, memory_order S, memory_order F UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_integral(T) && sizeof(T) <= 8)>
+    UTL_CONCEPT_CXX20(sizeof(T) <= 8)
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
+        T* ctx, pointer<T> expected, value_type<T> desired, memory_order_type<S> success,
+        memory_order_type<F> failure) noexcept {
+        using adaptor = interlocked_adaptor<T>;
+        constexpr auto order = interlock_order(success, failure);
+        auto const comp = adaptor::to_interlocked(*expected);
+        auto const prev = interlocked(
+            adaptor::to_interlocked(ctx), adaptor::to_interlocked(desired), comp, order);
+        if (comp == prev) {
+            return true;
+        }
+
+        __UTL_MEMCPY(expected, &prev, sizeof(T));
+        return false;
+    }
+
+    template <UTL_CONCEPT_CXX20(enum_type) T, memory_order S, memory_order F UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_enum(T) && sizeof(T) <= 8)>
+    UTL_CONCEPT_CXX20(sizeof(T) <= 8)
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
+        T* ctx, pointer<T> expected, value_type<T> desired, memory_order_type<S> success,
+        memory_order_type<F> failure) noexcept {
+        using adaptor = interlocked_adaptor<T>;
+        constexpr auto order = interlock_order(success, failure);
+        auto const comp = adaptor::to_interlocked(*expected);
+        auto const prev = interlocked(
+            adaptor::to_interlocked(ctx), adaptor::to_interlocked(desired), comp, order);
+        if (comp == prev) {
+            return true;
+        }
+
+        __UTL_MEMCPY(expected, &prev, sizeof(T));
+        return false;
+    }
+
+    template <typename T, memory_order S, memory_order F UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_pointer(T))>
     UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_pointer(T))
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, relaxed_type, relaxed_type) noexcept {
-        auto comp = *expected;
-        auto prev =
-            adaptor::to_value(_InterlockedCompareExchangePointer_nf(adaptor::to_interlocked(ctx),
-                adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<16>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(16, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, relaxed_type, relaxed_type) noexcept {
-        alignas(16) __int64 buf[2];
-        ::memcpy(buf, &desired, 16);
-        return _InterlockedCompareExchange128_nf(
-            (__int64 volatile*)ctx, buf[1], buf[0], (__int64*)expected);
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, release_type, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev = adaptor::to_value(_InterlockedCompareExchange8_rel(adaptor::to_interlocked(ctx),
-            adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, release_type, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev =
-            adaptor::to_value(_InterlockedCompareExchange16_rel(adaptor::to_interlocked(ctx),
-                adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, release_type, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev =
-            adaptor::to_value(_InterlockedCompareExchange32_rel(adaptor::to_interlocked(ctx),
-                adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, release_type, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev =
-            adaptor::to_value(_InterlockedCompareExchange64_rel(adaptor::to_interlocked(ctx),
-                adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
-    UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, release_type, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev =
-            adaptor::to_value(_InterlockedCompareExchangePointer_rel(adaptor::to_interlocked(ctx),
-                adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<16>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(16, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, release_type, relaxed_type) noexcept {
-        alignas(16) __int64 buf[2];
-        ::memcpy(buf, &desired, 16);
-        return _InterlockedCompareExchange128_rel(
-            (__int64 volatile*)ctx, buf[1], buf[0], (__int64*)expected);
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, acquire_type, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev = adaptor::to_value(_InterlockedCompareExchange8_acq(adaptor::to_interlocked(ctx),
-            adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, acquire_type, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev =
-            adaptor::to_value(_InterlockedCompareExchange16_acq(adaptor::to_interlocked(ctx),
-                adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, acquire_type, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev =
-            adaptor::to_value(_InterlockedCompareExchange32_acq(adaptor::to_interlocked(ctx),
-                adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, acquire_type, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev =
-            adaptor::to_value(_InterlockedCompareExchange64_acq(adaptor::to_interlocked(ctx),
-                adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
-    UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, acquire_type, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev =
-            adaptor::to_value(_InterlockedCompareExchangePointer_acq(adaptor::to_interlocked(ctx),
-                adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<16>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(16, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, acquire_type, relaxed_type) noexcept {
-        alignas(16) __int64 buf[2];
-        ::memcpy(buf, &desired, 16);
-        return _InterlockedCompareExchange128_acq(
-            (__int64 volatile*)ctx, buf[1], buf[0], (__int64*)expected);
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, release_type, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev = adaptor::to_value(_InterlockedCompareExchange8(adaptor::to_interlocked(ctx),
-            adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, release_type, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev = adaptor::to_value(_InterlockedCompareExchange16(adaptor::to_interlocked(ctx),
-            adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, release_type, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev = adaptor::to_value(_InterlockedCompareExchange32(adaptor::to_interlocked(ctx),
-            adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, release_type, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev = adaptor::to_value(_InterlockedCompareExchange64(adaptor::to_interlocked(ctx),
-            adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
-    UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, release_type, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
-        auto comp = *expected;
-        auto prev =
-            adaptor::to_value(_InterlockedCompareExchangePointer(adaptor::to_interlocked(ctx),
-                adaptor::to_interlocked(desired), adaptor::to_interlocked(comp)));
-        if (!adaptor::equal(comp, prev)) {
-            adaptor::assign(expected, prev);
-            return false;
-        }
-        return true;
-    }
-
-    template <UTL_CONCEPT_CXX20(sized_integral<16>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(16, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, release_type, acquire_type) noexcept {
-        alignas(16) __int64 buf[2];
-        ::memcpy(buf, &desired, 16);
-        return _InterlockedCompareExchange128(
-            (__int64 volatile*)ctx, buf[1], buf[0], (__int64*)expected);
-    }
-
-    template <typename T, memory_order O UTL_CONSTRAINT_CXX11(
-        UTL_TRAIT_is_integral(T) || UTL_TRAIT_is_pointer(T))>
-    UTL_CONSTRAINT_CXX20(integral<T> || is_pointer_v<T>)
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(T* ctx,
-        pointer<T> expected, value_type<T> desired, acq_rel_type, memory_order_type<O>) noexcept {
-        return compare_exchange(ctx, expected, desired, release_v, acquire_v);
+        pointer<T> expected, value_type<T> desired, memory_order_type<S> success,
+        memory_order_type<F> failure) noexcept {
+        using adaptor = interlocked_adaptor<T>;
+        constexpr auto order = interlock_order(success, failure);
+        auto const comp = adaptor::to_interlocked(*expected);
+        auto const prev = interlocked(
+            adaptor::to_interlocked(ctx), adaptor::to_interlocked(desired), comp, order);
+        if (comp == prev) {
+            return true;
+        }
+
+        __UTL_MEMCPY(expected, &prev, sizeof(T));
+        return false;
     }
 
-    template <typename T, memory_order O UTL_CONSTRAINT_CXX11(
-        UTL_TRAIT_is_integral(T) || UTL_TRAIT_is_pointer(T))>
-    UTL_CONSTRAINT_CXX20(integral<T> || is_pointer_v<T>)
+    template <UTL_CONCEPT_CXX20(interpretable_type) T, memory_order S, memory_order F UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(T* ctx,
-        pointer<T> expected, value_type<T> desired, seq_cst_type, memory_order_type<O>) noexcept {
-        return compare_exchange(ctx, expected, desired, release_v, acquire_v);
+        pointer<T> expected, value_type<T> desired, memory_order_type<S> success,
+        memory_order_type<F> failure) noexcept {
+        using adaptor = interlocked_adaptor<T>;
+        constexpr auto order = interlock_order(success, failure);
+        auto const comp = adaptor::to_interlocked(*expected);
+        auto const prev = interlocked(
+            adaptor::to_interlocked(ctx), adaptor::to_interlocked(desired), comp, order);
+        if (comp == prev) {
+            return true;
+        }
+
+        __UTL_MEMCPY(expected, &prev, sizeof(T));
+        return false;
     }
 
-    template <typename T, memory_order O UTL_CONSTRAINT_CXX11(
-        UTL_TRAIT_is_integral(T) || UTL_TRAIT_is_pointer(T))>
-    UTL_CONSTRAINT_CXX20(integral<T> || is_pointer_v<T>)
+    template <UTL_CONCEPT_CXX20(sized_integral<16>) T, memory_order S, memory_order F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(16, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(T* ctx,
-        pointer<T> expected, value_type<T> desired, consume_type, memory_order_type<O> f) noexcept {
-        return compare_exchange(ctx, expected, desired, acquire_v, f);
-    }
-
-    template <typename T, memory_order O UTL_CONSTRAINT_CXX11(
-        UTL_TRAIT_is_integral(T) || UTL_TRAIT_is_pointer(T))>
-    UTL_CONSTRAINT_CXX20(integral<T> || is_pointer_v<T>)
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(T* ctx,
-        pointer<T> expected, value_type<T> desired, memory_order_type<O> s, consume_type) noexcept {
-        return compare_exchange(ctx, expected, desired, s, acquire_v);
-    }
-
-    template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T) || UTL_TRAIT_is_pointer(T))>
-    UTL_CONSTRAINT_CXX20(integral<T> || is_pointer_v<T>)
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
-        T* ctx, pointer<T> expected, value_type<T> desired, consume_type, consume_type) noexcept {
-        return compare_exchange(ctx, expected, desired, acquire_v, acquire_v);
+        pointer<T> expected, value_type<T> desired, memory_order_type<S> success,
+        memory_order_type<F> failure) noexcept {
+        constexpr auto order = interlock_order(success, failure);
+        alignas(16) __int64 buffer[2];
+        __UTL_MEMCPY(buffer, &desired, 16);
+        return interlocked128(
+            (__int64 volatile*)ctx, buffer[1], buffer[0], (__int64*)expected, order);
     }
 
 public:
@@ -1660,41 +1548,24 @@ public:
     struct operations {
     protected:
         static constexpr memory_order_type<S> success_v{};
+        using failure_type = compare_exchange_failure<F>;
         UTL_CONSTEXPR_CXX20 ~operations() noexcept = default;
 
     public:
-        template <typename T UTL_CONSTRAINT_CXX11(
-            UTL_TRAIT_is_integral(T) || UTL_TRAIT_is_pointer(T))>
-        UTL_CONSTRAINT_CXX20(integral<T> || is_pointer_v<T>)
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_strong(T* ctx,
-            pointer<T> expected, value_type<T> desired, compare_exchange_failure<F> f) noexcept {
-            return compare_exchange(ctx, expected, desired, success_v, f);
+        template <typename T>
+        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline auto compare_exchange_strong(
+            T* ctx, pointer<T> expected, value_type<T> desired, failure_type failure) noexcept
+            -> decltype(compare_exchange(ctx, expected, desired, success_v, failure)) {
+            return compare_exchange(ctx, expected, desired, success_v, failure);
         }
 
-        template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_strong(T* ctx,
-            pointer<T> expected, value_type<T> desired, compare_exchange_failure<F> f) noexcept {
-            using type = copy_cv_t<T, underlying_type_t<T>>;
-            return compare_exchange((type*)ctx, (underlying_type_t<T>*)expected,
-                (underlying_type_t<T>)desired, success_v, f);
-        }
-
-        template <typename T UTL_CONSTRAINT_CXX11(
-            UTL_TRAIT_is_integral(T) || UTL_TRAIT_is_pointer(T))>
-        UTL_CONSTRAINT_CXX20(integral<T> || is_pointer_v<T>)
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak(T* ctx,
-            pointer<T> expected, value_type<T> desired, compare_exchange_failure<F> f) noexcept {
+        template <typename T>
+        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline auto compare_exchange_weak(
+            T* ctx, pointer<T> expected, value_type<T> desired, failure_type failure) noexcept
+            -> decltype(compare_exchange(ctx, expected, desired, success_v, failure)) {
             // Only < ARMv8.1-a has no dedicated CAS instruction
             // But it requires exclusive load/store intrinsics to be exposed by MSVC to be supported
-            return compare_exchange(ctx, expected, desired, success_v, f);
-        }
-
-        template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak(T* ctx,
-            pointer<T> expected, value_type<T> desired, compare_exchange_failure<F> f) noexcept {
-            using type = copy_cv_t<T, underlying_type_t<T>>;
-            return compare_exchange((type*)ctx, (underlying_type_t<T>*)expected,
-                (underlying_type_t<T>)desired, success_v, f);
+            return compare_exchange(ctx, expected, desired, success_v, failure);
         }
     };
 };
