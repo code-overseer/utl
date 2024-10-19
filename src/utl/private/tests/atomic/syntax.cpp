@@ -32,17 +32,10 @@ struct Enum {
     };
 };
 
-struct alignas(4) Struct {
-    char data[4];
+template <typename Native>
+struct alignas(Native) Struct {
+    unsigned char data[sizeof(Native)];
 };
-
-Enum<int>::Type func(Enum<int>::Type* ptr) {
-    return utl::atomic_acquire::load(ptr);
-}
-
-Struct func(Struct* ptr) {
-    return utl::atomic_acquire::load(ptr);
-}
 
 using native_types = utl::type_list<bool, char, signed char, unsigned char, short, unsigned short,
     int, unsigned int, long, unsigned long, long long, unsigned long long, void*>;
@@ -51,6 +44,10 @@ using enum_types = utl::type_list<Enum<bool>::Type, Enum<char>::Type, Enum<signe
     Enum<unsigned char>::Type, Enum<short>::Type, Enum<unsigned short>::Type, Enum<int>::Type,
     Enum<unsigned int>::Type, Enum<long>::Type, Enum<unsigned long>::Type, Enum<long long>::Type,
     Enum<unsigned long long>::Type>;
+
+using class_types = utl::type_list<Struct<bool>, Struct<char>, Struct<signed char>,
+    Struct<unsigned char>, Struct<short>, Struct<unsigned short>, Struct<int>, Struct<unsigned int>,
+    Struct<long>, Struct<unsigned long>, Struct<long long>, Struct<unsigned long long>>;
 
 template <typename TYPE, typename OP>
 struct LoadAssertions {
@@ -105,6 +102,12 @@ static_assert(utl::is_complete<decltype(instantiate<StoreAssertions>(
         enum_types{}, store_operations{}))>::value);
 static_assert(utl::is_complete<decltype(instantiate<ExchangeAssertions>(
         enum_types{}, atomic_operations{}))>::value);
+static_assert(utl::is_complete<decltype(instantiate<LoadAssertions>(
+        class_types{}, load_operations{}))>::value);
+static_assert(utl::is_complete<decltype(instantiate<StoreAssertions>(
+        class_types{}, store_operations{}))>::value);
+static_assert(utl::is_complete<decltype(instantiate<ExchangeAssertions>(
+        class_types{}, atomic_operations{}))>::value);
 
 template <typename From, typename = void>
 struct BitwiseArg {
@@ -240,5 +243,23 @@ static_assert(utl::is_complete<decltype(instantiate<
 static_assert(utl::is_complete<
     decltype(instantiate<CompareExchangeAssertions<decltype(utl::memory_order_seq_cst)>::Assert>(
         enum_types{}, utl::type_list<utl::atomic_seq_cst>{}))>::value);
+
+static_assert(utl::is_complete<
+    decltype(instantiate<CompareExchangeAssertions<decltype(utl::memory_order_relaxed)>::Assert>(
+        class_types{}, atomic_operations{}))>::value);
+
+static_assert(utl::is_complete<decltype(instantiate<
+        CompareExchangeAssertions<decltype(utl::memory_order_acquire)>::Assert>(class_types{},
+        utl::type_list<utl::atomic_acquire, utl::atomic_release, utl::atomic_acq_rel,
+            utl::atomic_seq_cst>{}))>::value);
+
+static_assert(utl::is_complete<decltype(instantiate<
+        CompareExchangeAssertions<decltype(utl::memory_order_consume)>::Assert>(class_types{},
+        utl::type_list<utl::atomic_acquire, utl::atomic_consume, utl::atomic_release,
+            utl::atomic_acq_rel, utl::atomic_seq_cst>{}))>::value);
+
+static_assert(utl::is_complete<
+    decltype(instantiate<CompareExchangeAssertions<decltype(utl::memory_order_seq_cst)>::Assert>(
+        class_types{}, utl::type_list<utl::atomic_seq_cst>{}))>::value);
 
 } // namespace atomic_tests

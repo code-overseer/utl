@@ -25,6 +25,7 @@
 #include "utl/type_traits/utl_is_trivially_destructible.h"
 #include "utl/type_traits/utl_is_trivially_move_constructible.h"
 #include "utl/type_traits/utl_make_unsigned.h"
+#include "utl/type_traits/utl_remove_cv.h"
 #include "utl/type_traits/utl_underlying_type.h"
 
 #include <stdint.h>
@@ -67,8 +68,8 @@ struct interpreted_type<T, 16> {
 #if UTL_CXX20
 template <typename T>
 concept interpretable_type = (UTL_TRAIT_is_class(T) && UTL_TRAIT_is_trivially_destructible(T) &&
-    (UTL_TRAIT_is_trivially_copy_constructible(T) ||
-        UTL_TRAIT_is_trivially_move_constructible(T)) &&
+    (UTL_TRAIT_is_trivially_copy_constructible(remove_cv_t<T>) ||
+        UTL_TRAIT_is_trivially_move_constructible(remove_cv_t<T>)) &&
     requires { typename interpreted_type<T>::type; });
 
 template <typename T>
