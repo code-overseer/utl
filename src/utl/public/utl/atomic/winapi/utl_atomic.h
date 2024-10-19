@@ -1175,22 +1175,15 @@ public:
         }
         template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
-            T* ctx, value_type<T> value) noexcept {
+            T* ctx, value_type<T> const& value) noexcept {
             using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
             return adaptor::to_value(
                 exchange(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value), this_order));
         }
-
         template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
             T* ctx, value_type<T> value) noexcept {
             return fetch_add(ctx, value, this_order);
-        }
-        template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
-            T* ctx, underlying_type_t<T> value) noexcept {
-            using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-            return (value_type<T>)fetch_add((type*)ctx, value);
         }
         template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
         UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
@@ -1205,12 +1198,6 @@ public:
             T* ctx, value_type<T> value) noexcept {
             return fetch_sub(ctx, value, this_order);
         }
-        template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_sub(
-            T* ctx, underlying_type_t<T> value) noexcept {
-            using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-            return (value_type<T>)fetch_sub((type*)ctx, value);
-        }
         template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
         UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_sub(
@@ -1224,35 +1211,15 @@ public:
             T* ctx, value_type<T> value) noexcept {
             return fetch_and(ctx, value, this_order);
         }
-        template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
-            T* ctx, underlying_type_t<T> value) noexcept {
-            using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-            return (value_type<T>)fetch_and((type*)ctx, value);
-        }
-
         template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
             T* ctx, value_type<T> value) noexcept {
             return fetch_or(ctx, value, this_order);
         }
-        template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
-            T* ctx, underlying_type_t<T> value) noexcept {
-            using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-            return (value_type<T>)fetch_or((type*)ctx, value);
-        }
-
         template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
             T* ctx, value_type<T> value) noexcept {
             return fetch_xor(ctx, value, this_order);
-        }
-        template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
-            T* ctx, underlying_type_t<T> value) noexcept {
-            using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-            return (value_type<T>)fetch_xor((type*)ctx, value);
         }
     };
 };
