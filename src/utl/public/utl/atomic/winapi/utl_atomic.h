@@ -39,22 +39,22 @@ using interpreted_type_t UTL_NODEBUG = typename interpreted_type<T>::type;
 
 template <typename T>
 struct interpreted_type<T, 1> {
-    using type = char;
+    using type UTL_NODEBUG = char;
 };
 
 template <typename T>
 struct interpreted_type<T, 2> {
-    using type = short;
+    using type UTL_NODEBUG = short;
 };
 
 template <typename T>
 struct interpreted_type<T, 4> {
-    using type = long;
+    using type UTL_NODEBUG = long;
 };
 
 template <typename T>
 struct interpreted_type<T, 8> {
-    using type = __int64;
+    using type UTL_NODEBUG = __int64;
 };
 
 // TODO: Could we support int128?
@@ -411,7 +411,7 @@ public:
         template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline value_type<T> load(
             T const* ctx) noexcept {
-            using type = copy_cv_t<T const, underlying_type_t<T>>;
+            using type UTL_NODEBUG = copy_cv_t<T const, underlying_type_t<T>>;
             return load((type*)ctx);
         }
 
@@ -424,7 +424,7 @@ public:
         template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline value_type<T> load(
             T const* ctx) noexcept {
-            using type = copy_cv_t<T const, interpreted_type_t<T>>;
+            using type UTL_NODEBUG = copy_cv_t<T const, interpreted_type_t<T>>;
             return load((type*)ctx, this_order);
         }
     };
@@ -513,7 +513,7 @@ public:
         template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
             T* ctx, value_type<T> value) noexcept {
-            using type = copy_cv_t<T, underlying_type_t<T>>;
+            using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
             store((type*)ctx, (underlying_type_t<T>)value);
         }
 
@@ -526,7 +526,7 @@ public:
         template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
             T* ctx, value_type<T> value) noexcept {
-            using type = copy_cv_t<T, interpreted_type_t<T>>;
+            using type UTL_NODEBUG = copy_cv_t<T, interpreted_type_t<T>>;
             alignas(T) unsigned char buffer[sizeof(T)];
             store((type*)ctx, *(interpreted_type_t<T>*)__UTL_MEMCPY(buffer, &value, sizeof(T)),
                 this_order);
@@ -552,28 +552,28 @@ private:
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedExchange8_nf(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchange16_nf(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchange32_nf(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchange64_nf(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
@@ -581,7 +581,7 @@ private:
     UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_pointer(T))
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangePointer_nf(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
@@ -589,28 +589,28 @@ private:
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchange8_acq(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchange16_acq(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchange32_acq(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchange64_acq(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
@@ -618,7 +618,7 @@ private:
     UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_pointer(T))
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangePointer_acq(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
@@ -626,28 +626,28 @@ private:
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchange8_rel(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchange16_rel(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchange32_rel(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchange64_rel(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
@@ -655,7 +655,7 @@ private:
     UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_pointer(T))
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangePointer_rel(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
@@ -663,28 +663,28 @@ private:
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedExchange8(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedExchange16(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedExchange32(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedExchange64(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
@@ -692,7 +692,7 @@ private:
     UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_pointer(T))
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangePointer(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
@@ -700,84 +700,84 @@ private:
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd8_nf(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd16_nf(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd32_nf(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd64_nf(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd8_acq(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd16_acq(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd32_acq(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd64_acq(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd8_rel(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd16_rel(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd32_rel(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd64_rel(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
@@ -785,28 +785,28 @@ private:
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedExchangeAdd8(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd16(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd32(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(_InterlockedExchangeAdd64(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
@@ -818,336 +818,336 @@ private:
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd8_nf(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd16_nf(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd32_nf(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd64_nf(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd8_rel(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd16_rel(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd32_rel(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd64_rel(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd8_acq(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd16_acq(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd32_acq(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd64_acq(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd8(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd16(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd32(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedAnd64(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr8_nf(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr16_nf(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr32_nf(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr64_nf(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr8_rel(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr16_rel(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr32_rel(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr64_rel(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr8_acq(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr16_acq(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr32_acq(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr64_acq(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr8(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr16(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr32(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedOr64(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor8_nf(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor16_nf(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor32_nf(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, relaxed_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor64_nf(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor8_rel(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor16_rel(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor32_rel(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, release_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor64_rel(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor8_acq(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor16_acq(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor32_acq(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, acquire_type) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor64_acq(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor8(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<2>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor16(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<4>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor32(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
     template <UTL_CONCEPT_CXX20(sized_integral<8>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> value, memory_order_type<O>) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         return adaptor::to_value(
             _InterlockedXor64(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
     }
@@ -1170,13 +1170,13 @@ public:
         template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
             T* ctx, value_type<T> value) noexcept {
-            using type = copy_cv_t<T, underlying_type_t<T>>;
+            using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
             return (value_type<T>)exchange((type*)ctx, (underlying_type_t<T>)value);
         }
         template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
             T* ctx, value_type<T> value) noexcept {
-            using adaptor = interlocked_adaptor<T>;
+            using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
             return adaptor::to_value(
                 exchange(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value), this_order));
         }
@@ -1189,7 +1189,7 @@ public:
         template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
             T* ctx, underlying_type_t<T> value) noexcept {
-            using type = copy_cv_t<T, underlying_type_t<T>>;
+            using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
             return (value_type<T>)fetch_add((type*)ctx, value);
         }
         template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
@@ -1197,7 +1197,7 @@ public:
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
             T* ctx, ptrdiff_t value) noexcept {
             static constexpr intptr_t stride = sizeof(T);
-            using type = copy_cv_t<T, intptr_t>;
+            using type UTL_NODEBUG = copy_cv_t<T, intptr_t>;
             return (value_type<T>)fetch_add((type*)ctx, (intptr_t)value * stride);
         }
         template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
@@ -1208,7 +1208,7 @@ public:
         template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_sub(
             T* ctx, underlying_type_t<T> value) noexcept {
-            using type = copy_cv_t<T, underlying_type_t<T>>;
+            using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
             return (value_type<T>)fetch_sub((type*)ctx, value);
         }
         template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
@@ -1216,7 +1216,7 @@ public:
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_sub(
             T* ctx, ptrdiff_t value) noexcept {
             static constexpr intptr_t stride = sizeof(T);
-            using type = copy_cv_t<T, intptr_t>;
+            using type UTL_NODEBUG = copy_cv_t<T, intptr_t>;
             return (value_type<T>)fetch_sub((type*)ctx, (intptr_t)value * stride);
         }
         template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
@@ -1227,14 +1227,14 @@ public:
         template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
             T* ctx, underlying_type_t<T> value) noexcept {
-            using type = copy_cv_t<T, underlying_type_t<T>>;
+            using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
             return (value_type<T>)fetch_and((type*)ctx, value);
         }
         template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
         UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
             T* ctx, uintptr_t value) noexcept {
-            using type = copy_cv_t<T, uintptr_t>;
+            using type UTL_NODEBUG = copy_cv_t<T, uintptr_t>;
             return (value_type<T>)fetch_and((type*)ctx, value);
         }
         template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
@@ -1245,14 +1245,14 @@ public:
         template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
             T* ctx, underlying_type_t<T> value) noexcept {
-            using type = copy_cv_t<T, underlying_type_t<T>>;
+            using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
             return (value_type<T>)fetch_or((type*)ctx, value);
         }
         template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
         UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
             T* ctx, uintptr_t value) noexcept {
-            using type = copy_cv_t<T, uintptr_t>;
+            using type UTL_NODEBUG = copy_cv_t<T, uintptr_t>;
             return (value_type<T>)fetch_or((type*)ctx, value);
         }
         template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
@@ -1263,14 +1263,14 @@ public:
         template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
             T* ctx, underlying_type_t<T> value) noexcept {
-            using type = copy_cv_t<T, underlying_type_t<T>>;
+            using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
             return (value_type<T>)fetch_xor((type*)ctx, value);
         }
         template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
         UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
             T* ctx, uintptr_t value) noexcept {
-            using type = copy_cv_t<T, uintptr_t>;
+            using type UTL_NODEBUG = copy_cv_t<T, uintptr_t>;
             return (value_type<T>)fetch_xor((type*)ctx, value);
         }
     };
@@ -1286,15 +1286,15 @@ using exchange_operations = exchange_traits::operations<O>;
 struct compare_exchange_traits {
 private:
     template <typename T>
-    using value_type = typename interlocked_adaptor<T>::value_type;
+    using value_type UTL_NODEBUG = typename interlocked_adaptor<T>::value_type;
     template <typename T>
-    using pointer = typename interlocked_adaptor<T>::pointer;
-    using relaxed_type = memory_order_type<memory_order::relaxed>;
-    using acquire_type = memory_order_type<memory_order::acquire>;
-    using release_type = memory_order_type<memory_order::release>;
-    using consume_type = memory_order_type<memory_order::consume>;
-    using seq_cst_type = memory_order_type<memory_order::seq_cst>;
-    using acq_rel_type = memory_order_type<memory_order::acq_rel>;
+    using pointer UTL_NODEBUG = typename interlocked_adaptor<T>::pointer;
+    using relaxed_type UTL_NODEBUG = memory_order_type<memory_order::relaxed>;
+    using acquire_type UTL_NODEBUG = memory_order_type<memory_order::acquire>;
+    using release_type UTL_NODEBUG = memory_order_type<memory_order::release>;
+    using consume_type UTL_NODEBUG = memory_order_type<memory_order::consume>;
+    using seq_cst_type UTL_NODEBUG = memory_order_type<memory_order::seq_cst>;
+    using acq_rel_type UTL_NODEBUG = memory_order_type<memory_order::acq_rel>;
     static constexpr release_type release_v{};
     static constexpr acquire_type acquire_v{};
 
@@ -1465,7 +1465,7 @@ private:
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
         T* ctx, pointer<T> expected, value_type<T> desired, memory_order_type<S> success,
         memory_order_type<F> failure) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         constexpr auto order = interlock_order(success, failure);
         auto const comp = adaptor::to_interlock(*expected);
         auto const prev = interlocked(
@@ -1484,7 +1484,7 @@ private:
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(
         T* ctx, pointer<T> expected, value_type<T> desired, memory_order_type<S> success,
         memory_order_type<F> failure) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         constexpr auto order = interlock_order(success, failure);
         auto const comp = adaptor::to_interlock(*expected);
         auto const prev = interlocked(
@@ -1503,7 +1503,7 @@ private:
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(T* ctx,
         pointer<T> expected, value_type<T> desired, memory_order_type<S> success,
         memory_order_type<F> failure) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         constexpr auto order = interlock_order(success, failure);
         auto const comp = adaptor::to_interlock(*expected);
         auto const prev = interlocked(
@@ -1520,7 +1520,7 @@ private:
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(T* ctx,
         pointer<T> expected, value_type<T> const& desired, memory_order_type<S> success,
         memory_order_type<F> failure) noexcept {
-        using adaptor = interlocked_adaptor<T>;
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
         constexpr auto order = interlock_order(success, failure);
         auto const comp = adaptor::to_interlock(*expected);
         auto const prev = interlocked(
@@ -1549,7 +1549,7 @@ public:
     struct operations {
     protected:
         static constexpr memory_order_type<S> success_v{};
-        using failure_type = compare_exchange_failure<F>;
+        using failure_type UTL_NODEBUG = compare_exchange_failure<F>;
         UTL_CONSTEXPR_CXX20 ~operations() noexcept = default;
 
     public:
