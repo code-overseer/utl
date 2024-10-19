@@ -32,6 +32,18 @@ struct Enum {
     };
 };
 
+struct alignas(4) Struct {
+    char data[4];
+};
+
+Enum<int>::Type func(Enum<int>::Type* ptr) {
+    return utl::atomic_acquire::load(ptr);
+}
+
+Struct func(Struct* ptr) {
+    return utl::atomic_acquire::load(ptr);
+}
+
 using native_types = utl::type_list<bool, char, signed char, unsigned char, short, unsigned short,
     int, unsigned int, long, unsigned long, long long, unsigned long long, void*>;
 

@@ -14,6 +14,7 @@
 
 #include "utl/atomic/gnu/utl_memory_barriers.h"
 #include "utl/concepts/utl_boolean_type.h"
+#include "utl/memory/utl_addressof.h"
 #include "utl/numeric/utl_sized_integral.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_copy_cv.h"
@@ -122,8 +123,9 @@ public:
 
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> load(T const* ctx) noexcept {
-        using type UTL_NODEBUG = copy_cv_t<T const, underlying_type_t<T>>;
-        return (value_type<T>)load((type*)ctx);
+        value_type<T> out;
+        __atomic_load(ctx, &out, order);
+        return out;
     }
 
     template <UTL_CONCEPT_CXX20(boolean_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_boolean(T))>
@@ -133,11 +135,14 @@ public:
 
     template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> load(T const* ctx) noexcept {
-        // Since the pointer isn't actually dereferenced, this __may__ not be UB
-        using type UTL_NODEBUG = copy_cv_t<T const, interpreted_type_t<T>>;
-        auto const val = load((type*)ctx);
         alignas(T) unsigned char buffer[sizeof(T)];
-        return *((value_type<T>*)__UTL_MEMCPY(buffer, &val, sizeof(T)));
+        auto ptr = reinterpret_cast<value_type<T>*>(buffer);
+        __atomic_load(ctx, ptr, order);
+#ifdef UTL_BUILTIN_launder
+        return *UTL_BUILTIN_launder(ptr);
+#else
+        return *ptr;
+#endif
     }
 };
 
@@ -162,8 +167,7 @@ public:
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
         T* ctx, value_type<T> value) noexcept {
-        using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-        store((type*)ctx, (underlying_type_t<T>)value, order);
+        __atomic_store(ctx, __UTL addressof(value), order);
     }
 
     template <UTL_CONCEPT_CXX20(boolean_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_boolean(T))>
@@ -173,10 +177,8 @@ public:
 
     template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
-        T* ctx, value_type<T> value) noexcept {
-        using type UTL_NODEBUG = copy_cv_t<T, interpreted_type_t<T>>;
-        alignas(T) unsigned char buffer[sizeof(T)];
-        store((type*)ctx, *((interpreted_type_t<T>*)__UTL_MEMCPY(buffer, &value, sizeof(T))));
+        T* ctx, value_type<T> const& value) noexcept {
+        __atomic_store(ctx, __UTL addressof(value), order);
     }
 };
 
@@ -206,18 +208,17 @@ public:
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> value) noexcept {
-        using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-        return (value_type<T>)exchange((type*)ctx, (underlying_type_t<T>)value);
+        __atomic_exchange(ctx, __UTL addressof(value), __UTL addressof(value), order);
+        return value;
     }
 
     template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
-        T* ctx, value_type<T> value) noexcept {
-        using type UTL_NODEBUG = copy_cv_t<T, interpreted_type_t<T>>;
+        T* ctx, value_type<T> const& value) noexcept {
         alignas(T) unsigned char buffer[sizeof(T)];
-        auto const val = exchange(
-            (type*)ctx, *((interpreted_type_t<T>*)__UTL_MEMCPY(buffer, &value, sizeof(T))));
-        return *((interpreted_type_t<T>*)__UTL_MEMCPY(buffer, &val, sizeof(T)));
+        auto ptr = (value_type<T>*)__UTL_MEMCPY(buffer, __UTL addressof(value), sizeof(T));
+        __atomic_exchange(ctx, ptr, ptr, order);
+        return *ptr;
     }
 
     template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
@@ -367,35 +368,33 @@ private:
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_strong_(
         T* ctx, pointer<T> expected, value_type<T> value) noexcept {
-        using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-        return compare_exchange_strong_(
-            (type*)ctx, (underlying_type_t<T>*)expected, (underlying_type_t<T>)value);
+        return __atomic_compare_exchange(
+            ctx, expected, __UTL addressof(value), strong, success, fail);
     }
 
     template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak_(
         T* ctx, pointer<T> expected, value_type<T> value) noexcept {
-        using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-        return compare_exchange_weak_(
-            (type*)ctx, (underlying_type_t<T>*)expected, (underlying_type_t<T>)value);
+        return __atomic_compare_exchange(
+            ctx, expected, __UTL addressof(value), weak, success, fail);
     }
 
     template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_strong_(
-        T* ctx, pointer<T> expected, value_type<T> value) noexcept {
-        using type UTL_NODEBUG = copy_cv_t<T, interpreted_type_t<T>>;
+        T* ctx, pointer<T> expected, value_type<T> const& value) noexcept {
         alignas(T) unsigned char buffer[sizeof(T)];
-        return compare_exchange_strong_((type*)ctx, (interpreted_type_t<T>*)expected,
-            *((interpreted_type_t<T>*)__UTL_MEMCPY(buffer, &value, sizeof(T))));
+        auto desired = reinterpret_cast<value_type<T>*>(
+            __UTL_MEMCPY(buffer, __UTL addressof(value), sizeof(T)));
+        return __atomic_compare_exchange(ctx, expected, desired, strong, success, fail);
     }
 
     template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak_(
-        T* ctx, pointer<T> expected, value_type<T> value) noexcept {
-        using type UTL_NODEBUG = copy_cv_t<T, interpreted_type_t<T>>;
+        T* ctx, pointer<T> expected, value_type<T> const& value) noexcept {
         alignas(T) unsigned char buffer[sizeof(T)];
-        return compare_exchange_weak_((type*)ctx, (interpreted_type_t<T>*)expected,
-            *((interpreted_type_t<T>*)__UTL_MEMCPY(buffer, &value, sizeof(T))));
+        auto desired = reinterpret_cast<value_type<T>*>(
+            __UTL_MEMCPY(buffer, __UTL addressof(value), sizeof(T)));
+        return __atomic_compare_exchange(ctx, expected, desired, weak, success, fail);
     }
 
 public:
