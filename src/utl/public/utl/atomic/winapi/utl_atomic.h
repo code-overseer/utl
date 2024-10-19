@@ -192,7 +192,7 @@ public:
 
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
     static inline constexpr interlocked_type to_interlocked(value_type value) noexcept {
-        return base_type::to_interlocked(to_underlying(value));
+        return base_type::to_interlocked(__UTL to_underlying(value));
     }
 
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
@@ -223,9 +223,10 @@ public:
     using interlocked_type = interpreted_type_t<T>;
 
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr interlocked_type to_interlocked(value_type value) noexcept {
+    static inline constexpr interlocked_type to_interlocked(value_type const& value) noexcept {
         interlocked_type ret;
-        return *(interlocked_type*)__UTL_MEMCPY(&ret, &value, sizeof(value_type));
+        __UTL_MEMCPY(&ret, __UTL addressof(value), sizeof(value_type));
+        return ret;
     }
 
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
@@ -1466,7 +1467,7 @@ private:
         memory_order_type<F> failure) noexcept {
         using adaptor = interlocked_adaptor<T>;
         constexpr auto order = interlock_order(success, failure);
-        auto const comp = adaptor::to_interlocked(*expected);
+        auto const comp = adaptor::to_interlock(*expected);
         auto const prev = interlocked(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(desired), comp, order);
         if (comp == prev) {
@@ -1485,7 +1486,7 @@ private:
         memory_order_type<F> failure) noexcept {
         using adaptor = interlocked_adaptor<T>;
         constexpr auto order = interlock_order(success, failure);
-        auto const comp = adaptor::to_interlocked(*expected);
+        auto const comp = adaptor::to_interlock(*expected);
         auto const prev = interlocked(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(desired), comp, order);
         if (comp == prev) {
@@ -1504,7 +1505,7 @@ private:
         memory_order_type<F> failure) noexcept {
         using adaptor = interlocked_adaptor<T>;
         constexpr auto order = interlock_order(success, failure);
-        auto const comp = adaptor::to_interlocked(*expected);
+        auto const comp = adaptor::to_interlock(*expected);
         auto const prev = interlocked(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(desired), comp, order);
         if (comp == prev) {
@@ -1517,11 +1518,11 @@ private:
 
     template <UTL_CONCEPT_CXX20(interpretable_type) T, memory_order S, memory_order F UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(T* ctx,
-        pointer<T> expected, value_type<T> desired, memory_order_type<S> success,
+        pointer<T> expected, value_type<T> const& desired, memory_order_type<S> success,
         memory_order_type<F> failure) noexcept {
         using adaptor = interlocked_adaptor<T>;
         constexpr auto order = interlock_order(success, failure);
-        auto const comp = adaptor::to_interlocked(*expected);
+        auto const comp = adaptor::to_interlock(*expected);
         auto const prev = interlocked(
             adaptor::to_interlocked(ctx), adaptor::to_interlocked(desired), comp, order);
         if (comp == prev) {
@@ -1534,7 +1535,7 @@ private:
 
     template <UTL_CONCEPT_CXX20(sized_integral<16>) T, memory_order S, memory_order F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(16, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange(T* ctx,
-        pointer<T> expected, value_type<T> desired, memory_order_type<S> success,
+        pointer<T> expected, value_type<T> const& desired, memory_order_type<S> success,
         memory_order_type<F> failure) noexcept {
         constexpr auto order = interlock_order(success, failure);
         alignas(16) __int64 buffer[2];
@@ -1553,15 +1554,15 @@ public:
 
     public:
         template <typename T>
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline auto compare_exchange_strong(
-            T* ctx, pointer<T> expected, value_type<T> desired, failure_type failure) noexcept
+        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline auto compare_exchange_strong(T* ctx,
+            pointer<T> expected, value_type<T> const& desired, failure_type failure) noexcept
             -> decltype(compare_exchange(ctx, expected, desired, success_v, failure)) {
             return compare_exchange(ctx, expected, desired, success_v, failure);
         }
 
         template <typename T>
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline auto compare_exchange_weak(
-            T* ctx, pointer<T> expected, value_type<T> desired, failure_type failure) noexcept
+        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline auto compare_exchange_weak(T* ctx,
+            pointer<T> expected, value_type<T> const& desired, failure_type failure) noexcept
             -> decltype(compare_exchange(ctx, expected, desired, success_v, failure)) {
             // Only < ARMv8.1-a has no dedicated CAS instruction
             // But it requires exclusive load/store intrinsics to be exposed by MSVC to be supported
