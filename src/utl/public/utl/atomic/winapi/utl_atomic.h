@@ -1230,13 +1230,7 @@ public:
             using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
             return (value_type<T>)fetch_and((type*)ctx, value);
         }
-        template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
-        UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
-            T* ctx, uintptr_t value) noexcept {
-            using type UTL_NODEBUG = copy_cv_t<T, uintptr_t>;
-            return (value_type<T>)fetch_and((type*)ctx, value);
-        }
+
         template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
             T* ctx, value_type<T> value) noexcept {
@@ -1248,13 +1242,7 @@ public:
             using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
             return (value_type<T>)fetch_or((type*)ctx, value);
         }
-        template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
-        UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
-            T* ctx, uintptr_t value) noexcept {
-            using type UTL_NODEBUG = copy_cv_t<T, uintptr_t>;
-            return (value_type<T>)fetch_or((type*)ctx, value);
-        }
+
         template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
             T* ctx, value_type<T> value) noexcept {
@@ -1264,13 +1252,6 @@ public:
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
             T* ctx, underlying_type_t<T> value) noexcept {
             using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-            return (value_type<T>)fetch_xor((type*)ctx, value);
-        }
-        template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
-        UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
-        UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
-            T* ctx, uintptr_t value) noexcept {
-            using type UTL_NODEBUG = copy_cv_t<T, uintptr_t>;
             return (value_type<T>)fetch_xor((type*)ctx, value);
         }
     };

@@ -6,10 +6,7 @@
 #include "utl/configuration/utl_keywords.h"
 #include "utl/configuration/utl_standard.h"
 
-#if UTL_HAS_BUILTIN(__builtin_memcpy_inline)
-#  define __UTL_MEMCPY __builtin_memcpy_inline
-
-#elif UTL_HAS_BUILTIN(__builtin_memcpy)
+#if UTL_HAS_BUILTIN(__builtin_memcpy)
 
 #  define __UTL_MEMCPY __builtin_memcpy
 

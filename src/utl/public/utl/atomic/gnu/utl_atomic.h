@@ -179,7 +179,10 @@ public:
     template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
         T* ctx, value_type<T> const& value) noexcept {
-        __atomic_store(ctx, __UTL addressof(value), order);
+        alignas(T) unsigned char buffer[sizeof(T)];
+        auto ptr = reinterpret_cast<value_type<T>*>(
+            __UTL_MEMCPY(buffer, __UTL addressof(value), sizeof(T)));
+        __atomic_store(ctx, ptr, order);
     }
 };
 
@@ -228,13 +231,6 @@ public:
         return __atomic_fetch_add(ctx, delta, order);
     }
 
-    template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
-        T* ctx, underlying_type_t<T> delta) noexcept {
-        using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-        return (value_type<T>)fetch_add((type*)ctx, (underlying_type_t<T>)delta);
-    }
-
     template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
     UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_add(
@@ -246,13 +242,6 @@ public:
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_sub(
         T* ctx, value_type<T> delta) noexcept {
         return __atomic_fetch_sub(ctx, delta, order);
-    }
-
-    template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_sub(
-        T* ctx, underlying_type_t<T> delta) noexcept {
-        using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-        return (value_type<T>)fetch_sub((type*)ctx, delta);
     }
 
     template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
@@ -268,57 +257,15 @@ public:
         return __atomic_fetch_and(ctx, mask, order);
     }
 
-    template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
-        T* ctx, underlying_type_t<T> mask) noexcept {
-        using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-        return (value_type<T>)fetch_and((type*)ctx, mask);
-    }
-
-    template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
-    UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_and(
-        T* ctx, uintptr_t mask) noexcept {
-        return __atomic_fetch_and(ctx, mask, order);
-    }
-
     template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
         T* ctx, value_type<T> mask) noexcept {
         return __atomic_fetch_or(ctx, mask, order);
     }
 
-    template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
-        T* ctx, underlying_type_t<T> mask) noexcept {
-        using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-        return (value_type<T>)fetch_or((type*)ctx, (underlying_type_t<T>)mask);
-    }
-
-    template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
-    UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_or(
-        T* ctx, uintptr_t mask) noexcept {
-        return __atomic_fetch_or(ctx, mask, order);
-    }
-
     template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
         T* ctx, value_type<T> mask) noexcept {
-        return __atomic_fetch_xor(ctx, mask, order);
-    }
-
-    template <UTL_CONCEPT_CXX20(enum_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_enum(T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
-        T* ctx, underlying_type_t<T> mask) noexcept {
-        using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-        return (value_type<T>)fetch_xor((type*)ctx, mask);
-    }
-
-    template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_pointer(T))>
-    UTL_CONSTRAINT_CXX20(is_pointer_v<T>)
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> fetch_xor(
-        T* ctx, uintptr_t mask) noexcept {
         return __atomic_fetch_xor(ctx, mask, order);
     }
 };

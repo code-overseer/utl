@@ -8,6 +8,7 @@
 #include "utl/type_traits/utl_is_void.h"
 #include "utl/type_traits/utl_logical_traits.h"
 #include "utl/type_traits/utl_template_list.h"
+#include "utl/type_traits/utl_type_identity.h"
 #include "utl/type_traits/utl_underlying_type.h"
 
 namespace atomic_tests {
@@ -32,10 +33,19 @@ struct Enum {
     };
 };
 
+template <>
+struct Enum<void*> {
+    enum class Type {
+    };
+};
+
 template <typename Native>
 struct alignas(Native) Struct {
     unsigned char data[sizeof(Native)];
 };
+
+template <typename Native>
+using Enum_t = Enum<Native>::Type;
 
 using native_types = utl::type_list<bool, char, signed char, unsigned char, short, unsigned short,
     int, unsigned int, long, unsigned long, long long, unsigned long long, void*>;
@@ -51,27 +61,82 @@ using class_types = utl::type_list<Struct<bool>, Struct<char>, Struct<signed cha
 
 template <typename TYPE, typename OP>
 struct LoadAssertions {
-    static_assert(utl::is_same<TYPE, decltype(OP::load((TYPE*)(0)))>::value, "");
-    static_assert(utl::is_same<TYPE, decltype(OP::load((TYPE volatile*)(0)))>::value, "");
-    static_assert(utl::is_same<TYPE, decltype(OP::load((TYPE const*)(0)))>::value, "");
-    static_assert(utl::is_same<TYPE, decltype(OP::load((TYPE const volatile*)(0)))>::value, "");
+    static TYPE load(TYPE* ptr) noexcept { return OP::load(ptr); }
+    static TYPE load(TYPE volatile* ptr) noexcept { return OP::load(ptr); }
+    static TYPE load(TYPE const* ptr) noexcept { return OP::load(ptr); }
+    static TYPE load(TYPE const volatile* ptr) noexcept { return OP::load(ptr); }
 };
+
+#define INSTANTIATE(ASSERTION, MODIFIER, OP)                     \
+    template struct ASSERTION<MODIFIER<bool>, OP>;               \
+    template struct ASSERTION<MODIFIER<char>, OP>;               \
+    template struct ASSERTION<MODIFIER<signed char>, OP>;        \
+    template struct ASSERTION<MODIFIER<unsigned char>, OP>;      \
+    template struct ASSERTION<MODIFIER<short>, OP>;              \
+    template struct ASSERTION<MODIFIER<unsigned short>, OP>;     \
+    template struct ASSERTION<MODIFIER<int>, OP>;                \
+    template struct ASSERTION<MODIFIER<unsigned int>, OP>;       \
+    template struct ASSERTION<MODIFIER<long>, OP>;               \
+    template struct ASSERTION<MODIFIER<unsigned long>, OP>;      \
+    template struct ASSERTION<MODIFIER<long long>, OP>;          \
+    template struct ASSERTION<MODIFIER<unsigned long long>, OP>; \
+    template struct ASSERTION<MODIFIER<void*>, OP>
+
+INSTANTIATE(LoadAssertions, utl::type_identity_t, utl::atomic_relaxed);
+INSTANTIATE(LoadAssertions, Enum_t, utl::atomic_relaxed);
+INSTANTIATE(LoadAssertions, Struct, utl::atomic_relaxed);
+INSTANTIATE(LoadAssertions, utl::type_identity_t, utl::atomic_consume);
+INSTANTIATE(LoadAssertions, Enum_t, utl::atomic_consume);
+INSTANTIATE(LoadAssertions, Struct, utl::atomic_consume);
+INSTANTIATE(LoadAssertions, utl::type_identity_t, utl::atomic_acquire);
+INSTANTIATE(LoadAssertions, Enum_t, utl::atomic_acquire);
+INSTANTIATE(LoadAssertions, Struct, utl::atomic_acquire);
+INSTANTIATE(LoadAssertions, utl::type_identity_t, utl::atomic_seq_cst);
+INSTANTIATE(LoadAssertions, Enum_t, utl::atomic_seq_cst);
+INSTANTIATE(LoadAssertions, Struct, utl::atomic_seq_cst);
 
 template <typename TYPE, typename OP>
 struct StoreAssertions {
-    static_assert(utl::is_void<decltype(OP::store((TYPE*)(0), utl::declval<TYPE>()))>::value, "");
-    static_assert(
-        utl::is_void<decltype(OP::store((TYPE volatile*)(0), utl::declval<TYPE>()))>::value, "");
+    static void store(TYPE* ptr, TYPE value) noexcept { OP::store(ptr, value); }
+    static void store(TYPE volatile* ptr, TYPE value) noexcept { OP::store(ptr, value); }
 };
+
+INSTANTIATE(StoreAssertions, utl::type_identity_t, utl::atomic_relaxed);
+INSTANTIATE(StoreAssertions, Enum_t, utl::atomic_relaxed);
+INSTANTIATE(StoreAssertions, Struct, utl::atomic_relaxed);
+INSTANTIATE(StoreAssertions, utl::type_identity_t, utl::atomic_release);
+INSTANTIATE(StoreAssertions, Enum_t, utl::atomic_release);
+INSTANTIATE(StoreAssertions, Struct, utl::atomic_release);
+INSTANTIATE(StoreAssertions, utl::type_identity_t, utl::atomic_seq_cst);
+INSTANTIATE(StoreAssertions, Enum_t, utl::atomic_seq_cst);
+INSTANTIATE(StoreAssertions, Struct, utl::atomic_seq_cst);
 
 template <typename TYPE, typename OP>
 struct ExchangeAssertions {
-    static_assert(
-        utl::is_same<TYPE, decltype(OP::exchange((TYPE*)(0), utl::declval<TYPE>()))>::value, "");
-    static_assert(utl::is_same<TYPE,
-                      decltype(OP::exchange((TYPE volatile*)(0), utl::declval<TYPE>()))>::value,
-        "");
+    static TYPE exchange(TYPE* ptr, TYPE value) noexcept { return OP::exchange(ptr, value); }
+    static TYPE exchange(TYPE volatile* ptr, TYPE value) noexcept {
+        return OP::exchange(ptr, value);
+    }
 };
+
+INSTANTIATE(ExchangeAssertions, utl::type_identity_t, utl::atomic_relaxed);
+INSTANTIATE(ExchangeAssertions, Enum_t, utl::atomic_relaxed);
+INSTANTIATE(ExchangeAssertions, Struct, utl::atomic_relaxed);
+INSTANTIATE(ExchangeAssertions, utl::type_identity_t, utl::atomic_consume);
+INSTANTIATE(ExchangeAssertions, Enum_t, utl::atomic_consume);
+INSTANTIATE(ExchangeAssertions, Struct, utl::atomic_consume);
+INSTANTIATE(ExchangeAssertions, utl::type_identity_t, utl::atomic_acquire);
+INSTANTIATE(ExchangeAssertions, Enum_t, utl::atomic_acquire);
+INSTANTIATE(ExchangeAssertions, Struct, utl::atomic_acquire);
+INSTANTIATE(ExchangeAssertions, utl::type_identity_t, utl::atomic_release);
+INSTANTIATE(ExchangeAssertions, Enum_t, utl::atomic_release);
+INSTANTIATE(ExchangeAssertions, Struct, utl::atomic_release);
+INSTANTIATE(ExchangeAssertions, utl::type_identity_t, utl::atomic_acq_rel);
+INSTANTIATE(ExchangeAssertions, Enum_t, utl::atomic_acq_rel);
+INSTANTIATE(ExchangeAssertions, Struct, utl::atomic_acq_rel);
+INSTANTIATE(ExchangeAssertions, utl::type_identity_t, utl::atomic_seq_cst);
+INSTANTIATE(ExchangeAssertions, Enum_t, utl::atomic_seq_cst);
+INSTANTIATE(ExchangeAssertions, Struct, utl::atomic_seq_cst);
 
 template <typename... Ts>
 struct Complete {
@@ -89,25 +154,6 @@ struct EachType<Assertion, T, utl::type_list<Ops...>> {
 template <template <typename, typename> class Assertion, typename... Types, typename... Operations>
 Complete<EachType<Assertion, Types, utl::type_list<Operations...>>...> instantiate(
     utl::type_list<Types...>, utl::type_list<Operations...>) noexcept;
-
-static_assert(utl::is_complete<decltype(instantiate<LoadAssertions>(
-        native_types{}, load_operations{}))>::value);
-static_assert(utl::is_complete<decltype(instantiate<StoreAssertions>(
-        native_types{}, store_operations{}))>::value);
-static_assert(utl::is_complete<decltype(instantiate<ExchangeAssertions>(
-        native_types{}, atomic_operations{}))>::value);
-static_assert(utl::is_complete<decltype(instantiate<LoadAssertions>(
-        enum_types{}, load_operations{}))>::value);
-static_assert(utl::is_complete<decltype(instantiate<StoreAssertions>(
-        enum_types{}, store_operations{}))>::value);
-static_assert(utl::is_complete<decltype(instantiate<ExchangeAssertions>(
-        enum_types{}, atomic_operations{}))>::value);
-static_assert(utl::is_complete<decltype(instantiate<LoadAssertions>(
-        class_types{}, load_operations{}))>::value);
-static_assert(utl::is_complete<decltype(instantiate<StoreAssertions>(
-        class_types{}, store_operations{}))>::value);
-static_assert(utl::is_complete<decltype(instantiate<ExchangeAssertions>(
-        class_types{}, atomic_operations{}))>::value);
 
 template <typename From, typename = void>
 struct BitwiseArg {
@@ -140,126 +186,129 @@ using ArithmeticArg_t = typename ArithmeticArg<T>::type;
 
 template <typename TYPE, typename OP>
 struct FetchBitwiseAssertions {
-    static_assert(
-        utl::is_same<TYPE,
-            decltype(OP::fetch_and((TYPE*)(0), utl::declval<BitwiseArg_t<TYPE>>()))>::value,
-        "");
-    static_assert(utl::is_same<TYPE,
-                      decltype(OP::fetch_and(
-                          (TYPE volatile*)(0), utl::declval<BitwiseArg_t<TYPE>>()))>::value,
-        "");
-    static_assert(
-        utl::is_same<TYPE,
-            decltype(OP::fetch_or((TYPE*)(0), utl::declval<BitwiseArg_t<TYPE>>()))>::value,
-        "");
-    static_assert(
-        utl::is_same<TYPE,
-            decltype(OP::fetch_or((TYPE volatile*)(0), utl::declval<BitwiseArg_t<TYPE>>()))>::value,
-        "");
-    static_assert(
-        utl::is_same<TYPE,
-            decltype(OP::fetch_xor((TYPE*)(0), utl::declval<BitwiseArg_t<TYPE>>()))>::value,
-        "");
-    static_assert(utl::is_same<TYPE,
-                      decltype(OP::fetch_xor(
-                          (TYPE volatile*)(0), utl::declval<BitwiseArg_t<TYPE>>()))>::value,
-        "");
+    static TYPE fetch_and(TYPE* ptr, BitwiseArg_t<TYPE> arg) noexcept {
+        return OP::fetch_and(ptr, arg);
+    }
+    static TYPE fetch_and(TYPE volatile* ptr, BitwiseArg_t<TYPE> arg) noexcept {
+        return OP::fetch_and(ptr, arg);
+    }
+
+    static TYPE fetch_or(TYPE* ptr, BitwiseArg_t<TYPE> arg) noexcept {
+        return OP::fetch_or(ptr, arg);
+    }
+    static TYPE fetch_or(TYPE volatile* ptr, BitwiseArg_t<TYPE> arg) noexcept {
+        return OP::fetch_or(ptr, arg);
+    }
+    static TYPE fetch_xor(TYPE* ptr, BitwiseArg_t<TYPE> arg) noexcept {
+        return OP::fetch_xor(ptr, arg);
+    }
+    static TYPE fetch_xor(TYPE volatile* ptr, BitwiseArg_t<TYPE> arg) noexcept {
+        return OP::fetch_xor(ptr, arg);
+    }
 };
+
+template <typename OP>
+struct FetchBitwiseAssertions<void*, OP> {};
 
 template <typename TYPE, typename OP>
 struct FetchArithmeticAssertions {
-    static_assert(
-        utl::is_same<TYPE,
-            decltype(OP::fetch_add((TYPE*)(0), utl::declval<ArithmeticArg_t<TYPE>>()))>::value,
-        "");
-    static_assert(utl::is_same<TYPE,
-                      decltype(OP::fetch_add(
-                          (TYPE volatile*)(0), utl::declval<ArithmeticArg_t<TYPE>>()))>::value,
-        "");
-    static_assert(
-        utl::is_same<TYPE,
-            decltype(OP::fetch_sub((TYPE*)(0), utl::declval<ArithmeticArg_t<TYPE>>()))>::value,
-        "");
-    static_assert(utl::is_same<TYPE,
-                      decltype(OP::fetch_sub(
-                          (TYPE volatile*)(0), utl::declval<ArithmeticArg_t<TYPE>>()))>::value,
-        "");
+    static TYPE fetch_add(TYPE* ptr, ArithmeticArg_t<TYPE> arg) noexcept {
+        return OP::fetch_add(ptr, arg);
+    }
+    static TYPE fetch_add(TYPE volatile* ptr, ArithmeticArg_t<TYPE> arg) noexcept {
+        return OP::fetch_add(ptr, arg);
+    }
+
+    static TYPE fetch_sub(TYPE* ptr, ArithmeticArg_t<TYPE> arg) noexcept {
+        return OP::fetch_sub(ptr, arg);
+    }
+    static TYPE fetch_sub(TYPE volatile* ptr, ArithmeticArg_t<TYPE> arg) noexcept {
+        return OP::fetch_sub(ptr, arg);
+    }
 };
 
-static_assert(utl::is_complete<decltype(instantiate<FetchBitwiseAssertions>(
-        native_types{}, atomic_operations{}))>::value);
-static_assert(utl::is_complete<decltype(instantiate<FetchArithmeticAssertions>(
-        native_types{}, atomic_operations{}))>::value);
-static_assert(utl::is_complete<decltype(instantiate<FetchBitwiseAssertions>(
-        enum_types{}, atomic_operations{}))>::value);
-static_assert(utl::is_complete<decltype(instantiate<FetchArithmeticAssertions>(
-        enum_types{}, atomic_operations{}))>::value);
+INSTANTIATE(FetchBitwiseAssertions, utl::type_identity_t, utl::atomic_relaxed);
+INSTANTIATE(FetchBitwiseAssertions, utl::type_identity_t, utl::atomic_consume);
+INSTANTIATE(FetchBitwiseAssertions, utl::type_identity_t, utl::atomic_acquire);
+INSTANTIATE(FetchBitwiseAssertions, utl::type_identity_t, utl::atomic_release);
+INSTANTIATE(FetchBitwiseAssertions, utl::type_identity_t, utl::atomic_acq_rel);
+INSTANTIATE(FetchBitwiseAssertions, utl::type_identity_t, utl::atomic_seq_cst);
 
-template <typename Failure>
+INSTANTIATE(FetchArithmeticAssertions, utl::type_identity_t, utl::atomic_relaxed);
+INSTANTIATE(FetchArithmeticAssertions, utl::type_identity_t, utl::atomic_consume);
+INSTANTIATE(FetchArithmeticAssertions, utl::type_identity_t, utl::atomic_acquire);
+INSTANTIATE(FetchArithmeticAssertions, utl::type_identity_t, utl::atomic_release);
+INSTANTIATE(FetchArithmeticAssertions, utl::type_identity_t, utl::atomic_acq_rel);
+INSTANTIATE(FetchArithmeticAssertions, utl::type_identity_t, utl::atomic_seq_cst);
+
+template <typename TYPE, typename OP, typename Failure>
 struct CompareExchangeAssertions {
-    template <typename TYPE, typename OP>
-    struct Assert {
-        static_assert(utl::is_boolean<decltype(OP::compare_exchange_strong(
-                          (TYPE*)(0), (TYPE*)(0), utl::declval<TYPE>(), Failure{}))>::value,
-            "");
-        static_assert(utl::is_boolean<decltype(OP::compare_exchange_strong((TYPE volatile*)(0),
-                          (TYPE*)(0), utl::declval<TYPE>(), Failure{}))>::value,
-            "");
-    };
+    static bool cas_stron(TYPE* ptr, TYPE* exp, TYPE val, Failure f) noexcept {
+        return OP::compare_exchange_strong(ptr, exp, val, f);
+    }
+    static bool cas_weak(TYPE* ptr, TYPE* exp, TYPE val, Failure f) noexcept {
+        return OP::compare_exchange_weak(ptr, exp, val, f);
+    }
+    static bool cas_stron(TYPE volatile* ptr, TYPE* exp, TYPE val, Failure f) noexcept {
+        return OP::compare_exchange_strong(ptr, exp, val, f);
+    }
+    static bool cas_weak(TYPE volatile* ptr, TYPE* exp, TYPE val, Failure f) noexcept {
+        return OP::compare_exchange_weak(ptr, exp, val, f);
+    }
 };
 
-static_assert(utl::is_complete<
-    decltype(instantiate<CompareExchangeAssertions<decltype(utl::memory_order_relaxed)>::Assert>(
-        native_types{}, atomic_operations{}))>::value);
+#undef INSTANTIATE
+#define INSTANTIATE(ASSERTION, MODIFIER, OP, FAIL)                     \
+    template struct ASSERTION<MODIFIER<bool>, OP, FAIL>;               \
+    template struct ASSERTION<MODIFIER<char>, OP, FAIL>;               \
+    template struct ASSERTION<MODIFIER<signed char>, OP, FAIL>;        \
+    template struct ASSERTION<MODIFIER<unsigned char>, OP, FAIL>;      \
+    template struct ASSERTION<MODIFIER<short>, OP, FAIL>;              \
+    template struct ASSERTION<MODIFIER<unsigned short>, OP, FAIL>;     \
+    template struct ASSERTION<MODIFIER<int>, OP, FAIL>;                \
+    template struct ASSERTION<MODIFIER<unsigned int>, OP, FAIL>;       \
+    template struct ASSERTION<MODIFIER<long>, OP, FAIL>;               \
+    template struct ASSERTION<MODIFIER<unsigned long>, OP, FAIL>;      \
+    template struct ASSERTION<MODIFIER<long long>, OP, FAIL>;          \
+    template struct ASSERTION<MODIFIER<unsigned long long>, OP, FAIL>; \
+    template struct ASSERTION<MODIFIER<void*>, OP, FAIL>
 
-static_assert(utl::is_complete<decltype(instantiate<
-        CompareExchangeAssertions<decltype(utl::memory_order_acquire)>::Assert>(native_types{},
-        utl::type_list<utl::atomic_acquire, utl::atomic_release, utl::atomic_acq_rel,
-            utl::atomic_seq_cst>{}))>::value);
+#define INSTANTIATE_CAS_ASSERT(MODIFIER)                                  \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_relaxed, \
+        decltype(utl::memory_order_relaxed));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_consume, \
+        decltype(utl::memory_order_relaxed));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_consume, \
+        decltype(utl::memory_order_consume));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_acquire, \
+        decltype(utl::memory_order_relaxed));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_acquire, \
+        decltype(utl::memory_order_consume));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_acquire, \
+        decltype(utl::memory_order_acquire));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_release, \
+        decltype(utl::memory_order_relaxed));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_release, \
+        decltype(utl::memory_order_consume));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_release, \
+        decltype(utl::memory_order_acquire));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_acq_rel, \
+        decltype(utl::memory_order_relaxed));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_acq_rel, \
+        decltype(utl::memory_order_consume));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_acq_rel, \
+        decltype(utl::memory_order_acquire));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_seq_cst, \
+        decltype(utl::memory_order_relaxed));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_seq_cst, \
+        decltype(utl::memory_order_consume));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_seq_cst, \
+        decltype(utl::memory_order_acquire));                             \
+    INSTANTIATE(CompareExchangeAssertions, MODIFIER, utl::atomic_seq_cst, \
+        decltype(utl::memory_order_seq_cst))
 
-static_assert(utl::is_complete<decltype(instantiate<
-        CompareExchangeAssertions<decltype(utl::memory_order_consume)>::Assert>(native_types{},
-        utl::type_list<utl::atomic_acquire, utl::atomic_consume, utl::atomic_release,
-            utl::atomic_acq_rel, utl::atomic_seq_cst>{}))>::value);
-
-static_assert(utl::is_complete<
-    decltype(instantiate<CompareExchangeAssertions<decltype(utl::memory_order_seq_cst)>::Assert>(
-        native_types{}, utl::type_list<utl::atomic_seq_cst>{}))>::value);
-
-static_assert(utl::is_complete<
-    decltype(instantiate<CompareExchangeAssertions<decltype(utl::memory_order_relaxed)>::Assert>(
-        enum_types{}, atomic_operations{}))>::value);
-
-static_assert(utl::is_complete<decltype(instantiate<
-        CompareExchangeAssertions<decltype(utl::memory_order_acquire)>::Assert>(enum_types{},
-        utl::type_list<utl::atomic_acquire, utl::atomic_release, utl::atomic_acq_rel,
-            utl::atomic_seq_cst>{}))>::value);
-
-static_assert(utl::is_complete<decltype(instantiate<
-        CompareExchangeAssertions<decltype(utl::memory_order_consume)>::Assert>(enum_types{},
-        utl::type_list<utl::atomic_acquire, utl::atomic_consume, utl::atomic_release,
-            utl::atomic_acq_rel, utl::atomic_seq_cst>{}))>::value);
-
-static_assert(utl::is_complete<
-    decltype(instantiate<CompareExchangeAssertions<decltype(utl::memory_order_seq_cst)>::Assert>(
-        enum_types{}, utl::type_list<utl::atomic_seq_cst>{}))>::value);
-
-static_assert(utl::is_complete<
-    decltype(instantiate<CompareExchangeAssertions<decltype(utl::memory_order_relaxed)>::Assert>(
-        class_types{}, atomic_operations{}))>::value);
-
-static_assert(utl::is_complete<decltype(instantiate<
-        CompareExchangeAssertions<decltype(utl::memory_order_acquire)>::Assert>(class_types{},
-        utl::type_list<utl::atomic_acquire, utl::atomic_release, utl::atomic_acq_rel,
-            utl::atomic_seq_cst>{}))>::value);
-
-static_assert(utl::is_complete<decltype(instantiate<
-        CompareExchangeAssertions<decltype(utl::memory_order_consume)>::Assert>(class_types{},
-        utl::type_list<utl::atomic_acquire, utl::atomic_consume, utl::atomic_release,
-            utl::atomic_acq_rel, utl::atomic_seq_cst>{}))>::value);
-
-static_assert(utl::is_complete<
-    decltype(instantiate<CompareExchangeAssertions<decltype(utl::memory_order_seq_cst)>::Assert>(
-        class_types{}, utl::type_list<utl::atomic_seq_cst>{}))>::value);
+INSTANTIATE_CAS_ASSERT(utl::type_identity_t);
+INSTANTIATE_CAS_ASSERT(Enum_t);
+INSTANTIATE_CAS_ASSERT(Struct);
 
 } // namespace atomic_tests
