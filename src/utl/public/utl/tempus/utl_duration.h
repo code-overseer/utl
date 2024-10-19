@@ -49,32 +49,6 @@ class __UTL_ABI_PUBLIC duration {
     struct direct_tag {};
     struct invalid_tag {};
 
-    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) static constexpr uint64_t reinterpret(
-        duration const& d) noexcept {
-        return (d.seconds_ << 30) | d.nanoseconds_;
-    }
-
-    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) static constexpr duration adjust_ns(
-        int64_t total_ns) noexcept {
-        return total_ns >= 0 ? duration{UTL_TRAIT_default_constant(direct_tag),
-                                   total_ns / nano_multiple, total_ns % nano_multiple}
-                             : invalid();
-    }
-
-    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) static constexpr duration adjust(
-        int64_t s, int64_t ns) noexcept {
-        return adjust_ns(s * nano_multiple + ns);
-    }
-
-    template <typename R, typename P>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) static UTL_CONSTEXPR_CXX14 duration from_chrono(
-        ::std::chrono::duration<R, P> const& t) noexcept {
-        using nano_ratio = ::std::ratio<1, nano_multiple>;
-        using nano_duration = ::std::chrono::duration<int64_t, nano_ratio>;
-        auto const time = ::std::chrono::duration_cast<nano_duration>(t).count();
-        return adjust(0, time);
-    }
-
     __UTL_HIDE_FROM_ABI constexpr duration(
         direct_tag, uint64_t seconds, uint64_t nanoseconds) noexcept
         : nanoseconds_(nanoseconds)
@@ -87,10 +61,18 @@ class __UTL_ABI_PUBLIC duration {
         , seconds_((1ull << seconds_bitwidth) - 1) {}
 
 public:
-    __UTL_HIDE_FROM_ABI static constexpr duration invalid() noexcept {
+#if UTL_COMPILER_APPLE_CLANG
+    // TODO: Check if this is still needed for Apple Clang 16000023
+    static constexpr duration invalid() noexcept {
         return {UTL_TRAIT_default_constant(invalid_tag)};
     }
+#else
+    static UTL_CONSTEVAL duration invalid() noexcept {
+        return {UTL_TRAIT_default_constant(invalid_tag)};
+    }
+#endif
 
+public:
     template <typename R, typename P>
     __UTL_HIDE_FROM_ABI explicit UTL_CONSTEXPR_CXX14 duration(::std::chrono::duration<R, P> const& t) noexcept
         : duration(from_chrono(t)) {}
@@ -129,8 +111,7 @@ public:
         return reinterpret(*this) != invalid_value;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr duration operator-(
-        duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr duration operator-(duration other) const noexcept {
         return *this && other
             ? duration{0,
                   static_cast<int64_t>(__UTL sub_sat(seconds_ * nano_multiple + nanoseconds_,
@@ -138,8 +119,7 @@ public:
             : invalid();
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr duration operator+(
-        duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr duration operator+(duration other) const noexcept {
         return *this && other
             ? duration{0,
                   static_cast<int64_t>(__UTL add_sat(seconds_ * nano_multiple + nanoseconds_,
@@ -147,34 +127,34 @@ public:
             : invalid();
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator==(duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator==(duration other) const noexcept {
         return reinterpret(*this) == reinterpret(other) && *this;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator!=(duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator!=(duration other) const noexcept {
         return *this && other && reinterpret(*this) != reinterpret(other);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator<(duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator<(duration other) const noexcept {
         return *this && other && reinterpret(*this) < reinterpret(other);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator>(duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator>(duration other) const noexcept {
         return *this && other && reinterpret(*this) > reinterpret(other);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator<=(duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator<=(duration other) const noexcept {
         return *this && other && reinterpret(*this) <= reinterpret(other);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator>=(duration const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool operator>=(duration other) const noexcept {
         return *this && other && reinterpret(*this) >= reinterpret(other);
     }
 
 #if UTL_CXX20
 
     template <same_as<duration> D, same_as<::std::partial_ordering> R = ::std::partial_ordering>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr R operator<=>(D const& other) const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr R operator<=>(D other) const noexcept {
         if (!*this || !other) {
             return R::unordered;
         }
@@ -185,6 +165,31 @@ public:
 #endif
 
 private:
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) static constexpr uint64_t reinterpret(duration d) noexcept {
+        return (d.seconds_ << 30) | d.nanoseconds_;
+    }
+
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) static constexpr duration adjust_ns(
+        int64_t total_ns) noexcept {
+        return total_ns >= 0 ? duration{UTL_TRAIT_default_constant(direct_tag),
+                                   total_ns / nano_multiple, total_ns % nano_multiple}
+                             : invalid();
+    }
+
+    UTL_ATTRIBUTES(ALWAYS_INLINE, _HIDE_FROM_ABI) static constexpr duration adjust(
+        int64_t s, int64_t ns) noexcept {
+        return adjust_ns(s * nano_multiple + ns);
+    }
+
+    template <typename R, typename P>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) static UTL_CONSTEXPR_CXX14 duration from_chrono(
+        ::std::chrono::duration<R, P> const& t) noexcept {
+        using nano_ratio = ::std::ratio<1, nano_multiple>;
+        using nano_duration = ::std::chrono::duration<int64_t, nano_ratio>;
+        auto const time = ::std::chrono::duration_cast<nano_duration>(t).count();
+        return adjust(0, time);
+    }
+
     using value_type = uint64_t;
     value_type nanoseconds_ : nanoseconds_bitwidth;
     value_type seconds_ : seconds_bitwidth;
