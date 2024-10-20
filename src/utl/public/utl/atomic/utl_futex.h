@@ -19,8 +19,8 @@ public:
 
     __UTL_HIDE_FROM_ABI static UTL_CONSTEVAL result success() noexcept;
 
-    constexpr friend bool operator==(result l, result r) noexcept { return l.value == r.value; }
-    constexpr friend bool operator!=(result l, result r) noexcept { return l.value != r.value; }
+    constexpr friend bool operator==(result l, result r) noexcept { return l.value_ == r.value_; }
+    constexpr friend bool operator!=(result l, result r) noexcept { return l.value_ != r.value_; }
 
 private:
     int value_;

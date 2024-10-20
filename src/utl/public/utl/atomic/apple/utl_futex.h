@@ -12,9 +12,9 @@
 
 #  include "utl/memory/utl_addressof.h"
 #  include "utl/numeric/utl_add_sat.h"
+#  include "utl/numeric/utl_limits.h"
 #  include "utl/tempus/utl_duration.h"
 #  include "utl/type_traits/utl_constants.h"
-#  include "utl/utility/utl_intcmp.h"
 
 #  include <errno.h>
 #  include <stdint.h>
@@ -94,24 +94,27 @@ UTL_INLINE_CXX17 constexpr bool is_waitable_v = __UTL futex::details::waitable<T
 #  endif // UTL_CXX20
 
 namespace details {
-inline bool to_microseconds(__UTL tempus::duration t, uint32_t* result) noexcept {
-    auto const micro = __UTL add_sat<uint64_t>(t.seconds() / 1000000, t.nanoseconds() * 1000);
-    *result = micro;
-    return __UTL in_range<uint32_t>(micro);
+UTL_ATTRIBUTE(_HIDE_FROM_ABI) inline uint32_t to_microseconds(__UTL tempus::duration t) noexcept {
+    if (!t) {
+        return UTL_NUMERIC_maximum(uint32_t);
+    }
+
+    auto const micro = __UTL add_sat<uint64_t>(t.seconds() * 1000000, t.nanoseconds() / 1000);
+    return micro > UTL_NUMERIC_maximum(uint32_t) ? UTL_NUMERIC_maximum(uint32_t) : micro;
 }
 } // namespace details
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4)
-auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
+UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
     -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
-    static constexpr uint32_t type = UL_COMPARE_AND_WAIT | UL_UNFAIR_LOCK;
-    static constexpr uint32_t op = type | ULF_WAIT_WORKQ_DATA_CONTENTION;
-    uint32_t microseconds = 0;
-    if (!details::to_microseconds(t, &microseconds)) UTL_UNLIKELY {
-        return result{EINVAL};
+    if (t == __UTL tempus::duration::zero()) {
+        return result{ETIMEDOUT};
     }
 
+    static constexpr uint32_t type = UL_COMPARE_AND_WAIT | UL_UNFAIR_LOCK;
+    static constexpr uint32_t op = type | ULF_WAIT_WORKQ_DATA_CONTENTION;
+    uint32_t const microseconds = details::to_microseconds(t);
     uint64_t readable_value = 0;
     __UTL_MEMCPY(&readable_value, __UTL addressof(value), sizeof(value));
     // If value is not equal ulock_wait returns 0
@@ -124,7 +127,7 @@ auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4)
-auto notify_one(T* address) noexcept
+UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_one(T* address) noexcept
     -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
     static constexpr uint32_t op = UL_COMPARE_AND_WAIT | UL_UNFAIR_LOCK;
     return __ulock_wake(op, address, __UTL_UNUSED);
@@ -132,7 +135,7 @@ auto notify_one(T* address) noexcept
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4)
-auto notify_all(T* address) noexcept
+UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_all(T* address) noexcept
     -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
     static constexpr uint32_t type = UL_COMPARE_AND_WAIT | UL_UNFAIR_LOCK;
     static constexpr uint32_t op = type | ULF_WAKE_ALL;
@@ -141,16 +144,15 @@ auto notify_all(T* address) noexcept
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 8)
-auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
+UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
     -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 8) {
-    static constexpr uint32_t type = UL_COMPARE_AND_WAIT64 | UL_UNFAIR_LOCK;
-    static constexpr uint32_t op = type | ULF_WAIT_WORKQ_DATA_CONTENTION;
-
-    uint32_t microseconds = 0;
-    if (!details::to_microseconds(t, &microseconds)) UTL_UNLIKELY {
-        return result{EINVAL};
+    if (t == __UTL tempus::duration::zero()) {
+        return result{ETIMEDOUT};
     }
 
+    static constexpr uint32_t type = UL_COMPARE_AND_WAIT64 | UL_UNFAIR_LOCK;
+    static constexpr uint32_t op = type | ULF_WAIT_WORKQ_DATA_CONTENTION;
+    uint32_t const microseconds = details::to_microseconds(t);
     uint64_t readable_value = 0;
     __UTL_MEMCPY(&readable_value, __UTL addressof(value), sizeof(value));
     // If value is not equal ulock_wait returns 0

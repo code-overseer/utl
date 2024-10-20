@@ -70,11 +70,16 @@ UTL_INLINE_CXX17 constexpr bool is_waitable_v = __UTL futex::details::waitable<T
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
-    -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_futex_waitable(T)) {
-    timespec timeout = static_cast<timespec>(t);
+    -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T)) {
+    if (t == __UTL tempus::duration::zero()) {
+        return result{ETIMEDOUT};
+    }
+
+    auto const timeout = static_cast<timespec>(t);
+    auto const timeout_ptr = !t ? nullptr : &timeout;
+
     int readable_value = 0;
     __UTL_MEMCPY(&readable_value, __UTL addressof(value), sizeof(value));
-    auto timeout_ptr = !t || (t.nanoseconds() | t.seconds()) == 0 ? nullptr : &timeout;
     auto wait_on = reinterpret_cast<uint32_t*>(address);
 
     if (!::futex(wait_on, FUTEX_WAIT, readable_value, timeout_ptr, nullptr)) {
@@ -83,7 +88,7 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus
 
     auto const error = errno;
     if (error == EAGAIN) {
-        return 0;
+        return result::success();
     }
 
     return result{error};
