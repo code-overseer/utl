@@ -2,7 +2,7 @@
 
 #pragma once
 
-#if !defined(UTL_PLATFORM_ATOMIC_PRIVATE_HEADER_GUARD)
+#if !defined(UTL_ATOMIC_PRIVATE_HEADER_GUARD)
 #  error "Private header accessed"
 #endif
 
@@ -220,7 +220,8 @@ public:
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> const& value) noexcept {
         alignas(T) unsigned char buffer[sizeof(T)];
-        auto ptr = (value_type<T>*)__UTL_MEMCPY(buffer, __UTL addressof(value), sizeof(T));
+        auto ptr = reinterpret_cast<value_type<T>*>(
+            __UTL_MEMCPY(buffer, __UTL addressof(value), sizeof(T)));
         __atomic_exchange(ctx, ptr, ptr, order);
         return *ptr;
     }

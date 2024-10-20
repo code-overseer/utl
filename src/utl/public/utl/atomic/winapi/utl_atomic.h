@@ -2,7 +2,7 @@
 
 #pragma once
 
-#if !defined(UTL_PLATFORM_ATOMIC_PRIVATE_HEADER_GUARD)
+#if !defined(UTL_ATOMIC_PRIVATE_HEADER_GUARD)
 #  error "Private header accessed"
 #endif
 
@@ -459,6 +459,35 @@ private:
         __iso_volatile_store64((__int64 volatile*)ctx, value);
     }
 
+    template <UTL_CONCEPT_CXX20(sized_integral<1>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
+        T* ctx, value_type<T> value, seq_cst_typ) noexcept {
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
+        return adaptor::to_value(
+            _InterlockedExchange8(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value)));
+    }
+
+    template <UTL_CONCEPT_CXX20(sized_integral<2>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(2, T))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
+        T* ctx, value_type<T> value, seq_cst_typ) noexcept {
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
+        _InterlockedExchange16(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value));
+    }
+
+    template <UTL_CONCEPT_CXX20(sized_integral<4>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(4, T))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
+        T* ctx, value_type<T> value, seq_cst_typ) noexcept {
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
+        _InterlockedExchange32(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value));
+    }
+
+    template <UTL_CONCEPT_CXX20(sized_integral<8>) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(8, T))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
+        T* ctx, value_type<T> value, seq_cst_typ) noexcept {
+        using adaptor UTL_NODEBUG = interlocked_adaptor<T>;
+        _InterlockedExchange64(adaptor::to_interlocked(ctx), adaptor::to_interlocked(value));
+    }
+
 #if UTL_ARCH_ARM
     template <UTL_CONCEPT_CXX20(sized_integral<1>) T, memory_order O UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_integral(1, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
@@ -514,7 +543,7 @@ public:
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
             T* ctx, value_type<T> value) noexcept {
             using type UTL_NODEBUG = copy_cv_t<T, underlying_type_t<T>>;
-            store((type*)ctx, (underlying_type_t<T>)value);
+            store((type*)ctx, (underlying_type_t<T>)value, this_order);
         }
 
         template <UTL_CONCEPT_CXX20(boolean_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_boolean(T))>

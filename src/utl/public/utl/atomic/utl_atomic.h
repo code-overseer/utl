@@ -20,16 +20,13 @@
 #endif
 
 /**
- * Atomic Standardization
+ * UTL Atomic
  * Current support:
  * * GNU based compilers that rely on the GNU atomic intrinsics
  * * MSVC using the Interlock intrinsics
  *
- * By default only fundamental objects are supported:
- * * Custom atomic types must specialize the platform::custom_atomic_type type
- * trait
- * * If data type is a class with padding bits, it is the user's responsibility
- * to zero them out
+ * * Class types must be trivially destructible and either trivially copyable or trivially movable
+ * * If data type is a class with padding bits, it is the user's responsibility to zero them out
  */
 
 #if UTL_COMPILER_GNU_BASED
@@ -126,7 +123,7 @@ UTL_CONSTEVAL bool is_store_order() noexcept {
 } // namespace atomics
 
 UTL_NAMESPACE_END
-#define UTL_PLATFORM_ATOMIC_PRIVATE_HEADER_GUARD
+#define UTL_ATOMIC_PRIVATE_HEADER_GUARD
 #if UTL_COMPILER_GNU_BASED
 #  include "utl/atomic/gnu/utl_atomic.h"
 #elif UTL_COMPILER_MSVC
@@ -134,7 +131,7 @@ UTL_NAMESPACE_END
 #else
 #  error Unsupported platform
 #endif
-#undef UTL_PLATFORM_ATOMIC_PRIVATE_HEADER_GUARD
+#undef UTL_ATOMIC_PRIVATE_HEADER_GUARD
 UTL_NAMESPACE_BEGIN
 
 template <>

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#if !defined(UTL_PLATFORM_ATOMIC_PRIVATE_HEADER_GUARD)
+#if !defined(UTL_ATOMIC_PRIVATE_HEADER_GUARD)
 #  error "Private header accessed"
 #endif
 
