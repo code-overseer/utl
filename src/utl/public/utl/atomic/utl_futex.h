@@ -71,34 +71,36 @@ public:
      *
      * @return `true` if the wait was interrupted, `false` otherwise.
      */
-    __UTL_HIDE_FROM_ABI constexpr bool interrupted() const noexcept;
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool interrupted() const noexcept;
     /**
      * Checks if the wait operation timed out.
      *
      * @return `true` if the wait timed out, `false` otherwise.
      */
-    __UTL_HIDE_FROM_ABI constexpr bool timed_out() const noexcept;
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool timed_out() const noexcept;
 
     /**
      * Checks if the wait operation failed for any reason other than interruption or timeout.
      *
      * @return `true` if the wait operation failed, `false` otherwise.
      */
-    __UTL_HIDE_FROM_ABI constexpr bool failed() const noexcept;
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr bool failed() const noexcept;
 
     /**
      * Returns the underlying integer value representing the result.
      *
      * @return The result value.
      */
-    __UTL_HIDE_FROM_ABI constexpr value_type value() const noexcept { return value_; }
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) constexpr value_type value() const noexcept {
+        return value_;
+    }
 
     /**
      * Returns a `result` object representing a successful futex operation.
      *
      * @return A `result` representing success.
      */
-    __UTL_HIDE_FROM_ABI static UTL_CONSTEVAL result success() noexcept;
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) static UTL_CONSTEVAL result success() noexcept;
 
     constexpr friend bool operator==(result l, result r) noexcept { return l.value_ == r.value_; }
     constexpr friend bool operator!=(result l, result r) noexcept { return l.value_ != r.value_; }

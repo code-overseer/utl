@@ -73,8 +73,8 @@ UTL_INLINE_CXX17 constexpr bool is_waitable_v = __UTL futex::details::waitable<T
 #endif // UTL_CXX20
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
-UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
-    -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T)) {
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) auto wait(T* address, T const& value,
+    __UTL tempus::duration t) noexcept -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T)) {
 
     if (t == __UTL tempus::duration::zero()) {
         return result{ETIMEDOUT};

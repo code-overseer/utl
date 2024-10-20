@@ -108,7 +108,8 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) inline uint32_t to_microseconds(__UTL tempus::dura
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4)
-UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) auto wait(
+    T* address, T const& value, __UTL tempus::duration t) noexcept
     -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
     if (t == __UTL tempus::duration::zero()) {
         return result{ETIMEDOUT};
