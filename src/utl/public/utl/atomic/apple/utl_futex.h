@@ -107,6 +107,15 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) inline uint32_t to_microseconds(__UTL tempus::dura
 } // namespace details
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
+result wait(T volatile* address, T const volatile& value, __UTL tempus::duration t) = delete;
+template <UTL_CONCEPT_CXX20(waitable_type) T>
+result wait(T volatile* address, T const& value, __UTL tempus::duration t) = delete;
+template <UTL_CONCEPT_CXX20(waitable_type) T>
+result wait(T const volatile* address, T const volatile& value, __UTL tempus::duration t) = delete;
+template <UTL_CONCEPT_CXX20(waitable_type) T>
+result wait(T const volatile* address, T const& value, __UTL tempus::duration t) = delete;
+
+template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4)
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) auto wait(
     T* address, T const& value, __UTL tempus::duration t) noexcept

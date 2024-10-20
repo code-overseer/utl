@@ -75,7 +75,7 @@ concept interpretable_type = (implicit_lifetime<remove_cv_t<T>> && UTL_TRAIT_is_
 template <typename T>
 struct is_interpretable : bool_constant<interpretable_type<T>> {};
 
-#  define UTL_TRAIT_is_atomic_interpretable(TYPE) __UTL atomic::interpretable_type<TYPE>
+#  define UTL_TRAIT_is_atomic_interpretable(TYPE) __UTL atomics::interpretable_type<TYPE>
 
 #else // UTL_CXX20
 
@@ -92,7 +92,7 @@ using interpretable UTL_NODEBUG = decltype(__UTL atomics::details::interpretable
 } // namespace details
 template <typename T>
 struct is_interpretable : details::interpretable<T> {};
-#  define UTL_TRAIT_is_atomic_interpretable(TYPE) __UTL atomic::details::interpretable<TYPE>::value
+#  define UTL_TRAIT_is_atomic_interpretable(TYPE) __UTL atomics::details::interpretable<TYPE>::value
 
 #endif // UTL_CXX20
 
