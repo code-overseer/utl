@@ -144,13 +144,13 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) auto wait(
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_one(T* address) noexcept
-    -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_futex_waitable(T)) {
+    -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T)) {
     WakeByAddressSingle((PVOID)address);
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_all(T* address) noexcept
-    -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_futex_waitable(T)) {
+    -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T)) {
     WakeByAddressAll((PVOID)address);
 }
 
