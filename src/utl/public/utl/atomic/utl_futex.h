@@ -9,14 +9,15 @@ namespace futex {
 
 class __UTL_ABI_PUBLIC result {
 public:
-    __UTL_HIDE_FROM_ABI constexpr result() noexcept : value_(0) {}
     __UTL_HIDE_FROM_ABI explicit constexpr result(int val) noexcept : value_(val) {}
 
-    __UTL_HIDE_FROM_ABI bool interrupted() const noexcept;
-    __UTL_HIDE_FROM_ABI bool timed_out() const noexcept;
-    __UTL_HIDE_FROM_ABI bool failed() const noexcept;
+    __UTL_HIDE_FROM_ABI constexpr bool interrupted() const noexcept;
+    __UTL_HIDE_FROM_ABI constexpr bool timed_out() const noexcept;
+    __UTL_HIDE_FROM_ABI constexpr bool failed() const noexcept;
 
-    __UTL_HIDE_FROM_ABI int value() const noexcept { return value_; }
+    __UTL_HIDE_FROM_ABI constexpr int value() const noexcept { return value_; }
+
+    __UTL_HIDE_FROM_ABI static UTL_CONSTEVAL result success() noexcept;
 
 private:
     int value_;

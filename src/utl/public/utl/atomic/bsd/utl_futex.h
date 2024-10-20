@@ -10,8 +10,6 @@
 
 #if UTL_TARGET_BSD
 
-#  include "utl/chrono/utl_chrono_fwd.h"
-
 #  include "utl/memory/utl_addressof.h"
 #  include "utl/tempus/utl_duration.h"
 #  include "utl/type_traits/utl_is_trivially_copyable.h"
@@ -24,13 +22,17 @@ UTL_NAMESPACE_BEGIN
 
 namespace futex {
 
-bool result::interrupted() const noexcept {
+UTL_CONSTEVAL result result::success() noexcept {
+    return result(0);
+}
+
+constexpr bool result::interrupted() const noexcept {
     return value_ == EINTR;
 }
-bool result::timed_out() const noexcept {
+constexpr bool result::timed_out() const noexcept {
     return value_ == ETIMEDOUT;
 }
-bool result::failed() const noexcept {
+constexpr bool result::failed() const noexcept {
     return value_ != 0;
 }
 
@@ -76,7 +78,7 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus
     auto wait_on = reinterpret_cast<uint32_t*>(address);
 
     if (!::futex(wait_on, FUTEX_WAIT, readable_value, timeout_ptr, nullptr)) {
-        return 0;
+        return result::success();
     }
 
     auto const error = errno;

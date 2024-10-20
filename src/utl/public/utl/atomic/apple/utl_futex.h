@@ -2,7 +2,7 @@
 
 #pragma once
 
-#if !defined(UTL_PLATFORM_FUTEX_PRIVATE_HEADER_GUARD)
+#if !defined(UTL_FUTEX_PRIVATE_HEADER_GUARD)
 #  error "Private header accessed"
 #endif
 
@@ -10,10 +10,9 @@
 
 #if UTL_TARGET_APPLE
 
-#  include "utl/chrono/utl_chrono_fwd.h"
-
 #  include "utl/memory/utl_addressof.h"
 #  include "utl/numeric/utl_add_sat.h"
+#  include "utl/tempus/utl_duration.h"
 #  include "utl/type_traits/utl_constants.h"
 #  include "utl/utility/utl_intcmp.h"
 
@@ -46,13 +45,17 @@ UTL_NAMESPACE_BEGIN
 
 namespace futex {
 
-bool result::interrupted() const noexcept {
+UTL_CONSTEVAL result result::success() noexcept {
+    return result(0);
+}
+
+constexpr bool result::interrupted() const noexcept {
     return value_ == EINTR;
 }
-bool result::timed_out() const noexcept {
+constexpr bool result::timed_out() const noexcept {
     return value_ == ETIMEDOUT;
 }
-bool result::failed() const noexcept {
+constexpr bool result::failed() const noexcept {
     return value_ != 0;
 }
 
@@ -101,12 +104,12 @@ inline bool to_microseconds(__UTL tempus::duration t, uint32_t* result) noexcept
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4)
 auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
-    -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
+    -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
     static constexpr uint32_t type = UL_COMPARE_AND_WAIT | UL_UNFAIR_LOCK;
     static constexpr uint32_t op = type | ULF_WAIT_WORKQ_DATA_CONTENTION;
     uint32_t microseconds = 0;
     if (!details::to_microseconds(t, &microseconds)) UTL_UNLIKELY {
-        return EINVAL;
+        return result{EINVAL};
     }
 
     uint64_t readable_value = 0;
@@ -116,7 +119,7 @@ auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
         return result{errno};
     }
 
-    return result();
+    return result::success();
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
@@ -139,23 +142,23 @@ auto notify_all(T* address) noexcept
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 8)
 auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
-    -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 8) {
+    -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 8) {
     static constexpr uint32_t type = UL_COMPARE_AND_WAIT64 | UL_UNFAIR_LOCK;
     static constexpr uint32_t op = type | ULF_WAIT_WORKQ_DATA_CONTENTION;
 
     uint32_t microseconds = 0;
     if (!details::to_microseconds(t, &microseconds)) UTL_UNLIKELY {
-        return EINVAL;
+        return result{EINVAL};
     }
 
     uint64_t readable_value = 0;
     __UTL_MEMCPY(&readable_value, __UTL addressof(value), sizeof(value));
     // If value is not equal ulock_wait returns 0
     if (__ulock_wait(op, address, readable_value, microseconds)) {
-        return errno;
+        return result{errno};
     }
 
-    return 0;
+    return result::success();
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>

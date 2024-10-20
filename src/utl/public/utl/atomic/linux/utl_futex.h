@@ -24,13 +24,17 @@ UTL_NAMESPACE_BEGIN
 
 namespace futex {
 
-bool result::interrupted() const noexcept {
+UTL_CONSTEVAL result result::success() noexcept {
+    return result(0);
+}
+
+constexpr bool result::interrupted() const noexcept {
     return value_ == EINTR;
 }
-bool result::timed_out() const noexcept {
+constexpr bool result::timed_out() const noexcept {
     return value_ == ETIMEDOUT;
 }
-bool result::failed() const noexcept {
+constexpr bool result::failed() const noexcept {
     return value_ != 0;
 }
 
@@ -77,12 +81,12 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus
     auto timeout_ptr = !t || (t.nanoseconds() | t.seconds()) == 0 ? nullptr : &timeout;
     if (!syscall(
             SYS_futex, reinterpret_cast<uint32_t*>(address), op, readable_value, timeout_ptr)) {
-        return 0;
+        return result::success();
     }
 
     auto const error = errno;
     if (error == EAGAIN) {
-        return 0;
+        return result::success();
     }
 
     return result{error};
