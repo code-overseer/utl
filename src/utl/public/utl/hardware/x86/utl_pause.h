@@ -2,10 +2,6 @@
 
 #pragma once
 
-#if !defined(UTL_PLATFORM_PAUSE_PRIVATE_HEADER_GUARD)
-#  error "Private header accessed"
-#endif
-
 #include "utl/utl_config.h"
 
 #if UTL_ARCH_x86
@@ -14,15 +10,17 @@
 extern "C" void _mm_pause(void);
 #    define __UTL_PAUSE() _mm_pause()
 #  else
-#    define __UTL_PAUSE() __asm__ volatile("pause")
+#    define __UTL_PAUSE() __asm__ volatile("pause" : : : "memory")
 #  endif
 UTL_NAMESPACE_BEGIN
 
-namespace platform {
-inline void pause() noexcept {
+namespace x86 {
+namespace {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline void pause() noexcept {
     __UTL_PAUSE();
 }
-} // namespace platform
+} // namespace
+} // namespace x86
 
 UTL_NAMESPACE_END
 

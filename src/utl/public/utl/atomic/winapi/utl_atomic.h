@@ -15,14 +15,14 @@
 #include "utl/atomic/winapi/utl_interlocked.h"
 #include "utl/atomic/winapi/utl_memory_access.h"
 #include "utl/atomic/winapi/utl_memory_barriers.h"
+#include "utl/concepts/utl_implicit_lifetime.h"
 #include "utl/numeric/utl_sized_integral.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_copy_cv.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_class.h"
-#include "utl/type_traits/utl_is_trivially_copy_constructible.h"
-#include "utl/type_traits/utl_is_trivially_destructible.h"
-#include "utl/type_traits/utl_is_trivially_move_constructible.h"
+#include "utl/type_traits/utl_is_implicit_lifetime.h"
+#include "utl/type_traits/utl_is_trivially_copyable.h"
 #include "utl/type_traits/utl_make_unsigned.h"
 #include "utl/type_traits/utl_remove_cv.h"
 #include "utl/type_traits/utl_underlying_type.h"
@@ -61,25 +61,25 @@ struct interpreted_type<T, 8> {
 
 #if UTL_CXX20
 template <typename T>
-concept interpretable_type = (UTL_TRAIT_is_class(T) && UTL_TRAIT_is_trivially_destructible(T) &&
-    (UTL_TRAIT_is_trivially_copy_constructible(T) ||
-        UTL_TRAIT_is_trivially_move_constructible(T)) &&
+concept interpretable_type = (implicit_lifetime<remove_cv_t<T>> && UTL_TRAIT_is_class(T) &&
+    UTL_TRAIT_is_trivially_copyable(remove_cv_t<T>) &&
     requires { typename interpreted_type<T>::type; });
 
 template <typename T>
 struct is_interpretable : bool_constant<interpretable_type<T>> {};
-#else  // UTL_CXX20
+#  define UTL_TRAIT_is_atomic_interpretable(TYPE) __UTL atomic::interpretable_type<TYPE>
+#else // UTL_CXX20
 namespace details {
 template <typename T>
 auto interpretable_impl(float) noexcept -> __UTL false_type;
 template <typename T>
-auto interpretable_impl(int) noexcept
-    -> __UTL bool_constant<UTL_TRAIT_is_class(T) && UTL_TRAIT_is_trivially_destructible(T) &&
-        (UTL_TRAIT_is_trivially_copy_constructible(T) ||
-            UTL_TRAIT_is_trivially_move_constructible(T)) &&
+auto interpretable_impl(int) noexcept -> __UTL
+    bool_constant<UTL_TRAIT_is_class(T) && UTL_TRAIT_is_implicit_lifetime(remove_cv_t<T>) &&
+        UTL_TRAIT_is_trivially_copyable(remove_cv_t<T>) &&
         __UTL always_true<typename interpreted_type<T>::type>()>;
 template <typename T>
 using interpretable UTL_NODEBUG = decltype(__UTL atomics::details::interpretable_impl<T>(0));
+#  define UTL_TRAIT_is_atomic_interpretable(TYPE) __UTL atomic::details::interpretable<TYPE>::value
 } // namespace details
 template <typename T>
 struct is_interpretable : details::interpretable<T> {};
@@ -1564,6 +1564,7 @@ public:
 template <memory_order S, memory_order F>
 using compare_exchange_operations = compare_exchange_traits::operations<S, F>;
 
+#undef UTL_TRAIT_is_atomic_interpretable
 } // namespace atomics
 
 UTL_NAMESPACE_END

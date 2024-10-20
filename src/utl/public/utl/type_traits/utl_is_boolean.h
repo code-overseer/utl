@@ -33,11 +33,6 @@ template <>
 UTL_INLINE_CXX17 constexpr bool is_boolean_v<bool const volatile> = true;
 #endif
 
-#if UTL_CXX20
-template <typename T>
-concept boolean_type = is_boolean_v<T>;
-#endif
-
 UTL_NAMESPACE_END
 
 #if UTL_CXX14

@@ -14,6 +14,7 @@
 
 #include "utl/atomic/gnu/utl_memory_barriers.h"
 #include "utl/concepts/utl_boolean_type.h"
+#include "utl/concepts/utl_implicit_lifetime.h"
 #include "utl/memory/utl_addressof.h"
 #include "utl/numeric/utl_sized_integral.h"
 #include "utl/type_traits/utl_constants.h"
@@ -21,9 +22,8 @@
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_boolean.h"
 #include "utl/type_traits/utl_is_class.h"
-#include "utl/type_traits/utl_is_trivially_copy_constructible.h"
-#include "utl/type_traits/utl_is_trivially_destructible.h"
-#include "utl/type_traits/utl_is_trivially_move_constructible.h"
+#include "utl/type_traits/utl_is_implicit_lifetime.h"
+#include "utl/type_traits/utl_is_trivially_copyable.h"
 #include "utl/type_traits/utl_make_unsigned.h"
 #include "utl/type_traits/utl_remove_cv.h"
 #include "utl/type_traits/utl_underlying_type.h"
@@ -66,30 +66,34 @@ struct interpreted_type<T, 16> {
 #endif
 
 #if UTL_CXX20
+
 template <typename T>
-concept interpretable_type = (UTL_TRAIT_is_class(T) && UTL_TRAIT_is_trivially_destructible(T) &&
-    (UTL_TRAIT_is_trivially_copy_constructible(remove_cv_t<T>) ||
-        UTL_TRAIT_is_trivially_move_constructible(remove_cv_t<T>)) &&
+concept interpretable_type = (implicit_lifetime<remove_cv_t<T>> && UTL_TRAIT_is_class(T) &&
+    UTL_TRAIT_is_trivially_copyable(remove_cv_t<T>) &&
     requires { typename interpreted_type<T>::type; });
 
 template <typename T>
 struct is_interpretable : bool_constant<interpretable_type<T>> {};
 
-#else  // UTL_CXX20
+#  define UTL_TRAIT_is_atomic_interpretable(TYPE) __UTL atomic::interpretable_type<TYPE>
+
+#else // UTL_CXX20
+
 namespace details {
 template <typename T>
 auto interpretable_impl(float) noexcept -> __UTL false_type;
 template <typename T>
-auto interpretable_impl(int) noexcept
-    -> __UTL bool_constant<UTL_TRAIT_is_class(T) && UTL_TRAIT_is_trivially_destructible(T) &&
-        (UTL_TRAIT_is_trivially_copy_constructible(T) ||
-            UTL_TRAIT_is_trivially_move_constructible(T)) &&
+auto interpretable_impl(int) noexcept -> __UTL
+    bool_constant<UTL_TRAIT_is_class(T) && UTL_TRAIT_is_implicit_lifetime(remove_cv_t<T>) &&
+        UTL_TRAIT_is_trivially_copyable(remove_cv_t<T>) &&
         __UTL always_true<typename interpreted_type<T>::type>()>;
 template <typename T>
 using interpretable UTL_NODEBUG = decltype(__UTL atomics::details::interpretable_impl<T>(0));
 } // namespace details
 template <typename T>
 struct is_interpretable : details::interpretable<T> {};
+#  define UTL_TRAIT_is_atomic_interpretable(TYPE) __UTL atomic::details::interpretable<TYPE>::value
+
 #endif // UTL_CXX20
 
 template <memory_order O>
@@ -134,7 +138,7 @@ public:
         return __atomic_load_n(ctx, order);
     }
 
-    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
+    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_atomic_interpretable(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> load(T const* ctx) noexcept {
         alignas(T) unsigned char buffer[sizeof(T)];
         auto ptr = reinterpret_cast<value_type<T>*>(buffer);
@@ -176,7 +180,7 @@ public:
         __atomic_store(ctx, __UTL addressof(value), order);
     }
 
-    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
+    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_atomic_interpretable(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline void store(
         T* ctx, value_type<T> const& value) noexcept {
         alignas(T) unsigned char buffer[sizeof(T)];
@@ -216,7 +220,7 @@ public:
         return value;
     }
 
-    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
+    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_atomic_interpretable(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline value_type<T> exchange(
         T* ctx, value_type<T> const& value) noexcept {
         alignas(T) unsigned char buffer[sizeof(T)];
@@ -328,7 +332,7 @@ private:
             ctx, expected, __UTL addressof(value), weak, success, fail);
     }
 
-    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
+    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_atomic_interpretable(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_strong_(
         T* ctx, pointer<T> expected, value_type<T> const& value) noexcept {
         alignas(T) unsigned char buffer[sizeof(T)];
@@ -337,7 +341,7 @@ private:
         return __atomic_compare_exchange(ctx, expected, desired, strong, success, fail);
     }
 
-    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(is_interpretable<T>::value)>
+    template <UTL_CONCEPT_CXX20(interpretable_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_atomic_interpretable(T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline bool compare_exchange_weak_(
         T* ctx, pointer<T> expected, value_type<T> const& value) noexcept {
         alignas(T) unsigned char buffer[sizeof(T)];
@@ -362,6 +366,7 @@ public:
     }
 };
 
+#undef UTL_TRAIT_is_atomic_interpretable
 } // namespace atomics
 
 UTL_NAMESPACE_END

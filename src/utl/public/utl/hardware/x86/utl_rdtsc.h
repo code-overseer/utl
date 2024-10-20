@@ -36,14 +36,14 @@ namespace {
 
 #  if UTL_SUPPORTS_GNU_ASM
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_none)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_none)) noexcept {
     uint64_t high;
     uint64_t low;
     __asm__("rdtsc" : "=a"(low), "=d"(high) : :);
     return (high << 32) | low;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_after)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_after)) noexcept {
     uint64_t high;
     uint64_t low;
     uint32_t aux;
@@ -56,7 +56,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier
     return (high << 32) | low;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_before)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_before)) noexcept {
     uint64_t high;
     uint64_t low;
     uint32_t aux;
@@ -69,7 +69,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier
     return (high << 32) | low;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_enclose)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_enclose)) noexcept {
     uint64_t high;
     uint64_t low;
     uint32_t aux;
@@ -85,25 +85,25 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier
 
 #  elif UTL_COMPILER_MSVC // UTL_SUPPORTS_GNU_ASM
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_none)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_none)) noexcept {
     return __rdtsc();
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_after)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_after)) noexcept {
     uint64_t const result = __rdtsc();
     _mm_lfence();
     UTL_COMPILER_BARRIER();
     return result;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_before)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_before)) noexcept {
     UTL_COMPILER_BARRIER();
     _mm_mfence();
     _mm_lfence();
     return __rdtsc();
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_enclose)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline uint64_t rdtsc(decltype(instruction_barrier_enclose)) noexcept {
     UTL_COMPILER_BARRIER();
     _mm_mfence();
     _mm_lfence();

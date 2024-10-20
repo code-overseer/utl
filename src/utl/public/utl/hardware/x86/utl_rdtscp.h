@@ -40,7 +40,7 @@ struct rdtcp_t {
 
 #  if UTL_SUPPORTS_GNU_ASM
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_none)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_none)) noexcept {
     uint64_t high;
     uint64_t low;
     uint32_t aux;
@@ -48,7 +48,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrie
     return rdtcp_t{(high << 32) | low, aux};
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_after)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_after)) noexcept {
     uint64_t high;
     uint64_t low;
     uint32_t aux;
@@ -61,7 +61,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrie
     return rdtcp_t{(high << 32) | low, aux};
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_before)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_before)) noexcept {
     uint64_t high;
     uint64_t low;
     uint32_t aux;
@@ -73,7 +73,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrie
     return rdtcp_t{(high << 32) | low, aux};
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_enclose)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_enclose)) noexcept {
     uint64_t high;
     uint64_t low;
     uint32_t aux;
@@ -88,13 +88,13 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrie
 
 #  elif UTL_COMPILER_MSVC // UTL_SUPPORTS_GNU_ASM
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_none)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_none)) noexcept {
     rdtscp_t result;
     result.timestamp = __rdtscp(&result.aux);
     return result;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_after)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_after)) noexcept {
     rdtscp_t result;
     result.timestamp = __rdtscp(&result.aux);
     _mm_lfence();
@@ -102,7 +102,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrie
     return result;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_before)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_before)) noexcept {
     rdtscp_t result;
     UTL_COMPILER_BARRIER();
     _mm_mfence();
@@ -110,7 +110,7 @@ UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrie
     return result;
 }
 
-UTL_ATTRIBUTES(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_enclose)) noexcept {
+UTL_ATTRIBUTE(ALWAYS_INLINE) inline rdtscp_t rdtscp(decltype(instruction_barrier_enclose)) noexcept {
     rdtscp_t result;
     UTL_COMPILER_BARRIER();
     _mm_mfence();
