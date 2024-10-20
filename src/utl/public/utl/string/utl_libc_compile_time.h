@@ -142,7 +142,7 @@ __UTL_HIDE_FROM_ABI constexpr int memcmp(
     T const* left, U const* right, element_count_t count) noexcept {
     static_assert(is_trivially_lexicographically_comparable<T, U>::value,
         "Types must be lexicographically comparable");
-#if UTL_HAS_BUILTIN(__builtin_char_memcmp)
+#if UTL_HAS_BUILTIN(__builtin_memcmp)
     return __builtin_memcmp(left, right, byte_count<T>(count));
 #else
     return recursive::memcmp(left, right, count);
