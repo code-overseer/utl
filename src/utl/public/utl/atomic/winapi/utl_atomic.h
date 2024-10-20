@@ -96,22 +96,24 @@ struct basic_adaptor {
     using interlocked_type = Interlock;
 
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr Interlock to_interlocked(value_type value) noexcept {
-        return (Interlock)value;
+    static inline constexpr interlocked_type to_interlocked(value_type value) noexcept {
+        return (interlocked_type)value;
     }
 
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr Interlock volatile* to_interlocked(volatile_pointer value) noexcept {
-        return (Interlock volatile*)value;
+    static inline constexpr interlocked_type volatile* to_interlocked(
+        volatile_pointer value) noexcept {
+        return reinterpret_cast<interlocked_type volatile*>(value);
     }
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
-    static inline constexpr Interlock const volatile* to_interlocked(
+    static inline constexpr interlocked_type const volatile* to_interlocked(
         const_volatile_pointer value) noexcept {
-        return (Interlock const volatile*)value;
+        return reinterpret_cast<interlocked_type const volatile*>(value);
     }
 
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
     static inline constexpr value_type to_value(interlocked_type value) noexcept {
+        // TODO: verify this is compilable when Interlock is void*
         return (value_type)value;
     }
 };
@@ -198,12 +200,17 @@ public:
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
     static inline constexpr interlocked_type volatile* to_interlocked(
         volatile_pointer value) noexcept {
-        return (interlocked_type volatile*)value;
+        return reinterpret_cast<interlocked_type volatile*>(value);
+    }
+    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
+    static inline constexpr interlocked_type const volatile* to_interlocked(
+        const_volatile_pointer value) noexcept {
+        return reinterpret_cast<interlocked_type const volatile*>(value);
     }
 
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
     static inline constexpr value_type to_value(interlocked_type value) noexcept {
-        return (value_type)base_type::to_value(value);
+        return static_cast<value_type>(base_type::to_value(value));
     }
 };
 
@@ -232,13 +239,19 @@ public:
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
     static inline constexpr interlocked_type volatile* to_interlocked(
         volatile_pointer value) noexcept {
-        return (interlocked_type volatile*)value;
+        return reinterpret_cast<interlocked_type volatile*>(value);
+    }
+    UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
+    static inline constexpr interlocked_type const volatile* to_interlocked(
+        const_volatile_pointer value) noexcept {
+        return reinterpret_cast<interlocked_type const volatile*>(value);
     }
 
     UTL_ATTRIBUTE(__HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD)
     static inline constexpr value_type to_value(interlocked_type value) noexcept {
         alignas(value_type) unsigned char buffer[sizeof(value_type)];
-        return *(value_type*)__UTL_MEMCPY(buffer, &value, sizeof(value_type));
+        // no need to launder, memcpy starts lifetime
+        return *reinterpret_cast<value_type*>(__UTL_MEMCPY(buffer, &value, sizeof(value_type)));
     }
 };
 
@@ -412,7 +425,7 @@ public:
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline value_type<T> load(
             T const* ctx) noexcept {
             using type UTL_NODEBUG = copy_cv_t<T const, underlying_type_t<T>>;
-            return load((type*)ctx);
+            return (value_type<T>)load((type*)ctx, this_order);
         }
 
         template <UTL_CONCEPT_CXX20(boolean_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_boolean(T))>
@@ -425,7 +438,7 @@ public:
         UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) static inline value_type<T> load(
             T const* ctx) noexcept {
             using type UTL_NODEBUG = copy_cv_t<T const, interpreted_type_t<T>>;
-            return load((type*)ctx, this_order);
+            return adaptor::to_value(load(adaptor::to_interlocked(ctx), this_order));
         }
     };
 };
