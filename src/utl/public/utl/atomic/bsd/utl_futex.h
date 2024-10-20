@@ -96,18 +96,18 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_one(T* address) noexcept
-    -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_futex_waitable(T)) {
+    -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T)) {
     static constexpr int wake_one = 1;
     auto wake_address = reinterpret_cast<uint32_t*>(address);
-    return ::futex(wake_address, FUTEX_WAKE, wake_one, nullptr, nullptr);
+    ::futex(wake_address, FUTEX_WAKE, wake_one, nullptr, nullptr);
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_futex_waitable(T))>
 UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_all(T* address) noexcept
-    -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_futex_waitable(T)) {
+    -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T)) {
     static constexpr int wake_all = INT_MAX;
     auto wake_address = reinterpret_cast<uint32_t*>(address);
-    return ::futex(wake_address, FUTEX_WAKE, wake_all, nullptr, nullptr);
+    ::futex(wake_address, FUTEX_WAKE, wake_all, nullptr, nullptr);
 }
 
 #  undef UTL_TRAIT_is_futex_waitable

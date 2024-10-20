@@ -8,10 +8,14 @@
 
 #include "utl/utl_config.h"
 
-#include "utl/memory/utl_addressof.h"
-#include "utl/numeric/utl_limits.h"
-
 #if UTL_TARGET_MICROSOFT
+// Tested on: https://godbolt.org/z/K393T4884
+
+#  include "utl/memory/utl_addressof.h"
+#  include "utl/numeric/utl_limits.h"
+#  include "utl/type_traits/utl_is_class.h"
+#  include "utl/type_traits/utl_remove_cv.h"
+
 #  pragma comment(lib, "synchronization")
 #  pragma comment(lib, "kernel32")
 
@@ -33,23 +37,23 @@ extern "C" void WakeByAddressSingle(PVOID);
 extern "C" void WakeByAddressAll(PVOID);
 
 namespace futex {
-
 namespace details {
-UTL_INLINE_CXX17 constexpr DWORD ERROR_TIMEOUT = 0x5B4u;
+UTL_INLINE_CXX17 constexpr DWORD error_timeout = 0x5B4u;
+UTL_INLINE_CXX17 constexpr DWORD error_success = 0x0u;
 } // namespace details
 
 UTL_CONSTEVAL result result::success() noexcept {
-    return result(0);
+    return result(details::error_success);
 }
 
 constexpr bool result::interrupted() const noexcept {
     return false;
 }
 constexpr bool result::timed_out() const noexcept {
-    return static_cast<DWORD>(value_) == details::ERROR_TIMEOUT;
+    return static_cast<DWORD>(value_) == details::error_timeout;
 }
 constexpr bool result::failed() const noexcept {
-    return value_ != 0;
+    return value_ != details::error_success;
 }
 
 UTL_INLINE_CXX17 constexpr size_t max_size = 8;
@@ -98,13 +102,30 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) inline DWORD to_milliseconds(__UTL tempus::duratio
 } // namespace details
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
-auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
-    -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T)) {
+auto wait(T* address, T value, __UTL tempus::duration t) noexcept
+    -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && !UTL_TRAIT_is_class(T)) {
     if (t == __UTL tempus::duration::zero()) {
         return result{details::ERROR_TIMEOUT};
     }
 
     if (WaitOnAddress(address, __UTL addressof(value), sizeof(T), details::to_milliseconds(t))) {
+        return result::success();
+    }
+
+    return result{GetLastError()};
+}
+
+template <UTL_CONCEPT_CXX20(waitable_type) T>
+UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_class(T))
+auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
+    -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && UTL_TRAIT_is_class(T)) {
+    if (t == __UTL tempus::duration::zero()) {
+        return result{details::ERROR_TIMEOUT};
+    }
+
+    alignof(T) unsigned char buffer[sizeof(T)];
+    auto cmp = __UTL_MEMCPY(buffer, __UTL addressof(value), sizeof(T));
+    if (WaitOnAddress(address, cmp, sizeof(T), details::to_milliseconds(t))) {
         return result::success();
     }
 

@@ -52,6 +52,11 @@ namespace futex {
  * methods for checking the result status.
  */
 class __UTL_ABI_PUBLIC result {
+#if UTL_TARGET_MICROSOFT
+    using value_type = unsigned long;
+#else
+    using value_type = int;
+#endif
 public:
     /**
      * Constructs a `result` with the specified value.
@@ -59,7 +64,7 @@ public:
      * @param val The integer value representing the result of a futex operation.
      * @note this will usaully be errno on POSIX compliant platforms and GetLastError on Windows
      */
-    __UTL_HIDE_FROM_ABI explicit constexpr result(int val) noexcept : value_(val) {}
+    __UTL_HIDE_FROM_ABI explicit constexpr result(value_type val) noexcept : value_(val) {}
 
     /**
      * Checks if the wait operation was interrupted by a signal.
@@ -86,7 +91,7 @@ public:
      *
      * @return The result value.
      */
-    __UTL_HIDE_FROM_ABI constexpr int value() const noexcept { return value_; }
+    __UTL_HIDE_FROM_ABI constexpr value_type value() const noexcept { return value_; }
 
     /**
      * Returns a `result` object representing a successful futex operation.

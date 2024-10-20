@@ -99,18 +99,18 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_one(T* address) noexcept
-    -> UTL_ENABLE_IF_CXX11(unsigned int, UTL_TRAIT_is_futex_waitable(T)) {
+    -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T)) {
     static constexpr uint32_t op = FUTEX_WAKE_PRIVATE;
     static constexpr int32_t wake_one = 1;
-    return syscall(SYS_futex, reinterpret_cast<uint32_t*>(address), op, wake_one);
+    syscall(SYS_futex, reinterpret_cast<uint32_t*>(address), op, wake_one);
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_futex_waitable(T))>
 UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_all(T* address) noexcept
-    -> UTL_ENABLE_IF_CXX11(unsigned int, UTL_TRAIT_is_futex_waitable(T)) {
+    -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T)) {
     static constexpr uint32_t op = FUTEX_WAKE_PRIVATE;
     static constexpr int32_t wake_all = INT_MAX;
-    return syscall(SYS_futex, reinterpret_cast<uint32_t*>(address), op, wake_all);
+    syscall(SYS_futex, reinterpret_cast<uint32_t*>(address), op, wake_all);
 }
 
 #  undef UTL_TRAIT_is_futex_waitable

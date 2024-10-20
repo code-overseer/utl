@@ -128,18 +128,18 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4)
 UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_one(T* address) noexcept
-    -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
+    -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
     static constexpr uint32_t op = UL_COMPARE_AND_WAIT | UL_UNFAIR_LOCK;
-    return __ulock_wake(op, address, __UTL_UNUSED);
+    __ulock_wake(op, address, __UTL_UNUSED);
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4)
 UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_all(T* address) noexcept
-    -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
+    -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
     static constexpr uint32_t type = UL_COMPARE_AND_WAIT | UL_UNFAIR_LOCK;
     static constexpr uint32_t op = type | ULF_WAKE_ALL;
-    return __ulock_wake(op, address, __UTL_UNUSED);
+    __ulock_wake(op, address, __UTL_UNUSED);
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
@@ -166,18 +166,18 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 8)
 auto notify_one(T* address) noexcept
-    -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 8) {
+    -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 8) {
     static constexpr uint32_t op = UL_COMPARE_AND_WAIT64 | UL_UNFAIR_LOCK;
-    return __ulock_wake(op, address, __UTL_UNUSED);
+    __ulock_wake(op, address, __UTL_UNUSED);
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 8)
 auto notify_all(T* address) noexcept
-    -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 8) {
+    -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 8) {
     static constexpr uint32_t type = UL_COMPARE_AND_WAIT64 | UL_UNFAIR_LOCK;
     static constexpr uint32_t op = type | ULF_WAKE_ALL;
-    return __ulock_wake(op, address, __UTL_UNUSED);
+    __ulock_wake(op, address, __UTL_UNUSED);
 }
 
 } // namespace futex
