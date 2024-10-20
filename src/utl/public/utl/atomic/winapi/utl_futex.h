@@ -8,28 +8,31 @@
 
 #include "utl/utl_config.h"
 
-#if UTL_TARGET_MICROSOFT
+#if !UTL_TARGET_MICROSOFT
+#  error Invalid Target
+#endif
+
 // Tested on: https://godbolt.org/z/K393T4884
 
-#  include "utl/memory/utl_addressof.h"
-#  include "utl/numeric/utl_limits.h"
-#  include "utl/type_traits/utl_is_class.h"
-#  include "utl/type_traits/utl_remove_cv.h"
+#include "utl/memory/utl_addressof.h"
+#include "utl/numeric/utl_limits.h"
+#include "utl/type_traits/utl_is_class.h"
+#include "utl/type_traits/utl_remove_cv.h"
 
-#  pragma comment(lib, "synchronization")
-#  pragma comment(lib, "kernel32")
+#pragma comment(lib, "synchronization")
+#pragma comment(lib, "kernel32")
 
-#  ifndef _WINDEF_
+#ifndef _WINDEF_
 typedef void VOID, *PVOID;
 typedef int BOOL;
 typedef unsigned long DWORD;
-#    if defined(_WIN64)
+#  if defined(_WIN64)
 typedef unsigned __int64 ULONG_PTR;
-#    else
+#  else
 typedef unsigned long ULONG_PTR;
-#    endif
-typedef ULONG_PTR SIZE_T;
 #  endif
+typedef ULONG_PTR SIZE_T;
+#endif
 
 extern "C" DWORD GetLastError();
 extern "C" BOOL WaitOnAddress(VOID volatile*, PVOID, SIZE_T, DWORD);
@@ -58,7 +61,7 @@ constexpr bool result::failed() const noexcept {
 
 UTL_INLINE_CXX17 constexpr size_t max_size = 8;
 UTL_INLINE_CXX17 constexpr size_t min_size = 1;
-#  if UTL_CXX20
+#if UTL_CXX20
 template <typename T>
 concept waitable_type = (sizeof(T) <= max_size && sizeof(T) >= min_size &&
     alignof(T) == sizeof(T) && UTL_TRAIT_is_trivially_copyable(T));
@@ -66,9 +69,9 @@ template <typename T>
 struct is_waitable : __UTL bool_constant<waitable_type<T>> {};
 template <typename T>
 inline constexpr bool is_waitable_v = waitable_type<T>;
-#    define UTL_TRAIT_is_futex_waitable(TYPE) __UTL futex::waitable_type<TYPE>
+#  define UTL_TRAIT_is_futex_waitable(TYPE) __UTL futex::waitable_type<TYPE>
 
-#  else // UTL_CXX20
+#else // UTL_CXX20
 
 namespace details {
 template <typename T>
@@ -83,12 +86,12 @@ using waitable UTL_NODEBUG = decltype(waitable_impl<T>(0));
 template <typename T>
 struct is_waitable : details::waitable<T> {};
 
-#    if UTL_CXX14
+#  if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_waitable_v = __UTL futex::details::waitable<T>::value;
-#    endif // UTL_CXX14
-#    define UTL_TRAIT_is_futex_waitable(TYPE) __UTL futex::details::waitable<TYPE>::value
-#  endif // UTL_CXX20
+#  endif // UTL_CXX14
+#  define UTL_TRAIT_is_futex_waitable(TYPE) __UTL futex::details::waitable<TYPE>::value
+#endif // UTL_CXX20
 
 namespace details {
 UTL_ATTRIBUTE(_HIDE_FROM_ABI) inline DWORD to_milliseconds(__UTL tempus::duration t) noexcept {
@@ -143,5 +146,3 @@ auto notify_all(T* address) noexcept -> UTL_ENABLE_IF_CXX11(int, UTL_TRAIT_is_fu
 }
 
 } // namespace futex
-
-#endif

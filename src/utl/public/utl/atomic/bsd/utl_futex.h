@@ -8,15 +8,17 @@
 
 #include "utl/utl_config.h"
 
-#if UTL_TARGET_BSD
+#if !UTL_TARGET_BSD
+#  error Invalid Target
+#endif // UTL_TARGET_BSD
 
-#  include "utl/memory/utl_addressof.h"
-#  include "utl/tempus/utl_duration.h"
-#  include "utl/type_traits/utl_is_trivially_copyable.h"
+#include "utl/memory/utl_addressof.h"
+#include "utl/tempus/utl_duration.h"
+#include "utl/type_traits/utl_is_trivially_copyable.h"
 
-#  include <errno.h>
-#  include <sys/futex.h>
-#  include <sys/time.h>
+#include <errno.h>
+#include <sys/futex.h>
+#include <sys/time.h>
 
 UTL_NAMESPACE_BEGIN
 
@@ -36,7 +38,7 @@ constexpr bool result::failed() const noexcept {
     return value_ != 0;
 }
 
-#  if UTL_CXX20
+#if UTL_CXX20
 
 template <typename T>
 concept waitable_type = (sizeof(T) == 4 && alignof(T) == 4 && UTL_TRAIT_is_trivially_copyable(T));
@@ -44,9 +46,9 @@ template <typename T>
 struct is_waitable : __UTL bool_constant<waitable_type<T>> {};
 template <typename T>
 inline constexpr bool is_waitable_v = waitable_type<T>;
-#    define UTL_TRAIT_is_futex_waitable(TYPE) __UTL futex::waitable_type<TYPE>
+#  define UTL_TRAIT_is_futex_waitable(TYPE) __UTL futex::waitable_type<TYPE>
 
-#  else // UTL_CXX20
+#else // UTL_CXX20
 
 namespace details {
 template <typename T>
@@ -61,12 +63,12 @@ using waitable UTL_NODEBUG = decltype(waitable_impl<T>(0));
 template <typename T>
 struct is_waitable : details::waitable<T> {};
 
-#    if UTL_CXX14
+#  if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_waitable_v = __UTL futex::details::waitable<T>::value;
-#    endif // UTL_CXX14
-#    define UTL_TRAIT_is_futex_waitable(TYPE) __UTL futex::details::waitable<TYPE>::value
-#  endif // UTL_CXX20
+#  endif // UTL_CXX14
+#  define UTL_TRAIT_is_futex_waitable(TYPE) __UTL futex::details::waitable<TYPE>::value
+#endif // UTL_CXX20
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
@@ -110,9 +112,7 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_all(T* address) noexcept
     ::futex(wake_address, FUTEX_WAKE, wake_all, nullptr, nullptr);
 }
 
-#  undef UTL_TRAIT_is_futex_waitable
+#undef UTL_TRAIT_is_futex_waitable
 } // namespace futex
 
 UTL_NAMESPACE_END
-
-#endif // UTL_TARGET_LINUX

@@ -8,16 +8,18 @@
 
 #include "utl/utl_config.h"
 
-#if UTL_TARGET_APPLE
+#if !UTL_TARGET_APPLE
+#  error Invalid target
+#endif // UTL_TARGET_APPLE
 
-#  include "utl/memory/utl_addressof.h"
-#  include "utl/numeric/utl_add_sat.h"
-#  include "utl/numeric/utl_limits.h"
-#  include "utl/tempus/utl_duration.h"
-#  include "utl/type_traits/utl_constants.h"
+#include "utl/memory/utl_addressof.h"
+#include "utl/numeric/utl_add_sat.h"
+#include "utl/numeric/utl_limits.h"
+#include "utl/tempus/utl_duration.h"
+#include "utl/type_traits/utl_constants.h"
 
-#  include <errno.h>
-#  include <stdint.h>
+#include <errno.h>
+#include <stdint.h>
 
 UTL_EXTERN_C_BEGIN
 int __ulock_wait(uint32_t operation, void* addr, uint64_t value, uint32_t timeout);
@@ -26,22 +28,22 @@ UTL_EXTERN_C_END
 
 UTL_NAMESPACE_BEGIN
 
-#  define UL_COMPARE_AND_WAIT 1
-#  define UL_UNFAIR_LOCK 2
-#  define UL_COMPARE_AND_WAIT_SHARED 3
-#  define UL_UNFAIR_LOCK64_SHARED 4
-#  define UL_COMPARE_AND_WAIT64 5
-#  define UL_COMPARE_AND_WAIT64_SHARED 6
+#define UL_COMPARE_AND_WAIT 1
+#define UL_UNFAIR_LOCK 2
+#define UL_COMPARE_AND_WAIT_SHARED 3
+#define UL_UNFAIR_LOCK64_SHARED 4
+#define UL_COMPARE_AND_WAIT64 5
+#define UL_COMPARE_AND_WAIT64_SHARED 6
 
-#  define ULF_WAKE_ALL 0x00000100
-#  define ULF_WAKE_THREAD 0x00000200
-#  define ULF_WAKE_ALLOW_NON_OWNER 0x00000400
+#define ULF_WAKE_ALL 0x00000100
+#define ULF_WAKE_THREAD 0x00000200
+#define ULF_WAKE_ALLOW_NON_OWNER 0x00000400
 
-#  define ULF_WAIT_WORKQ_DATA_CONTENTION 0x00010000
-#  define ULF_WAIT_CANCEL_POINT 0x00020000
-#  define ULF_WAIT_ADAPTIVE_SPIN 0x00040000
+#define ULF_WAIT_WORKQ_DATA_CONTENTION 0x00010000
+#define ULF_WAIT_CANCEL_POINT 0x00020000
+#define ULF_WAIT_ADAPTIVE_SPIN 0x00040000
 
-#  define __UTL_UNUSED 0
+#define __UTL_UNUSED 0
 
 namespace futex {
 
@@ -61,7 +63,7 @@ constexpr bool result::failed() const noexcept {
 
 UTL_INLINE_CXX17 constexpr size_t max_size = 8;
 UTL_INLINE_CXX17 constexpr size_t min_size = 4;
-#  if UTL_CXX20
+#if UTL_CXX20
 template <typename T>
 concept waitable_type = (sizeof(T) <= max_size && sizeof(T) >= min_size &&
     alignof(T) == sizeof(T) && UTL_TRAIT_is_trivially_copyable(T));
@@ -69,9 +71,9 @@ template <typename T>
 struct is_waitable : __UTL bool_constant<waitable_type<T>> {};
 template <typename T>
 inline constexpr bool is_waitable_v = waitable_type<T>;
-#    define UTL_TRAIT_is_futex_waitable(TYPE) __UTL futex::waitable_type<TYPE>
+#  define UTL_TRAIT_is_futex_waitable(TYPE) __UTL futex::waitable_type<TYPE>
 
-#  else // UTL_CXX20
+#else // UTL_CXX20
 
 namespace details {
 template <typename T>
@@ -86,12 +88,12 @@ using waitable UTL_NODEBUG = decltype(waitable_impl<T>(0));
 template <typename T>
 struct is_waitable : details::waitable<T> {};
 
-#    if UTL_CXX14
+#  if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_waitable_v = __UTL futex::details::waitable<T>::value;
-#    endif // UTL_CXX14
-#    define UTL_TRAIT_is_futex_waitable(TYPE) __UTL futex::details::waitable<TYPE>::value
-#  endif // UTL_CXX20
+#  endif // UTL_CXX14
+#  define UTL_TRAIT_is_futex_waitable(TYPE) __UTL futex::details::waitable<TYPE>::value
+#endif // UTL_CXX20
 
 namespace details {
 UTL_ATTRIBUTE(_HIDE_FROM_ABI) inline uint32_t to_microseconds(__UTL tempus::duration t) noexcept {
@@ -182,23 +184,21 @@ auto notify_all(T* address) noexcept
 
 } // namespace futex
 
-#  undef __UTL_UNUSED
+#undef __UTL_UNUSED
 
-#  undef UL_COMPARE_AND_WAIT
-#  undef UL_UNFAIR_LOCK
-#  undef UL_COMPARE_AND_WAIT_SHARED
-#  undef UL_UNFAIR_LOCK64_SHARED
-#  undef UL_COMPARE_AND_WAIT64
-#  undef UL_COMPARE_AND_WAIT64_SHARED
+#undef UL_COMPARE_AND_WAIT
+#undef UL_UNFAIR_LOCK
+#undef UL_COMPARE_AND_WAIT_SHARED
+#undef UL_UNFAIR_LOCK64_SHARED
+#undef UL_COMPARE_AND_WAIT64
+#undef UL_COMPARE_AND_WAIT64_SHARED
 
-#  undef ULF_WAKE_ALL
-#  undef ULF_WAKE_THREAD
-#  undef ULF_WAKE_ALLOW_NON_OWNER
+#undef ULF_WAKE_ALL
+#undef ULF_WAKE_THREAD
+#undef ULF_WAKE_ALLOW_NON_OWNER
 
-#  undef ULF_WAIT_WORKQ_DATA_CONTENTION
-#  undef ULF_WAIT_CANCEL_POINT
-#  undef ULF_WAIT_ADAPTIVE_SPIN
+#undef ULF_WAIT_WORKQ_DATA_CONTENTION
+#undef ULF_WAIT_CANCEL_POINT
+#undef ULF_WAIT_ADAPTIVE_SPIN
 
 UTL_NAMESPACE_END
-
-#endif // UTL_TARGET_APPLE
