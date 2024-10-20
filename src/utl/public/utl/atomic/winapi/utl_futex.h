@@ -17,7 +17,8 @@
 #include "utl/memory/utl_addressof.h"
 #include "utl/numeric/utl_limits.h"
 #include "utl/type_traits/utl_is_class.h"
-#include "utl/type_traits/utl_remove_cv.h"
+#include "utl/type_traits/utl_is_const.h"
+#include "utl/type_traits/utl_remove_volatile.h"
 
 #pragma comment(lib, "synchronization")
 #pragma comment(lib, "kernel32")
@@ -63,8 +64,9 @@ UTL_INLINE_CXX17 constexpr size_t max_size = 8;
 UTL_INLINE_CXX17 constexpr size_t min_size = 1;
 #if UTL_CXX20
 template <typename T>
-concept waitable_type = (sizeof(T) <= max_size && sizeof(T) >= min_size &&
-    alignof(T) == sizeof(T) && UTL_TRAIT_is_trivially_copyable(T));
+concept waitable_type =
+    (sizeof(T) <= max_size && sizeof(T) >= min_size && alignof(T) == sizeof(T) &&
+        UTL_TRAIT_is_trivially_copyable(remove_volatile_t<T>) && !UTL_TRAIT_is_const(T));
 template <typename T>
 struct is_waitable : __UTL bool_constant<waitable_type<T>> {};
 template <typename T>
@@ -77,8 +79,9 @@ namespace details {
 template <typename T>
 auto waitable_impl(float) noexcept -> __UTL false_type;
 template <typename T>
-auto waitable_impl(int) noexcept -> __UTL bool_constant<sizeof(T) <= max_size &&
-    sizeof(T) >= min_size && alignof(T) == sizeof(T) && UTL_TRAIT_is_trivially_copyable(T)>;
+auto waitable_impl(int) noexcept -> __UTL
+    bool_constant<sizeof(T) <= max_size && sizeof(T) >= min_size && alignof(T) == sizeof(T) &&
+        UTL_TRAIT_is_trivially_copyable(remove_volatile_t<T>) && !UTL_TRAIT_is_const(T)>;
 template <typename T>
 using waitable UTL_NODEBUG = decltype(waitable_impl<T>(0));
 } // namespace details
@@ -111,7 +114,7 @@ result wait(T const volatile*, T const& value, __UTL tempus::duration) = delete;
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) auto wait(
-    T* address, remove_cv_t<T> value, __UTL tempus::duration t) noexcept
+    T* address, remove_volatile_t<T> value, __UTL tempus::duration t) noexcept
     -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && !UTL_TRAIT_is_class(T)) {
     if (t == __UTL tempus::duration::zero()) {
         return result{details::ERROR_TIMEOUT};
@@ -127,7 +130,7 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) auto wait(
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_class(T))
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) auto wait(
-    T* address, remove_cv_t<T> const& value, __UTL tempus::duration t) noexcept
+    T* address, remove_volatile_t<T> const& value, __UTL tempus::duration t) noexcept
     -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && UTL_TRAIT_is_class(T)) {
     if (t == __UTL tempus::duration::zero()) {
         return result{details::ERROR_TIMEOUT};

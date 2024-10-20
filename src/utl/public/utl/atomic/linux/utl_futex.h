@@ -43,7 +43,8 @@ constexpr bool result::failed() const noexcept {
 #if UTL_CXX20
 
 template <typename T>
-concept waitable_type = (sizeof(T) == 4 && alignof(T) == 4 && UTL_TRAIT_is_trivially_copyable(T));
+concept waitable_type = (sizeof(T) == 4 && alignof(T) == 4 && UTL_TRAIT_is_trivially_copyable(T) &&
+    !UTL_TRAIT_is_const(T) && !UTL_TRAIT_is_volatile(T));
 template <typename T>
 struct is_waitable : __UTL bool_constant<waitable_type<T>> {};
 template <typename T>
@@ -56,8 +57,8 @@ namespace details {
 template <typename T>
 auto waitable_impl(float) noexcept -> __UTL false_type;
 template <typename T>
-auto waitable_impl(int) noexcept
-    -> __UTL bool_constant<sizeof(T) == 4 && alignof(T) == 4 && UTL_TRAIT_is_trivially_copyable(T)>;
+auto waitable_impl(int) noexcept -> __UTL bool_constant<sizeof(T) == 4 && alignof(T) == 4 &&
+    UTL_TRAIT_is_trivially_copyable(T) && !UTL_TRAIT_is_const(T) && !UTL_TRAIT_is_volatile(T)>;
 template <typename T>
 using waitable UTL_NODEBUG = decltype(waitable_impl<T>(0));
 } // namespace details
@@ -71,15 +72,6 @@ UTL_INLINE_CXX17 constexpr bool is_waitable_v = __UTL futex::details::waitable<T
 #  endif // UTL_CXX14
 #  define UTL_TRAIT_is_futex_waitable(TYPE) __UTL futex::details::waitable<TYPE>::value
 #endif // UTL_CXX20
-
-template <UTL_CONCEPT_CXX20(waitable_type) T>
-result wait(T volatile* address, T const volatile& value, __UTL tempus::duration t) = delete;
-template <UTL_CONCEPT_CXX20(waitable_type) T>
-result wait(T volatile* address, T const& value, __UTL tempus::duration t) = delete;
-template <UTL_CONCEPT_CXX20(waitable_type) T>
-result wait(T const volatile* address, T const volatile& value, __UTL tempus::duration t) = delete;
-template <UTL_CONCEPT_CXX20(waitable_type) T>
-result wait(T const volatile* address, T const& value, __UTL tempus::duration t) = delete;
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) auto wait(T* address, T const& value,
@@ -113,7 +105,7 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_one(T* address) noexcept
     -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T)) {
     static constexpr uint32_t op = FUTEX_WAKE_PRIVATE;
     static constexpr int32_t wake_one = 1;
-    syscall(SYS_futex, (uint32_t*)address, op, wake_one);
+    syscall(SYS_futex, reinterpret_cast<uint32_t*>(address), op, wake_one);
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_futex_waitable(T))>
@@ -121,7 +113,7 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_all(T* address) noexcept
     -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T)) {
     static constexpr uint32_t op = FUTEX_WAKE_PRIVATE;
     static constexpr int32_t wake_all = INT_MAX;
-    syscall(SYS_futex, (uint32_t*)address, op, wake_all);
+    syscall(SYS_futex, reinterpret_cast<uint32_t*>(address), op, wake_all);
 }
 
 #undef UTL_TRAIT_is_futex_waitable

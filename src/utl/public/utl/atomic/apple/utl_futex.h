@@ -65,8 +65,9 @@ UTL_INLINE_CXX17 constexpr size_t max_size = 8;
 UTL_INLINE_CXX17 constexpr size_t min_size = 4;
 #if UTL_CXX20
 template <typename T>
-concept waitable_type = (sizeof(T) <= max_size && sizeof(T) >= min_size &&
-    alignof(T) == sizeof(T) && UTL_TRAIT_is_trivially_copyable(T));
+concept waitable_type =
+    (sizeof(T) <= max_size && sizeof(T) >= min_size && alignof(T) == sizeof(T) &&
+        UTL_TRAIT_is_trivially_copyable(T) && !UTL_TRAIT_is_const(T) && !UTL_TRAIT_is_volatile(T));
 template <typename T>
 struct is_waitable : __UTL bool_constant<waitable_type<T>> {};
 template <typename T>
@@ -79,8 +80,9 @@ namespace details {
 template <typename T>
 auto waitable_impl(float) noexcept -> __UTL false_type;
 template <typename T>
-auto waitable_impl(int) noexcept -> __UTL bool_constant<sizeof(T) <= max_size &&
-    sizeof(T) >= min_size && alignof(T) == sizeof(T) && UTL_TRAIT_is_trivially_copyable(T)>;
+auto waitable_impl(int) noexcept -> __UTL
+    bool_constant<(sizeof(T) <= max_size && sizeof(T) >= min_size) && alignof(T) == sizeof(T) &&
+        UTL_TRAIT_is_trivially_copyable(T) && !UTL_TRAIT_is_const(T) && !UTL_TRAIT_is_volatile(T)>;
 template <typename T>
 using waitable UTL_NODEBUG = decltype(waitable_impl<T>(0));
 } // namespace details
@@ -105,15 +107,6 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) inline uint32_t to_microseconds(__UTL tempus::dura
     return micro > UTL_NUMERIC_maximum(uint32_t) ? UTL_NUMERIC_maximum(uint32_t) : micro;
 }
 } // namespace details
-
-template <UTL_CONCEPT_CXX20(waitable_type) T>
-result wait(T volatile* address, T const volatile& value, __UTL tempus::duration t) = delete;
-template <UTL_CONCEPT_CXX20(waitable_type) T>
-result wait(T volatile* address, T const& value, __UTL tempus::duration t) = delete;
-template <UTL_CONCEPT_CXX20(waitable_type) T>
-result wait(T const volatile* address, T const volatile& value, __UTL tempus::duration t) = delete;
-template <UTL_CONCEPT_CXX20(waitable_type) T>
-result wait(T const volatile* address, T const& value, __UTL tempus::duration t) = delete;
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4)
