@@ -29,8 +29,7 @@ public:
 private:
     using stored_pointer UTL_NODEBUG = __UTL remove_const_t<value_type>*;
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) static constexpr value_type* get_ptr(
-        It const& it) noexcept {
+    UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) static constexpr value_type* get_ptr(It const& it) noexcept {
         static_assert(UTL_TRAIT_is_base_of(contiguous_iterator_base, It), "Invalid iterator type");
         return ((contiguous_iterator_base const&)it).ptr_;
     }
@@ -41,32 +40,30 @@ private:
     }
 
 public:
-    UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE, _HIDE_FROM_ABI) constexpr value_type&
-    operator*() const noexcept {
+    UTL_ATTRIBUTES(NODISCARD, ALWAYS_INLINE, _HIDE_FROM_ABI) constexpr value_type& operator*() const noexcept {
         return *ptr_;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, ALWAYS_INLINE, _HIDE_FROM_ABI) constexpr value_type*
-    operator->() const noexcept {
+    UTL_ATTRIBUTES(NODISCARD, ALWAYS_INLINE, _HIDE_FROM_ABI) constexpr value_type* operator->() const noexcept {
         return ptr_;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN, _HIDE_FROM_ABI) friend constexpr It operator+(
+    UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) friend constexpr It operator+(
         It it, difference_type offset) noexcept {
         return set_ptr(it, get_ptr(it) + offset), it;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN, _HIDE_FROM_ABI) friend constexpr It operator+(
+    UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) friend constexpr It operator+(
         difference_type offset, It it) noexcept {
         return set_ptr(it, get_ptr(it) + offset), it;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN, _HIDE_FROM_ABI) friend constexpr It operator-(
+    UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) friend constexpr It operator-(
         It it, difference_type offset) noexcept {
         return set_ptr(it, get_ptr(it) - offset), it;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, CONST, FLATTEN, _HIDE_FROM_ABI) friend constexpr difference_type operator-(
+    UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) friend constexpr difference_type operator-(
         It left, It right) noexcept {
         return get_ptr(left) - get_ptr(right);
     }
@@ -101,45 +98,45 @@ public:
         return before;
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, FLATTEN) constexpr value_type& operator[](
-        difference_type offset) const noexcept {
+    UTL_ATTRIBUTES(NODISCARD, FLATTEN) constexpr value_type& operator[](difference_type offset) const noexcept {
         return *(ptr_ + offset);
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, FLATTEN, _HIDE_FROM_ABI) friend constexpr bool operator==(
+    UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) friend constexpr bool operator==(
         It const& left, It const& right) noexcept {
         return get_ptr(left) == get_ptr(right);
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, FLATTEN, _HIDE_FROM_ABI) friend constexpr bool operator!=(
+    UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) friend constexpr bool operator!=(
         It const& left, It const& right) noexcept {
         return get_ptr(left) != get_ptr(right);
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, FLATTEN, _HIDE_FROM_ABI) friend constexpr bool operator<(
+    UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) friend constexpr bool operator<(
         It const& left, It const& right) noexcept {
         return get_ptr(left) < get_ptr(right);
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, FLATTEN, _HIDE_FROM_ABI) friend constexpr bool operator>(
+    UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) friend constexpr bool operator>(
         It const& left, It const& right) noexcept {
         return get_ptr(left) > get_ptr(right);
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, FLATTEN, _HIDE_FROM_ABI) friend constexpr bool operator<=(
+    UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) friend constexpr bool operator<=(
         It const& left, It const& right) noexcept {
         return get_ptr(left) <= get_ptr(right);
     }
 
-    UTL_ATTRIBUTES(NODISCARD, PURE, FLATTEN, _HIDE_FROM_ABI) friend constexpr bool operator>=(
+    UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) friend constexpr bool operator>=(
         It const& left, It const& right) noexcept {
         return get_ptr(left) >= get_ptr(right);
     }
 
-#ifdef UTL_CXX20
-    UTL_ATTRIBUTES(NODISCARD, PURE, FLATTEN, _HIDE_FROM_ABI) friend constexpr auto operator<=>(
-        It const& left, It const& right) noexcept {
-        return get_ptr(left) <=> get_ptr(right);
+#if UTL_CXX20
+    template <same_as<It> R>
+    UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) constexpr auto operator<=>(
+        R const& right) const noexcept {
+        return get_ptr(*this) <=> get_ptr(right);
     }
 #endif
 

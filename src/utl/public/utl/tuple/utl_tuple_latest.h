@@ -867,7 +867,7 @@ template <size_t I, tuple_like T, tuple_like U>
 requires (I < tuple_size_v<T>)
 __UTL_HIDE_FROM_ABI constexpr three_way_result_t<T, U> three_way(T const& l, U const& r) noexcept(
     is_nothrow_three_way_v<T, U>) {
-    auto c = __UTL get_element<I>(l) <=> __UTL get_element<I>(r);
+    three_way_result_t<T, U> const c = __UTL get_element<I>(l) <=> __UTL get_element<I>(r);
     return c != 0 ? c : three_way<I + 1>(l, r);
 }
 

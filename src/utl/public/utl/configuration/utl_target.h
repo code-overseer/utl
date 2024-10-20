@@ -87,6 +87,7 @@
 #endif /* if UTL_TARGET_BSD && !defined(UTL_TARGET_UNIX) */
 
 #if UTL_TARGET_SONY
+// AFAIK the Pro models are not dedicated targets, I could be wrong though
 #  if RENAME_TO_PS4_IDENTIFIER /* NDA */
 #    define UTL_TARGET_SONY_PS4 1
 #  elif RENAME_TO_PS5_IDENTIFIER /* NDA */
@@ -116,3 +117,8 @@
 #  endif
 
 #endif /* if UTL_TARGET_MICROSOFT */
+
+#if UTL_COMPILER_CLANG | UTL_COMPILER_GCC | UTL_COMPILER_ICX | \
+    (UTL_COMPILER_ICC & !UTL_TARGET_MICROSOFT)
+#  define UTL_SUPPORTS_GNU_ASM 1
+#endif

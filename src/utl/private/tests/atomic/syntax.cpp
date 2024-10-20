@@ -45,7 +45,7 @@ struct alignas(Native) Struct {
 };
 
 template <typename Native>
-using Enum_t = Enum<Native>::Type;
+using Enum_t = typename Enum<Native>::Type;
 
 using native_types = utl::type_list<bool, char, signed char, unsigned char, short, unsigned short,
     int, unsigned int, long, unsigned long, long long, unsigned long long, void*>;

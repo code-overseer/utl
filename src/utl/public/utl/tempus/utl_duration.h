@@ -61,6 +61,14 @@ class __UTL_ABI_PUBLIC duration {
         , seconds_((1ull << seconds_bitwidth) - 1) {}
 
 public:
+    template <typename R, typename P>
+    __UTL_HIDE_FROM_ABI explicit UTL_CONSTEXPR_CXX14 duration(::std::chrono::duration<R, P> const& t) noexcept
+        : duration(from_chrono(t)) {}
+    __UTL_HIDE_FROM_ABI constexpr explicit duration(
+        int64_t seconds, int64_t nanoseconds = 0) noexcept
+        : duration(adjust(seconds, nanoseconds)) {}
+    __UTL_HIDE_FROM_ABI constexpr explicit duration() noexcept : nanoseconds_(0), seconds_(0) {}
+
 #if UTL_COMPILER_APPLE_CLANG
     // TODO: Check if this is still needed for Apple Clang 16000023
     static constexpr duration invalid() noexcept {
@@ -72,14 +80,7 @@ public:
     }
 #endif
 
-public:
-    template <typename R, typename P>
-    __UTL_HIDE_FROM_ABI explicit UTL_CONSTEXPR_CXX14 duration(::std::chrono::duration<R, P> const& t) noexcept
-        : duration(from_chrono(t)) {}
-    __UTL_HIDE_FROM_ABI constexpr explicit duration(
-        int64_t seconds, int64_t nanoseconds = 0) noexcept
-        : duration(adjust(seconds, nanoseconds)) {}
-    __UTL_HIDE_FROM_ABI constexpr explicit duration() noexcept : nanoseconds_(0), seconds_(0) {}
+    static UTL_CONSTEVAL duration zero() noexcept { return duration{}; }
 
     template <typename R, typename P>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) explicit UTL_CONSTEXPR_CXX14

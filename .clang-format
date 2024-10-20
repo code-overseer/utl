@@ -117,7 +117,7 @@ Macros:
 - UTL_CONSTRAINT_CXX20(X,Y,Z)=requires (X,Y,Z)
 - UTL_CONCEPT_CXX20(X)=type<X>
 - UTL_NODISCARD=[[nodiscard]]
-- UTL_ENABLE_IF_CXX11(X,Y)=void
+- UTL_ENABLE_IF_CXX11(X,Y)=enable_if_t<Y, X>
 - UTL_ATTRIBUTE(X)=[[X]]
 - UTL_ATTRIBUTES(X)=[[X]]
 - UTL_ATTRIBUTES(X,Y)=[[X,Y]]
@@ -125,3 +125,5 @@ Macros:
 - UTL_ATTRIBUTES(X,Y,Z,W)=[[X,Y,Z,W]]
 - UTL_NODISCARD=[[nodiscard]]
 - UTL_LIFETIMEBOUND=[[clang::lifetimebound]]
+- UTL_UNLIKELY=[[unlikely]]
+- UTL_LIKELY=[[likely]]
