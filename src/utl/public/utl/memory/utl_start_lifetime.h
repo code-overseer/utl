@@ -11,16 +11,10 @@
 #include <new>
 
 #if UTL_HAS_BUILTIN(__builtin_memmove)
-#  define __UTL_MEMMOVE(...) __builtin_memmove(__VA_ARGS__)
+#  define __UTL_MEMMOVE __builtin_memmove
 #else
 #  include <string.h>
-#  define __UTL_MEMMOVE(...) ::memmove(__VA_ARGS__)
-#endif
-#if UTL_HAS_BUILTIN(__builtin_memcpy)
-#  define __UTL_MEMCPY(...) __builtin_memcpy(__VA_ARGS__)
-#else
-#  include <string.h>
-#  define __UTL_MEMCPY(...) ::memcpy(__VA_ARGS__)
+#  define __UTL_MEMMOVE ::memmove
 #endif
 
 UTL_NAMESPACE_BEGIN
@@ -42,9 +36,6 @@ namespace lifetime {
 #  define __UTL_ENTANGLE_PLACEMENT_IMPL 1
 #else
 #  define __UTL_ENTANGLE_MEMCPY_IMPL 1
-#  if UTL_COMPILER_MSVC
-#    pragma intrinsic(memcpy)
-#  endif
 #endif
 /**
  * Generates a superposition of all posible implicit lifetime types of size n with alignment

@@ -12,6 +12,8 @@
 #include "utl/configuration/utl_compiler_barrier.h"
 #include "utl/configuration/utl_exceptions.h"
 #include "utl/configuration/utl_keywords.h"
+#include "utl/configuration/utl_memcmp.h"
+#include "utl/configuration/utl_memcpy.h"
 #include "utl/configuration/utl_namespace.h"
 #include "utl/configuration/utl_pragma.h"
 #include "utl/configuration/utl_simd.h"
