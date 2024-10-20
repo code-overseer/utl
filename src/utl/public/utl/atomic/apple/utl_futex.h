@@ -110,7 +110,7 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) inline uint32_t to_microseconds(__UTL tempus::dura
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4)
-UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) auto wait(
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline auto wait(
     T* address, T const& value, __UTL tempus::duration t) noexcept
     -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
     if (t == __UTL tempus::duration::zero()) {
@@ -132,7 +132,7 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) auto wait(
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4)
-UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_one(T* address) noexcept
+UTL_ATTRIBUTE(_HIDE_FROM_ABI) inline auto notify_one(T* address) noexcept
     -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
     static constexpr uint32_t op = UL_COMPARE_AND_WAIT | UL_UNFAIR_LOCK;
     __ulock_wake(op, address, __UTL_UNUSED);
@@ -140,7 +140,7 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_one(T* address) noexcept
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4)
-UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_all(T* address) noexcept
+UTL_ATTRIBUTE(_HIDE_FROM_ABI) inline auto notify_all(T* address) noexcept
     -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
     static constexpr uint32_t type = UL_COMPARE_AND_WAIT | UL_UNFAIR_LOCK;
     static constexpr uint32_t op = type | ULF_WAKE_ALL;
@@ -149,7 +149,8 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto notify_all(T* address) noexcept
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 8)
-UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus::duration t) noexcept
+UTL_ATTRIBUTE(_HIDE_FROM_ABI, NODISCARD) inline auto wait(
+    T* address, T const& value, __UTL tempus::duration t) noexcept
     -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 8) {
     if (t == __UTL tempus::duration::zero()) {
         return result{ETIMEDOUT};
@@ -170,7 +171,7 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) auto wait(T* address, T const& value, __UTL tempus
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 8)
-auto notify_one(T* address) noexcept
+UTL_ATTRIBUTE(_HIDE_FROM_ABI) inline auto notify_one(T* address) noexcept
     -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 8) {
     static constexpr uint32_t op = UL_COMPARE_AND_WAIT64 | UL_UNFAIR_LOCK;
     __ulock_wake(op, address, __UTL_UNUSED);
@@ -178,7 +179,7 @@ auto notify_one(T* address) noexcept
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 8)
-auto notify_all(T* address) noexcept
+UTL_ATTRIBUTE(_HIDE_FROM_ABI) inline auto notify_all(T* address) noexcept
     -> UTL_ENABLE_IF_CXX11(void, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 8) {
     static constexpr uint32_t type = UL_COMPARE_AND_WAIT64 | UL_UNFAIR_LOCK;
     static constexpr uint32_t op = type | ULF_WAKE_ALL;
