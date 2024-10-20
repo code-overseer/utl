@@ -10,8 +10,8 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename F, typename... Args>
-UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr invoke_result_t<F, Args> invoke(
-    F&& f, Args&&... args) noexcept(UTL_TRAIT_is_nothrow_invocable_r(invoke_result_t<F, Args>, F,
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr invoke_result_t<F, Args...> invoke(
+    F&& f, Args&&... args) noexcept(UTL_TRAIT_is_nothrow_invocable_r(invoke_result_t<F, Args...>, F,
     Args...)) {
     return details::invocable::invoke(__UTL forward<F>(f), __UTL forward<Args>(args)...);
 }

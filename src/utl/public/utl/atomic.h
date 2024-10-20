@@ -2,25 +2,4 @@
 
 #pragma once
 
-#include "utl/utl_config.h"
-
-#if UTL_CXX20
-
-#  include <atomic>
-
-UTL_NAMESPACE_BEGIN
-
-using std::atomic;
-using std::atomic_signal_fence;
-using std::atomic_thread_fence;
-using std::memory_order;
-using std::memory_order_acq_rel;
-using std::memory_order_acquire;
-using std::memory_order_consume;
-using std::memory_order_relaxed;
-using std::memory_order_release;
-using std::memory_order_seq_cst;
-
-UTL_NAMESPACE_END
-
-#endif
+#include "utl/atomic/utl_atomic.h"

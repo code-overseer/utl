@@ -22,9 +22,10 @@ constexpr T default_constant<T>::value;
 #if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr T default_constant_v{};
-#  define UTL_TRAIT_dafault_constant(...) __UTL default_constant_v<__VA_ARGS__>
+
+#  define UTL_TRAIT_default_constant(...) __UTL default_constant_v<__VA_ARGS__>
 #else
-#  define UTL_TRAIT_dafault_constant(...) __UTL default_constant<__VA_ARGS__>::value
+#  define UTL_TRAIT_default_constant(...) __UTL default_constant<__VA_ARGS__>::value
 #endif
 
 UTL_NAMESPACE_END

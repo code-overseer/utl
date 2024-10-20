@@ -37,11 +37,11 @@ public:
      * @param fmt The message format object containing the format string and source location.
      * @param ... Variadic arguments for the message format.
      */
-    __UTL_HIDE_FROM_ABI explicit basic_exception(exceptions::message_format fmt, ...)
+    __UTL_HIDE_FROM_ABI explicit basic_exception(exceptions::message_vformat fmt, ...)
         : location_(fmt.location) {
         va_list args;
         va_start(args, fmt);
-        messages_.emplace(__UTL move(fmt), args);
+        messages_.emplacef(__UTL move(fmt), args);
         va_end(args);
     }
 
@@ -67,10 +67,10 @@ public:
      * @param fmt The message format object containing the format string.
      * @param ... Variadic arguments for the message format.
      */
-    __UTL_HIDE_FROM_ABI void emplace_message(exceptions::message_format fmt, ...) {
+    __UTL_HIDE_FROM_ABI void emplace_messagef(exceptions::message_vformat fmt, ...) {
         va_list args;
         va_start(args, fmt);
-        messages_.emplace(__UTL move(fmt), args);
+        messages_.vemplacef(__UTL move(fmt), args);
         va_end(args);
     }
 
@@ -120,7 +120,7 @@ public:
      */
     template <UTL_CONCEPT_CXX20(constructible_as<T>) U, typename... Args UTL_CONSTRAINT_CXX11(
         is_constructible<T, U>::value)>
-    __UTL_HIDE_FROM_ABI basic_exception(U&& u, exceptions::message_format fmt,
+    __UTL_HIDE_FROM_ABI basic_exception(U&& u, exceptions::message_vformat fmt,
         Args... args) noexcept(UTL_TRAIT_is_nothrow_constructible(T, U))
         : base_type(__UTL move(fmt), args...)
         , data_(__UTL forward<U>(u)) {}

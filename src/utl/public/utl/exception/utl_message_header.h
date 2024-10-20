@@ -93,11 +93,11 @@ public:
      * @return A pointer to the header of the newly created message.
      * @throws std::bad_alloc on memory allocation failure.
      */
-    UTL_NODISCARD static message_header* create(message_format fmt, ...) UTL_THROWS {
+    UTL_NODISCARD static message_header* createf(message_vformat fmt, ...) UTL_THROWS {
         va_list args;
         va_start(args, fmt);
         UTL_TRY {
-            auto ptr = create(fmt, args);
+            auto ptr = vcreatef(fmt, args);
             va_end(args);
             return ptr;
         } UTL_CATCH(...) {
@@ -109,7 +109,7 @@ public:
     /**
      * @brief Creates a new message using a pre-initialized va_list.
      *
-     * This static function creates a new message by accepting a `message_format` object and a
+     * This static function creates a new message by accepting a `message_vformat` object and a
      * `va_list` of arguments. The provided arguments are used to generate the message string, which
      * is then stored alongside a message header. This function allows for more controlled argument
      * forwarding using an existing `va_list`.
@@ -119,7 +119,7 @@ public:
      * @return A pointer to the newly created message's header.
      * @throws std::bad_alloc if memory allocation fails.
      */
-    UTL_NODISCARD static message_header* create(message_format fmt, va_list args1) UTL_THROWS {
+    UTL_NODISCARD static message_header* vcreatef(message_vformat fmt, va_list args1) UTL_THROWS {
         static constexpr auto header_size = sizeof(message_header);
         va_list args2;
         va_copy(args2, args1);
