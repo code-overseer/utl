@@ -18,18 +18,11 @@ UTL_NAMESPACE_BEGIN
 namespace libc {
 namespace runtime {
 namespace standard {
-#if UTL_COMPILER_MSVC
-#  pragma intrinsic(memcpy)
-#endif
 
 template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_CONSTRAINT_CXX11(is_trivially_copyable<T>::value)>
 UTL_ATTRIBUTES(ALWAYS_INLINE,_HIDE_FROM_ABI) inline T* memcpy(
     T* UTL_RESTRICT dst, T const* UTL_RESTRICT src, element_count_t count) noexcept {
-#if UTL_HAS_BUILTIN(__builtin_memcpy)
-    return (T*)__builtin_memcpy(dst, src, byte_count<T>(count));
-#else
-    return (T*)::memcpy(dst, src, byte_count<T>(count));
-#endif
+    return (T*)__UTL_MEMCPY(dst, src, byte_count<T>(count));
 }
 
 template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_CONSTRAINT_CXX11(is_trivially_copyable<T>::value)>
@@ -68,19 +61,11 @@ UTL_ATTRIBUTES(LIBC_INLINE_PURE) inline T* memchr(T const* ptr, U value, size_t 
 #endif
 }
 
-#if UTL_COMPILER_MSVC
-#  pragma intrinsic(memcmp)
-#endif
-
 template <typename T, typename U>
 UTL_ATTRIBUTES(LIBC_INLINE_PURE) inline int memcmp(T const* lhs, U const* rhs, element_count_t count) noexcept {
     static_assert(is_trivially_lexicographically_comparable<T, U>::value,
         "Types must be lexicographically comparable");
-#if UTL_HAS_BUILTIN(__builtin_char_memchr)
-    return __builtin_memcmp(lhs, rhs, byte_count<T>(count));
-#else
-    return ::memcmp(lhs, rhs, byte_count<T>(count));
-#endif
+    return __UTL_MEMCMP(lhs, rhs, byte_count<T>(count));
 }
 
 #if UTL_COMPILER_MSVC

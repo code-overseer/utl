@@ -1,7 +1,8 @@
-* Supporting modules will probably be a massive PITA
+# Supporting modules will probably be a massive PITA
 # TODO: Modules doesn't play well with forward declarations, if using modules, just import std modules that we need
-* TODO: Maybe move all the type_traits builtins to a single file?
+# TODO: Maybe move all the type_traits builtins to a single file?
 # TODO: Fix for C++11 T.T
 # TODO: define CONSTEXPR_ASSERT for C++11
 # TODO: Investigate consteval bugs
 # TODO: Enable UTL keywords (utl_standard.h) based on features instead of standard
+# TODO: Make string_view use pointer_traits to allow smaller pointers
