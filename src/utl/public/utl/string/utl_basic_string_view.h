@@ -38,7 +38,7 @@ public:
     using const_pointer = CharType const*;
     using reference = CharType&;
     using const_reference = CharType const&;
-    static inline constexpr size_type npos = details::string::npos;
+    __UTL_PUBLIC_TEMPLATE_DATA static inline constexpr size_type npos = details::string::npos;
     class const_iterator;
     using iterator = const_iterator;
     using const_reverse_iterator = __UTL reverse_iterator<const_iterator>;
@@ -401,26 +401,11 @@ UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator==(
     return lhs.size() == rhs.size() && lhs.compare(rhs) == 0;
 }
 
-UTL_NAMESPACE_END
-
-#if UTL_CXX20
-
-#  include "utl/compare/utl_compare_fwd.h"
-
-UTL_NAMESPACE_BEGIN
-
 template <typename CharType, typename Traits>
-UTL_ATTRIBUTE(STRING_PURE) inline constexpr typename Traits::comparison_category operator<=>(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator!=(
     basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
-    using result_type = typename Traits::comparison_category;
-    return static_cast<result_type>(lhs.compare(rhs) <=> 0);
+    return !(lhs == rhs);
 }
-
-UTL_NAMESPACE_END
-
-#else
-
-UTL_NAMESPACE_BEGIN
 
 template <typename CharType, typename Traits>
 UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator<(
@@ -446,11 +431,32 @@ UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator<=(
     return !(rhs < lhs);
 }
 
+UTL_NAMESPACE_END
+
+#if UTL_CXX20
+
+#  include "utl/compare/utl_compare_fwd.h"
+
+UTL_NAMESPACE_BEGIN
+
 template <typename CharType, typename Traits>
-UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator!=(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr typename Traits::comparison_category operator<=>(
     basic_string_view<CharType, Traits> lhs, basic_string_view<CharType, Traits> rhs) noexcept {
-    return !(lhs == rhs);
+    using result_type = typename Traits::comparison_category;
+    return static_cast<result_type>(lhs.compare(rhs) <=> 0);
 }
+
+UTL_NAMESPACE_END
+
+#endif
+
+#if !UTL_CXX17
+
+UTL_NAMESPACE_BEGIN
+
+template <typename CharT, typename Traits>
+__UTL_ABI_PUBLIC constexpr typename basic_string_view<CharT, N, Traits, Alloc>::size_type
+    basic_string_view<CharT, Traits>::npos;
 
 UTL_NAMESPACE_END
 
