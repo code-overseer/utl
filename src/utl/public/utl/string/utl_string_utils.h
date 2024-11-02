@@ -263,7 +263,8 @@ __UTL_HIDE_FROM_ABI inline constexpr auto split(basic_string_view<CharType, Trai
     basic_string_view<CharType, Traits> str,
     F process) noexcept(UTL_TRAIT_is_nothrow_invocable(F, basic_string_view<CharType, Traits>))
     -> UTL_ENABLE_IF_CXX11(size_t, UTL_TRAIT_is_invocable(F, basic_string_view<CharType, Traits>)) {
-    return UTL_CONSTANT_P(str.data() != nullptr && delimiter.data() != nullptr)
+    return UTL_CONSTANT_P(
+               string_utils::compile_time::split_all(delimiter, str, __UTL move(process)))
         ? string_utils::compile_time::split_all(delimiter, str, __UTL move(process))
         : string_utils::runtime::split_all(delimiter, str, __UTL move(process));
 }
@@ -278,7 +279,8 @@ __UTL_HIDE_FROM_ABI inline constexpr auto split_while(basic_string_view<CharType
     F predicate) noexcept(UTL_TRAIT_is_nothrow_invocable(F, basic_string_view<CharType, Traits>) &&
     UTL_TRAIT_is_nothrow_boolean_testable(decltype(predicate(str))))
     -> UTL_ENABLE_IF_CXX11(size_t, UTL_TRAIT_is_boolean_testable(decltype(predicate(str)))) {
-    return UTL_CONSTANT_P(str.data() != nullptr && delimiter.data() != nullptr)
+    return UTL_CONSTANT_P(
+               string_utils::compile_time::split_while(delimiter, str, __UTL move(predicate)))
         ? string_utils::compile_time::split_while(delimiter, str, __UTL move(predicate))
         : string_utils::runtime::split_while(delimiter, str, __UTL move(predicate));
 }
@@ -289,7 +291,8 @@ __UTL_HIDE_FROM_ABI inline constexpr auto split(CharType delimiter,
     basic_string_view<CharType, Traits> str,
     F process) noexcept(UTL_TRAIT_is_nothrow_invocable(F, basic_string_view<CharType, Traits>))
     -> UTL_ENABLE_IF_CXX11(size_t, UTL_TRAIT_is_invocable(F, basic_string_view<CharType, Traits>)) {
-    return UTL_CONSTANT_P(str.data() != nullptr) && UTL_CONSTANT_P(delimiter)
+    return UTL_CONSTANT_P(
+               string_utils::compile_time::split_all(delimiter, str, __UTL move(process)))
         ? string_utils::compile_time::split_all(delimiter, str, __UTL move(process))
         : string_utils::runtime::split_all(delimiter, str, __UTL move(process));
 }
@@ -304,7 +307,8 @@ __UTL_HIDE_FROM_ABI inline constexpr auto split_while(CharType delimiter,
     F predicate) noexcept(UTL_TRAIT_is_nothrow_invocable(F, basic_string_view<CharType, Traits>) &&
     UTL_TRAIT_is_nothrow_boolean_testable(decltype(predicate(str))))
     -> UTL_ENABLE_IF_CXX11(size_t, UTL_TRAIT_is_boolean_testable(decltype(predicate(str)))) {
-    return UTL_CONSTANT_P(str.data() != nullptr) && UTL_CONSTANT_P(delimiter)
+    return UTL_CONSTANT_P(
+               string_utils::compile_time::split_while(delimiter, str, __UTL move(predicate)))
         ? string_utils::compile_time::split_while(delimiter, str, __UTL move(predicate))
         : string_utils::runtime::split_while(delimiter, str, __UTL move(predicate));
 }

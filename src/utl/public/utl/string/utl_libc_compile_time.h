@@ -12,6 +12,11 @@ namespace libc {
 namespace compile_time {
 namespace recursive {
 
+/**
+ * Non-pure, multi statement functions are _not_ constexpr in C++11,
+ * the recursive implementation is only used to suppress warnings
+ * about C++14 extensions
+ */
 template <typename T>
 __UTL_HIDE_FROM_ABI inline constexpr T* memcpy(
     T* dst, T const* src, element_count_t count, T* org) noexcept {
