@@ -3,6 +3,11 @@
 #include "utl/string/utl_basic_short_string.h"
 #include "utl/string/utl_basic_string_view.h"
 #include "utl/string/utl_basic_zstring_view.h"
+#include "utl/string/utl_string_utils.h"
+
+static_assert(utl::string_view("  \tabc ").find_last_not_of(" ") == 5, "");
+static_assert(
+    utl::string_utils::strip(utl::string_view("  \tabc ")) == utl::string_view("abc"), "");
 
 int comparable(utl::string s) {
     if (s != "hello") {
