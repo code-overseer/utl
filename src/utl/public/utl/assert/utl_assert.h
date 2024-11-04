@@ -5,8 +5,15 @@
 #include "utl/utl_config.h"
 
 #define UTL_ASSERTIONS_ENABLED 0
-#define UTL_ASSERT(...)
-#define UTL_ASSERT_MSG(...)
+#define UTL_ASSERT(...)                                                                            \
+    []() {                                                                                         \
+        static_assert(                                                                             \
+            static_cast<decltype(static_cast<bool>(__VA_ARGS__))*>(0) == nullptr, "syntax check"); \
+    }()
+#define UTL_ASSERT_MSG(X, ...)                                                                     \
+    []() {                                                                                         \
+        static_assert(static_cast<decltype(static_cast<bool>(X))*>(0) == nullptr, "syntax check"); \
+    }()
 
 #if UTL_CXX14
 #  define UTL_ASSERT_CXX14(...) UTL_ASSERT(__VA_ARGS__)
