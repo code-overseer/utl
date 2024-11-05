@@ -153,8 +153,10 @@ struct __UTL_PUBLIC_TEMPLATE iterator_traits<T*> : private details::iterator_tra
 };
 
 template <typename T>
-struct __UTL_PUBLIC_TEMPLATE iterator_traits :
-    private details::iterator_traits::legacy_traits<T> {};
+struct __UTL_PUBLIC_TEMPLATE iterator_traits : details::iterator_traits::legacy_traits<T> {
+private:
+    using base_type = details::iterator_traits::legacy_traits<T>;
+};
 
 UTL_NAMESPACE_END
 

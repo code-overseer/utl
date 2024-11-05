@@ -59,7 +59,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(contiguous_iterator) It,
         UTL_CONCEPT_CXX20(sized_sentinel_for<It>) E UTL_CONSTRAINT_CXX11(
-        UTL_TRAIT_is_contiguous_iterator(It) && UTL_TRAIT_is_sized_sentinel_for(E, It))>
+        UTL_TRAIT_is_contiguous_iterator(It) && UTL_TRAIT_is_sized_sentinel_for(It, E))>
     __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 basic_zstring_view(It begin, E end)
         UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_dereferenceable(It)&& noexcept(end - begin))
         : basic_zstring_view(__UTL to_address(begin), end - begin) {}

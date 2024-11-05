@@ -7,15 +7,27 @@
 #include "utl/concepts/utl_convertible_to.h"
 #include "utl/concepts/utl_default_initializable.h"
 #include "utl/concepts/utl_different_from.h"
+#include "utl/concepts/utl_three_way_comparable.h"
+#include "utl/concepts/utl_totally_ordered.h"
+#include "utl/iterator/utl_bidirectional_iterator.h"
+#include "utl/iterator/utl_constant_iterator.h"
+#include "utl/iterator/utl_contiguous_iterator.h"
 #include "utl/iterator/utl_forward_iterator.h"
+#include "utl/iterator/utl_indirectly_readable.h"
 #include "utl/iterator/utl_input_iterator.h"
 #include "utl/iterator/utl_iter_const_reference_t.h"
 #include "utl/iterator/utl_iter_difference_t.h"
+#include "utl/iterator/utl_iter_move.h"
+#include "utl/iterator/utl_iter_reference_t.h"
+#include "utl/iterator/utl_iter_rvalue_reference_t.h"
 #include "utl/iterator/utl_iter_value_t.h"
 #include "utl/iterator/utl_iterator_traits.h"
-#include "utl/iterator/utl_to_address.h"
+#include "utl/iterator/utl_random_access_iterator.h"
+#include "utl/iterator/utl_sentinel_for.h"
 #include "utl/memory/utl_addressof.h"
+#include "utl/memory/utl_to_address.h"
 #include "utl/type_traits/utl_add_const.h"
+#include "utl/type_traits/utl_common_reference.h"
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_is_convertible.h"
 #include "utl/type_traits/utl_is_nothrow_constructible.h"
@@ -23,6 +35,9 @@
 #include "utl/type_traits/utl_is_nothrow_default_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_move_constructible.h"
 #include "utl/type_traits/utl_is_same.h"
+#include "utl/type_traits/utl_is_subordinate_comparable.h"
+#include "utl/type_traits/utl_is_superordinate_comparable.h"
+#include "utl/type_traits/utl_is_totally_ordered.h"
 #include "utl/utility/utl_forward.h"
 #include "utl/utility/utl_move.h"
 
@@ -30,19 +45,26 @@ UTL_NAMESPACE_BEGIN
 
 namespace details::const_iterator {
 
+template <typename D>
+class specialization_tag {
+private:
+    friend D;
+    UTL_CONSTEXPR_CXX20 ~specialization_tag() noexcept = default;
+};
+
 #if UTL_CXX20
 template <typename It>
 struct category {};
 
 template <forward_iterator It>
-struct category {
-    using iterator_category = typename iterator_traits<It>::iterator_category;
+struct category<It> {
+    using iterator_category = typename __UTL iterator_traits<It>::iterator_category;
 };
 
 template <typename It>
 struct concept_type {
     using type UTL_NODEBUG = __UTL input_iterator_tag;
-}
+};
 
 template <__UTL contiguous_iterator It>
 struct concept_type<It> {
@@ -67,7 +89,24 @@ struct concept_type<It> {
 template <typename It>
 using concept_type_t UTL_NODEBUG = typename concept_type<It>::type;
 
-#else
+template <__UTL indirectly_readable I>
+using const_rvalue_reference_t UTL_NODEBUG =
+    __UTL common_reference_t<__UTL iter_value_t<I> const&&, __UTL iter_rvalue_reference_t<I>>;
+
+#else // UTL_CXX20
+
+template <typename I, typename = void>
+struct const_rvalue_reference {};
+
+template <typename I>
+struct const_rvalue_reference<I, enable_if_t<UTL_TRAIT_is_indirectly_readable(I)>> {
+    using type UTL_NODEBUG =
+        __UTL common_reference_t<__UTL iter_value_t<I> const&&, __UTL iter_rvalue_reference_t<I>>;
+};
+
+template <typename I>
+using const_rvalue_reference_t UTL_NODEBUG = typename const_rvalue_reference<T>::type;
+
 template <typename It, typename = void>
 struct category {};
 
@@ -134,56 +173,118 @@ class decrement {};
 template <typename D, typename It>
 class decrement<D, It, true> {
 public:
-    __UTL_HIDE_FROM_ABI friend inline UTL_CONSTEXPR_CXX14 D& operator--(D& derive) noexcept(
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 D& operator--() noexcept(
         noexcept(--__UTL declval<It&>())) {
-        --derive.current;
-        return *this;
+        --static_cast<D*>(this)->current;
+        return static_cast<D*>(this);
     }
 
-    __UTL_HIDE_FROM_ABI friend inline UTL_CONSTEXPR_CXX14 D operator--(D& derive, int) noexcept(
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 D operator--(int) noexcept(
         noexcept(__UTL declval<It&>()--)) {
-        return D(derive.current--);
+        return D(static_cast<D*>(this)->current--);
     }
 };
 
 template <typename D, typename It, bool = UTL_TRAIT_is_forward_iterator(It)>
 class post_increment {
-    __UTL_HIDE_FROM_ABI friend inline UTL_CONSTEXPR_CXX14 void operator++(D& derive, int) noexcept(
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void operator++(int) noexcept(
         noexcept(++__UTL declval<It&>())) {
-        ++derive.current;
+        ++static_cast<D*>(this)->current;
     }
 };
 
 template <typename D, typename It>
 class post_increment<D, It, true> {
-    __UTL_HIDE_FROM_ABI friend inline UTL_CONSTEXPR_CXX14 D operator++(D& derive, int) noexcept(
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 D operator++(int) noexcept(
         noexcept(__UTL declval<It&>()++)) {
-        return D(derive.current++);
+        return D(static_cast<D*>(this)->current++);
     }
 };
 
+template <typename D, typename It, bool = UTL_TRAIT_is_random_access_iterator(It)>
+class comparisons {};
+
+template <typename D, typename It>
+class comparisons<D, It, true> {
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator<(D const& other) const
+        noexcept(UTL_TRAIT_is_nothrow_strict_subordinate_comparable(It)) {
+        return static_cast<D const*>(this)->base() < other.base();
+    }
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator<=(D const& other) const
+        noexcept(UTL_TRAIT_is_nothrow_subordinate_comparable(It)) {
+        return static_cast<D const*>(this)->base() <= other.base();
+    }
+
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator>(D const& other) const
+        noexcept(UTL_TRAIT_is_nothrow_strict_superordinate_comparable(It)) {
+        return static_cast<D const*>(this)->base() > other.base();
+    }
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator>=(D const& other) const
+        noexcept(UTL_TRAIT_is_nothrow_superordinate_comparable(It)) {
+        return static_cast<D const*>(this)->base() >= other.base();
+    }
+};
 #endif
 
 } // namespace details::const_iterator
 
+#if UTL_CXX20
+template <typename I>
+concept not_const_iterator = !is_base_of_v<details::const_iterator::specialization_tag<I>, I>;
+
+template <typename I>
+struct __UTL_PUBLIC_TEMPLATE is_not_const_iterator : bool_constant<not_const_iterator<I>> {};
+
+template <typename I>
+UTL_INLINE_CXX17 constexpr bool is_not_const_iterator_v = not_const_iterator<I>;
+
+#  define UTL_TRAIT_is_not_const_iterator(...) __UTL not_const_iterator<__VA_ARGS__>
+
+#else // UTL_CXX20
+
+template <typename I>
+struct __UTL_PUBLIC_TEMPLATE is_not_const_iterator :
+    bool_constant<!UTL_TRAIT_is_base_of(details::const_iterator::specialization_tag<I>, I)> {};
+
+#  if UTL_CXX14
+template <typename I>
+UTL_INLINE_CXX17 constexpr bool is_not_const_iterator_v =
+    !is_base_of_v<details::const_iterator::specialization_tag<I>, I>;
+
+#    define UTL_TRAIT_is_not_const_iterator(...) __UTL is_not_const_iterator_v<__VA_ARGS__>
+#  else
+#    define UTL_TRAIT_is_not_const_iterator(...) __UTL is_not_const_iterator<__VA_ARGS__>::value
+
+#  endif // UTL_CXX20
+
+#endif
+
 template <typename It>
-class basic_const_iterator;
+class __UTL_PUBLIC_TEMPLATE basic_const_iterator;
+
 #if UTL_CXX20
 template <input_iterator It>
-class basic_const_iterator<It> : public details::const_iterator::category<It> {
+class basic_const_iterator<It> :
+    private details::const_iterator::specialization_tag<basic_const_iterator<It>>,
+    public details::const_iterator::category<It> {
 #else
 template <typename It>
 class basic_const_iterator :
+    private details::const_iterator::specialization_tag<basic_const_iterator<It>>,
     public details::const_iterator::category<It>,
     public details::const_iterator::arrow<basic_const_iterator<It>, It>,
     public details::const_iterator::decrement<basic_const_iterator<It>, It>,
-    public details::const_iterator::post_increment<basic_const_iterator<It>, It> {
+    public details::const_iterator::post_increment<basic_const_iterator<It>, It>,
+    public details::const_iterator::comparisons<basic_const_iterator<It>, It> {
     static_assert(UTL_TRAIT_is_input_iterator(It), "Invalid argument");
     friend details::const_iterator::decrement<basic_const_iterator, It>;
     friend details::const_iterator::post_increment<basic_const_iterator, It>;
 #endif
+    using reference = iter_const_reference_t<It>;
+    using rvalue_reference = details::const_iterator::const_rvalue_reference_t<It>;
+
 public:
-    using iterator_concept = details::const_iterator::concept_type_t<T>;
+    using iterator_concept = details::const_iterator::concept_type_t<It>;
     using value_type = iter_value_t<It>;
     using difference_type = iter_difference_t<It>;
 
@@ -194,7 +295,7 @@ public:
 
     __UTL_HIDE_FROM_ABI inline constexpr basic_const_iterator(It i) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(It))
-        : current(__UTL move(it)) {}
+        : current(__UTL move(i)) {}
 
     template <UTL_CONCEPT_CXX20(convertible_to<It>) Jt UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_convertible(Jt, It))>
@@ -209,23 +310,142 @@ public:
         UTL_TRAIT_is_nothrow_convertible(U, It))
         : current(__UTL forward<U>(other)) {}
 
-    __UTL_HIDE_FROM_ABI inline constexpr It const& base() const& noexcept { return current; }
-    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 It&& base() && noexcept { return __UTL move(current); }
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr It const& base() const& noexcept {
+        return current;
+    }
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 It&& base() && noexcept {
+        return __UTL move(current);
+    }
 
-    __UTL_HIDE_FROM_ABI inline constexpr reference operator*() const
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr reference operator*() const
         noexcept(UTL_TRAIT_is_nothrow_convertible(It const&, reference)) {
         return static_cast<reference>(*base());
     }
 
+    template <UTL_CONCEPT_CXX20(sentinel_for<It>) S UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_sentinel_for(It, S))>
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator==(S const& s) const {
+        return base() == s;
+    }
+
+    template <UTL_CONCEPT_CXX20(sentinel_for<It>) S UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_sentinel_for(It, S))>
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator!=(S const& s) const {
+        return !(base() == s);
+    }
+
+    template <UTL_CONCEPT_CXX20(not_const_iterator) CI UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_conjunction(is_not_const_iterator<CI>, is_convertible<It const&, CI>))>
+    UTL_CONSTRAINT_CXX20(constant_iterator<CI> && convertible_to<It const&, CI>)
+    __UTL_HIDE_FROM_ABI inline constexpr operator CI() const& noexcept(
+        UTL_TRAIT_is_nothrow_convertible(It const&, CI)) {
+        return base();
+    }
+
+    template <UTL_CONCEPT_CXX20(not_const_iterator) I UTL_CONSTRAINT_CXX11(UTL_TRAIT_conjunction(
+        is_not_const_iterator<I>, is_random_access_iterator<It>, is_totally_ordered_with<It, I>))>
+    UTL_CONSTRAINT_CXX20(random_access_iterator<It> && totally_ordered_with<It, I>)
+    __UTL_HIDE_FROM_ABI friend inline constexpr bool
+    operator<(I const& left, basic_const_iterator const& right) noexcept(
+        UTL_TRAIT_is_nothrow_strict_subordinate_comparable_with(I, basic_const_iterator)) {
+        return left < right.base();
+    }
+
+    template <UTL_CONCEPT_CXX20(not_const_iterator) I UTL_CONSTRAINT_CXX11(UTL_TRAIT_conjunction(
+        is_not_const_iterator<I>, is_random_access_iterator<It>, is_totally_ordered_with<It, I>))>
+    UTL_CONSTRAINT_CXX20(random_access_iterator<It> && totally_ordered_with<It, I>)
+    __UTL_HIDE_FROM_ABI friend inline constexpr bool
+    operator<=(I const& left, basic_const_iterator const& right) noexcept(
+        UTL_TRAIT_is_nothrow_subordinate_comparable_with(I, basic_const_iterator)) {
+        return left <= right.base();
+    }
+
+    template <UTL_CONCEPT_CXX20(not_const_iterator) I UTL_CONSTRAINT_CXX11(UTL_TRAIT_conjunction(
+        is_not_const_iterator<I>, is_random_access_iterator<It>, is_totally_ordered_with<It, I>))>
+    UTL_CONSTRAINT_CXX20(random_access_iterator<It> && totally_ordered_with<It, I>)
+    __UTL_HIDE_FROM_ABI friend inline constexpr bool
+    operator>(I const& left, basic_const_iterator const& right) noexcept(
+        UTL_TRAIT_is_nothrow_strict_superordinate_comparable_with(I, basic_const_iterator)) {
+        return left > right.base();
+    }
+
+    template <UTL_CONCEPT_CXX20(not_const_iterator) I UTL_CONSTRAINT_CXX11(UTL_TRAIT_conjunction(
+        is_not_const_iterator<I>, is_random_access_iterator<It>, is_totally_ordered_with<It, I>))>
+    UTL_CONSTRAINT_CXX20(random_access_iterator<It> && totally_ordered_with<It, I>)
+    __UTL_HIDE_FROM_ABI friend inline constexpr bool
+    operator>=(I const& left, basic_const_iterator const& right) noexcept(
+        UTL_TRAIT_is_nothrow_superordinate_comparable_with(I, basic_const_iterator)) {
+        return left >= right.base();
+    }
+
+    template <UTL_CONCEPT_CXX20(not_const_iterator) CI UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_conjunction(is_not_const_iterator<CI>, is_convertible<It, CI>))>
+    UTL_CONSTRAINT_CXX20(constant_iterator<CI> && convertible_to<It, CI>)
+    __UTL_HIDE_FROM_ABI inline constexpr operator CI() && noexcept(
+        UTL_TRAIT_is_nothrow_convertible(It, CI)) {
+        return __UTL move(*this).base();
+    }
+
+    template <UTL_CONCEPT_CXX20(different_from<basic_const_iterator>) I UTL_CONSTRAINT_CXX11(
+        !UTL_TRAIT_is_same(basic_const_iterator, I) && UTL_TRAIT_is_random_access_iterator(It) &&
+        UTL_TRAIT_is_totally_ordered_with(It, I))>
+    UTL_CONSTRAINT_CXX20(random_access_iterator<It> && totally_ordered_with<It, I>)
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator<(I const& i) const {
+        return base() < i;
+    }
+
+    template <UTL_CONCEPT_CXX20(different_from<basic_const_iterator>) I UTL_CONSTRAINT_CXX11(
+        !UTL_TRAIT_is_same(basic_const_iterator, I) && UTL_TRAIT_is_random_access_iterator(It) &&
+        UTL_TRAIT_is_totally_ordered_with(It, I))>
+    UTL_CONSTRAINT_CXX20(random_access_iterator<It> && totally_ordered_with<It, I>)
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator<=(I const& i) const {
+        return base() <= i;
+    }
+
+    template <UTL_CONCEPT_CXX20(different_from<basic_const_iterator>) I UTL_CONSTRAINT_CXX11(
+        !UTL_TRAIT_is_same(basic_const_iterator, I) && UTL_TRAIT_is_random_access_iterator(It) &&
+        UTL_TRAIT_is_totally_ordered_with(It, I))>
+    UTL_CONSTRAINT_CXX20(random_access_iterator<It> && totally_ordered_with<It, I>)
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator>(I const& i) const {
+        return base() > i;
+    }
+
+    template <UTL_CONCEPT_CXX20(different_from<basic_const_iterator>) I UTL_CONSTRAINT_CXX11(
+        !UTL_TRAIT_is_same(basic_const_iterator, I) && UTL_TRAIT_is_random_access_iterator(It) &&
+        UTL_TRAIT_is_totally_ordered_with(It, I))>
+    UTL_CONSTRAINT_CXX20(random_access_iterator<It> && totally_ordered_with<It, I>)
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator>=(I const& i) const {
+        return base() >= i;
+    }
+
+    template <UTL_CONCEPT_CXX20(sized_sentinel_for<It>) S UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_sized_sentinel_for(It, S))>
+    __UTL_HIDE_FROM_ABI inline constexpr difference_type operator-(S const& s) const
+        noexcept(noexcept(__UTL declval<It>() - s)) {
+        return base() - s;
+    }
+
+    template <UTL_CONCEPT_CXX20(not_const_iterator) S UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_conjunction(is_not_const_iterator<It>, is_sized_sentinel_for<It, S>))>
+    __UTL_HIDE_FROM_ABI friend inline constexpr difference_type operator-(
+        S const& left, basic_const_iterator const& right) noexcept(noexcept(left - right.base())) {
+        return left - right.base();
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr rvalue_reference
+    iter_move(basic_const_iterator const& i) noexcept(
+        noexcept(static_cast<rvalue_reference>(__UTL ranges::iter_move(i.base())))) {
+        return static_cast<rvalue_reference>(__UTL ranges::iter_move(i.base()));
+    }
+
 #if UTL_CXX20
-    __UTL_HIDE_FROM_ABI inline constexpr const auto* operator->() const
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr auto const* operator->() const
     requires (UTL_TRAIT_is_lvalue_reference(iter_reference_t<It>) &&
         same_as<remove_cvref_t<iter_reference_t<It>>, value_type> && contiguous_iterator<It>)
     {
         return __UTL to_address(base());
     }
 
-    __UTL_HIDE_FROM_ABI inline constexpr const auto* operator->() const
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr const auto* operator->() const
     requires (UTL_TRAIT_is_lvalue_reference(iter_reference_t<It>) &&
         same_as<remove_cvref_t<iter_reference_t<It>>, value_type>)
     {
@@ -274,7 +494,7 @@ public:
 
     __UTL_HIDE_FROM_ABI inline constexpr reference operator+=(difference_type n) const
         noexcept(noexcept(current += 1))
-    requires (random_access_iterator<It>)
+    requires random_access_iterator<It>
     {
         current += n;
         return *this;
@@ -282,10 +502,74 @@ public:
 
     __UTL_HIDE_FROM_ABI inline constexpr reference operator-=(difference_type n) const
         noexcept(noexcept(current -= 1))
-    requires (random_access_iterator<It>)
+    requires random_access_iterator<It>
     {
         current -= n;
         return *this;
+    }
+
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator<(basic_const_iterator const& other) const
+        noexcept(UTL_TRAIT_is_nothrow_strict_subordinate_comparable(It))
+    requires random_access_iterator<It>
+    {
+        return base() < other.base();
+    }
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator<=(basic_const_iterator const& other) const
+        noexcept(UTL_TRAIT_is_nothrow_subordinate_comparable(It))
+    requires random_access_iterator<It>
+    {
+        return base() <= other.base();
+    }
+
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator>(basic_const_iterator const& other) const
+        noexcept(UTL_TRAIT_is_nothrow_strict_superordinate_comparable(It))
+    requires random_access_iterator<It>
+    {
+        return base() > other.base();
+    }
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator>=(basic_const_iterator const& other) const
+        noexcept(UTL_TRAIT_is_nothrow_superordinate_comparable(It))
+    requires random_access_iterator<It>
+    {
+        return base() >= other.base();
+    }
+
+    template <typename U>
+    requires convertible_to<U const&, basic_const_iterator const&> && random_access_iterator<It>
+    __UTL_HIDE_FROM_ABI inline constexpr auto operator<=>(U const& other) const
+        noexcept(UTL_TRAIT_is_nothrow_three_way_comparable(It)) {
+        return base() <=> static_cast<basic_const_iterator const&>(other).base();
+    }
+
+    template <different_from<basic_const_iterator> I>
+    requires random_access_iterator<It> && totally_ordered_with<It, I> &&
+        three_way_comparable_with<It, I>
+    __UTL_HIDE_FROM_ABI inline constexpr bool operator<=>(I const& i) const
+        noexcept(UTL_TRAIT_is_nothrow_three_way_comparable_with(It, I)) {
+        return base() <=> i;
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_const_iterator operator+(
+        basic_const_iterator const& it,
+        difference_type n) noexcept(noexcept(__UTL declval<It>() + n))
+    requires random_access_iterator<It>
+    {
+        return basic_const_iterator(it.base() + n);
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_const_iterator operator+(difference_type n,
+        basic_const_iterator const& it) noexcept(noexcept(__UTL declval<It>() + n))
+    requires random_access_iterator<It>
+    {
+        return basic_const_iterator(it.base() + n);
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_const_iterator operator-(
+        basic_const_iterator const& it,
+        difference_type n) noexcept(noexcept(__UTL declval<It>() - n))
+    requires random_access_iterator<It>
+    {
+        return basic_const_iterator(it.base() - n);
     }
 
 #else
@@ -293,8 +577,8 @@ public:
      * Arrow operator implemented in details::const_iterator::arrow
      */
     template <typename Idx,
-        enable_if_t<UTL_TRAIT_is_random_access_iterator(It) &&
-                UTL_TRAIT_is_convertible(Idx, difference_type),
+        enable_if_t<UTL_TRAIT_conjunction(
+                        is_random_access_iterator<It>, is_convertible<Idx, difference_type>),
             int> = 0>
     __UTL_HIDE_FROM_ABI inline constexpr reference operator[](Idx n) const
         noexcept(UTL_TRAIT_is_nothrow_convertible(It const&, reference)) {
@@ -308,8 +592,8 @@ public:
     }
 
     template <typename Idx,
-        enable_if_t<UTL_TRAIT_is_random_access_iterator(It) &&
-                UTL_TRAIT_is_convertible(Idx, difference_type),
+        enable_if_t<UTL_TRAIT_conjunction(
+                        is_random_access_iterator<It>, is_convertible<Idx, difference_type>),
             int> = 0>
     __UTL_HIDE_FROM_ABI inline constexpr basic_const_iterator& operator+=(Idx n) const
         noexcept(noexcept(current += 1)) {
@@ -318,19 +602,116 @@ public:
     }
 
     template <typename Idx,
-        enable_if_t<UTL_TRAIT_is_random_access_iterator(It) &&
-                UTL_TRAIT_is_convertible(Idx, difference_type),
+        enable_if_t<UTL_TRAIT_conjunction(
+                        is_random_access_iterator<It>, is_convertible<Idx, difference_type>),
             int> = 0>
     __UTL_HIDE_FROM_ABI inline constexpr basic_const_iterator& operator-=(Idx n) const
         noexcept(noexcept(current -= 1)) {
         current -= static_cast<difference_type>(n);
         return *this;
     }
+
+    template <typename Diff,
+        enable_if_t<UTL_TRAIT_conjunction(
+                        is_convertible<Diff, difference_type>, is_random_access_iterator<It>),
+            int> = 0>
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_const_iterator operator+(
+        basic_const_iterator const& it,
+        Diff n) noexcept(noexcept(__UTL declval<It>() + static_cast<difference_type>(n))) {
+        return basic_const_iterator(it.base() + static_cast<difference_type>(n));
+    }
+
+    template <typename Diff,
+        enable_if_t<UTL_TRAIT_conjunction(
+                        is_convertible<Diff, difference_type>, is_random_access_iterator<It>),
+            int> = 0>
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_const_iterator
+    operator+(Diff n, basic_const_iterator const& it) noexcept(
+        noexcept(__UTL declval<It>() + static_cast<difference_type>(n))) {
+        return basic_const_iterator(it.base() + static_cast<difference_type>(n));
+    }
+
+    template <typename Diff,
+        enable_if_t<UTL_TRAIT_conjunction(
+                        is_convertible<Diff, difference_type>, is_random_access_iterator<It>),
+            int> = 0>
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_const_iterator operator-(
+        basic_const_iterator const& it,
+        Diff n) noexcept(noexcept(__UTL declval<It>() - static_cast<difference_type>(n))) {
+        return basic_const_iterator(it.base() - static_cast<difference_type>(n));
+    }
 #endif
 
 private:
-    using reference = iter_const_reference_t<It>;
     It current;
 };
+
+template <typename...>
+struct common_type;
+
+#if UTL_CXX20
+
+template <input_iterator It>
+using const_iterator = conditional_t<constant_iterator<It>, It, basic_const_iterator<It>>;
+template <semiregular It>
+using const_sentinel = conditional_t<input_iterator<It>, const_iterator<It>, It>;
+
+template <typename T, common_with<T> U>
+requires input_iterator<typename common_type<T, U>::type>
+struct common_type<basic_const_iterator<T>, U> {
+    using type = basic_const_iterator<typename common_type<T, U>::type>;
+};
+
+template <typename T, common_with<T> U>
+requires input_iterator<typename common_type<T, U>::type>
+struct common_type<U, basic_const_iterator<T>> {
+    using type = basic_const_iterator<typename common_type<T, U>::type>;
+};
+
+template <typename T, common_with<T> U>
+requires input_iterator<typename common_type<T, U>::type>
+struct common_type<basic_const_iterator<T>, basic_const_iterator<U>> {
+    using type = basic_const_iterator<typename common_type<T, U>::type>;
+};
+
+#else // UTL_CXX20
+
+namespace details::const_iterator {
+
+template <typename T, typename U>
+__UTL_HIDE_FROM_ABI auto common_type_impl(int) noexcept
+    -> enable_if<is_input_iterator<typename common_type<T, U>::type>,
+        basic_const_iterator<typename common_type<T, U>::type>>;
+
+struct common_type_fallback {};
+
+template <typename T, typename U>
+__UTL_HIDE_FROM_ABI auto common_type_impl(float) noexcept -> common_type_fallback;
+
+template <typename T, typename U>
+using common_type = decltype(common_type_impl<T, U>(0));
+
+} // namespace details::const_iterator
+
+template <typename It>
+using const_iterator = enable_if_t<UTL_TRAIT_is_input_iterator(It)
+        conditional_t<UTL_TRAIT_is_constant_iterator(It), It, basic_const_iterator<It>>>;
+
+template <typename It>
+using const_sentinel =
+    enable_if_t<UTL_TRAIT_conjunction(is_copyable<It>, is_default_constructible<It>),
+        conditional_t<UTL_TRAIT_is_input_iterator(It), const_iterator<It>, It>>;
+
+template <typename T, typename U>
+struct common_type<basic_const_iterator<T>, U> : details::const_iterator::common_type<T, U> {};
+
+template <typename T, common_with<T> U>
+struct common_type<U, basic_const_iterator<T>> : details::const_iterator::common_type<T, U> {};
+
+template <typename T, common_with<T> U>
+struct common_type<basic_const_iterator<T>, basic_const_iterator<U>> :
+    details::const_iterator::common_type<T, U> {};
+
+#endif // UTL_CXX20
 
 UTL_NAMESPACE_END

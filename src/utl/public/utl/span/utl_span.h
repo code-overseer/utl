@@ -196,48 +196,52 @@ public:
 
     __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 span& operator=(span const&) noexcept = default;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr iterator begin() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr iterator begin() const noexcept {
         return iterator(data());
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr const_iterator cbegin() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr const_iterator
+    cbegin() const noexcept {
         return const_iterator(data());
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr const_iterator cend() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr const_iterator
+    cend() const noexcept {
         return const_iterator(data() + size());
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr iterator end() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr iterator end() const noexcept {
         return iterator(data() + size());
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr iterator rbegin() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr iterator rbegin() const noexcept {
         return reverse_iterator(end());
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr const_iterator crbegin() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr const_iterator
+    crbegin() const noexcept {
         return const_reverse_iterator(end());
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr iterator rend() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr iterator rend() const noexcept {
         return reverse_iterator(begin());
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr const_iterator crend() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr const_iterator
+    crend() const noexcept {
         return const_reverse_iterator(begin());
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr reference front() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr reference front() const noexcept {
         return *data();
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr reference back() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr reference back() const noexcept {
         return data()[size() - 1];
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr reference operator[](
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr reference operator[](
         size_type idx) noexcept {
         return data()[idx];
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr pointer data() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr pointer data() const noexcept {
         return data_;
     }
 
-    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 reference at(size_type idx) const UTL_THROWS {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 reference at(size_type idx) const UTL_THROWS {
         UTL_THROW_IF(idx >= size(),
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] span::at operation failed, "
                                             "Reason=[index out of range], idx=[%zu], size=[%zu]"),
@@ -245,26 +249,28 @@ public:
         return data()[idx];
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr size_type size() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr size_type size() const noexcept {
         return size_;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr size_type size_bytes() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr size_type
+    size_bytes() const noexcept {
         return size_ * sizeof(element_type);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr bool empty() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE, NODISCARD) inline constexpr bool empty() const noexcept {
         return size_ == 0;
     }
 
     template <size_type Count UTL_CONSTRAINT_CXX11(
         Count != dynamic_extent && (extent == dynamic_extent || Count < extent))>
     UTL_CONSTRAINT_CXX20(Count != dynamic_extent && (extent == dynamic_extent || Count < extent))
-    __UTL_HIDE_FROM_ABI inline constexpr span<element_type, Count> first() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr span<element_type, Count>
+    first() const noexcept {
         return span<element_type, Count>{data_, Count};
     }
 
-    __UTL_HIDE_FROM_ABI inline constexpr span<element_type, dynamic_extent> first(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr span<element_type, dynamic_extent> first(
         size_type count) const noexcept {
         return span<element_type, dynamic_extent>{data_, count};
     }
@@ -272,12 +278,12 @@ public:
     template <size_type Count UTL_CONSTRAINT_CXX11(
         Count != dynamic_extent && (extent == dynamic_extent || Count < extent))>
     UTL_CONSTRAINT_CXX20(Count != dynamic_extent && (extent == dynamic_extent || Count < extent))
-    __UTL_HIDE_FROM_ABI inline constexpr span<element_type, Count> last() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr span<element_type, Count> last() const noexcept {
         return span<element_type, Count>{
             data_ + (UTL_ASSERT(count < size()), (size() - count)), Count};
     }
 
-    __UTL_HIDE_FROM_ABI inline constexpr span<element_type, dynamic_extent> last(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr span<element_type, dynamic_extent> last(
         size_type count) const noexcept {
         return count < size()
             ? span<element_type, dynamic_extent>{data_ + size() - count, count}
@@ -288,7 +294,7 @@ public:
     template <size_type Offset, size_type Count = dynamic_extent UTL_CONSTRAINT_CXX11(
         (Offset > extent) || (Count != dynamic_extent && Count > (extent - Offset))) >
     UTL_CONSTRAINT_CXX20(Offset > extent || (Count != dynamic_extent && Count > (extent - Offset)))
-    __UTL_HIDE_FROM_ABI inline constexpr subspan_result<Count> subspan() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr subspan_result<Count> subspan() const noexcept {
         return Offset <= size() && (Count == dynamic_extent || Count <= (size() - Offset))
             ? subspan_result<Count>{data_ + Offset,
                   Count == dynamic_extent ? size() - Offset : Count}
@@ -297,7 +303,7 @@ public:
                       data_ + Offset, Count == dynamic_extent ? size() - Offset : Count});
     }
 
-    __UTL_HIDE_FROM_ABI inline constexpr span<element_type, dynamic_extent> subspan(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr span<element_type, dynamic_extent> subspan(
         size_type offset, size_type count) const noexcept {
         using result_type UTL_NODEBUG = span<element_type, dynamic_extent>;
         return offset <= size() || (count <= (size() - offset))
@@ -305,13 +311,13 @@ public:
             : (UTL_ASSERT(!"Out of range"), result_type{data_ + offset, count});
     }
 
-    __UTL_HIDE_FROM_ABI friend inline span<std::byte const, byte_span_size> as_bytes(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend inline span<std::byte const, byte_span_size> as_bytes(
         span s) noexcept {
         using result_type UTL_NODEBUG = span<std::byte const, byte_span_size>;
         return result_type{reinterpret_cast<std::byte const*>(s.data()), s.size_bytes()};
     }
 
-    __UTL_HIDE_FROM_ABI friend inline span<std::byte, byte_span_size> as_writable_bytes(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend inline span<std::byte, byte_span_size> as_writable_bytes(
         span s) noexcept {
         using result_type UTL_NODEBUG = span<std::byte, byte_span_size>;
         return result_type{reinterpret_cast<std::byte*>(s.data()), s.size_bytes()};

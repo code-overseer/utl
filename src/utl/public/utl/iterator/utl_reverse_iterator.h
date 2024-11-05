@@ -192,15 +192,16 @@ public:
         return *this;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, FLATTEN) constexpr auto operator[](offset_t idx) const noexcept(
-        noexcept(subscript(this->current, idx))) -> decltype(subscript(this->current, idx)) {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, FLATTEN) constexpr auto operator[](offset_t idx) const
+        noexcept(noexcept(subscript(this->current, idx)))
+            -> decltype(subscript(__UTL declval<iterator_type>(), idx)) {
         return subscript(this->current, idx);
     }
 
     void operator[](invalid_offset_t idx) const = delete;
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, FLATTEN) constexpr reference operator*() const
-        noexcept(noexcept(*__UTL prev(this->current))) {
+        noexcept(noexcept(*__UTL prev(__UTL declval<iterator_type>()))) {
         return *__UTL prev(this->current);
     }
 
@@ -317,8 +318,9 @@ template <typename It1, typename It2>
 UTL_CONSTRAINT_CXX20(requires(It1 l, It2 r) { l == r; })
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator==(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
-    UTL_TRAIT_is_nothrow_equality_comparable_with(decltype(l.base()), decltype(r.base()))) -> 
-    UTL_ENABLE_IF_CXX11(bool, UTL_TRAIT_is_equality_comparable_with(decltype(l.base()), decltype(r.base()))) {
+    UTL_TRAIT_is_nothrow_equality_comparable_with(decltype(l.base()), decltype(r.base())))
+    -> UTL_ENABLE_IF_CXX11(
+        bool, UTL_TRAIT_is_equality_comparable_with(decltype(l.base()), decltype(r.base()))) {
     return l.base() == r.base();
 }
 
@@ -347,7 +349,8 @@ UTL_CONSTRAINT_CXX20(requires(It1 l, It2 r) { l > r; })
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD, ALWAYS_INLINE) constexpr auto
 operator>(reverse_iterator<It1> const& l, reverse_iterator<It1> const& r) noexcept(
     UTL_TRAIT_is_nothrow_strict_superordinate_comparable_with(
-        decltype(l.base()), decltype(r.base()))) -> UTL_ENABLE_IF_CXX11(bool,
+        decltype(l.base()), decltype(r.base())))
+    -> UTL_ENABLE_IF_CXX11(bool,
         UTL_TRAIT_is_strict_superordinate_comparable_with(decltype(l.base()), decltype(r.base()))) {
     return l.base() > r.base();
 }
