@@ -7,6 +7,7 @@
 #include "utl/string/utl_string_fwd.h"
 
 #include "utl/exception.h"
+#include "utl/iterator/utl_const_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator_base.h"
 #include "utl/iterator/utl_distance.h"
@@ -17,6 +18,7 @@
 #include "utl/memory/utl_to_address.h"
 #include "utl/numeric/utl_max.h"
 #include "utl/numeric/utl_min.h"
+#include "utl/string/utl_basic_string_view.h"
 #include "utl/string/utl_string_details.h"
 
 #define __UTL_ATTRIBUTE_STRING_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE__HIDE_FROM_ABI

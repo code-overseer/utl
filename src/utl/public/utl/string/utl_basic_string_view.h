@@ -8,6 +8,7 @@
 
 #include "utl/assert/utl_assert.h"
 #include "utl/exception.h"
+#include "utl/iterator/utl_const_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator_base.h"
 #include "utl/iterator/utl_distance.h"
