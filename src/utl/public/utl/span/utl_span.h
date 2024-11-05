@@ -47,11 +47,7 @@ public:
         using base_type UTL_NODEBUG = contiguous_iterator_base<iterator, element_type>;
 
     public:
-        using typename base_type::difference_type;
-        using typename base_type::iterator_concept;
-        using typename base_type::pointer;
-        using typename base_type::reference;
-        using typename base_type::value_type;
+        UTL_INHERIT_CONTIGUOUS_ITERATOR_MEMBERS(iterator, element_type);
 
         __UTL_HIDE_FROM_ABI inline constexpr iterator() noexcept = default;
         __UTL_HIDE_FROM_ABI inline constexpr iterator(iterator const& other) noexcept = default;
@@ -60,12 +56,11 @@ public:
             iterator const& other) noexcept = default;
         __UTL_HIDE_FROM_ABI inline constexpr iterator& operator=(
             iterator&& other) noexcept = default;
-        using base_type::operator*;
-        using base_type::operator->;
 
     private:
         friend span;
-        __UTL_HIDE_FROM_ABI inline constexpr iterator(pointer data) noexcept : base_type(data) {}
+        __UTL_HIDE_FROM_ABI inline constexpr iterator(span::pointer data) noexcept
+            : base_type(data) {}
     };
 
 private:
