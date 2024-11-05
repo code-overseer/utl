@@ -43,7 +43,7 @@ public:
     using reverse_iterator = __UTL reverse_iterator<iterator>;
     using const_reverse_iterator = __UTL const_iterator<reverse_iterator>;
 
-    __UTL_PUBLIC_TEMPLATE_DATA static inline constexpr size_type npos = details::string::npos;
+    __UTL_PUBLIC_TEMPLATE_DATA static constexpr size_type npos = details::string::npos;
 
     class __UTL_ABI_PUBLIC iterator : __UTL contiguous_iterator_base<iterator, value_type const> {
         using base_type = contiguous_iterator_base<iterator, value_type const>;
@@ -446,8 +446,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename CharT, typename Traits>
-__UTL_ABI_PUBLIC constexpr typename basic_string_view<CharT, N, Traits, Alloc>::size_type
-    basic_string_view<CharT, Traits>::npos;
+__UTL_ABI_PUBLIC constexpr
+    typename basic_string_view<CharT, Traits>::size_type basic_string_view<CharT, Traits>::npos;
 
 UTL_NAMESPACE_END
 

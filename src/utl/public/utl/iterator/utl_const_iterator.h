@@ -43,7 +43,8 @@
 
 UTL_NAMESPACE_BEGIN
 
-namespace details::const_iterator {
+namespace details {
+namespace _const_iterator {
 
 template <typename D>
 class specialization_tag {
@@ -105,14 +106,14 @@ struct const_rvalue_reference<I, enable_if_t<UTL_TRAIT_is_indirectly_readable(I)
 };
 
 template <typename I>
-using const_rvalue_reference_t UTL_NODEBUG = typename const_rvalue_reference<T>::type;
+using const_rvalue_reference_t UTL_NODEBUG = typename const_rvalue_reference<I>::type;
 
 template <typename It, typename = void>
 struct category {};
 
 template <typename It>
 struct category<It, enable_if_t<UTL_TRAIT_is_forward_iterator(It)>> {
-    using iterator_category = typename iterator_traits<It>::iterator_category;
+    using iterator_category = typename __UTL iterator_traits<It>::iterator_category;
 };
 
 template <typename It>
@@ -131,9 +132,9 @@ template <typename It>
 __UTL_HIDE_FROM_ABI auto concept_type(...) noexcept -> __UTL input_iterator_tag;
 
 template <typename It>
-using concept_type_t UTL_NODEBUG = decltype(__UTL details::const_iterator::concept_type<It>(0));
+using concept_type_t UTL_NODEBUG = decltype(__UTL details::_const_iterator::concept_type<It>(0));
 
-template <typename It,
+template <typename D, typename It,
     bool = UTL_TRAIT_is_lvalue_reference(iter_reference_t<It>) &&
         UTL_TRAIT_is_same(remove_cvref_t<iter_reference_t<It>>, iter_value_t<It>),
     bool = UTL_TRAIT_is_contiguous_iterator(It)>
@@ -150,7 +151,7 @@ template <typename T>
 using const_pointer_t = typename const_pointer<T>::type;
 
 template <typename D, typename It>
-class arrow<It, true, true> {
+class arrow<D, It, true, true> {
 public:
     __UTL_HIDE_FROM_ABI inline constexpr auto operator->() const noexcept
         -> const_pointer_t<decltype(__UTL to_address(__UTL declval<It const&>()))> {
@@ -159,7 +160,7 @@ public:
 };
 
 template <typename D, typename It>
-class arrow<It, true, false> {
+class arrow<D, It, true, false> {
 public:
     __UTL_HIDE_FROM_ABI inline constexpr auto operator->() const noexcept
         -> const_pointer_t<decltype(__UTL addressof(*__UTL declval<It const&>()))> {
@@ -226,11 +227,12 @@ class comparisons<D, It, true> {
 };
 #endif
 
-} // namespace details::const_iterator
+} // namespace _const_iterator
+} // namespace details
 
 #if UTL_CXX20
 template <typename I>
-concept not_const_iterator = !is_base_of_v<details::const_iterator::specialization_tag<I>, I>;
+concept not_const_iterator = !is_base_of_v<details::_const_iterator::specialization_tag<I>, I>;
 
 template <typename I>
 struct __UTL_PUBLIC_TEMPLATE is_not_const_iterator : bool_constant<not_const_iterator<I>> {};
@@ -244,12 +246,12 @@ UTL_INLINE_CXX17 constexpr bool is_not_const_iterator_v = not_const_iterator<I>;
 
 template <typename I>
 struct __UTL_PUBLIC_TEMPLATE is_not_const_iterator :
-    bool_constant<!UTL_TRAIT_is_base_of(details::const_iterator::specialization_tag<I>, I)> {};
+    bool_constant<!UTL_TRAIT_is_base_of(details::_const_iterator::specialization_tag<I>, I)> {};
 
 #  if UTL_CXX14
 template <typename I>
 UTL_INLINE_CXX17 constexpr bool is_not_const_iterator_v =
-    !is_base_of_v<details::const_iterator::specialization_tag<I>, I>;
+    !is_base_of_v<details::_const_iterator::specialization_tag<I>, I>;
 
 #    define UTL_TRAIT_is_not_const_iterator(...) __UTL is_not_const_iterator_v<__VA_ARGS__>
 #  else
@@ -265,26 +267,26 @@ class __UTL_PUBLIC_TEMPLATE basic_const_iterator;
 #if UTL_CXX20
 template <input_iterator It>
 class basic_const_iterator<It> :
-    private details::const_iterator::specialization_tag<basic_const_iterator<It>>,
-    public details::const_iterator::category<It> {
+    private details::_const_iterator::specialization_tag<basic_const_iterator<It>>,
+    public details::_const_iterator::category<It> {
 #else
 template <typename It>
 class basic_const_iterator :
-    private details::const_iterator::specialization_tag<basic_const_iterator<It>>,
-    public details::const_iterator::category<It>,
-    public details::const_iterator::arrow<basic_const_iterator<It>, It>,
-    public details::const_iterator::decrement<basic_const_iterator<It>, It>,
-    public details::const_iterator::post_increment<basic_const_iterator<It>, It>,
-    public details::const_iterator::comparisons<basic_const_iterator<It>, It> {
+    private details::_const_iterator::specialization_tag<basic_const_iterator<It>>,
+    public details::_const_iterator::category<It>,
+    public details::_const_iterator::arrow<basic_const_iterator<It>, It>,
+    public details::_const_iterator::decrement<basic_const_iterator<It>, It>,
+    public details::_const_iterator::post_increment<basic_const_iterator<It>, It>,
+    public details::_const_iterator::comparisons<basic_const_iterator<It>, It> {
     static_assert(UTL_TRAIT_is_input_iterator(It), "Invalid argument");
-    friend details::const_iterator::decrement<basic_const_iterator, It>;
-    friend details::const_iterator::post_increment<basic_const_iterator, It>;
+    friend details::_const_iterator::decrement<basic_const_iterator, It>;
+    friend details::_const_iterator::post_increment<basic_const_iterator, It>;
 #endif
     using reference = iter_const_reference_t<It>;
-    using rvalue_reference = details::const_iterator::const_rvalue_reference_t<It>;
+    using rvalue_reference = details::_const_iterator::const_rvalue_reference_t<It>;
 
 public:
-    using iterator_concept = details::const_iterator::concept_type_t<It>;
+    using iterator_concept = details::_const_iterator::concept_type_t<It>;
     using value_type = iter_value_t<It>;
     using difference_type = iter_difference_t<It>;
 
@@ -574,7 +576,7 @@ public:
 
 #else
     /**
-     * Arrow operator implemented in details::const_iterator::arrow
+     * Arrow operator implemented in details::_const_iterator::arrow
      */
     template <typename Idx,
         enable_if_t<UTL_TRAIT_conjunction(
@@ -676,12 +678,13 @@ struct common_type<basic_const_iterator<T>, basic_const_iterator<U>> {
 
 #else // UTL_CXX20
 
-namespace details::const_iterator {
+namespace details {
+namespace _const_iterator {
 
 template <typename T, typename U>
 __UTL_HIDE_FROM_ABI auto common_type_impl(int) noexcept
-    -> enable_if<is_input_iterator<typename common_type<T, U>::type>,
-        basic_const_iterator<typename common_type<T, U>::type>>;
+    -> enable_if<UTL_TRAIT_is_input_iterator(typename __UTL common_type<T, U>::type),
+        basic_const_iterator<typename __UTL common_type<T, U>::type>>;
 
 struct common_type_fallback {};
 
@@ -691,11 +694,12 @@ __UTL_HIDE_FROM_ABI auto common_type_impl(float) noexcept -> common_type_fallbac
 template <typename T, typename U>
 using common_type = decltype(common_type_impl<T, U>(0));
 
-} // namespace details::const_iterator
+} // namespace _const_iterator
+} // namespace details
 
 template <typename It>
-using const_iterator = enable_if_t<UTL_TRAIT_is_input_iterator(It)
-        conditional_t<UTL_TRAIT_is_constant_iterator(It), It, basic_const_iterator<It>>>;
+using const_iterator = enable_if_t<UTL_TRAIT_is_input_iterator(It),
+    conditional_t<UTL_TRAIT_is_constant_iterator(It), It, basic_const_iterator<It>>>;
 
 template <typename It>
 using const_sentinel =
@@ -703,14 +707,14 @@ using const_sentinel =
         conditional_t<UTL_TRAIT_is_input_iterator(It), const_iterator<It>, It>>;
 
 template <typename T, typename U>
-struct common_type<basic_const_iterator<T>, U> : details::const_iterator::common_type<T, U> {};
+struct common_type<basic_const_iterator<T>, U> : details::_const_iterator::common_type<T, U> {};
 
-template <typename T, common_with<T> U>
-struct common_type<U, basic_const_iterator<T>> : details::const_iterator::common_type<T, U> {};
+template <typename T, typename U>
+struct common_type<U, basic_const_iterator<T>> : details::_const_iterator::common_type<T, U> {};
 
-template <typename T, common_with<T> U>
+template <typename T, typename U>
 struct common_type<basic_const_iterator<T>, basic_const_iterator<U>> :
-    details::const_iterator::common_type<T, U> {};
+    details::_const_iterator::common_type<T, U> {};
 
 #endif // UTL_CXX20
 

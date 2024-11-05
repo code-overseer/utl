@@ -176,9 +176,14 @@ namespace details {
 namespace iterator_traits {
 
 template <typename T>
-using simple_iter UTL_NODEBUG =
-    __UTL conjunction<__UTL has_member_difference_type<T>, __UTL has_member_value_type<T>,
+__UTL_HIDE_FROM_ABI auto simple_iter_impl(int) noexcept
+    -> __UTL conjunction<__UTL has_member_difference_type<T>, __UTL has_member_value_type<T>,
         __UTL has_member_reference<T>, __UTL is_iterator_tag<typename T::iterator_category>>;
+template <typename T>
+__UTL_HIDE_FROM_ABI auto simple_iter_impl(float) noexcept -> __UTL false_type;
+
+template <typename T>
+using simple_iter = decltype(simple_iter_impl<T>(0));
 
 template <typename T, bool = simple_iter<T>::value, bool = UTL_TRAIT_has_member_pointer(T)>
 struct traits;
