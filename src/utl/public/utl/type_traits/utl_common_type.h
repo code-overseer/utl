@@ -103,4 +103,4 @@ struct __UTL_PUBLIC_TEMPLATE common_type<T, U, Vs...> :
 UTL_NAMESPACE_END
 #endif
 
-#define UTL_TRAIT_SUPPORTEDcommon_type 1
+#define UTL_TRAIT_SUPPORTED_common_type 1
