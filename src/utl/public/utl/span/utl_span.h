@@ -15,6 +15,7 @@
 #include "utl/type_traits/utl_copy_cv.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_const.h"
+#include "utl/type_traits/utl_is_convertible.h"
 #include "utl/type_traits/utl_is_same.h"
 #include "utl/type_traits/utl_remove_cv.h"
 #include "utl/type_traits/utl_type_identity.h"
@@ -122,7 +123,7 @@ public:
         , size_(ensure_size(il.size())) {}
 
     template <typename U, size_t N>
-    requires (same_as<copy_cv_t<element_type, U const>, element_type> &&
+    requires (same_as<copy_cv_t<element_type, U>, element_type> &&
                  (extent == dynamic_extent || N == dynamic_extent || E == N))
     __UTL_HIDE_FROM_ABI explicit(extent != dynamic_extent &&
         N == dynamic_extent) inline constexpr span(span<U, N> src) noexcept
@@ -171,7 +172,7 @@ public:
 
     template <typename U, size_t N,
         enable_if_t<(extent != dynamic_extent && N == dynamic_extent) &&
-                UTL_TRAIT_is_same(copy_cv_t<element_type, U const>, element_type) &&
+                UTL_TRAIT_is_same(copy_cv_t<element_type, U>, element_type) &&
                 (extent == dynamic_extent || N == dynamic_extent || E == N),
             int> = 0>
     __UTL_HIDE_FROM_ABI explicit inline constexpr span(span<U, N> src) noexcept
@@ -180,7 +181,7 @@ public:
 
     template <typename U, size_t N,
         enable_if_t<!(extent != dynamic_extent && N == dynamic_extent) &&
-                UTL_TRAIT_is_same(copy_cv_t<element_type, U const>, element_type) &&
+                UTL_TRAIT_is_same(copy_cv_t<element_type, U>, element_type) &&
                 (extent == dynamic_extent || N == dynamic_extent || E == N),
             int> = 0>
     __UTL_HIDE_FROM_ABI inline constexpr span(span<U, N> src) noexcept
