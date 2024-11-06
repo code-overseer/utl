@@ -1,3 +1,5 @@
+// Copyright 2023-2024 Bryan Wong
+
 //===----------------------------------------------------------------------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -11,18 +13,13 @@
 
 //  constexpr span& operator=(const span& other) noexcept = default;
 
+#include "tests/test_macros.h"
 #include "utl/span/utl_span.h"
 #include "utl/string/utl_basic_short_string.h"
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_is_assignable.h"
 
 #include <cassert>
-
-#define ASSERT_NOEXCEPT(...) static_assert(noexcept(__VA_ARGS__), "Operation must be noexcept")
-
-template <typename T, size_t N>
-utl::integral_constant<size_t, N> ArraySize(T (&)[N]) noexcept;
-#define ARRAY_SIZE(A) decltype(ArraySize(A))::value
 
 namespace span {
 namespace assign {

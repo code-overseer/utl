@@ -18,11 +18,10 @@
 //   - remove_pointer_t<decltype(data(arr))>(*)[] is convertible to ElementType(*)[].
 //
 
+#include "tests/test_macros.h"
 #include "utl/span/utl_span.h"
 #include "utl/string/utl_basic_short_string.h"
 #include "utl/type_traits/utl_is_constructible.h"
-
-#define ASSERT_NOEXCEPT(...) static_assert(noexcept(__VA_ARGS__), "Operation must be noexcept")
 
 #include <cassert>
 

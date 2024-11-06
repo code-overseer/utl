@@ -3,7 +3,7 @@
 
 #if UTL_CXX17
 
-#  include <stddef.h>
+#  include <cstddef>
 
 UTL_NAMESPACE_BEGIN
 using byte = ::std::byte;
