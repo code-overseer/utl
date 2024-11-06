@@ -143,7 +143,7 @@ struct __UTL_PUBLIC_TEMPLATE iterator_traits<Iter> :
 };
 
 template <object_type T>
-struct __UTL_PUBLIC_TEMPLATE iterator_traits<T*> : private details::iterator_traits::impl_tag<T*> {
+struct __UTL_PUBLIC_TEMPLATE iterator_traits<T*> {
     using difference_type = pointer_traits<T*>::difference_type;
     using value_type = remove_cv_t<T>;
     using pointer = T*;
@@ -284,9 +284,7 @@ struct __UTL_PUBLIC_TEMPLATE iterator_traits :
     private details::iterator_traits::impl_tag<Iter> {};
 
 template <typename T>
-struct __UTL_PUBLIC_TEMPLATE iterator_traits<T*> :
-    details::iterator_traits::pointer_impl<T*>,
-    private details::iterator_traits::impl_tag<T*> {};
+struct __UTL_PUBLIC_TEMPLATE iterator_traits<T*> : details::iterator_traits::pointer_impl<T*> {};
 
 UTL_NAMESPACE_END
 

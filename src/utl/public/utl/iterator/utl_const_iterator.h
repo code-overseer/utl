@@ -4,6 +4,7 @@
 
 #include "utl/utl_config.h"
 
+#include "utl/concepts/utl_common_with.h"
 #include "utl/concepts/utl_convertible_to.h"
 #include "utl/concepts/utl_default_initializable.h"
 #include "utl/concepts/utl_different_from.h"
@@ -462,25 +463,26 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI inline constexpr basic_const_iterator& operator++() noexcept(
-        noexcept(++current)) {
+        noexcept(++__UTL declval<It&>())) {
         ++current;
         return *this;
     }
 
-    __UTL_HIDE_FROM_ABI inline constexpr void operator++(int) noexcept(noexcept(++current)) {
+    __UTL_HIDE_FROM_ABI inline constexpr void operator++(int) noexcept(
+        noexcept(++__UTL declval<It&>())) {
         ++current;
         return *this;
     }
 
     __UTL_HIDE_FROM_ABI inline constexpr basic_const_iterator operator++(int) noexcept(
-        noexcept(current++))
+        noexcept(__UTL declval<It&>()++))
     requires forward_iterator<It>
     {
         return basic_const_iterator(current++);
     }
 
     __UTL_HIDE_FROM_ABI inline constexpr basic_const_iterator& operator--() noexcept(
-        noexcept(--current))
+        noexcept(--__UTL declval<It&>()))
     requires bidirectional_iterator<It>
     {
         --current;
@@ -488,22 +490,22 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI inline constexpr basic_const_iterator operator--(int) noexcept(
-        noexcept(current--))
+        noexcept(__UTL declval<It&>()--))
     requires bidirectional_iterator<It>
     {
         return basic_const_iterator(current--);
     }
 
-    __UTL_HIDE_FROM_ABI inline constexpr reference operator+=(difference_type n) const
-        noexcept(noexcept(current += 1))
+    __UTL_HIDE_FROM_ABI inline constexpr reference operator+=(difference_type n) noexcept(
+        noexcept(__UTL declval<It&>() += 1))
     requires random_access_iterator<It>
     {
         current += n;
         return *this;
     }
 
-    __UTL_HIDE_FROM_ABI inline constexpr reference operator-=(difference_type n) const
-        noexcept(noexcept(current -= 1))
+    __UTL_HIDE_FROM_ABI inline constexpr reference operator-=(difference_type n) noexcept(
+        noexcept(__UTL declval<It&>() -= 1))
     requires random_access_iterator<It>
     {
         current -= n;

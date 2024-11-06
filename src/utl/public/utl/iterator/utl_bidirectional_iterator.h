@@ -44,8 +44,8 @@ namespace bidirectional_iterator {
 
 template <typename T>
 __UTL_HIDE_FROM_ABI auto reversible(int) noexcept
-    -> __UTL conjunction<__UTL is_same<decltype(--static_cast<T (*)()>(0)()), T&>,
-        __UTL is_same<decltype(static_cast<T (*)()>(0)()--), T>>;
+    -> __UTL conjunction<__UTL is_same<decltype(--__UTL declval<T&>()), T&>,
+        __UTL is_same<decltype(__UTL declval<T&>()--), T>>;
 
 template <typename T>
 __UTL_HIDE_FROM_ABI auto reversible(float) noexcept -> __UTL false_type;

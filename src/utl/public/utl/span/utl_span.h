@@ -6,7 +6,9 @@
 
 #include "utl/array/utl_array_fwd.h"
 
+#include "utl/byte/utl_byte.h"
 #include "utl/concepts/utl_same_as.h"
+#include "utl/exception/utl_program_exception.h"
 #include "utl/iterator/utl_const_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator_base.h"
@@ -70,7 +72,7 @@ private:
     __UTL_HIDE_FROM_ABI static constexpr size_t ensure_size(size_t n) noexcept {
         return extent == dynamic_extent || n == extent ? n : (UTL_ASSERT(!"Invalid size"), 0);
     }
-    template <size_type Count>
+    template <size_type Offset, size_type Count>
     using subspan_result UTL_NODEBUG = span<element_type,
         (Count != dynamic_extent           ? Count
                 : extent != dynamic_extent ? extent - Offset
@@ -113,8 +115,8 @@ public:
 
     template <contiguous_iterator It, sized_sentinel_for<It> End>
     __UTL_HIDE_FROM_ABI explicit(extent != dynamic_extent) inline constexpr span(
-        It begin, End end) noexcept(noexcept(__UTL to_address(first)) && noexcept(end - begin))
-        : data_(__UTL to_address(first))
+        It begin, End end) noexcept(noexcept(__UTL to_address(begin)) && noexcept(end - begin))
+        : data_(__UTL to_address(begin))
         , size_(ensure_size(end - begin)) {}
 
     __UTL_HIDE_FROM_ABI inline constexpr span(::std::initializer_list<value_type> il) noexcept
@@ -151,8 +153,8 @@ public:
                 UTL_TRAIT_is_sized_sentinel_for(It, End),
             int> = 0>
     __UTL_HIDE_FROM_ABI explicit inline constexpr span(It begin, End end) noexcept(
-        noexcept(__UTL to_address(first)) && noexcept(end - begin))
-        : data_(__UTL to_address(first))
+        noexcept(__UTL to_address(begin)) && noexcept(end - begin))
+        : data_(__UTL to_address(begin))
         , size_(ensure_size(end - begin)) {}
 
     template <typename It, typename End,
@@ -160,8 +162,8 @@ public:
                 UTL_TRAIT_is_sized_sentinel_for(It, End),
             int> = 1>
     __UTL_HIDE_FROM_ABI inline constexpr span(It begin, End end) noexcept(
-        noexcept(__UTL to_address(first)) && noexcept(end - begin))
-        : data_(__UTL to_address(first))
+        noexcept(__UTL to_address(begin)) && noexcept(end - begin))
+        : data_(__UTL to_address(begin))
         , size_(ensure_size(end - begin)) {}
 
     template <typename U,
@@ -276,7 +278,7 @@ public:
     UTL_CONSTRAINT_CXX20(Count != dynamic_extent && (extent == dynamic_extent || Count < extent))
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr span<element_type, Count> last() const noexcept {
         return span<element_type, Count>{
-            data_ + (UTL_ASSERT(count < size()), (size() - count)), Count};
+            data_ + (UTL_ASSERT(Count < size()), (size() - Count)), Count};
     }
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr span<element_type, dynamic_extent> last(
@@ -290,12 +292,13 @@ public:
     template <size_type Offset, size_type Count = dynamic_extent UTL_CONSTRAINT_CXX11(
         (Offset > extent) || (Count != dynamic_extent && Count > (extent - Offset))) >
     UTL_CONSTRAINT_CXX20(Offset > extent || (Count != dynamic_extent && Count > (extent - Offset)))
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr subspan_result<Count> subspan() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr subspan_result<Offset, Count>
+    subspan() const noexcept {
         return Offset <= size() && (Count == dynamic_extent || Count <= (size() - Offset))
-            ? subspan_result<Count>{data_ + Offset,
+            ? subspan_result<Offset, Count>{data_ + Offset,
                   Count == dynamic_extent ? size() - Offset : Count}
             : (UTL_ASSERT(!"Out of range"),
-                  subspan_result<Count>{
+                  subspan_result<Offset, Count>{
                       data_ + Offset, Count == dynamic_extent ? size() - Offset : Count});
     }
 
@@ -307,16 +310,16 @@ public:
             : (UTL_ASSERT(!"Out of range"), result_type{data_ + offset, count});
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend inline span<std::byte const, byte_span_size> as_bytes(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend inline span<__UTL byte const, byte_span_size> as_bytes(
         span s) noexcept {
-        using result_type UTL_NODEBUG = span<std::byte const, byte_span_size>;
-        return result_type{reinterpret_cast<std::byte const*>(s.data()), s.size_bytes()};
+        using result_type UTL_NODEBUG = span<__UTL byte const, byte_span_size>;
+        return result_type{reinterpret_cast<__UTL byte const*>(s.data()), s.size_bytes()};
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend inline span<std::byte, byte_span_size> as_writable_bytes(
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend inline span<__UTL byte, byte_span_size> as_writable_bytes(
         span s) noexcept {
-        using result_type UTL_NODEBUG = span<std::byte, byte_span_size>;
-        return result_type{reinterpret_cast<std::byte*>(s.data()), s.size_bytes()};
+        using result_type UTL_NODEBUG = span<__UTL byte, byte_span_size>;
+        return result_type{reinterpret_cast<__UTL byte*>(s.data()), s.size_bytes()};
     }
 
 private:

@@ -87,7 +87,7 @@ using is_subtractible UTL_NODEBUG =
 template <typename I, typename S>
 struct __UTL_PUBLIC_TEMPLATE is_sized_sentinel_for :
     conjunction<is_sentinel_for<I, S>,
-        details::sized_sentinel_for::is_disabled<remove_cv_t<I>, remove_cv_t<S>>,
+        negation<details::sized_sentinel_for::is_disabled<remove_cv_t<I>, remove_cv_t<S>>>,
         details::sized_sentinel_for::is_subtractible<I, S>> {};
 
 #  if UTL_CXX14
