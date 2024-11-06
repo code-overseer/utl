@@ -5,6 +5,7 @@
 #include "utl/utl_config.h"
 
 #include "utl/string/utl_libc_common.h"
+#include "utl/utility/utl_signs.h"
 
 UTL_NAMESPACE_BEGIN
 
@@ -65,7 +66,7 @@ __UTL_HIDE_FROM_ABI inline constexpr T* memchr(T const* str, U value, size_t byt
 
 template <typename T>
 __UTL_HIDE_FROM_ABI inline constexpr size_t strlen(T const* str, size_t r = 0) noexcept {
-    return !*str ? r : strlen(str, r + 1);
+    return !*str ? r : strlen(str + 1, r + 1);
 }
 
 template <typename T>
@@ -77,18 +78,19 @@ __UTL_HIDE_FROM_ABI inline constexpr T* strchr(T const* str, T const ch) noexcep
 
 template <typename T>
 __UTL_HIDE_FROM_ABI inline constexpr int strcmp(T const* left, T const* right) noexcept {
-    return !*left && !*right ? 0
-        : (*left < *right)   ? -1
-        : (*right < *left)   ? 1
-                             : __UTL libc::compile_time::recursive::strcmp(left + 1, right + 1);
+    return !*left && !*right                                     ? 0
+        : (__UTL to_unsigned(*left) < __UTL to_unsigned(*right)) ? -1
+        : (__UTL to_unsigned(*right) < __UTL to_unsigned(*left))
+        ? 1
+        : __UTL libc::compile_time::recursive::strcmp(left + 1, right + 1);
 }
 
 template <typename T>
 __UTL_HIDE_FROM_ABI inline constexpr int strncmp(
     T const* left, T const* right, element_count_t len) noexcept {
-    return len == 0 || (!*left && !*right) ? 0
-        : (*left < *right)                 ? -1
-        : (*right < *left)
+    return len == 0 || (!*left && !*right)                       ? 0
+        : (__UTL to_unsigned(*left) < __UTL to_unsigned(*right)) ? -1
+        : (__UTL to_unsigned(*right) < __UTL to_unsigned(*left))
         ? 1
         : __UTL libc::compile_time::recursive::strncmp(left + 1, right + 1, len - 1);
 }
@@ -117,11 +119,7 @@ template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_CONSTRAINT_CXX11(
     is_trivially_copyable<T>::value)>
 __UTL_HIDE_FROM_ABI inline constexpr T* memcpy(
     T* dst, T const* src, element_count_t count) noexcept {
-#if UTL_HAS_BUILTIN(__builtin_memcpy)
-    return __builtin_memcpy(dst, src, byte_count<T>(count)), dst;
-#else
     return recursive::memcpy(dst, src, count, dst);
-#endif
 }
 
 template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_CONSTRAINT_CXX11(
@@ -129,22 +127,14 @@ template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_CONSTRAINT_CXX11(
 UTL_CONSTRAINT_CXX20(exact_size<T, 1>)
 __UTL_HIDE_FROM_ABI inline constexpr T* memset(
     T* dst, T const src, element_count_t count) noexcept {
-#if UTL_HAS_BUILTIN(__builtin_memset)
-    return __builtin_memset(dst, as_byte(src), byte_count<T>(count)), dst;
-#else
     return recursive::memset(dst, as_byte(src), count, dst);
-#endif
 }
 
 template <UTL_CONCEPT_CXX20(trivially_copyable) T UTL_CONSTRAINT_CXX11(
     is_trivially_copyable<T>::value)>
 __UTL_HIDE_FROM_ABI inline constexpr T* memmove(
     T* dst, T const* src, element_count_t count) noexcept {
-#if UTL_HAS_BUILTIN(__builtin_memmove)
-    return __builtin_memmove(dst, src, byte_count<T>(count)), dst;
-#else
-    return recursive::memmove(dst, src, count)
-#endif
+    return recursive::memmove(dst, src, count);
 }
 
 template <typename T, typename U>
@@ -152,20 +142,12 @@ __UTL_HIDE_FROM_ABI inline constexpr int memcmp(
     T const* left, U const* right, element_count_t count) noexcept {
     static_assert(is_trivially_lexicographically_comparable<T, U>::value,
         "Types must be lexicographically comparable");
-#if UTL_HAS_BUILTIN(__builtin_memcmp)
-    return __builtin_memcmp(left, right, byte_count<T>(count));
-#else
     return recursive::memcmp(left, right, count);
-#endif
 }
 
 __UTL_HIDE_FROM_ABI inline constexpr char* memchr(
     char const* str, char value, size_t bytes) noexcept {
-#if UTL_HAS_BUILTIN(__builtin_char_memchr)
-    return __builtin_char_memchr(str, (int)value, bytes);
-#else
-    return recuresive::memchr(str, value, bytes);
-#endif
+    return recursive::memchr(str, value, bytes);
 }
 
 template <UTL_CONCEPT_CXX20(exact_size<1>) T, UTL_CONCEPT_CXX20(
@@ -175,19 +157,11 @@ __UTL_HIDE_FROM_ABI inline constexpr T* memchr(T const* str, U value, size_t byt
 }
 
 __UTL_HIDE_FROM_ABI inline constexpr size_t strlen(char const* str) noexcept {
-#if UTL_HAS_BUILTIN(__builtin_strlen)
-    return __builtin_strlen(str);
-#else
     return recursive::strlen(str);
-#endif
 }
 
 __UTL_HIDE_FROM_ABI inline constexpr size_t strlen(wchar_t const* str) noexcept {
-#if UTL_HAS_BUILTIN(__builtin_wcslen)
-    return __builtin_wcslen(str);
-#else
     return recursive::strlen(str);
-#endif
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_CONSTRAINT_CXX11(is_string_char<T>::value)>
@@ -196,20 +170,12 @@ __UTL_HIDE_FROM_ABI inline constexpr size_t strlen(T const* str) noexcept {
 }
 
 __UTL_HIDE_FROM_ABI inline constexpr char* strchr(char const* str, char const ch) noexcept {
-#if UTL_HAS_BUILTIN(__builtin_strchr)
-    return __builtin_strchr(str, (int)ch);
-#else
     return recursive::strchr(str, ch);
-#endif
 }
 
 __UTL_HIDE_FROM_ABI inline constexpr wchar_t* strchr(
     wchar_t const* str, wchar_t const ch) noexcept {
-#if UTL_HAS_BUILTIN(__builtin_wcschr)
-    return __builtin_wcschr(str, ch);
-#else
     return recursive::strchr(str, ch);
-#endif
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_CONSTRAINT_CXX11(is_string_char<T>::value)>
@@ -218,20 +184,12 @@ __UTL_HIDE_FROM_ABI inline constexpr T* strchr(T const* str, T const ch) noexcep
 }
 
 __UTL_HIDE_FROM_ABI inline constexpr int strcmp(char const* left, char const* right) noexcept {
-#if UTL_HAS_BUILTIN(__builtin_strcmp)
-    return __builtin_strcmp(left, right);
-#else
     return recursive::strcmp(left, right);
-#endif
 }
 
 __UTL_HIDE_FROM_ABI inline constexpr int strcmp(
     wchar_t const* left, wchar_t const* right) noexcept {
-#if UTL_HAS_BUILTIN(__builtin_wcscmp)
-    return __builtin_wcscmp(left, right);
-#else
     return recursive::strcmp(left, right);
-#endif
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_CONSTRAINT_CXX11(is_string_char<T>::value)>
@@ -241,20 +199,12 @@ __UTL_HIDE_FROM_ABI inline constexpr int strcmp(T const* left, T const* right) n
 
 __UTL_HIDE_FROM_ABI inline constexpr int strncmp(
     char const* left, char const* right, element_count_t len) noexcept {
-#if UTL_HAS_BUILTIN(__builtin_strncmp)
-    return __builtin_strncmp(left, right, (size_t)len);
-#else
-    return recursive::strncmp((unsigned char const*)left, (unsigned char const*)right, len);
-#endif
+    return recursive::strncmp(left, right, len);
 }
 
 __UTL_HIDE_FROM_ABI inline constexpr int strncmp(
     wchar_t const* left, wchar_t const* right, element_count_t len) noexcept {
-#if UTL_HAS_BUILTIN(__builtin_wcsncmp)
-    return __builtin_wcsncmp(left, right, (size_t)len);
-#else
     return recursive::strncmp(left, right, len);
-#endif
 }
 
 template <UTL_CONCEPT_CXX20(string_char) T UTL_CONSTRAINT_CXX11(is_string_char<T>::value)>
