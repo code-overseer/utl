@@ -29,7 +29,7 @@ concept is_specialized = UTL_TRAIT_is_complete(__UTL iterator_traits<T>) &&
 
 template <typename T, typename R = decltype(__UTL details::complete_type::is_complete<T>(0))>
 using is_specialized =
-    __UTL conjunction<R, __UTL is_base_of<impl_tag<T>, __UTL iterator_traits<T>>>;
+    __UTL conjunction<R, __UTL negation<__UTL is_base_of<impl_tag<T>, __UTL iterator_traits<T>>>>;
 
 #endif
 } // namespace iterator_traits

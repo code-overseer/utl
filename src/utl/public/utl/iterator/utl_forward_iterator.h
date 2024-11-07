@@ -25,6 +25,7 @@ struct __UTL_PUBLIC_TEMPLATE is_forward_iterator : __UTL bool_constant<forward_i
 
 template <typename T>
 inline constexpr bool is_forward_iterator_v = forward_iterator<T>;
+#  define UTL_TRAIT_is_forward_iterator(...) __UTL forward_iterator<__VA_ARGS__>
 
 UTL_NAMESPACE_END
 
@@ -43,6 +44,9 @@ struct __UTL_PUBLIC_TEMPLATE is_forward_iterator :
 #  if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_forward_iterator_v = is_forward_iterator<T>::value;
+#    define UTL_TRAIT_is_forward_iterator(...) __UTL is_forward_iterator_v<__VA_ARGS__>
+#  else
+#    define UTL_TRAIT_is_forward_iterator(...) __UTL is_forward_iterator<__VA_ARGS__>::value
 #  endif
 
 UTL_NAMESPACE_END

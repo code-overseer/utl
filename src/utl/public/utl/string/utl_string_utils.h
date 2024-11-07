@@ -320,7 +320,7 @@ struct literal_sequence {
 };
 
 template <typename CharType, CharType... Vs>
-constexpr CharType literal_sequence<CharType, Vs...>::value[sizeof...(Vs)];
+constexpr CharType literal_sequence<CharType, Vs...>::value[sizeof...(Vs) + 1];
 
 template <typename CharType, typename Traits = __UTL char_traits<CharType>>
 __UTL_HIDE_FROM_ABI inline constexpr basic_string_view<CharType, Traits> rstrip(

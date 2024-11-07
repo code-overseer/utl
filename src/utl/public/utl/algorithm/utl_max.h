@@ -4,14 +4,10 @@
 
 #include "utl/utl_config.h"
 
+#include "utl/initializer_list/utl_initializer_list_fwd.h"
+
 #include "utl/type_traits/utl_is_nothrow_copy_constructible.h"
 #include "utl/utility/utl_move.h"
-
-namespace std {
-/* UTL_UNDEFINED_BEHAVIOUR */
-template <typename>
-class initializer_list;
-} // namespace std
 
 UTL_NAMESPACE_BEGIN
 

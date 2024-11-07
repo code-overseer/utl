@@ -36,6 +36,7 @@ struct __UTL_PUBLIC_TEMPLATE is_random_access_iterator :
 
 template <typename T>
 inline constexpr bool is_random_access_iterator_v = random_access_iterator<T>;
+#  define UTL_TRAIT_is_random_access_iterator(...) __UTL random_access_iterator<__VA_ARGS__>
 
 UTL_NAMESPACE_END
 
@@ -82,6 +83,10 @@ struct __UTL_PUBLIC_TEMPLATE is_random_access_iterator :
 #  if UTL_CXX14
 template <typename T>
 UTL_INLINE_CXX17 constexpr bool is_random_access_iterator_v = is_random_access_iterator<T>::value;
+#    define UTL_TRAIT_is_random_access_iterator(...) __UTL is_random_access_iterator_v<__VA_ARGS__>
+#  else
+#    define UTL_TRAIT_is_random_access_iterator(...) \
+        __UTL is_random_access_iterator<__VA_ARGS__>::value
 #  endif
 
 UTL_NAMESPACE_END

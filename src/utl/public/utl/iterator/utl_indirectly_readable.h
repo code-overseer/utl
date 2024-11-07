@@ -44,6 +44,7 @@ struct __UTL_PUBLIC_TEMPLATE is_indirectly_readable :
 
 template <typename T>
 inline constexpr bool is_indirectly_readable_v = indirectly_readable<T>;
+#  define UTL_TRAIT_is_indirectly_readable(...) __UTL indirectly_readable<__VA_ARGS__>
 
 UTL_NAMESPACE_END
 
@@ -70,7 +71,10 @@ struct is_indirectly_readable : details::indirectly_readable::trait<__UTL remove
 
 #  if UTL_CXX14
 template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_indirectly_readable_v = details::indirectly_readable::trait<T>::value;
+UTL_INLINE_CXX17 constexpr bool is_indirectly_readable_v = is_indirectly_readable<T>::value;
+#    define UTL_TRAIT_is_indirectly_readable(...) __UTL is_indirectly_readable_v<__VA_ARGS__>
+#  else
+#    define UTL_TRAIT_is_indirectly_readable(...) __UTL is_indirectly_readable<__VA_ARGS__>::value
 #  endif
 
 UTL_NAMESPACE_END

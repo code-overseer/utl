@@ -7,6 +7,7 @@
 #include "utl/string/utl_string_fwd.h"
 
 #include "utl/exception.h"
+#include "utl/iterator/utl_const_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator_base.h"
 #include "utl/iterator/utl_distance.h"
@@ -17,6 +18,7 @@
 #include "utl/memory/utl_to_address.h"
 #include "utl/numeric/utl_max.h"
 #include "utl/numeric/utl_min.h"
+#include "utl/string/utl_basic_string_view.h"
 #include "utl/string/utl_string_details.h"
 
 #define __UTL_ATTRIBUTE_STRING_PURE (PURE)(NODISCARD) __UTL_ATTRIBUTE__HIDE_FROM_ABI
@@ -59,7 +61,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(contiguous_iterator) It,
         UTL_CONCEPT_CXX20(sized_sentinel_for<It>) E UTL_CONSTRAINT_CXX11(
-        UTL_TRAIT_is_contiguous_iterator(It) && UTL_TRAIT_is_sized_sentinel_for(E, It))>
+        UTL_TRAIT_is_contiguous_iterator(It) && UTL_TRAIT_is_sized_sentinel_for(It, E))>
     __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 basic_zstring_view(It begin, E end)
         UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_dereferenceable(It)&& noexcept(end - begin))
         : basic_zstring_view(__UTL to_address(begin), end - begin) {}

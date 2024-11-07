@@ -13,6 +13,7 @@
 #include "utl/concepts/utl_convertible_to.h"
 #include "utl/concepts/utl_integral.h"
 #include "utl/exception.h"
+#include "utl/iterator/utl_const_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator_base.h"
 #include "utl/iterator/utl_distance.h"
 #include "utl/iterator/utl_iterator_traits.h"
@@ -80,7 +81,6 @@ public:
     __UTL_PUBLIC_TEMPLATE_DATA static constexpr size_type npos = -1;
 
     class iterator;
-    class const_iterator;
 
 private:
     using char_pointer = CharType*;
@@ -130,13 +130,10 @@ private:
 public:
     class __UTL_ABI_PUBLIC iterator : __UTL contiguous_iterator_base<iterator, value_type> {
         using base_type = contiguous_iterator_base<iterator, value_type>;
+        friend basic_short_string;
 
     public:
-        using typename base_type::difference_type;
-        using typename base_type::iterator_concept;
-        using typename base_type::pointer;
-        using typename base_type::reference;
-        using typename base_type::value_type;
+        UTL_INHERIT_CONTIGUOUS_ITERATOR_MEMBERS(iterator, value_type);
 
         __UTL_HIDE_FROM_ABI inline constexpr iterator() noexcept = default;
         __UTL_HIDE_FROM_ABI inline constexpr iterator(iterator const& other) noexcept = default;
@@ -145,11 +142,8 @@ public:
             iterator const& other) noexcept = default;
         __UTL_HIDE_FROM_ABI inline constexpr iterator& operator=(
             iterator&& other) noexcept = default;
-        using base_type::operator*;
-        using base_type::operator->;
 
     private:
-        friend basic_short_string;
         __UTL_HIDE_FROM_ABI inline constexpr iterator(char_pointer data) noexcept
             : base_type(data) {}
         template <typename It>
@@ -157,39 +151,9 @@ public:
             : iterator(const_cast<pointer>(__UTL to_address(other))) {}
     };
 
-    class __UTL_ABI_PUBLIC const_iterator :
-        __UTL contiguous_iterator_base<const_iterator, value_type const> {
-        using base_type = contiguous_iterator_base<const_iterator, value_type const>;
-
-    public:
-        using typename base_type::difference_type;
-        using typename base_type::iterator_concept;
-        using typename base_type::pointer;
-        using typename base_type::reference;
-        using typename base_type::value_type;
-
-        __UTL_HIDE_FROM_ABI inline constexpr const_iterator() noexcept = default;
-        __UTL_HIDE_FROM_ABI inline constexpr const_iterator(
-            const_iterator const& other) noexcept = default;
-        __UTL_HIDE_FROM_ABI inline constexpr const_iterator(
-            const_iterator&& other) noexcept = default;
-        __UTL_HIDE_FROM_ABI inline constexpr const_iterator& operator=(
-            const_iterator const& other) noexcept = default;
-        __UTL_HIDE_FROM_ABI inline constexpr const_iterator& operator=(
-            const_iterator&& other) noexcept = default;
-        using base_type::operator*;
-        using base_type::operator->;
-
-    private:
-        friend basic_short_string;
-        __UTL_HIDE_FROM_ABI inline constexpr const_iterator(char_pointer data) noexcept
-            : base_type(data) {}
-        __UTL_HIDE_FROM_ABI inline constexpr const_iterator(iterator other) noexcept
-            : base_type(__UTL to_address(other)) {}
-    };
-
+    using const_iterator = __UTL const_iterator<iterator>;
     using reverse_iterator = __UTL reverse_iterator<iterator>;
-    using const_reverse_iterator = __UTL reverse_iterator<const_iterator>;
+    using const_reverse_iterator = __UTL const_iterator<reverse_iterator>;
 
     basic_short_string(decltype(nullptr)) = delete;
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE constexpr basic_short_string() noexcept(

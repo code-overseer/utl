@@ -22,3 +22,13 @@
 #include "utl/configuration/utl_types.h"
 
 #include "utl/preprocessor/utl_attribute_list.h"
+
+UTL_NAMESPACE_BEGIN
+
+using ptrdiff_t = decltype((char*)0 - (char*)0);
+using size_t = decltype(sizeof(0));
+
+UTL_NAMESPACE_END
+
+using __UTL ptrdiff_t;
+using __UTL size_t;

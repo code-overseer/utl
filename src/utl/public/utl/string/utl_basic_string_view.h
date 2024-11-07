@@ -8,6 +8,7 @@
 
 #include "utl/assert/utl_assert.h"
 #include "utl/exception.h"
+#include "utl/iterator/utl_const_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator_base.h"
 #include "utl/iterator/utl_distance.h"
@@ -38,39 +39,30 @@ public:
     using const_pointer = CharType const*;
     using reference = CharType&;
     using const_reference = CharType const&;
-    __UTL_PUBLIC_TEMPLATE_DATA static inline constexpr size_type npos = details::string::npos;
-    class const_iterator;
-    using iterator = const_iterator;
-    using const_reverse_iterator = __UTL reverse_iterator<const_iterator>;
-    using reverse_iterator = const_reverse_iterator;
+    class iterator;
+    using const_iterator = __UTL const_iterator<iterator>;
+    using reverse_iterator = __UTL reverse_iterator<iterator>;
+    using const_reverse_iterator = __UTL const_iterator<reverse_iterator>;
 
-    class __UTL_ABI_PUBLIC const_iterator :
-        __UTL contiguous_iterator_base<const_iterator, value_type const> {
-        using base_type = contiguous_iterator_base<const_iterator, value_type const>;
+    __UTL_PUBLIC_TEMPLATE_DATA static constexpr size_type npos = details::string::npos;
+
+    class __UTL_ABI_PUBLIC iterator : __UTL contiguous_iterator_base<iterator, value_type const> {
+        using base_type = contiguous_iterator_base<iterator, value_type const>;
 
     public:
-        using typename base_type::difference_type;
-        using typename base_type::iterator_concept;
-        using typename base_type::pointer;
-        using typename base_type::reference;
-        using typename base_type::value_type;
+        UTL_INHERIT_CONTIGUOUS_ITERATOR_MEMBERS(iterator, value_type const);
 
-        __UTL_HIDE_FROM_ABI inline constexpr const_iterator() noexcept = default;
-        __UTL_HIDE_FROM_ABI inline constexpr const_iterator(
-            const_iterator const& other) noexcept = default;
-        __UTL_HIDE_FROM_ABI inline constexpr const_iterator(
-            const_iterator&& other) noexcept = default;
-        __UTL_HIDE_FROM_ABI inline constexpr const_iterator& operator=(
-            const_iterator const& other) noexcept = default;
-        __UTL_HIDE_FROM_ABI inline constexpr const_iterator& operator=(
-            const_iterator&& other) noexcept = default;
-        using base_type::operator*;
-        using base_type::operator->;
+        __UTL_HIDE_FROM_ABI inline constexpr iterator() noexcept = default;
+        __UTL_HIDE_FROM_ABI inline constexpr iterator(iterator const&) noexcept = default;
+        __UTL_HIDE_FROM_ABI inline constexpr iterator(iterator&&) noexcept = default;
+        __UTL_HIDE_FROM_ABI inline constexpr iterator& operator=(
+            iterator const& other) noexcept = default;
+        __UTL_HIDE_FROM_ABI inline constexpr iterator& operator=(
+            iterator&& other) noexcept = default;
 
     private:
         friend basic_string_view;
-        __UTL_HIDE_FROM_ABI inline constexpr const_iterator(pointer data) noexcept
-            : base_type(data) {}
+        __UTL_HIDE_FROM_ABI inline constexpr iterator(pointer data) noexcept : base_type(data) {}
     };
 
     basic_string_view(decltype(nullptr)) = delete;
@@ -88,7 +80,7 @@ public:
 
     template <UTL_CONCEPT_CXX20(contiguous_iterator) It,
         UTL_CONCEPT_CXX20(sized_sentinel_for<It>) E UTL_CONSTRAINT_CXX11(
-        UTL_TRAIT_is_contiguous_iterator(It) && UTL_TRAIT_is_sized_sentinel_for(E, It))>
+        UTL_TRAIT_is_contiguous_iterator(It) && UTL_TRAIT_is_sized_sentinel_for(It, E))>
     __UTL_HIDE_FROM_ABI inline constexpr basic_string_view(It begin, E end) noexcept(
         UTL_TRAIT_is_nothrow_dereferenceable(It) && noexcept(end - begin))
         : data_(__UTL to_address(begin))
@@ -455,8 +447,8 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename CharT, typename Traits>
-__UTL_ABI_PUBLIC constexpr typename basic_string_view<CharT, N, Traits, Alloc>::size_type
-    basic_string_view<CharT, Traits>::npos;
+__UTL_ABI_PUBLIC constexpr
+    typename basic_string_view<CharT, Traits>::size_type basic_string_view<CharT, Traits>::npos;
 
 UTL_NAMESPACE_END
 

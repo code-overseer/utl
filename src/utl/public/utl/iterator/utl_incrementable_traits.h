@@ -14,8 +14,6 @@ struct incrementable_traits;
 template <typename T>
 struct __UTL_PUBLIC_TEMPLATE incrementable_traits<T const> : incrementable_traits<T> {};
 
-using ptrdiff_t = decltype((char*)0 - (char*)0);
-
 namespace details {
 namespace incrementable {
 template <typename T>

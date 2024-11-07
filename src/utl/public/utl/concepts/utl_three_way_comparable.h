@@ -7,6 +7,7 @@
 #include "utl/compare/utl_compare_fwd.h"
 
 #include "utl/concepts/utl_boolean_testable.h"
+#include "utl/concepts/utl_common_reference_with.h"
 #include "utl/concepts/utl_equality_comparable.h"
 #include "utl/concepts/utl_partially_ordered_with.h"
 #include "utl/concepts/utl_same_as.h"

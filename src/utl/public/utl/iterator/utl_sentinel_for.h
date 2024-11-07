@@ -15,11 +15,13 @@ template <typename S, typename I>
 concept sentinel_for =
     semiregular<S> && input_or_output_iterator<I> && details::equality_comparable::weak<S, I>;
 
-template <typename S, typename I>
+template <typename I, typename S>
 struct __UTL_PUBLIC_TEMPLATE is_sentinel_for : bool_constant<sentinel_for<S, I>> {};
 
-template <typename S, typename I>
+template <typename I, typename S>
 inline constexpr bool is_sentinel_for_v = sentinel_for<S, I>;
+
+#  define UTL_TRAIT_is_sentinel_for(...) __UTL is_sentinel_for_v<__VA_ARGS__>
 
 UTL_NAMESPACE_END
 
@@ -33,16 +35,20 @@ UTL_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename S, typename I>
+template <typename I, typename S>
 struct __UTL_PUBLIC_TEMPLATE is_sentinel_for :
     conjunction<is_copyable<S>, is_default_constructible<S>, is_input_or_output_iterator<I>,
         is_equality_comparable_with<S, I>, is_inequality_comparable_with<S, I>,
         is_equality_comparable_with<I, S>, is_inequality_comparable_with<I, S>> {};
 
 #  if UTL_CXX14
-template <typename S, typename I>
-UTL_INLINE_CXX17 constexpr bool is_sentinel_for_v = is_sentinel_for<S, I>::value;
+template <typename I, typename S>
+UTL_INLINE_CXX17 constexpr bool is_sentinel_for_v = is_sentinel_for<I, S>::value;
+#    define UTL_TRAIT_is_sentinel_for(...) __UTL is_sentinel_for_v<__VA_ARGS__>
+#  else
+#    define UTL_TRAIT_is_sentinel_for(...) __UTL is_sentinel_for<__VA_ARGS__>::value
 #  endif
 
 UTL_NAMESPACE_END
+
 #endif // UTL_CXX20
