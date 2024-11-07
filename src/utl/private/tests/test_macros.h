@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "utl/type_traits/utl_is_same.h"
 namespace {
 using size_t = decltype(sizeof(0));
 template <typename T, size_t N>
@@ -14,3 +15,4 @@ array_size<size_t, N> ArraySize(T (&)[N]) noexcept;
 
 #define ARRAY_SIZE(A) decltype(ArraySize(A))::value
 #define ASSERT_NOEXCEPT(...) static_assert(noexcept(__VA_ARGS__), "Operation must be noexcept")
+#define ASSERT_SAME_TYPE(...) static_assert(utl::is_same<__VA_ARGS__>::value, "Types must be equal")

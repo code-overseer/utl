@@ -5,24 +5,28 @@
 #include "utl/utl_config.h"
 
 #include "utl/array/utl_array_fwd.h"
+#include "utl/initializer_list/utl_initializer_list_fwd.h"
 
 #include "utl/byte/utl_byte.h"
+#include "utl/concepts/utl_equality_comparable.h"
 #include "utl/concepts/utl_same_as.h"
 #include "utl/exception/utl_program_exception.h"
 #include "utl/iterator/utl_const_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator_base.h"
+#include "utl/iterator/utl_iter_reference_t.h"
 #include "utl/iterator/utl_reverse_iterator.h"
 #include "utl/iterator/utl_sized_sentinel_for.h"
 #include "utl/type_traits/utl_copy_cv.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_is_const.h"
 #include "utl/type_traits/utl_is_convertible.h"
+#include "utl/type_traits/utl_is_equality_comparable.h"
+#include "utl/type_traits/utl_is_inequality_comparable.h"
 #include "utl/type_traits/utl_is_same.h"
 #include "utl/type_traits/utl_remove_cv.h"
+#include "utl/type_traits/utl_remove_reference.h"
 #include "utl/type_traits/utl_type_identity.h"
-
-#include <initializer_list>
 
 UTL_NAMESPACE_BEGIN
 
@@ -319,8 +323,65 @@ template <typename T, size_t E>
 inline UTL_CONSTEVAL size_t bytes_size() noexcept {
     return E == dynamic_extent ? dynamic_extent : E * sizeof(T);
 }
+
+#if UTL_CXX20
+template <typename T>
+concept integral_constant_like = is_integral_v<decltype(T::value)> &&
+    !is_same_v<bool, remove_const_t<decltype(T::value)>> && convertible_to<T, decltype(T::value)> &&
+    equality_comparable_with<T, decltype(T::value)> && bool_constant<T() == T::value>::value &&
+    bool_constant<static_cast<decltype(T::value)>(T()) == T::value>::value;
+
+template <class T>
+UTL_INLINE_CXX17 constexpr size_t maybe_static_extent = dynamic_extent; // exposition only
+template <UTL_CONCEPT_CXX20(integral_constant_like) T>
+UTL_INLINE_CXX17 constexpr size_t maybe_static_extent<T> = {T::value};
+
+#  define __UTL_MAYBE_STATIC_EXTENT(TYPE) __UTL details::span::maybe_static_extent<TYPE>
+
+#else
+template <typename T>
+__UTL_HIDE_FROM_ABI auto integral_constant_like_impl(float) noexcept -> false_type;
+
+template <typename T>
+__UTL_HIDE_FROM_ABI auto integral_constant_like_impl(int) noexcept
+    -> conjunction<is_integral<decltype(T::value)>,
+        negation<is_same<bool, remove_const_t<decltype(T::value)>>>,
+        is_convertible<T, decltype(T::value)>, is_equality_comparable_with<T, decltype(T::value)>,
+        is_inequality_comparable_with<T, decltype(T::value)>, bool_constant<T() == T::value>,
+        bool_constant<static_cast<decltype(T::value)>(T()) == T::value>>;
+
+template <typename T>
+using is_integral_constant_like = decltype(integral_constant_like_impl<T>(0));
+
+template <typename T>
+__UTL_HIDE_FROM_ABI auto maybe_static_extent_impl(float) noexcept -> size_constant<dynamic_extent>;
+template <typename T>
+__UTL_HIDE_FROM_ABI auto maybe_static_extent_impl(int) noexcept
+    -> enable_if_t<is_integral_constant_like<T>::value, size_constant<T::value>>;
+
+template <typename T>
+using maybe_static_extent = decltype(maybe_static_extent_impl<T>(0));
+
+#  define __UTL_MAYBE_STATIC_EXTENT(TYPE) __UTL details::span::maybe_static_extent<TYPE>::value
+
+#endif
+
 } // namespace span
 } // namespace details
+
+#if UTL_CXX17
+
+template <typename It, typename E>
+span(It, E) -> span<remove_reference_t<iter_reference_t<It>>, __UTL_MAYBE_STATIC_EXTENT(E)>;
+template <typename T, size_t N>
+span(T (&)[N]) -> span<T, N>;
+template <typename T, size_t N>
+span(::std::array<T, N>&) -> span<T, N>;
+template <typename T, size_t N>
+span(::std::array<T, N> const&) -> span<T const, N>;
+// template<typename R>
+// span(R&&) -> span<remove_reference_t<ranges::range_reference_t<R>>>;
+#endif
 
 template <typename T, size_t N>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline span<__UTL byte const, details::span::bytes_size<T, N>()>

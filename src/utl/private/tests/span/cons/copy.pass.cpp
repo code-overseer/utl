@@ -1,3 +1,5 @@
+// Copyright 2023-2024 Bryan Wong
+
 //===----------------------------------------------------------------------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -113,7 +115,9 @@ constexpr bool test_all() {
 
 void copy_test_driver() {
     test_all();
+#if UTL_CXX20
     static_assert(test_all());
+#endif
 }
 } // namespace copy
 } // namespace span
