@@ -34,7 +34,7 @@ public:
     using element_type = T;
     using value_type = __UTL remove_cv_t<T>;
     using size_type = decltype(sizeof(0));
-    using difference_type = decltype(static_cast<T*>(0) - static_cast<T*>(0));
+    using difference_type = decltype(static_cast<char*>(0) - static_cast<char*>(0));
     using pointer = T*;
     using const_pointer = T const*;
     using reference = T&;
@@ -67,8 +67,6 @@ public:
     };
 
 private:
-    static constexpr size_type byte_span_size =
-        extent == dynamic_extent ? dynamic_extent : extent * sizeof(T);
     __UTL_HIDE_FROM_ABI static constexpr size_t ensure_size(size_t n) noexcept {
         return extent == dynamic_extent || n == extent ? n : (UTL_ASSERT(!"Invalid size"), 0);
     }
@@ -310,21 +308,33 @@ public:
             : (UTL_ASSERT(!"Out of range"), result_type{data_ + offset, count});
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend inline span<__UTL byte const, byte_span_size> as_bytes(
-        span s) noexcept {
-        using result_type UTL_NODEBUG = span<__UTL byte const, byte_span_size>;
-        return result_type{reinterpret_cast<__UTL byte const*>(s.data()), s.size_bytes()};
-    }
-
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend inline span<__UTL byte, byte_span_size> as_writable_bytes(
-        span s) noexcept {
-        using result_type UTL_NODEBUG = span<__UTL byte, byte_span_size>;
-        return result_type{reinterpret_cast<__UTL byte*>(s.data()), s.size_bytes()};
-    }
-
 private:
     pointer data_;
     size_type size_;
 };
+
+namespace details {
+namespace span {
+template <typename T, size_t E>
+inline UTL_CONSTEVAL size_t bytes_size() noexcept {
+    return E == dynamic_extent ? dynamic_extent : E * sizeof(T);
+}
+} // namespace span
+} // namespace details
+
+template <typename T, size_t N>
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline span<__UTL byte const, details::span::bytes_size<T, N>()>
+as_bytes(span<T, N> s) noexcept {
+    using result_type UTL_NODEBUG = span<__UTL byte const, details::span::bytes_size<T, N>()>;
+    return result_type{reinterpret_cast<__UTL byte const*>(s.data()), s.size_bytes()};
+}
+
+template <typename T, size_t N UTL_CONSTRAINT_CXX11(!UTL_TRAIT_is_const(T))>
+UTL_CONSTRAINT_CXX20(!is_const_v<T>)
+UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline span<__UTL byte, details::span::bytes_size<T, N>()>
+as_writable_bytes(span<T, N> s) noexcept {
+    using result_type UTL_NODEBUG = span<__UTL byte, details::span::bytes_size<T, N>()>;
+    return result_type{reinterpret_cast<__UTL byte*>(s.data()), s.size_bytes()};
+}
 
 UTL_NAMESPACE_END
