@@ -197,20 +197,20 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     __UTL_HIDE_FROM_ABI explicit __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string(View const& view,
         allocator_type const& a = allocator_type()) noexcept(!utl::with_exceptions &&
-        is_nothrow_convertible<View, view_type>::value)
+        UTL_TRAIT_is_nothrow_convertible(View, view_type))
         : basic_short_string(a) {
         assign(view);
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string(View const& view,
         size_type pos, size_type n,
         allocator_type const& a = allocator_type()) noexcept(!utl::with_exceptions &&
-        is_nothrow_convertible<View, view_type>::value)
+        UTL_TRAIT_is_nothrow_convertible(View, view_type))
         : basic_short_string(a) {
         assign(view, pos, n);
     }
@@ -577,7 +577,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& assign(
         View const& view) UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
@@ -585,7 +585,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& assign(View const& view,
         size_type subidx, size_type subcount = npos) UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
@@ -704,7 +704,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& insert(
         size_type pos, View const& view) UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
@@ -712,7 +712,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& insert(
         size_type pos, View const& view, size_type subidx, size_type subcount = npos)
         UTL_THROWS UTL_LIFETIMEBOUND {
@@ -796,14 +796,14 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& append(
         View const& view) UTL_THROWS UTL_LIFETIMEBOUND {
         return insert(size(), view);
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& append(View const& view,
         size_type subidx, size_type subcount = npos) UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
@@ -837,7 +837,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(
         View const& view) UTL_THROWS UTL_LIFETIMEBOUND {
         return append(view);
@@ -960,7 +960,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& replace(
         const_iterator first, const_iterator last, View const& view) UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
@@ -968,7 +968,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& replace(
         const_iterator first, const_iterator last, View const& view, size_type subidx,
         size_type subcount = npos) UTL_THROWS UTL_LIFETIMEBOUND {
@@ -983,7 +983,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& replace(
         size_type idx, size_type count, View const& view) UTL_THROWS UTL_LIFETIMEBOUND {
         auto const first = cbegin() + idx;
@@ -991,7 +991,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& replace(size_type idx,
         size_type count, View const& view, size_type subidx, size_type subcount = npos)
         UTL_THROWS UTL_LIFETIMEBOUND {
@@ -1057,7 +1057,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE constexpr size_type find(View const& view,
         size_type pos = 0) const noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return find(view_type(view), pos);
@@ -1091,7 +1091,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE constexpr size_type rfind(View const& view,
         size_type pos = npos) const noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return rfind(view_type(view), pos);
@@ -1125,7 +1125,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE constexpr size_type find_first_of(
         View const& view, size_type pos = 0) const
         noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
@@ -1161,7 +1161,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE constexpr size_type find_first_not_of(
         View const& view, size_type pos = 0) const
         noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
@@ -1196,7 +1196,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE constexpr size_type find_last_of(
         View const& view, size_type pos = npos) const
         noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
@@ -1231,7 +1231,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE constexpr size_type find_last_not_of(
         View const& view, size_type pos = npos) const UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_convertible(View,
         view_type)) {
@@ -1253,7 +1253,7 @@ public:
         return details::string::compare<traits_type>(data(), size(), view.data(), view.size());
     }
 
-    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(is_convertible<View, view_type>::value)>
+    template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_convertible(View, view_type))>
     UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 int compare(View const& view) const
         noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return compare(view_type(view));
@@ -1286,7 +1286,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 int compare(
         size_type pos, size_type count, View const& view) const UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return compare(pos, count, view_type(view));
@@ -1313,7 +1313,7 @@ public:
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
-        is_convertible<View, view_type>::value)>
+        UTL_TRAIT_is_convertible(View, view_type))>
     UTL_ATTRIBUTES(NODISCARD, PURE, _ABI_PRIVATE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 int compare(size_type pos,
         size_type count, View const& view, size_type pos2, size_type count2 = npos) const UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_convertible(View,
         view_type)) {

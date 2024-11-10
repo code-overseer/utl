@@ -139,6 +139,119 @@ public:
     using base_type::rfind;
     using base_type::starts_with;
 
+    template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_zstring_view remove_prefix(
+        basic_zstring_view str, T count) noexcept {
+        return basic_zstring_view(
+            str.substr(__UTL numeric::min<size_type>(__UTL to_unsigned(count), str.size())));
+    }
+
+    template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
+    __UTL_HIDE_FROM_ABI friend inline constexpr base_type remove_suffix(
+        basic_zstring_view str, T count) noexcept {
+        return str.substr(0, __UTL sub_sat<size_type>(str.size(), __UTL to_unsigned(count)));
+    }
+
+    template <UTL_CONCEPT_CXX20(invocable<base_type>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(
+        size_type, UTL_TRAIT_is_invocable(F, base_type))
+    split_all(basic_zstring_view str, value_type delimiter, F callable) noexcept {
+        return split_all(base_type(str), delimiter, __UTL move(callable));
+    }
+
+    template <UTL_CONCEPT_CXX20(invocable<base_type>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(
+        size_type, UTL_TRAIT_is_invocable(F, base_type))
+    split_all(basic_zstring_view str, const_pointer delimiter, F callable) noexcept {
+        return split_all(base_type(str), base_type(delimiter), __UTL move(callable));
+    }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<base_type>) ViewLike,
+        UTL_CONCEPT_CXX20(predicate<base_type>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(size_type,
+        UTL_TRAIT_conjunction(is_predicate<F, base_type>, is_convertible<ViewLike, base_type>))
+    split_all(basic_zstring_view str, ViewLike const& delimiter, F callable) noexcept(
+        UTL_TRAIT_is_nothrow_convertible(ViewLike, base_type)) {
+        return split_all(base_type(str), base_type(delimiter), __UTL move(callable));
+    }
+
+    template <UTL_CONCEPT_CXX20(predicate<base_type>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(
+        size_type, UTL_TRAIT_is_predicate(F, base_type))
+    split_while(basic_zstring_view str, value_type delimiter, F callable) noexcept {
+        return split_while(base_type(str), delimiter, __UTL move(callable));
+    }
+
+    template <UTL_CONCEPT_CXX20(predicate<base_type>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(
+        size_type, UTL_TRAIT_is_predicate(F, base_type))
+    split_while(basic_zstring_view str, const_pointer delimiter, F callable) noexcept {
+        return split_while(base_type(str), base_type(delimiter), __UTL move(callable));
+    }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<base_type>) ViewLike,
+        UTL_CONCEPT_CXX20(predicate<base_type>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(size_type,
+        UTL_TRAIT_conjunction(is_predicate<F, base_type>, is_convertible<ViewLike, base_type>))
+    split_while(basic_zstring_view str, ViewLike const& delimiter, F callable) noexcept(
+        UTL_TRAIT_is_nothrow_convertible(ViewLike, base_type)) {
+        return split_while(base_type(str), base_type(delimiter), __UTL move(callable));
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr base_type rstrip(basic_zstring_view str) noexcept {
+        return rstrip(base_type(str));
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_zstring_view lstrip(
+        basic_zstring_view str) noexcept {
+        return basic_zstring_view(rstrip(base_type(str)));
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr base_type strip(basic_zstring_view str) noexcept {
+        return rstrip(lstrip(str));
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr base_type unwrap(
+        basic_zstring_view str, value_type enclosure) noexcept {
+        return unwrap(base_type(str), enclosure);
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr base_type unwrap(
+        basic_zstring_view str, value_type left, value_type right) noexcept {
+        return unwrap(base_type(str), left, right);
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr base_type unwrap(
+        basic_zstring_view str, const_pointer enclosure) noexcept {
+        return unwrap(base_type(str), enclosure);
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr base_type unwrap(
+        basic_zstring_view str, const_pointer left, const_pointer right) noexcept {
+        return unwrap(base_type(str), left, right);
+    }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<base_type>) ViewLike,
+        UTL_CONCEPT_CXX20(predicate<base_type>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(base_type,
+        UTL_TRAIT_conjunction(is_predicate<F, base_type>, is_convertible<ViewLike, base_type>))
+    unwrap(basic_zstring_view str, ViewLike const& enclosure) noexcept(
+        UTL_TRAIT_is_nothrow_convertible(ViewLike, base_type)) {
+        return unwrap(base_type(str), enclosure);
+    }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<base_type>) V0,
+        UTL_CONCEPT_CXX20(convertible_to<base_type>) V1,
+        UTL_CONCEPT_CXX20(predicate<base_type>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(base_type,
+        UTL_TRAIT_conjunction(is_predicate<F, base_type>, is_convertible<V0, base_type>,
+            is_convertible<V1, base_type>))
+    unwrap(basic_zstring_view str, V0 const& left, V1 const& right) noexcept(
+        UTL_TRAIT_is_nothrow_convertible(V0, base_type) &&
+        UTL_TRAIT_is_nothrow_convertible(V1, base_type)) {
+        return unwrap(base_type(str), left, right);
+    }
+
 private:
     UTL_ATTRIBUTES(NORETURN, NOINLINE) static basic_zstring_view substr_throw(
         __UTL source_location src, size_t pos, size_t size) UTL_THROWS {
