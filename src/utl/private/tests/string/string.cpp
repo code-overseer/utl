@@ -3,10 +3,16 @@
 #include "utl/string/utl_basic_short_string.h"
 #include "utl/string/utl_basic_string_view.h"
 #include "utl/string/utl_basic_zstring_view.h"
-#include "utl/string/utl_string_utils.h"
 
 static_assert(utl::string_view("  \tabc ").find_last_not_of(" ") == 5, "");
-static_assert(utl::strip(utl::string_view("  \tabc ")) == utl::string_view("abc"), "");
+static_assert(remove_prefix(utl::string_view(" abc "), 1) == utl::string_view("abc "), "");
+static_assert(strip(utl::string_view("  \tabc ")) == utl::string_view("abc"), "");
+static_assert(unwrap(utl::string_view("\'abc"), '\'') == utl::string_view("\'abc"), "");
+static_assert(unwrap(utl::string_view("\'abc\'"), '\'') == utl::string_view("abc"), "");
+static_assert(unwrap(utl::string_view("<abc>"), '\'') == utl::string_view("<abc>"), "");
+static_assert(unwrap(utl::string_view("<abc>"), '<', '>') == utl::string_view("abc"), "");
+static_assert(unwrap(utl::string_view("\"abc\""), '\"') == utl::string_view("abc"), "");
+static_assert(unwrap(utl::string_view("racecar"), "rac", "car") == utl::string_view("e"), "");
 
 int comparable(utl::string s) {
     if (s != "hello") {

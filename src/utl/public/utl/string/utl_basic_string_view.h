@@ -7,6 +7,10 @@
 #include "utl/string/utl_string_fwd.h"
 
 #include "utl/assert/utl_assert.h"
+#include "utl/concepts/utl_convertible_to.h"
+#include "utl/concepts/utl_integral.h"
+#include "utl/concepts/utl_invocable.h"
+#include "utl/concepts/utl_predicate.h"
 #include "utl/exception.h"
 #include "utl/iterator/utl_const_iterator.h"
 #include "utl/iterator/utl_contiguous_iterator.h"
@@ -17,9 +21,27 @@
 #include "utl/iterator/utl_reverse_iterator.h"
 #include "utl/iterator/utl_sized_sentinel_for.h"
 #include "utl/memory/utl_to_address.h"
+#include "utl/numeric/utl_add_sat.h"
 #include "utl/numeric/utl_max.h"
 #include "utl/numeric/utl_min.h"
+#include "utl/string/utl_literal_sequence.h"
+#include "utl/string/utl_split.h"
 #include "utl/string/utl_string_details.h"
+#include "utl/type_traits/utl_invoke.h"
+#include "utl/type_traits/utl_is_convertible.h"
+#include "utl/type_traits/utl_is_integral.h"
+#include "utl/type_traits/utl_is_nothrow_convertible.h"
+#include "utl/type_traits/utl_is_predicate.h"
+#include "utl/utility/utl_forward.h"
+#include "utl/utility/utl_move.h"
+#include "utl/utility/utl_signs.h"
+
+#if UTL_CXX20
+#  include "utl/concepts/utl_boolean_testable.h"
+#  include "utl/concepts/utl_invocable.h"
+#else
+#  include "utl/type_traits/utl_enable_if.h"
+#endif
 
 #define __UTL_ATTRIBUTE_STRING_INLINE_PURE \
     (ALWAYS_INLINE)(PURE)(NODISCARD)__UTL_ATTRIBUTE__HIDE_FROM_ABI
@@ -28,6 +50,7 @@
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_STRING_PURE
 
 UTL_NAMESPACE_BEGIN
+
 template <typename CharType, typename Traits>
 class __UTL_PUBLIC_TEMPLATE basic_string_view {
 public:
@@ -374,7 +397,208 @@ public:
         return find_last_not_of(&ch, pos, 1);
     }
 
+    /* Non-standard */
+    template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_string_view remove_prefix(
+        basic_string_view str, T count) noexcept {
+        return str.substr(__UTL numeric::min<size_type>(__UTL to_unsigned(count), str.size()));
+    }
+
+    template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_string_view remove_suffix(
+        basic_string_view str, T count) noexcept {
+        return str.substr(0, __UTL sub_sat<size_type>(str.size(), __UTL to_unsigned(count)));
+    }
+
+    template <UTL_CONCEPT_CXX20(invocable<basic_string_view>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(
+        size_type, UTL_TRAIT_is_invocable(F, basic_string_view))
+    split_all(basic_string_view str, basic_string_view delimiter, F callable) noexcept {
+        return UTL_CONSTANT_P(
+                   string_utils::compile_time::split_all(str, delimiter, __UTL move(callable)))
+            ? string_utils::compile_time::split_all(str, delimiter, __UTL move(callable))
+            : string_utils::runtime::split_all(str, delimiter, __UTL move(callable));
+    }
+
+    template <UTL_CONCEPT_CXX20(invocable<basic_string_view>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(
+        size_type, UTL_TRAIT_is_invocable(F, basic_string_view))
+    split_all(basic_string_view str, value_type delimiter, F callable) noexcept {
+        return UTL_CONSTANT_P(
+                   string_utils::compile_time::split_all(str, delimiter, __UTL move(callable)))
+            ? string_utils::compile_time::split_all(str, delimiter, __UTL move(callable))
+            : string_utils::runtime::split_all(str, delimiter, __UTL move(callable));
+    }
+
+    template <UTL_CONCEPT_CXX20(invocable<basic_string_view>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(
+        size_type, UTL_TRAIT_is_invocable(F, basic_string_view))
+    split_all(basic_string_view str, const_pointer delimiter, F callable) noexcept {
+        return UTL_CONSTANT_P(string_utils::compile_time::split_all(
+                   str, basic_string_view(delimiter), __UTL move(callable)))
+            ? string_utils::compile_time::split_all(
+                  str, basic_string_view(delimiter), __UTL move(callable))
+            : string_utils::runtime::split_all(
+                  str, basic_string_view(delimiter), __UTL move(callable));
+    }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<basic_string_view>) ViewLike,
+        UTL_CONCEPT_CXX20(predicate<basic_string_view>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(size_type,
+        UTL_TRAIT_conjunction(
+            is_predicate<F, basic_string_view>, is_convertible<ViewLike, basic_string_view>))
+    split_all(basic_string_view str, ViewLike const& delimiter, F callable) noexcept(
+        UTL_TRAIT_is_nothrow_convertible(ViewLike, basic_string_view)) {
+        return UTL_CONSTANT_P(string_utils::compile_time::split_all(
+                   str, basic_string_view(delimiter), __UTL move(callable)))
+            ? string_utils::compile_time::split_all(
+                  str, basic_string_view(delimiter), __UTL move(callable))
+            : string_utils::runtime::split_all(
+                  str, basic_string_view(delimiter), __UTL move(callable));
+    }
+
+    template <UTL_CONCEPT_CXX20(predicate<basic_string_view>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(
+        size_type, UTL_TRAIT_is_predicate(F, basic_string_view))
+    split_while(basic_string_view str, basic_string_view delimiter, F callable) noexcept {
+        return UTL_CONSTANT_P(
+                   string_utils::compile_time::split_while(str, delimiter, __UTL move(callable)))
+            ? string_utils::compile_time::split_while(str, delimiter, __UTL move(callable))
+            : string_utils::runtime::split_while(str, delimiter, __UTL move(callable));
+    }
+
+    template <UTL_CONCEPT_CXX20(predicate<basic_string_view>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(
+        size_type, UTL_TRAIT_is_predicate(F, basic_string_view))
+    split_while(basic_string_view str, value_type delimiter, F callable) noexcept {
+        return UTL_CONSTANT_P(
+                   string_utils::compile_time::split_while(str, delimiter, __UTL move(callable)))
+            ? string_utils::compile_time::split_while(str, delimiter, __UTL move(callable))
+            : string_utils::runtime::split_while(str, delimiter, __UTL move(callable));
+    }
+
+    template <UTL_CONCEPT_CXX20(predicate<basic_string_view>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(
+        size_type, UTL_TRAIT_is_predicate(F, basic_string_view))
+    split_while(basic_string_view str, const_pointer delimiter, F callable) noexcept {
+        return UTL_CONSTANT_P(string_utils::compile_time::split_while(
+                   str, basic_string_view(delimiter), __UTL move(callable)))
+            ? string_utils::compile_time::split_while(
+                  str, basic_string_view(delimiter), __UTL move(callable))
+            : string_utils::runtime::split_while(
+                  str, basic_string_view(delimiter), __UTL move(callable));
+    }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<basic_string_view>) ViewLike,
+        UTL_CONCEPT_CXX20(predicate<basic_string_view>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(size_type,
+        UTL_TRAIT_conjunction(
+            is_predicate<F, basic_string_view>, is_convertible<ViewLike, basic_string_view>))
+    split_while(basic_string_view str, ViewLike const& delimiter, F callable) noexcept(
+        UTL_TRAIT_is_nothrow_convertible(ViewLike, basic_string_view)) {
+        return UTL_CONSTANT_P(string_utils::compile_time::split_while(
+                   str, basic_string_view(delimiter), __UTL move(callable)))
+            ? string_utils::compile_time::split_while(
+                  str, basic_string_view(delimiter), __UTL move(callable))
+            : string_utils::runtime::split_while(
+                  str, basic_string_view(delimiter), __UTL move(callable));
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_string_view rstrip(
+        basic_string_view str) noexcept {
+        using whitespace = literal_sequence<CharType, (CharType)'\t', (CharType)'\n',
+            (CharType)'\v', (CharType)'\f', (CharType)'\r', (CharType)' '>;
+        return s_remove_suffix(str,
+            str.size() -
+                str.find_last_not_of(basic_string_view(whitespace::value, whitespace::size)) - 1);
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_string_view lstrip(
+        basic_string_view str) noexcept {
+        using whitespace = literal_sequence<CharType, (CharType)'\t', (CharType)'\n',
+            (CharType)'\v', (CharType)'\f', (CharType)'\r', (CharType)' '>;
+        return s_remove_prefix(
+            str, str.find_first_not_of(basic_string_view(whitespace::value, whitespace::size)));
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_string_view strip(
+        basic_string_view str) noexcept {
+        return rstrip(lstrip(str));
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_string_view unwrap(
+        basic_string_view str, basic_string_view enclosure) noexcept {
+        return str.starts_with(enclosure) && str.ends_with(enclosure)
+            ? s_remove_suffix(s_remove_prefix(str, enclosure.size()), enclosure.size())
+            : str;
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_string_view unwrap(
+        basic_string_view str, basic_string_view left, basic_string_view right) noexcept {
+        return str.starts_with(left) && str.ends_with(right)
+            ? s_remove_suffix(s_remove_prefix(str, left.size()), right.size())
+            : str;
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_string_view unwrap(
+        basic_string_view str, value_type enclosure) noexcept {
+        return str.starts_with(enclosure) && str.ends_with(enclosure)
+            ? s_remove_suffix(s_remove_prefix(str, 1), 1)
+            : str;
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_string_view unwrap(
+        basic_string_view str, value_type left, value_type right) noexcept {
+        return str.starts_with(left) && str.ends_with(right)
+            ? s_remove_suffix(s_remove_prefix(str, 1), 1)
+            : str;
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_string_view unwrap(
+        basic_string_view str, const_pointer enclosure) noexcept {
+        return unwrap(str, basic_string_view(enclosure));
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr basic_string_view unwrap(
+        basic_string_view str, const_pointer left, const_pointer right) noexcept {
+        return unwrap(str, basic_string_view(left), basic_string_view(right));
+    }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<basic_string_view>) ViewLike,
+        UTL_CONCEPT_CXX20(predicate<basic_string_view>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(basic_string_view,
+        UTL_TRAIT_conjunction(
+            is_predicate<F, basic_string_view>, is_convertible<ViewLike, basic_string_view>))
+    unwrap(basic_string_view str, ViewLike const& enclosure) noexcept(
+        UTL_TRAIT_is_nothrow_convertible(ViewLike, basic_string_view)) {
+        return unwrap(str, basic_string_view(enclosure));
+    }
+
+    template <UTL_CONCEPT_CXX20(convertible_to<basic_string_view>) V0,
+        UTL_CONCEPT_CXX20(convertible_to<basic_string_view>) V1,
+        UTL_CONCEPT_CXX20(predicate<basic_string_view>) F>
+    __UTL_HIDE_FROM_ABI friend inline constexpr UTL_ENABLE_IF_CXX11(basic_string_view,
+        UTL_TRAIT_conjunction(is_predicate<F, basic_string_view>,
+            is_convertible<V0, basic_string_view>, is_convertible<V1, basic_string_view>))
+    unwrap(basic_string_view str, V0 const& left, V1 const& right) noexcept(
+        UTL_TRAIT_is_nothrow_convertible(V0, basic_string_view) &&
+        UTL_TRAIT_is_nothrow_convertible(V1, basic_string_view)) {
+        return unwrap(str, basic_string_view(left), basic_string_view(right));
+    }
+
 private:
+    template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
+    __UTL_HIDE_FROM_ABI static inline constexpr basic_string_view s_remove_prefix(
+        basic_string_view str, T count) noexcept {
+        return str.substr(__UTL numeric::min<size_type>(__UTL to_unsigned(count), str.size()));
+    }
+
+    template <UTL_CONCEPT_CXX20(integral) T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_integral(T))>
+    __UTL_HIDE_FROM_ABI static inline constexpr basic_string_view s_remove_suffix(
+        basic_string_view str, T count) noexcept {
+        return str.substr(0, __UTL sub_sat<size_type>(str.size(), __UTL to_unsigned(count)));
+    }
+
     UTL_ATTRIBUTES(NORETURN, NOINLINE, _HIDE_FROM_ABI) static basic_string_view substr_throw(
         __UTL source_location src, size_t pos, size_t size) UTL_THROWS {
         exceptions::message_vformat format = {"[UTL] `basic_string_view::substr` operation failed, "
