@@ -16,6 +16,8 @@ class __UTL_PUBLIC_TEMPLATE expected;
 namespace details {
 namespace expected {
 
+struct empty_t {};
+
 template <typename T>
 struct __UTL_PUBLIC_TEMPLATE is_type : false_type {};
 template <typename T>
@@ -50,5 +52,14 @@ template <typename E>
 class __UTL_PUBLIC_TEMPLATE expected<void volatile, E> : expected<void, E> {};
 template <typename E>
 class __UTL_PUBLIC_TEMPLATE expected<void const volatile, E> : expected<void, E> {};
+
+struct transforming_t {
+    __UTL_HIDE_FROM_ABI explicit inline constexpr transforming_t() noexcept = default;
+};
+static constexpr transforming_t transforming{};
+struct transforming_error_t {
+    __UTL_HIDE_FROM_ABI explicit inline constexpr transforming_t() noexcept = default;
+};
+static constexpr transforming_error_t transforming_error{};
 
 UTL_NAMESPACE_END
