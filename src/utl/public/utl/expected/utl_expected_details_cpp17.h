@@ -7,8 +7,9 @@
 #if !defined(UTL_EXPECTED_PRIVATE_HEADER_GUARD)
 #  error "Private header accessed"
 #endif
-
-#include "utl/initializer_list/utl_initializer_list_fwd.h"
+#if !UTL_CXX17
+#  error "Invalid header accessed"
+#endif
 
 #include "utl/expected/utl_expected_common.h"
 #include "utl/expected/utl_unexpected.h"
@@ -51,16 +52,15 @@ UTL_NAMESPACE_BEGIN
 namespace details {
 namespace expected {
 
-#if UTL_CXX17
 template <typename T>
-__UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void invoke_destructor(T* ptr) {
+__UTL_HIDE_FROM_ABI inline constexpr void invoke_destructor(T* ptr) {
     if constexpr (!UTL_TRAIT_is_trivially_destructible(T)) {
         ptr->~T();
     }
 }
 
 template <typename T, typename... Args>
-__UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 T* replace_object(T* ptr, Args&&... args) noexcept {
+__UTL_HIDE_FROM_ABI inline constexpr T* replace_object(T* ptr, Args&&... args) noexcept {
     if constexpr (UTL_TRAIT_conjunction(is_trivially_destructible<T>,
                       is_trivially_move_assignable<T>, is_trivially_constructible<T, Args...>)) {
         *ptr = T{__UTL forward<Args>(args)};
@@ -72,44 +72,17 @@ __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 T* replace_object(T* ptr, Args&&.
     return ptr;
 }
 
-#else
-
-template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_trivially_destructible(T))>
-__UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void invoke_destructor(T* ptr) {}
-
-template <typename T UTL_CONSTRAINT_CXX11(!UTL_TRAIT_is_trivially_destructible(T))>
-__UTL_HIDE_FROM_ABI inline void invoke_destructor(T* ptr) {
-    ptr->~T();
-}
-
-template <typename T, typename... Args UTL_CONSTRAINT_CXX11(
-    UTL_TRAIT_conjunction(is_trivially_destructible<T>, is_trivially_move_assignable<T>,
-        is_trivially_constructible<T, Args...>))>
-__UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 T* replace_object(T* ptr, Args&&... args) noexcept {
-    *ptr = T{__UTL forward<Args>(args)};
-    return ptr;
-}
-
-template <typename T, typename... Args UTL_CONSTRAINT_CXX11(
-    !UTL_TRAIT_conjunction(is_trivially_destructible<T>, is_trivially_move_assignable<T>,
-        is_trivially_constructible<T, Args...>))>
-__UTL_HIDE_FROM_ABI inline T* replace_object(T* ptr, Args&&... args) noexcept(
-    UTL_TRAIT_is_nothrow_constructible(T, Args...)) {
-    invoke_destructor(ptr);
-    return ::new (ptr) T{__UTL forward<Args>(args)};
-}
-#endif
-
 template <typename T, typename U>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr T make_union(
-    bool has_value, U&& arg) noexcept(UTL_TRAIT_is_nothrow_copy_constructible(in_place_t, T) &&
-    UTL_TRAIT_is_nothrow_copy_constructible(unexpect_t, E)) {
+    bool has_value, U&& arg) noexcept(UTL_TRAIT_is_nothrow_constructible(T, in_place_t,
+                                          decltype(__UTL declval<U>().value)) &&
+    UTL_TRAIT_is_nothrow_constructible(T, unexpect_t, decltype(__UTL declval<U>().value))) {
     return has_value ? T{__UTL in_place, __UTL forward_like<U>(arg.value)}
                      : T{__UTL unexpect, __UTL forward_like<U>(arg.error)};
 }
 
-template <typename T, typename E, bool = is_default_constructible_v<T>,
-    bool = is_trivially_destructible_v<T> && is_trivially_destructible_v<E>>
+template <typename T, typename E, bool = UTL_TRAIT_is_default_constructible(T),
+    bool = UTL_TRAIT_is_trivially_destructible(T) && UTL_TRAIT_is_trivially_destructible(E)>
 union data_union {
     T value;
     E error;
@@ -268,15 +241,30 @@ protected:
         explicit constexpr protected_tag_t() noexcept = default;
     } protected_tag{};
 
+public:
+    __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base const&) noexcept(
+        UTL_TRAIT_is_nothrow_copy_constructible(T) &&
+        UTL_TRAIT_is_nothrow_copy_constructible(E)) = default;
+    __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base&&) noexcept(
+        UTL_TRAIT_is_nothrow_move_constructible(T) &&
+        UTL_TRAIT_is_nothrow_move_constructible(E)) = default;
+    __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(storage_base const&) noexcept(
+        UTL_TRAIT_is_nothrow_copy_assignable(T) &&
+        UTL_TRAIT_is_nothrow_copy_assignable(E)) = default;
+    __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(storage_base&&) noexcept(
+        UTL_TRAIT_is_nothrow_move_assignable(T) &&
+        UTL_TRAIT_is_nothrow_move_assignable(E)) = default;
+
+protected:
     template <typename... Args>
     __UTL_HIDE_FROM_ABI inline constexpr storage_base(in_place_t, Args&&... args) noexcept(
-        is_nothrow_constructible_v<T, Args...>)
+        UTL_TRAIT_is_nothrow_constructible(T, Args...))
         : data_{__UTL in_place, __UTL forward<Args>(args)...}
         , has_value_{true} {}
 
     template <typename... Args>
     __UTL_HIDE_FROM_ABI inline constexpr storage_base(unexpect_t, Args&&... args) noexcept(
-        is_nothrow_constructible_v<E, Args...>)
+        UTL_TRAIT_is_nothrow_constructible(E, Args...))
         : data_{__UTL unexpect, __UTL forward<Args>(args)...}
         , has_value_{false} {}
 
@@ -299,19 +287,6 @@ protected:
         : data_{make_union<data_type>(has_value, __UTL forward<U>(data))}
         , has_value_{has_value} {}
 
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base const&) noexcept(
-        UTL_TRAIT_is_nothrow_copy_constructible(T) &&
-        UTL_TRAIT_is_nothrow_copy_constructible(E)) = default;
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base&&) noexcept(
-        UTL_TRAIT_is_nothrow_move_constructible(T) &&
-        UTL_TRAIT_is_nothrow_move_constructible(E)) = default;
-    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 storage_base& operator=(storage_base const&) noexcept(
-        UTL_TRAIT_is_nothrow_copy_assignable(T) &&
-        UTL_TRAIT_is_nothrow_copy_assignable(E)) = default;
-    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 storage_base& operator=(storage_base&&) noexcept(
-        UTL_TRAIT_is_nothrow_move_assignable(T) &&
-        UTL_TRAIT_is_nothrow_move_assignable(E)) = default;
-
     __UTL_HIDE_FROM_ABI inline ~storage_base() = default;
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr data_union const&
@@ -319,40 +294,44 @@ protected:
         return data_;
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 data_union& data_ref() & noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr data_union& data_ref() & noexcept {
         return data_;
     }
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const* value_ptr() const noexcept {
         return __UTL addressof(data_.value);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 T* value_ptr() noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T* value_ptr() noexcept {
         return __UTL addressof(data_.value);
     }
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const* error_ptr() const noexcept {
         return __UTL addressof(data_.error);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 T* error_ptr() noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T* error_ptr() noexcept {
         return __UTL addressof(data_.error);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const& value() const& noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const& value_ref() const& noexcept {
         return data_.value;
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 T& value() & noexcept { return data_.value; }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const&& value() const&& noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T& value_ref() & noexcept {
+        return data_.value;
+    }
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const&& value_ref() const&& noexcept {
         return __UTL move(data_.value);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 T&& value() && noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T&& value_ref() && noexcept {
         return __UTL move(data_.value);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const& error() const& noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const& error_ref() const& noexcept {
         return data_.error;
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 T& error() & noexcept { return data_.error; }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const&& error() const&& noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T& error_ref() & noexcept {
+        return data_.error;
+    }
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const&& error_ref() const&& noexcept {
         return __UTL move(data_.error);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 T&& error() && noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T&& error_ref() && noexcept {
         return __UTL move(data_.error);
     }
 
@@ -360,77 +339,154 @@ protected:
         return has_value_;
     }
 
+    template <typename... Args>
+    __UTL_HIDE_FROM_ABI inline constexpr T& emplace_value(Args&&... args) noexcept {
+        if (has_value()) {
+            return *__UTL details::expected::replace_object(
+                value_ptr(), __UTL forward<Args>(args)...);
+        } else {
+            return *reinitialize_as_value(__UTL forward<Args>(args)...);
+        }
+    }
+
+    template <typename... Args>
+    __UTL_HIDE_FROM_ABI inline constexpr E& emplace_error(Args&&... args) noexcept {
+        if (!has_value()) {
+            return *__UTL details::expected::replace_object(
+                error_ptr(), __UTL forward<Args>(args)...);
+        } else {
+            return *reinitialize_as_error(__UTL forward<Args>(args)...);
+        }
+    }
+
+    template <typename... Args>
+    __UTL_HIDE_FROM_ABI inline T* reinitialize_as_value(Args&&... args) noexcept(
+        UTL_TRAIT_is_nothrow_constructible(T, Args...)) {
+        UTL_ASSERT(!has_value());
+        if constexpr (UTL_TRAIT_is_nothrow_constructible(T, Args...)) {
+            invoke_destructor(error_ptr());
+            auto ptr = ::new (value_ptr()) T{__UTL forward<Args>(args)...};
+            has_value_ = true;
+            return ptr;
+        } else {
+            E backup(__UTL move(error_ref()));
+            invoke_destructor(error_ptr());
+            UTL_TRY {
+                auto ptr = ::new (value_ptr()) T{__UTL forward<Args>(args)...};
+                has_value_ = true;
+                return ptr;
+            } UTL_CATCH(...) {
+                ::new (error_ptr()) E{__UTL move(backup)};
+                UTL_RETHROW();
+            }
+        }
+    }
+
+    template <typename... Args>
+    __UTL_HIDE_FROM_ABI inline E* reinitialize_as_error(Args&&... args) noexcept(
+        UTL_TRAIT_is_nothrow_constructible(E, Args...)) {
+        UTL_ASSERT(has_value());
+        if constexpr (UTL_TRAIT_is_nothrow_constructible(E, Args...)) {
+            invoke_destructor(value_ptr());
+            auto ptr = ::new (error_ptr()) E{__UTL forward<Args>(args)...};
+            has_value_ = false;
+            return ptr;
+        } else {
+            T backup(__UTL move(value_ref()));
+            invoke_destructor(value_ptr());
+            UTL_TRY {
+                auto ptr = ::new (error_ptr()) E{__UTL forward<Args>(args)...};
+                has_value_ = false;
+                return ptr;
+            } UTL_CATCH(...) {
+                ::new (value_ptr()) T{__UTL move(backup)};
+                UTL_RETHROW();
+            }
+        }
+    }
+
+private:
     data_type data_;
     bool has_value_;
 };
 
-template <typename T, typename E, bool = is_copy_constructible_v<T> && is_copy_constructible_v<E>,
-    bool = is_trivially_copy_constructible_v<T> && is_trivially_copy_constructible_v<E>>
+template <typename T, typename E,
+    bool = UTL_TRAIT_is_copy_constructible(T) && UTL_TRAIT_is_copy_constructible(E),
+    bool = UTL_TRAIT_is_trivially_copy_constructible(T) &&
+        UTL_TRAIT_is_trivially_copy_constructible(E)>
 class copy_ctor_t : protected storage_base<T, E> {
+public:
+    using storage_base<T, E>::storage_base;
+    using storage_base<T, E>::operator=;
+
 protected:
-    using storage_base::protected_tag;
-    using storage_base::storage_base;
-    using storage_base::operator=;
+    using storage_base<T, E>::protected_tag;
 };
 
 template <typename T, typename E>
 class copy_ctor_t<T, E, true, false> : protected storage_base<T, E> {
-    using data_type = data_union<T, E>;
+public:
+    using storage_base<T, E>::storage_base;
+    using storage_base<T, E>::operator=;
+    __UTL_HIDE_FROM_ABI inline constexpr copy_ctor_t(copy_ctor_t const& other) noexcept(
+        UTL_TRAIT_is_nothrow_copy_constructible(T) && UTL_TRAIT_is_nothrow_copy_constructible(E))
+        : storage_base{protected_tag, other.has_value(), other.data_ref()} {}
 
 protected:
-    using storage_base::protected_tag;
-    using storage_base::storage_base;
-    using storage_base::operator=;
-
-    __UTL_HIDE_FROM_ABI inline constexpr copy_ctor_t(copy_ctor_t const& other) noexcept(
-        is_nothrow_copy_constructible_v<T> && is_nothrow_copy_constructible_v<E>)
-        : storage_base{protected_tag, other.has_value(), other.data_ref()} {}
+    using storage_base<T, E>::protected_tag;
 };
 
-template <typename T, typename E, bool = is_move_constructible_v<T> && is_move_constructible_v<E>,
-    bool = is_trivially_move_constructible_v<T> && is_trivially_move_constructible_v<E>>
+template <typename T, typename E,
+    bool = UTL_TRAIT_is_move_constructible(T) && UTL_TRAIT_is_move_constructible(E),
+    bool = UTL_TRAIT_is_trivially_move_constructible(T) &&
+        UTL_TRAIT_is_trivially_move_constructible(E)>
 class move_ctor_t : protected copy_ctor_t<T, E> {
+public:
+    using copy_ctor_t<T, E>::copy_ctor_t;
+    using copy_ctor_t<T, E>::operator=;
+
 protected:
-    using copy_ctor_t::copy_ctor_t;
-    using copy_ctor_t::protected_tag;
-    using copy_ctor_t::operator=;
+    using copy_ctor_t<T, E>::protected_tag;
 };
 
 template <typename T, typename E>
 class move_ctor_t<T, E, true, false> : protected copy_ctor_t<T, E> {
-    using data_type = data_union<T, E>;
-
-protected:
-    using copy_ctor_t::copy_ctor_t;
-    using copy_ctor_t::protected_tag;
-    using copy_ctor_t::operator=;
+public:
+    using copy_ctor_t<T, E>::copy_ctor_t;
+    using copy_ctor_t<T, E>::operator=;
 
     __UTL_HIDE_FROM_ABI inline constexpr move_ctor_t(move_ctor_t&& other) noexcept(
-        is_nothrow_move_constructible_v<T> && is_nothrow_move_constructible_v<E>)
+        UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_move_constructible(E))
         : copy_ctor_t{protected_tag, other.has_value(), __UTL move(other.data_ref())} {}
+
+protected:
+    using copy_ctor_t<T, E>::protected_tag;
 };
 
-template <typename T, typename E, bool = is_copy_assignable_v<T> && is_copy_assignable_v<E>,
-    bool = is_trivially_copy_assignable_v<T> && is_trivially_copy_assignable_v<E>>
-class copy_assign_t : move_ctor_t<T, E> {
+template <typename T, typename E,
+    bool = UTL_TRAIT_is_copy_assignable(T) && UTL_TRAIT_is_copy_assignable(E),
+    bool = UTL_TRAIT_is_trivially_copy_assignable(T) && UTL_TRAIT_is_trivially_copy_assignable(E)>
+class copy_assign_t : protected move_ctor_t<T, E> {
+public:
+    using move_ctor_t<T, E>::move_ctor_t;
+    using move_ctor_t<T, E>::operator=;
+
 protected:
-    using move_ctor_t::move_ctor_t;
-    using move_ctor_t::protected_tag;
-    using move_ctor_t::operator=;
+    using move_ctor_t<T, E>::protected_tag;
 };
 
 template <typename T, typename E>
 class copy_assign_t<T, E, true, false> : protected move_ctor_t<T, E> {
-    using data_type = data_union<T, E>;
+public:
+    using move_ctor_t<T, E>::move_ctor_t;
+    using move_ctor_t<T, E>::operator=;
 
 protected:
-    using move_ctor_t::move_ctor_t;
-    using move_ctor_t::protected_tag;
-    using move_ctor_t::operator=;
+    using move_ctor_t<T, E>::protected_tag;
 
-    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 copy_assign_t& operator=(
-        copy_assign_t const& other) noexcept(is_nothrow_copy_assignable_v<T> &&
-        is_nothrow_copy_assignable_v<E>) {
+    __UTL_HIDE_FROM_ABI inline constexpr copy_assign_t& operator=(
+        copy_assign_t const& other) noexcept(UTL_TRAIT_is_nothrow_copy_assignable(T) &&
+        UTL_TRAIT_is_nothrow_copy_assignable(E)) {
         if (this != __UTL addressof(other)) {
             assign(other);
         }
@@ -439,68 +495,154 @@ protected:
     }
 
 private:
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 void assign(
-        copy_assign_t const& other) noexcept(is_nothrow_copy_assignable_v<T> &&
-        is_nothrow_copy_assignable_v<E>) {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr void assign(
+        copy_assign_t const& other) noexcept(UTL_TRAIT_is_nothrow_copy_assignable(T) &&
+        UTL_TRAIT_is_nothrow_copy_assignable(E)) {
         if (this->has_value() != other.has_value()) {
             if (other.has_value()) {
-                ::new (this->value_ptr()) T{other.value()};
+                ::new (this->value_ptr()) T{other.value_ref()};
             } else {
-                ::new (this->error_ptr()) E{other.error()};
+                ::new (this->error_ptr()) E{other.error_ref()};
             }
         } else if (other.has_value()) {
-            this->value() = other.value();
+            this->value_ref() = other.value_ref();
         } else {
-            this->error() = other.error();
+            this->error_ref() = other.error_ref();
         }
         has_value_ = other.has_value();
     }
 };
 
-template <typename T, typename E, bool = is_move_assignable_v<T> && is_move_assignable_v<E>,
-    bool = is_trivially_move_assignable_v<T> && is_trivially_move_assignable_v<E>>
+template <typename T, typename E,
+    bool = UTL_TRAIT_is_move_assignable(T) && UTL_TRAIT_is_move_assignable(E),
+    bool = UTL_TRAIT_is_trivially_move_assignable(T) && UTL_TRAIT_is_trivially_move_assignable(E)>
 class move_assign_t : protected copy_assign_t<T, E> {
 protected:
-    using copy_assign_t::copy_assign_t;
-    using copy_assign_t::protected_tag;
-    using copy_assign_t::operator=;
+    using copy_assign_t<T, E>::copy_assign_t;
+    using copy_assign_t<T, E>::protected_tag;
+    using copy_assign_t<T, E>::operator=;
 };
 
 template <typename T, typename E>
-class move_assign_t<T, E, true, false> : copy_assign_t<T, E> {
-    using data_type = data_union<T, E>;
+class move_assign_t<T, E, true, false> : protected copy_assign_t<T, E> {
+public:
+    using copy_assign_t<T, E>::copy_assign_t;
+    using copy_assign_t<T, E>::operator=;
 
-protected:
-    using copy_assign_t::copy_assign_t;
-    using copy_assign_t::protected_tag;
-    using copy_assign_t::operator=;
-
-    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 move_assign_t& operator=(move_assign_t&& other) noexcept(
-        is_nothrow_move_assignable_v<T> && is_nothrow_move_assignable_v<E>) {
+    __UTL_HIDE_FROM_ABI inline constexpr move_assign_t& operator=(move_assign_t&& other) noexcept(
+        UTL_TRAIT_is_nothrow_move_assignable(T) && UTL_TRAIT_is_nothrow_move_assignable(E)) {
         assign(__UTL move(other));
         return *this;
     }
 
+protected:
+    using copy_assign_t<T, E>::protected_tag;
+
 private:
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 void assign(move_assign_t&& other) noexcept(
-        is_nothrow_move_assignable_v<T> && is_nothrow_move_assignable_v<E>) {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr void assign(move_assign_t&& other) noexcept(
+        UTL_TRAIT_is_nothrow_move_assignable(T) && UTL_TRAIT_is_nothrow_move_assignable(E)) {
         if (has_value_ != other.has_value_) {
             if (other.has_value_) {
-                ::new (this->value_ptr()) T{__UTL move(other.value())};
+                ::new (this->value_ptr()) T{__UTL move(other.value_ref())};
             } else {
-                ::new (this->error_ptr()) E{__UTL move(other.error())};
+                ::new (this->error_ptr()) E{__UTL move(other.error_ref())};
             }
         } else if (other.has_value_) {
-            this->value() = __UTL move(other.value());
+            this->value_ref() = __UTL move(other.value_ref());
         } else {
-            this->error() = __UTL move(other.error());
+            this->error_ref() = __UTL move(other.error_ref());
         }
         has_value_ = other.has_value_;
     }
 };
 
-template <typename T, typename E>
-using storage = move_assign_t<T, E>;
+template <typename D, typename T, typename E,
+    bool = UTL_TRAIT_conjunction(is_swappable<T>, is_swappable<E>, is_move_constructible<T>,
+        is_move_constructible<E>,
+        disjunction<is_nothrow_move_constructible<T>, is_nothrow_move_constructible<E>>)>
+class swap_base : protected move_assign_t<T, E> {
+    static_assert(__UTL_TRAIT_is_expected(D));
+
+public:
+    using move_assign_t<T, E>::move_assign_t;
+    using move_assign_t<T, E>::operator=;
+
+    __UTL_HIDE_FROM_ABI inline constexpr void swap(D& other) noexcept(
+        UTL_TRAIT_is_nothrow_swappable(T) && UTL_TRAIT_is_nothrow_swappable(E) &&
+        UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_move_constructible(E)) {
+        static_assert(UTL_TRAIT_is_base_of(swap_base, D), "Invalid definition");
+        if (this->has_value() == other.has_value()) {
+            if (this->has_value()) {
+                __UTL ranges::swap(this->value_ref(), other.value_ref());
+            } else {
+                __UTL ranges::swap(this->error_ref(), other.error_ref());
+            }
+        } else if (this->has_value()) {
+            this->cross_swap(other);
+        } else {
+            other.cross_swap(*this);
+        }
+    }
+
+    __UTL_HIDE_FROM_ABI friend inline constexpr void swap(D& left, D& right) noexcept(
+        UTL_TRAIT_is_nothrow_swappable(T) && UTL_TRAIT_is_nothrow_swappable(E) &&
+        UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_move_constructible(E)) {
+        left.swap(right);
+    }
+
+protected:
+    using move_assign_t<T, E>::protected_tag;
+    __UTL_HIDE_FROM_ABI inline ~swap_base() noexcept = default;
+
+private:
+    __UTL_HIDE_FROM_ABI inline constexpr void cross_swap(storage_base& other) noexcept(
+        UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_move_constructible(E)) {
+        UTL_ASSERT(has_value() && !other.has_value());
+        if constexpr (UTL_TRAIT_is_nothrow_move_constructible(E)) {
+            E tmp(__UTL move(other.error_ref()));
+            details::expected::invoke_destructor(other.error_ptr());
+            UTL_TRY {
+                ::new (other.value_ptr()) T{__UTL move(this->value_ref())};
+                details::expected::invoke_destructor(this->value_ptr());
+                ::new (this->error_ptr()) E{__UTL move(tmp)};
+            } UTL_CATCH(...) {
+                ::new (other.error_ptr()) E{__UTL move(tmp)};
+                UTL_RETHROW();
+            }
+        } else {
+            T tmp(__UTL move(this->value_ref()));
+            details::expected::invoke_destructor(this->value_ptr());
+            UTL_TRY {
+                ::new (this->error_ptr()) E{__UTL move(other.error_ref())};
+                details::expected::invoke_destructor(other.error_ptr());
+                ::new (other.value_ptr()) T{__UTL move(tmp)};
+            } UTL_CATCH(...) {
+                ::new (this->value_ptr()) T{__UTL move(tmp)};
+                UTL_RETHROW();
+            }
+        }
+        this->has_value_ = false;
+        other.has_value_ = true;
+    }
+};
+
+template <typename D, typename T, typename E>
+class swap_base<D, T, E, false> : protected move_assign_t<T, E> {
+    static_assert(__UTL_TRAIT_is_expected(D));
+
+public:
+    using move_assign_t<T, E>::move_assign_t;
+    using move_assign_t<T, E>::operator=;
+
+    __UTL_HIDE_FROM_ABI void swap(D&) = delete;
+
+protected:
+    using move_assign_t<T, E>::protected_tag;
+    inline ~swap_base() noexcept = default;
+};
+
+template <typename D, typename T, typename E>
+using storage = swap_base<D, T, E>;
 
 } // namespace expected
 } // namespace details

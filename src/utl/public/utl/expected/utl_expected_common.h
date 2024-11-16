@@ -16,8 +16,6 @@ class __UTL_PUBLIC_TEMPLATE expected;
 namespace details {
 namespace expected {
 
-struct empty_t {};
-
 template <typename T>
 struct __UTL_PUBLIC_TEMPLATE is_type : false_type {};
 template <typename T>
