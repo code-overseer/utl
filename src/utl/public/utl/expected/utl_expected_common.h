@@ -14,50 +14,49 @@ template <typename T, typename E>
 class __UTL_PUBLIC_TEMPLATE expected;
 
 namespace details {
-namespace expected {
-
 template <typename T>
-struct __UTL_PUBLIC_TEMPLATE is_type : false_type {};
+struct __UTL_PUBLIC_TEMPLATE is_expected_type : false_type {};
 template <typename T>
-struct __UTL_PUBLIC_TEMPLATE is_type<T const> : is_type<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_expected_type<T const> : is_expected_type<T> {};
 template <typename T>
-struct __UTL_PUBLIC_TEMPLATE is_type<T volatile> : is_type<T> {};
+struct __UTL_PUBLIC_TEMPLATE is_expected_type<T volatile> : is_expected_type<T> {};
 template <typename T, typename U>
-struct __UTL_PUBLIC_TEMPLATE is_type<expected<T, U>> : true_type {};
+struct __UTL_PUBLIC_TEMPLATE is_expected_type<__UTL expected<T, U>> : true_type {};
 
 #if UTL_CXX14
-
 template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_type_v = false;
+UTL_INLINE_CXX17 constexpr bool is_expected_type_v = false;
 template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_type_v<T const> = is_type_v<T>;
+UTL_INLINE_CXX17 constexpr bool is_expected_type_v<T const> = is_expected_type_v<T>;
 template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_type_v<T volatile> = is_type_v<T>;
+UTL_INLINE_CXX17 constexpr bool is_expected_type_v<T volatile> = is_expected_type_v<T>;
 template <typename T, typename U>
-UTL_INLINE_CXX17 constexpr bool is_type_v<expected<T, U>> = true;
+UTL_INLINE_CXX17 constexpr bool is_expected_type_v<__UTL expected<T, U>> = true;
 
-#  define __UTL_TRAIT_is_expected(...) __UTL details::expected::is_type_v<__VA_ARGS__>
+#  define __UTL_TRAIT_is_expected(...) __UTL details::is_expected_type_v<__VA_ARGS__>
 #else
-#  define __UTL_TRAIT_is_expected(...) __UTL details::expected::is_type<__VA_ARGS__>::value
+#  define __UTL_TRAIT_is_expected(...) __UTL details::is_expected_type<__VA_ARGS__>::value
 #endif
 
-} // namespace expected
-} // namespace details
-
-template <typename E>
-class __UTL_PUBLIC_TEMPLATE expected<void const, E> : expected<void, E> {};
-template <typename E>
-class __UTL_PUBLIC_TEMPLATE expected<void volatile, E> : expected<void, E> {};
-template <typename E>
-class __UTL_PUBLIC_TEMPLATE expected<void const volatile, E> : expected<void, E> {};
-
+namespace expected {
 struct transforming_t {
     __UTL_HIDE_FROM_ABI explicit inline constexpr transforming_t() noexcept = default;
 };
-static constexpr transforming_t transforming{};
+UTL_INLINE_CXX17 constexpr transforming_t transforming{};
 struct transforming_error_t {
-    __UTL_HIDE_FROM_ABI explicit inline constexpr transforming_t() noexcept = default;
+    __UTL_HIDE_FROM_ABI explicit inline constexpr transforming_error_t() noexcept = default;
 };
-static constexpr transforming_error_t transforming_error{};
+UTL_INLINE_CXX17 constexpr transforming_error_t transforming_error{};
+
+struct converting_t {
+    __UTL_HIDE_FROM_ABI explicit constexpr converting_t() noexcept = default;
+};
+UTL_INLINE_CXX17 constexpr converting_t converting{};
+struct empty_t {
+    __UTL_HIDE_FROM_ABI explicit inline constexpr empty_t() noexcept = default;
+};
+UTL_INLINE_CXX17 constexpr empty_t empty{};
+} // namespace expected
+} // namespace details
 
 UTL_NAMESPACE_END
