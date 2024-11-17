@@ -18,6 +18,7 @@
 #include "utl/expected/utl_unexpected.h"
 #include "utl/functional/utl_invoke.h"
 #include "utl/type_traits/utl_constants.h"
+#include "utl/type_traits/utl_decay.h"
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_invoke.h"
@@ -224,11 +225,11 @@ public:
     template <typename U UTL_CONSTRAINT_CXX11(__UTL_TRAIT_is_unexpected(remove_cvref_t<U>) &&
         UTL_TRAIT_is_constructible(E, unexpected_error_type<U>) &&
         UTL_TRAIT_is_assignable(E&, unexpected_error_type<U>) &&
-        (UTL_TRAIT_is_nothrow_constructible(T, unexpected_error_type<U>) ||
+        (UTL_TRAIT_is_nothrow_constructible(E, unexpected_error_type<U>) ||
             UTL_TRAIT_nothrow_move_constructible(T) || UTL_TRAIT_nothrow_move_constructible(E)))>
     __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected& operator=(U&& u) noexcept(
         UTL_TRAIT_is_nothrow_assignable(E&, unexpected_error_type<U>) &&
-        UTL_TRAIT_is_nothrow_constructible(T, unexpected_error_type<U>)) {
+        UTL_TRAIT_is_nothrow_constructible(E, unexpected_error_type<U>)) {
         if (!has_value()) {
             this->error_ref() = __UTL forward_like<U>(u.error());
         } else {
@@ -242,26 +243,30 @@ public:
 
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const& value() const& UTL_THROWS {
         static_assert(UTL_TRAIT_copy_constructible(E), "Invalid error type");
-        UTL_THROW_IF(!has_value(), bad_expected_access(error_ref(), UTL_SOURCE_LOCATION()));
+        UTL_THROW_IF(
+            !has_value(), bad_expected_access<decay_t<E>>(error_ref(), UTL_SOURCE_LOCATION()));
         return this->value_ref();
     }
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 T& value() & UTL_THROWS {
         static_assert(UTL_TRAIT_copy_constructible(E), "Invalid error type");
-        UTL_THROW_IF(!has_value(), bad_expected_access(error_ref(), UTL_SOURCE_LOCATION()));
+        UTL_THROW_IF(
+            !has_value(), bad_expected_access<decay_t<E>>(error_ref(), UTL_SOURCE_LOCATION()));
         return this->value_ref();
     }
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const&& value() const&& UTL_THROWS {
         static_assert(UTL_TRAIT_copy_constructible(E) ||
                 UTL_TRAIT_is_constructible(E, decltype(__UTL move(this->error_ref()))),
             "Invalid error type");
-        UTL_THROW_IF(!has_value(), bad_expected_access(error_ref(), UTL_SOURCE_LOCATION()));
+        UTL_THROW_IF(
+            !has_value(), bad_expected_access<decay_t<E>>(error_ref(), UTL_SOURCE_LOCATION()));
         return __UTL move(this->value_ref());
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 T&& value() && noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 T&& value() && UTL_THROWS {
         static_assert(UTL_TRAIT_copy_constructible(E) ||
                 UTL_TRAIT_is_constructible(E, decltype(__UTL move(this->error_ref()))),
             "Invalid error type");
-        UTL_THROW_IF(!has_value(), bad_expected_access(error_ref(), UTL_SOURCE_LOCATION()));
+        UTL_THROW_IF(
+            !has_value(), bad_expected_access<decay_t<E>>(error_ref(), UTL_SOURCE_LOCATION()));
         return __UTL move(this->value_ref());
     }
     UTL_ATTRIBUTES(EXPECTED_INLINE_CONST) inline constexpr T const& error() const& noexcept {
@@ -340,7 +345,8 @@ public:
     template <typename F UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_invocable(F, T&) && UTL_TRAIT_is_constructible(E, E&))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto and_then(F&& f) & noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, T&)) -> invoke_result_t<F, T&> {
+        UTL_TRAIT_is_nothrow_invocable(F, T&) && UTL_TRAIT_is_nothrow_constructible(E, E&))
+        -> invoke_result_t<F, T&> {
         using return_type = remove_cvref_t<invoke_result_t<F, T&>>;
         static_assert(__UTL_TRAIT_is_expected(return_type) &&
                 UTL_TRAIT_is_same(typename return_type::error_type, E),
@@ -349,13 +355,14 @@ public:
             return __UTL invoke(__UTL forward<F>(f), this->value_ref());
         }
 
-        return return_type{unexpect, this->error_ref()};
+        return return_type{__UTL unexpect, this->error_ref()};
     }
 
     template <typename F UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_invocable(F, T const&) && UTL_TRAIT_is_constructible(E, E const&))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto and_then(F&& f) const& noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, T const&)) -> invoke_result_t<F, T const&> {
+        UTL_TRAIT_is_nothrow_invocable(F, T const&) &&
+        UTL_TRAIT_is_nothrow_constructible(E, E const&)) -> invoke_result_t<F, T const&> {
         using return_type = remove_cvref_t<invoke_result_t<F, T const&>>;
         static_assert(__UTL_TRAIT_is_expected(return_type) &&
                 UTL_TRAIT_is_same(typename return_type::error_type, E),
@@ -366,10 +373,11 @@ public:
     }
 
     template <typename F UTL_CONSTRAINT_CXX11(
-        UTL_TRAIT_is_invocable(F, T) && UTL_TRAIT_is_constructible(E, E&&))>
+        UTL_TRAIT_is_invocable(F, T) && UTL_TRAIT_is_constructible(E, E))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto and_then(F&& f) && noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, T&&)) -> invoke_result_t<F, T> {
-        using return_type = remove_cvref_t<invoke_result_t<F, T&&>>;
+        UTL_TRAIT_is_nothrow_invocable(F, T) && UTL_TRAIT_is_nothrow_constructible(E, E))
+        -> invoke_result_t<F, T> {
+        using return_type = remove_cvref_t<invoke_result_t<F, T>>;
         static_assert(__UTL_TRAIT_is_expected(return_type) &&
                 UTL_TRAIT_is_same(typename return_type::error_type, E),
             "Invalid return type");
@@ -382,10 +390,11 @@ public:
     }
 
     template <typename F UTL_CONSTRAINT_CXX11(
-        UTL_TRAIT_is_invocable(F, T const) && UTL_TRAIT_is_constructible(E, E const&&))>
+        UTL_TRAIT_is_invocable(F, T const) && UTL_TRAIT_is_constructible(E, E const))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto and_then(F&& f) const&& noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, T const&&)) -> invoke_result_t<F, T const> {
-        using return_type = remove_cvref_t<invoke_result_t<F, T const&&>>;
+        UTL_TRAIT_is_nothrow_invocable(F, T const) &&
+        UTL_TRAIT_is_nothrow_constructible(E, E const)) -> invoke_result_t<F, T const> {
+        using return_type = remove_cvref_t<invoke_result_t<F, T const>>;
         static_assert(__UTL_TRAIT_is_expected(return_type) &&
                 UTL_TRAIT_is_same(typename return_type::error_type, E),
             "Invalid return type");
@@ -396,8 +405,8 @@ public:
 
     template <typename F UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_invocable(F, T&) && UTL_TRAIT_is_constructible(E, E&))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform(F&& f) & noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, T&)) -> expected<remove_cv_t<invoke_result_t<F, T&>>, E> {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform(F&& f) & UTL_THROWS
+        -> expected<remove_cv_t<invoke_result_t<F, T&>>, E> {
         using return_type = remove_cv_t<invoke_result_t<F, T&>>;
         static_assert(UTL_TRAIT_is_complete(expected<return_type, E>) &&
                 (UTL_TRAIT_is_void(return_type) ||
@@ -412,8 +421,7 @@ public:
 
     template <typename F UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_invocable(F, T const&) && UTL_TRAIT_is_constructible(E, E const&))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform(F&& f) const& noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, T const&))
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform(F&& f) const& UTL_THROWS
         -> expected<remove_cv_t<invoke_result_t<F, T const&>>, E> {
         using return_type = remove_cv_t<invoke_result_t<F, T const&>>;
         static_assert(UTL_TRAIT_is_complete(expected<return_type, E>) &&
@@ -430,8 +438,8 @@ public:
 
     template <typename F UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_invocable(F, T) && UTL_TRAIT_is_constructible(E, E&&))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform(F&& f) && noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, T&&)) -> expected<remove_cv_t<invoke_result_t<F, T>>, E> {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform(F&& f) && UTL_THROWS
+        -> expected<remove_cv_t<invoke_result_t<F, T>>, E> {
         using return_type = remove_cv_t<invoke_result_t<F, T>>;
         static_assert(UTL_TRAIT_is_complete(expected<return_type, E>) &&
                 (UTL_TRAIT_is_void(return_type) ||
@@ -446,9 +454,8 @@ public:
     }
 
     template <typename F UTL_CONSTRAINT_CXX11(
-        UTL_TRAIT_is_invocable(F, T const) && UTL_TRAIT_is_constructible(E, E const&))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform(F&& f) const&& noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, T const&&))
+        UTL_TRAIT_is_invocable(F, T const) && UTL_TRAIT_is_constructible(E, E const))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform(F&& f) const&& UTL_THROWS
         -> expected<remove_cv_t<invoke_result_t<F, T const>>, E> {
         using return_type = remove_cv_t<invoke_result_t<F, T const>>;
         static_assert(UTL_TRAIT_is_complete(expected<return_type, E>) &&
@@ -466,7 +473,8 @@ public:
     template <typename F UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_invocable(F, E&) && UTL_TRAIT_is_constructible(T, T&))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto or_else(F&& f) & noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, E&)) -> invoke_result_t<F, E&> {
+        UTL_TRAIT_is_nothrow_invocable(F, E&) && UTL_TRAIT_is_nothrow_constructible(T, T&))
+        -> invoke_result_t<F, E&> {
         using return_type = remove_cvref_t<invoke_result_t<F, E&>>;
         static_assert(__UTL_TRAIT_is_expected(return_type) &&
                 UTL_TRAIT_is_same(typename return_type::value_type, T),
@@ -481,7 +489,8 @@ public:
     template <typename F UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_invocable(F, E const&) && UTL_TRAIT_is_constructible(T, T const&))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto or_else(F&& f) const& noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, E const&)) -> invoke_result_t<F, E const&> {
+        UTL_TRAIT_is_nothrow_invocable(F, E const&) &&
+        UTL_TRAIT_is_nothrow_constructible(T, T const&)) -> invoke_result_t<F, E const&> {
         using return_type = remove_cvref_t<invoke_result_t<F, E const&>>;
         static_assert(__UTL_TRAIT_is_expected(return_type) &&
                 UTL_TRAIT_is_same(typename return_type::value_type, T),
@@ -493,9 +502,10 @@ public:
     }
 
     template <typename F UTL_CONSTRAINT_CXX11(
-        UTL_TRAIT_is_invocable(F, E) && UTL_TRAIT_is_constructible(T, T&&))>
+        UTL_TRAIT_is_invocable(F, E) && UTL_TRAIT_is_constructible(T, T))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto or_else(F&& f) && noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, E&&)) -> invoke_result_t<F, E> {
+        UTL_TRAIT_is_nothrow_invocable(F, E) && UTL_TRAIT_is_nothrow_constructible(T, T))
+        -> invoke_result_t<F, E> {
         using return_type = remove_cvref_t<invoke_result_t<F, E>>;
         static_assert(__UTL_TRAIT_is_expected(return_type) &&
                 UTL_TRAIT_is_same(typename return_type::value_type, T),
@@ -511,8 +521,9 @@ public:
     template <typename F UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_invocable(F, E const) && UTL_TRAIT_is_constructible(T, T const))>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto or_else(F&& f) const&& noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, E const&&)) -> invoke_result_t<F, E const> {
-        using return_type = remove_cvref_t<invoke_result_t<F, E const&&>>;
+        UTL_TRAIT_is_nothrow_invocable(F, E const) &&
+        UTL_TRAIT_is_nothrow_constructible(T, T const)) -> invoke_result_t<F, E const> {
+        using return_type = remove_cvref_t<invoke_result_t<F, E const>>;
         static_assert(__UTL_TRAIT_is_expected(return_type) &&
                 UTL_TRAIT_is_same(typename return_type::value_type, T),
             "Invalid return type");
@@ -524,8 +535,8 @@ public:
 
     template <typename F UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_invocable(F, E&) && UTL_TRAIT_is_constructible(T, T&))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform_error(F&& f) & noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, E&)) -> expected<T, remove_cv_t<invoke_result_t<F, E&>>> {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform_error(F&& f) & UTL_THROWS
+        -> expected<T, remove_cv_t<invoke_result_t<F, E&>>> {
         using return_type = remove_cv_t<invoke_result_t<F, E&>>;
         static_assert(UTL_TRAIT_is_complete(expected<T, return_type>) &&
                 UTL_TRAIT_is_constructible(return_type, invoke_result_t<F, E&>),
@@ -540,11 +551,10 @@ public:
 
     template <typename F UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_invocable(F, E const&) && UTL_TRAIT_is_constructible(T, T const&))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto transform_error(F&& f) const& noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, E const&))
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto transform_error(F&& f) const& UTL_THROWS
         -> expected<T, remove_cv_t<invoke_result_t<F, E const&>>> {
         using return_type = remove_cv_t<invoke_result_t<F, E const&>>;
-        static_assert(UTL_TRAIT_is_complete(expected<return_type, E>) &&
+        static_assert(UTL_TRAIT_is_complete(expected<T, return_type>) &&
                 UTL_TRAIT_is_constructible(return_type, invoke_result_t<F, E const&>),
             "Invalid return type");
 
@@ -555,10 +565,10 @@ public:
 
     template <typename F UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_invocable(F, E) && UTL_TRAIT_is_constructible(T, T))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform_error(F&& f) && noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, E)) -> expected<T, remove_cv_t<invoke_result_t<F, E>>> {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform_error(F&& f) && UTL_THROWS
+        -> expected<T, remove_cv_t<invoke_result_t<F, E>>> {
         using return_type = remove_cv_t<invoke_result_t<F, E>>;
-        static_assert(UTL_TRAIT_is_complete(expected<E, return_type>) &&
+        static_assert(UTL_TRAIT_is_complete(expected<T, return_type>) &&
                 UTL_TRAIT_is_constructible(return_type, invoke_result_t<F, E>),
             "Invalid return type");
 
@@ -572,8 +582,7 @@ public:
 
     template <typename F UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_invocable(F, E const) && UTL_TRAIT_is_constructible(T, T const))>
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto transform_error(F&& f) const&& noexcept(
-        UTL_TRAIT_is_nothrow_invocable(F, E const))
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto transform_error(F&& f) const&& UTL_THROWS
         -> expected<T, remove_cv_t<invoke_result_t<F, E const>>> {
         using return_type = remove_cv_t<invoke_result_t<F, E const>>;
         static_assert(UTL_TRAIT_is_complete(expected<T, return_type>) &&
@@ -841,6 +850,459 @@ public:
         : base_type(__UTL unexpect, il, __UTL forward<Args>(args)...) {}
 
     __UTL_HIDE_FROM_ABI inline ~expected() noexcept = default;
+
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected& operator=(expected const&) noexcept(
+        UTL_TRAIT_nothrow_copy_assignable(E)) = default;
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected& operator=(expected&&) noexcept(
+        UTL_TRAIT_nothrow_move_assignable(E)) = default;
+
+    template <typename U UTL_CONSTRAINT_CXX11(__UTL_TRAIT_is_unexpected(remove_cvref_t<U>) &&
+        UTL_TRAIT_is_constructible(E, unexpected_error_type<U>) &&
+        UTL_TRAIT_is_assignable(E&, unexpected_error_type<U>) &&
+        (UTL_TRAIT_is_nothrow_constructible(E, unexpected_error_type<U>) ||
+            UTL_TRAIT_nothrow_move_constructible(E)))>
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected& operator=(U&& u) noexcept(
+        UTL_TRAIT_is_nothrow_assignable(E&, unexpected_error_type<U>)) {
+        if (!has_value()) {
+            this->error_ref() = __UTL forward_like<U>(u.error());
+        } else {
+            this->reinitialize_as_error(__UTL forward_like<U>(u.error()));
+        }
+
+        return *this;
+    }
+
+    using base_type::has_value;
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 void value() const& UTL_THROWS {
+        static_assert(UTL_TRAIT_copy_constructible(E), "Invalid error type");
+        UTL_THROW_IF(
+            !has_value(), bad_expected_access<decay_t<E>>(error_ref(), UTL_SOURCE_LOCATION()));
+    }
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 void value() && UTL_THROWS {
+        static_assert(UTL_TRAIT_copy_constructible(E) ||
+                UTL_TRAIT_is_constructible(E, decltype(__UTL move(this->error_ref()))),
+            "Invalid error type");
+        UTL_THROW_IF(
+            !has_value(), bad_expected_access<decay_t<E>>(error_ref(), UTL_SOURCE_LOCATION()));
+    }
+    UTL_ATTRIBUTES(EXPECTED_INLINE_CONST) inline constexpr T const& error() const& noexcept {
+        UTL_ASSERT(!has_value());
+        return this->error_ref();
+    }
+    UTL_ATTRIBUTES(EXPECTED_INLINE_CONST) inline UTL_CONSTEXPR_CXX14 T& error() & noexcept {
+        UTL_ASSERT(!has_value());
+        return this->error_ref();
+    }
+    UTL_ATTRIBUTES(EXPECTED_INLINE_CONST) inline constexpr T const&& error() const&& noexcept {
+        UTL_ASSERT(!has_value());
+        return __UTL move(this->error_ref());
+    }
+    UTL_ATTRIBUTES(EXPECTED_INLINE_CONST) inline UTL_CONSTEXPR_CXX14 T&& error() && noexcept {
+        UTL_ASSERT(!has_value());
+        return __UTL move(this->error_ref());
+    }
+
+    UTL_ATTRIBUTE(EXPECTED_INLINE_CONST) inline constexpr void operator*() const noexcept {}
+
+    UTL_ATTRIBUTE(EXPECTED_INLINE_PURE) inline constexpr explicit operator bool() const noexcept {
+        return has_value();
+    }
+
+    template <typename U = E UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_copy_constructible(E) && UTL_TRAIT_is_convertible(U, E))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr E error_or(U&& default_val) const& noexcept(
+        UTL_TRAIT_is_nothrow_convertible(U, E)) {
+        return has_value() ? static_cast<E>(__UTL forward<U>(default_val)) : this->error_ref();
+    }
+
+    template <typename U = E UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_move_constructible(E) && UTL_TRAIT_is_convertible(U, E))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 E error_or(U&& default_val) && noexcept(
+        UTL_TRAIT_is_nothrow_convertible(U, E)) {
+        return has_value() ? static_cast<E>(__UTL forward<U>(default_val))
+                           : __UTL move(this->error_ref());
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_invocable(F) && UTL_TRAIT_is_constructible(E, E&))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto and_then(F&& f) & noexcept(
+        UTL_TRAIT_is_nothrow_invocable(F)) -> invoke_result_t<F> {
+        using return_type = remove_cvref_t<invoke_result_t<F>>;
+        static_assert(__UTL_TRAIT_is_expected(return_type) &&
+                UTL_TRAIT_is_same(typename return_type::error_type, E),
+            "Invalid return type");
+        if (has_value()) {
+            return __UTL invoke(__UTL forward<F>(f));
+        }
+
+        return return_type{__UTL unexpect, this->error_ref()};
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_invocable(F) && UTL_TRAIT_is_constructible(E, E const&))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto and_then(F&& f) const& noexcept(
+        UTL_TRAIT_is_nothrow_invocable(F, T const&)) -> invoke_result_t<F> {
+        using return_type = remove_cvref_t<invoke_result_t<F>>;
+        static_assert(__UTL_TRAIT_is_expected(return_type) &&
+                UTL_TRAIT_is_same(typename return_type::error_type, E),
+            "Invalid return type");
+
+        return has_value() ? __UTL invoke(__UTL forward<F>(f))
+                           : return_type{__UTL unexpect, this->error_ref()};
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_invocable(F) && UTL_TRAIT_is_constructible(E, E))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto and_then(F&& f) && noexcept(
+        UTL_TRAIT_is_nothrow_invocable(F) && UTL_TRAIT_is_nothrow_constructible(E, E))
+        -> invoke_result_t<F> {
+        using return_type = remove_cvref_t<invoke_result_t<F>>;
+        static_assert(__UTL_TRAIT_is_expected(return_type) &&
+                UTL_TRAIT_is_same(typename return_type::error_type, E),
+            "Invalid return type");
+
+        if (has_value()) {
+            return __UTL invoke(__UTL forward<F>(f));
+        }
+
+        return return_type{__UTL unexpect, __UTL move(this->error_ref())};
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_invocable(F) && UTL_TRAIT_is_constructible(E, E const))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto and_then(F&& f) const&& noexcept(
+        UTL_TRAIT_is_nothrow_invocable(F) && UTL_TRAIT_is_nothrow_constructible(E, E const))
+        -> invoke_result_t<F> {
+        using return_type = remove_cvref_t<invoke_result_t<F>>;
+        static_assert(__UTL_TRAIT_is_expected(return_type) &&
+                UTL_TRAIT_is_same(typename return_type::error_type, E),
+            "Invalid return type");
+
+        return has_value() ? __UTL invoke(__UTL forward<F>(f))
+                           : return_type{__UTL unexpect, __UTL move(this->error_ref())};
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_invocable(F) && UTL_TRAIT_is_constructible(E, E&))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform(F&& f) & UTL_THROWS
+        -> expected<remove_cv_t<invoke_result_t<F>>, E> {
+        using return_type = remove_cv_t<invoke_result_t<F>>;
+        static_assert(UTL_TRAIT_is_complete(expected<return_type, E>) &&
+                (UTL_TRAIT_is_void(return_type) ||
+                    UTL_TRAIT_is_constructible(return_type, invoke_result_t<F>)),
+            "Invalid return type");
+        if (has_value()) {
+            transform_impl<return_type>(__UTL forward<F>(f));
+        }
+
+        return expected<return_type, E>{__UTL unexpect, this->error_ref()};
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_invocable(F) && UTL_TRAIT_is_constructible(E, E const&))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform(F&& f) const& UTL_THROWS
+        -> expected<remove_cv_t<invoke_result_t<F>>, E> {
+        using return_type = remove_cv_t<invoke_result_t<F>>;
+        static_assert(UTL_TRAIT_is_complete(expected<return_type, E>) &&
+                (UTL_TRAIT_is_void(return_type) ||
+                    UTL_TRAIT_is_constructible(return_type, invoke_result_t<F>)),
+            "Invalid return type");
+
+        if (has_value()) {
+            transform_impl<return_type>(__UTL forward<F>(f));
+        }
+
+        return expected<return_type, E>{__UTL unexpect, this->error_ref()};
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_invocable(F) && UTL_TRAIT_is_constructible(E, E&&))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform(F&& f) && UTL_THROWS
+        -> expected<remove_cv_t<invoke_result_t<F>>, E> {
+        using return_type = remove_cv_t<invoke_result_t<F>>;
+        static_assert(UTL_TRAIT_is_complete(expected<return_type, E>) &&
+                (UTL_TRAIT_is_void(return_type) ||
+                    UTL_TRAIT_is_constructible(return_type, invoke_result_t<F>)),
+            "Invalid return type");
+
+        if (has_value()) {
+            __UTL move(*this).transform_impl<return_type>(__UTL forward<F>(f));
+        }
+
+        return expected<return_type, E>{__UTL unexpect, __UTL move(this->error_ref())};
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_invocable(F) && UTL_TRAIT_is_constructible(E, E const))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform(F&& f) const&& UTL_THROWS
+        -> expected<remove_cv_t<invoke_result_t<F>>, E> {
+        using return_type = remove_cv_t<invoke_result_t<F>>;
+        static_assert(UTL_TRAIT_is_complete(expected<return_type, E>) &&
+                (UTL_TRAIT_is_void(return_type) ||
+                    UTL_TRAIT_is_constructible(return_type, invoke_result_t<F>)),
+            "Invalid return type");
+
+        if (has_value()) {
+            __UTL move(*this).transform_impl<return_type>(__UTL forward<F>(f));
+        }
+
+        return expected<return_type, E>{__UTL unexpect, __UTL move(this->error_ref())};
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_invocable(F, E&))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto or_else(F&& f) & noexcept(
+        UTL_TRAIT_is_nothrow_invocable(F, E&)) -> invoke_result_t<F, E&> {
+        using return_type = remove_cvref_t<invoke_result_t<F, E&>>;
+        static_assert(__UTL_TRAIT_is_expected(return_type) &&
+                UTL_TRAIT_is_void(typename return_type::value_type),
+            "Invalid return type");
+
+        if (has_value()) {
+            return return_type{__UTL in_place};
+        }
+
+        return __UTL invoke(__UTL forward<F>(f), this->error_ref());
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_invocable(F, E const&) && UTL_TRAIT_is_constructible(T, T const&))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto or_else(F&& f) const& noexcept(
+        UTL_TRAIT_is_nothrow_invocable(F, E const&) &&
+        UTL_TRAIT_is_nothrow_constructible(T, T const&)) -> invoke_result_t<F, E const&> {
+        using return_type = remove_cvref_t<invoke_result_t<F, E const&>>;
+        static_assert(__UTL_TRAIT_is_expected(return_type) &&
+                UTL_TRAIT_is_void(typename return_type::value_type),
+            "Invalid return type");
+
+        return has_value() ? return_type{__UTL in_place}
+                           : __UTL
+                             invoke(__UTL forward<F>(f), this->error_ref());
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_invocable(F, E) && UTL_TRAIT_is_constructible(T, T))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto or_else(F&& f) && noexcept(
+        UTL_TRAIT_is_nothrow_invocable(F, E) && UTL_TRAIT_is_nothrow_constructible(T, T))
+        -> invoke_result_t<F, E> {
+        using return_type = remove_cvref_t<invoke_result_t<F, E>>;
+        static_assert(__UTL_TRAIT_is_expected(return_type) &&
+                UTL_TRAIT_is_void(typename return_type::value_type),
+            "Invalid return type");
+
+        if (has_value()) {
+            return return_type{__UTL in_place};
+        }
+
+        return __UTL invoke(__UTL forward<F>(f), __UTL move(this->error_ref()));
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(
+        UTL_TRAIT_is_invocable(F, E const) && UTL_TRAIT_is_constructible(T, T const))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto or_else(F&& f) const&& noexcept(
+        UTL_TRAIT_is_nothrow_invocable(F, E const) &&
+        UTL_TRAIT_is_nothrow_constructible(T, T const)) -> invoke_result_t<F, E const> {
+        using return_type = remove_cvref_t<invoke_result_t<F, E const>>;
+        static_assert(__UTL_TRAIT_is_expected(return_type) &&
+                UTL_TRAIT_is_void(typename return_type::value_type),
+            "Invalid return type");
+
+        return has_value() ? return_type{__UTL in_place}
+                           : __UTL
+                             invoke(__UTL forward<F>(f), __UTL move(this->error_ref()));
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_invocable(F, E&))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform_error(F&& f) & UTL_THROWS
+        -> expected<T, remove_cv_t<invoke_result_t<F, E&>>> {
+        using return_type = remove_cv_t<invoke_result_t<F, E&>>;
+        static_assert(UTL_TRAIT_is_complete(expected<void, return_type>) &&
+                UTL_TRAIT_is_constructible(return_type, invoke_result_t<F, E&>),
+            "Invalid return type");
+        if (has_value()) {
+            return expected<void, return_type>{__UTL in_place};
+        }
+
+        return expected<void, return_type>{
+            __UTL details::expected::transforming_error, __UTL forward<F>(f), this->error_ref()};
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_invocable(F, E const&))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto transform_error(F&& f) const& UTL_THROWS
+        -> expected<T, remove_cv_t<invoke_result_t<F, E const&>>> {
+        using return_type = remove_cv_t<invoke_result_t<F, E const&>>;
+        static_assert(UTL_TRAIT_is_complete(expected<void, return_type>) &&
+                UTL_TRAIT_is_constructible(return_type, invoke_result_t<F, E const&>),
+            "Invalid return type");
+
+        return has_value()
+            ? expected<void, return_type>{__UTL in_place}
+            : expected<void, return_type>(__UTL details::expected::transforming_error,
+                  __UTL forward<F>(f), this->error_ref());
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_invocable(F, E))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline UTL_CONSTEXPR_CXX14 auto transform_error(F&& f) && UTL_THROWS
+        -> expected<T, remove_cv_t<invoke_result_t<F, E>>> {
+        using return_type = remove_cv_t<invoke_result_t<F, E>>;
+        static_assert(UTL_TRAIT_is_complete(expected<void, return_type>) &&
+                UTL_TRAIT_is_constructible(return_type, invoke_result_t<F, E>),
+            "Invalid return type");
+
+        if (has_value()) {
+            return expected<void, return_type>{__UTL in_place};
+        }
+
+        return expected<void, return_type>{__UTL details::expected::transforming_error,
+            __UTL forward<F>(f), __UTL move(this->error_ref())};
+    }
+
+    template <typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_invocable(F, E const))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline constexpr auto transform_error(F&& f) const&& UTL_THROWS
+        -> expected<T, remove_cv_t<invoke_result_t<F, E const>>> {
+        using return_type = remove_cv_t<invoke_result_t<F, E const>>;
+        static_assert(UTL_TRAIT_is_complete(expected<void, return_type>) &&
+                UTL_TRAIT_is_constructible(return_type, invoke_result_t<F, E const>),
+            "Invalid return type");
+
+        return has_value() ? expected<void, return_type>{__UTL in_place};
+            : expected<void, return_type>{__UTL details::expected::transforming_error, 
+            __UTL forward<F>(f), __UTL move(this->error_ref())};
+    }
+
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void emplace() noexcept { return this->emplace_value(); }
+
+    using base_type::swap;
+
+    template <typename T2, typename E2 UTL_CONSTRAINT_CXX11(!UTL_TRAIT_is_void(T2))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend constexpr bool operator==(expected const& left,
+        expected<T2, E2> const& right) noexcept(UTL_TRAIT_is_nothrow_equality_comparable(E, E2)) {
+        static_assert(UTL_TRAIT_is_equality_comparable_with(E, E2), "Program ill-formed");
+        return right.has_value() == right.has_value() &&
+            (left.has_value() || left.error_ref() == right.error());
+    }
+
+    template <typename E2>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend constexpr bool operator==(expected const& left,
+        unexpected<E2> const& right) noexcept(UTL_TRAIT_is_nothrow_equality_comparable(E, E2)) {
+        static_assert(UTL_TRAIT_is_equality_comparable_with(E, E2), "Program ill-formed");
+        return !left.has_value() && left.error_ref() == right.error();
+    }
+
+    template <typename T2, typename E2 UTL_CONSTRAINT_CXX11(!UTL_TRAIT_is_void(T2))>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend constexpr bool operator!=(expected const& left,
+        expected<T2, E2> const& right) noexcept(UTL_TRAIT_is_nothrow_equality_comparable(T, T2) &&
+        UTL_TRAIT_is_nothrow_equality_comparable(E, E2)) {
+        return !(left == right);
+    }
+
+    template <typename E2>
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend constexpr bool operator!=(expected const& left,
+        unexpected<E2> const& right) noexcept(UTL_TRAIT_is_nothrow_equality_comparable(E, E2)) {
+        return !(left == right);
+    }
+
+private:
+#if UTL_CXX17
+    template <typename R, typename F>
+    __UTL_HIDE_FROM_ABI inline constexpr expected<R, E> transform_impl(F&& f) & UTL_THROWS {
+        UTL_ASSERT(has_value());
+        if constexpr (UTL_TRAIT_is_void(R)) {
+            __UTL invoke(__UTL forward<F>(f));
+            return expected<void, E>{};
+        } else {
+            return expected<R, E>{__UTL details::expected::transforming, __UTL forward<F>(f)};
+        }
+    }
+    template <typename R, typename F>
+    __UTL_HIDE_FROM_ABI inline constexpr expected<R, E> transform_impl(F&& f) const& UTL_THROWS {
+        UTL_ASSERT(has_value());
+        if constexpr (UTL_TRAIT_is_void(R)) {
+            __UTL invoke(__UTL forward<F>(f));
+            return expected<void, E>{};
+        } else {
+            return expected<R, E>{__UTL details::expected::transforming, __UTL forward<F>(f)};
+        }
+    }
+    template <typename R, typename F>
+    __UTL_HIDE_FROM_ABI inline constexpr expected<R, E> transform_impl(F&& f) && noexcept(
+        UTL_TRAIT_is_nothrow_invocable(F, T&&)) {
+        UTL_ASSERT(has_value());
+        if constexpr (UTL_TRAIT_is_void(R)) {
+            __UTL invoke(__UTL forward<F>(f));
+            return expected<void, E>{};
+        } else {
+            return expected<R, E>{__UTL details::expected::transforming, __UTL forward<F>(f)};
+        }
+    }
+    template <typename R, typename F>
+    __UTL_HIDE_FROM_ABI inline constexpr expected<R, E> transform_impl(F&& f) const&& UTL_THROWS {
+        UTL_ASSERT(has_value());
+        if constexpr (UTL_TRAIT_is_void(R)) {
+            __UTL invoke(__UTL forward<F>(f));
+            return expected<void, E>{};
+        } else {
+            return expected<R, E>{__UTL details::expected::transforming, __UTL forward<F>(f)};
+        }
+    }
+#else  // UTL_CXX17
+    template <typename R, typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_void(R))>
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected<R, E> transform_impl(F&& f) &
+        UTL_THROWS {
+        UTL_ASSERT(has_value());
+        __UTL invoke(__UTL forward<F>(f));
+        return expected<void, E>{};
+    }
+    template <typename R, typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_void(R))>
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected<R, E> transform_impl(F&& f) const&
+        UTL_THROWS {
+        UTL_ASSERT(has_value());
+        __UTL invoke(__UTL forward<F>(f));
+        return expected<void, E>{};
+    }
+    template <typename R, typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_void(R))>
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected<R, E> transform_impl(F&& f) &&
+        UTL_THROWS {
+        UTL_ASSERT(has_value());
+        __UTL invoke(__UTL forward<F>(f));
+        return expected<void, E>{};
+    }
+    template <typename R, typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_void(R))>
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected<R, E> transform_impl(F&& f) const&&
+        UTL_THROWS {
+        UTL_ASSERT(has_value());
+        __UTL invoke(__UTL forward<F>(f));
+        return expected<void, E>{};
+    }
+
+    template <typename R, typename F UTL_CONSTRAINT_CXX11(!UTL_TRAIT_is_void(R))>
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected<R, E> transform_impl(F&& f) &
+        UTL_THROWS {
+        UTL_ASSERT(has_value());
+        return expected<R, E>{__UTL details::expected::transforming, __UTL forward<F>(f)};
+    }
+
+    template <typename R, typename F UTL_CONSTRAINT_CXX11(!UTL_TRAIT_is_void(R))>
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected<R, E> transform_impl(F&& f) const&
+        UTL_THROWS {
+        UTL_ASSERT(has_value());
+        return expected<R, E>{__UTL details::expected::transforming, __UTL forward<F>(f)};
+    }
+
+    template <typename R, typename F UTL_CONSTRAINT_CXX11(!UTL_TRAIT_is_void(R))>
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected<R, E> transform_impl(F&& f) &&
+        UTL_THROWS {
+        UTL_ASSERT(has_value());
+        return expected<R, E>{__UTL details::expected::transforming, __UTL forward<F>(f)};
+    }
+
+    template <typename R, typename F UTL_CONSTRAINT_CXX11(!UTL_TRAIT_is_void(R))>
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected<R, E> transform_impl(F&& f) const&&
+        UTL_THROWS {
+        UTL_ASSERT(has_value());
+        return expected<R, E>{__UTL details::expected::transforming, __UTL forward<F>(f)};
+    }
+#endif // UTL_CXX17
 };
 
 template <typename E>
@@ -857,8 +1319,8 @@ public:
     using expected<void, E>::error;
     using expected<void, E>::has_value;
     using expected<void, E>::operator bool;
-    using expected<void, E>::operator->;
     using expected<void, E>::operator*;
+    using expected<void, E>::error_or;
     using expected<void, E>::emplace;
     using expected<void, E>::swap;
     using expected<void, E>::transform;
@@ -880,8 +1342,8 @@ public:
     using expected<void, E>::error;
     using expected<void, E>::has_value;
     using expected<void, E>::operator bool;
-    using expected<void, E>::operator->;
     using expected<void, E>::operator*;
+    using expected<void, E>::error_or;
     using expected<void, E>::emplace;
     using expected<void, E>::swap;
     using expected<void, E>::transform;
@@ -903,8 +1365,8 @@ public:
     using expected<void, E>::error;
     using expected<void, E>::has_value;
     using expected<void, E>::operator bool;
-    using expected<void, E>::operator->;
     using expected<void, E>::operator*;
+    using expected<void, E>::error_or;
     using expected<void, E>::emplace;
     using expected<void, E>::swap;
     using expected<void, E>::transform;

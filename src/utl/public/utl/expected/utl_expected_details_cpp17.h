@@ -234,6 +234,8 @@ class storage_base {
     using data_type = data_union<T, E>;
 
 public:
+    __UTL_HIDE_FROM_ABI inline constexpr storage_base() noexcept(
+        UTL_TRAIT_is_nothrow_default_constructible(T)) = default;
     __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base const&) noexcept(
         UTL_TRAIT_is_nothrow_copy_constructible(T) &&
         UTL_TRAIT_is_nothrow_copy_constructible(E)) = default;
@@ -581,7 +583,7 @@ protected:
     __UTL_HIDE_FROM_ABI inline ~swap_base() noexcept = default;
 
 private:
-    __UTL_HIDE_FROM_ABI inline constexpr void cross_swap(storage_base& other) noexcept(
+    __UTL_HIDE_FROM_ABI inline void cross_swap(storage_base& other) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_move_constructible(E)) {
         UTL_ASSERT(has_value() && !other.has_value());
         if constexpr (UTL_TRAIT_is_nothrow_move_constructible(E)) {
@@ -624,6 +626,43 @@ public:
 protected:
     using move_assign_t<T, E>::operator=;
     inline ~swap_base() noexcept = default;
+};
+
+template <typename D, typename E>
+class swap_base<D, empty_t, E, true> : protected move_assign_t<T, E> {
+    static_assert(__UTL_TRAIT_is_expected(D), "Invalid derived type");
+
+public:
+    using move_assign_t<T, E>::move_assign_t;
+
+    __UTL_HIDE_FROM_ABI inline constexpr void swap(D& other) noexcept(
+        UTL_TRAIT_is_nothrow_swappable(E) && UTL_TRAIT_is_nothrow_move_constructible(E)) {
+        static_assert(UTL_TRAIT_is_base_of(swap_base, D), "Invalid definition");
+        if (this->has_value() == other.has_value()) {
+            if (!this->has_value()) {
+                __UTL ranges::swap(this->error_ref(), other.error_ref());
+            }
+        } else if (this->has_value()) {
+            this->cross_swap(other);
+        } else {
+            other.cross_swap(*this);
+        }
+    }
+
+protected:
+    using move_assign_t<T, E>::operator=;
+    inline ~swap_base() noexcept = default;
+
+private:
+    __UTL_HIDE_FROM_ABI inline void cross_swap(storage_base& other) noexcept(
+        UTL_TRAIT_is_nothrow_move_constructible(E)) {
+        UTL_ASSERT(has_value() && !other.has_value());
+        ::new (this->error_ptr()) E{__UTL move(other.error_ref())};
+        details::expected::invoke_destructor(other.error_ptr());
+        E tmp(__UTL move(other.error_ref()));
+        this->has_value_ = false;
+        other.has_value_ = true;
+    }
 };
 
 template <typename D, typename T, typename E>

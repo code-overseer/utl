@@ -117,11 +117,11 @@ union data_union {
         : error{__UTL forward<Args>(args)...} {}
     template <typename F, typename... Args>
     __UTL_HIDE_FROM_ABI inline constexpr explicit data_union(
-        transforming_t, F&& f, Args&&... args) noexcept(UTL_TRAIT_is_nothrow_invocable(F, Args...))
+        transforming_t, F&& f, Args&&... args) UTL_THROWS
         : value{__UTL invoke(__UTL forward<F>(f), __UTL forward<Args>(args)...)} {}
     template <typename F, typename... Args>
-    __UTL_HIDE_FROM_ABI inline constexpr explicit data_union(transforming_error_t, F&& f,
-        Args&&... args) noexcept(UTL_TRAIT_is_nothrow_invocable(F, Args...))
+    __UTL_HIDE_FROM_ABI inline constexpr explicit data_union(
+        transforming_error_t, F&& f, Args&&... args) UTL_THROWS
         : error{__UTL invoke(__UTL forward<F>(f), __UTL forward<Args>(args)...)} {}
 };
 
@@ -155,11 +155,11 @@ union data_union<T, E, false, true> {
         : error{__UTL forward<Args>(args)...} {}
     template <typename F, typename... Args>
     __UTL_HIDE_FROM_ABI inline constexpr explicit data_union(
-        transforming_t, F&& f, Args&&... args) noexcept(UTL_TRAIT_is_nothrow_invocable(F, Args...))
+        transforming_t, F&& f, Args&&... args) UTL_THROWS
         : value{__UTL invoke(__UTL forward<F>(f), __UTL forward<Args>(args)...)} {}
     template <typename F, typename... Args>
-    __UTL_HIDE_FROM_ABI inline constexpr explicit data_union(transforming_error_t, F&& f,
-        Args&&... args) noexcept(UTL_TRAIT_is_nothrow_invocable(F, Args...))
+    __UTL_HIDE_FROM_ABI inline constexpr explicit data_union(
+        transforming_error_t, F&& f, Args&&... args) UTL_THROWS
         : error{__UTL invoke(__UTL forward<F>(f), __UTL forward<Args>(args)...)} {}
 };
 
@@ -195,11 +195,11 @@ union data_union<T, E, true, false> {
         : error{__UTL forward<Args>(args)...} {}
     template <typename F, typename... Args>
     __UTL_HIDE_FROM_ABI inline constexpr explicit data_union(
-        transforming_t, F&& f, Args&&... args) noexcept(UTL_TRAIT_is_nothrow_invocable(F, Args...))
+        transforming_t, F&& f, Args&&... args) UTL_THROWS
         : value{__UTL invoke(__UTL forward<F>(f), __UTL forward<Args>(args)...)} {}
     template <typename F, typename... Args>
-    __UTL_HIDE_FROM_ABI inline constexpr explicit data_union(transforming_error_t, F&& f,
-        Args&&... args) noexcept(UTL_TRAIT_is_nothrow_invocable(F, Args...))
+    __UTL_HIDE_FROM_ABI inline constexpr explicit data_union(
+        transforming_error_t, F&& f, Args&&... args) UTL_THROWS
         : error{__UTL invoke(__UTL forward<F>(f), __UTL forward<Args>(args)...)} {}
     __UTL_HIDE_FROM_ABI inline ~data_union() {}
 };
@@ -234,11 +234,11 @@ union data_union<T, E, false, false> {
         : error{__UTL forward<Args>(args)...} {}
     template <typename F, typename... Args>
     __UTL_HIDE_FROM_ABI inline constexpr explicit data_union(
-        transforming_t, F&& f, Args&&... args) noexcept(UTL_TRAIT_is_nothrow_invocable(F, Args...))
+        transforming_t, F&& f, Args&&... args) UTL_THROWS
         : value{__UTL invoke(__UTL forward<F>(f), __UTL forward<Args>(args)...)} {}
     template <typename F, typename... Args>
-    __UTL_HIDE_FROM_ABI inline constexpr explicit data_union(transforming_error_t, F&& f,
-        Args&&... args) noexcept(UTL_TRAIT_is_nothrow_invocable(F, Args...))
+    __UTL_HIDE_FROM_ABI inline constexpr explicit data_union(
+        transforming_error_t, F&& f, Args&&... args) UTL_THROWS
         : error{__UTL invoke(__UTL forward<F>(f), __UTL forward<Args>(args)...)} {}
     __UTL_HIDE_FROM_ABI inline ~data_union() {}
 };
@@ -248,6 +248,8 @@ class storage_base {
     using data_type = data_union<T, E>;
 
 public:
+    __UTL_HIDE_FROM_ABI inline constexpr storage_base() noexcept(
+        UTL_TRAIT_is_nothrow_default_constructible(T)) = default;
     __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base const&) noexcept(
         UTL_TRAIT_is_nothrow_copy_constructible(T) &&
         UTL_TRAIT_is_nothrow_copy_constructible(E)) = default;
