@@ -12,6 +12,7 @@
 #include "utl/expected/utl_expected_common.h"
 #include "utl/expected/utl_unexpected.h"
 #include "utl/memory/utl_addressof.h"
+#include "utl/memory/utl_destroy_at.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_enable_if.h"
@@ -48,14 +49,6 @@ namespace expected {
 template <typename T, typename E>
 class storage_base;
 
-template <typename T UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_trivially_destructible(T))>
-__UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void invoke_destructor(T* ptr) {}
-
-template <typename T UTL_CONSTRAINT_CXX11(!UTL_TRAIT_is_trivially_destructible(T))>
-__UTL_HIDE_FROM_ABI inline void invoke_destructor(T* ptr) {
-    ptr->~T();
-}
-
 template <typename T, typename U UTL_CONSTRAINT_CXX11(
     UTL_TRAIT_is_trivially_move_constructible(T) ||
     UTL_TRAIT_is_trivially_copy_constructible(T))>
@@ -80,7 +73,7 @@ template <typename T, typename... Args UTL_CONSTRAINT_CXX11(
         is_trivially_constructible<T, Args...>))>
 __UTL_HIDE_FROM_ABI inline T* replace_object(T* ptr, Args&&... args) noexcept(
     UTL_TRAIT_is_nothrow_constructible(T, Args...)) {
-    invoke_destructor(ptr);
+    __UTL destroy_at(ptr);
     return ::new (ptr) T{__UTL forward<Args>(args)};
 }
 
@@ -389,7 +382,7 @@ protected:
     __UTL_HIDE_FROM_ABI inline T* reinitialize_as_value(Args&&... args) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, Args...)) {
         UTL_ASSERT(!has_value());
-        invoke_destructor(error_ptr());
+        __UTL destroy_at(error_ptr());
         auto ptr = ::new (value_ptr()) T{__UTL forward<Args>(args)...};
         has_value_ = true;
         return ptr;
@@ -401,7 +394,7 @@ protected:
         UTL_TRAIT_is_nothrow_constructible(T, Args...)) {
         UTL_ASSERT(!has_value());
         E backup(__UTL move(error_ref()));
-        invoke_destructor(error_ptr());
+        __UTL destroy_at(error_ptr());
         UTL_TRY {
             auto ptr = ::new (value_ptr()) T{__UTL forward<Args>(args)...};
             has_value_ = true;
@@ -416,7 +409,7 @@ protected:
     __UTL_HIDE_FROM_ABI inline E* reinitialize_as_error(Args&&... args) noexcept(
         UTL_TRAIT_is_nothrow_constructible(E, Args...)) {
         UTL_ASSERT(has_value());
-        invoke_destructor(value_ptr());
+        __UTL destroy_at(value_ptr());
         auto ptr = ::new (error_ptr()) E{__UTL forward<Args>(args)...};
         has_value_ = false;
         return ptr;
@@ -428,7 +421,7 @@ protected:
         UTL_TRAIT_is_nothrow_constructible(E, Args...)) {
         UTL_ASSERT(has_value());
         T backup(__UTL move(value_ref()));
-        invoke_destructor(value_ptr());
+        __UTL destroy_at(value_ptr());
         UTL_TRY {
             auto ptr = ::new (error_ptr()) E{__UTL forward<Args>(args)...};
             has_value_ = false;
@@ -621,14 +614,14 @@ protected:
     __UTL_HIDE_FROM_ABI inline ~swap_base() noexcept = default;
 
 private:
-    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void cross_swap(storage_base& other) noexcept(
+    __UTL_HIDE_FROM_ABI inline void cross_swap(storage_base& other) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(T)) {
         UTL_ASSERT(has_value() && !other.has_value());
         E tmp(__UTL move(other.error_ref()));
-        details::expected::invoke_destructor(other.error_ptr());
+        __UTL destroy_at(other.error_ptr());
         UTL_TRY {
             ::new (other.value_ptr()) T{__UTL move(this->value_ref())};
-            details::expected::invoke_destructor(this->value_ptr());
+            __UTL destroy_at(this->value_ptr());
             ::new (this->error_ptr()) E{__UTL move(tmp)};
         } UTL_CATCH(...) {
             ::new (other.error_ptr()) E{__UTL move(tmp)};
@@ -667,13 +660,13 @@ protected:
     __UTL_HIDE_FROM_ABI inline ~swap_base() noexcept = default;
 
 private:
-    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void cross_swap(storage_base& other) {
+    __UTL_HIDE_FROM_ABI inline void cross_swap(storage_base& other) {
         UTL_ASSERT(has_value() && !other.has_value());
         T tmp(__UTL move(this->value_ref()));
-        details::expected::invoke_destructor(this->value_ptr());
+        __UTL destroy_at(this->value_ptr());
         UTL_TRY {
             ::new (this->error_ptr()) E{__UTL move(other.error_ref())};
-            details::expected::invoke_destructor(other.error_ptr());
+            __UTL destroy_at(other.error_ptr());
             ::new (other.value_ptr()) T{__UTL move(tmp)};
         } UTL_CATCH(...) {
             ::new (this->value_ptr()) T{__UTL move(tmp)};

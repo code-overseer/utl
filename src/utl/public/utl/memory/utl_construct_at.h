@@ -18,8 +18,8 @@ namespace std {
 /* UTL_UNDEFINED_BEHAVIOUR */
 template <typename T, typename... Args>
 __UTL_HIDE_FROM_ABI inline constexpr T* utl_construct_at_impl(T* location, Args&&... args) noexcept(
-    noexcept(::new((void*)0) T(declval<Args>()...))) {
-    return ::new ((void*)(location)) T(forward<Args>(args)...);
+    noexcept(::new((void*)0) T{__UTL declval<Args>()...})) {
+    return ::new (location) T{__UTL forward<Args>(args)...};
 }
 } // namespace std
 
@@ -53,9 +53,9 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 template <typename T, typename... Args>
 inline __UTL_HIDE_FROM_ABI constexpr T* construct_at(T* location, Args&&... args) noexcept(
-    noexcept(::new((void*)0) T(declval<Args>()...))) {
+    noexcept(::new((void*)0) T{declval<Args>()...})) {
     UTL_ASSERT_CXX14(location != nullptr);
-    [[msvc::constexpr]] return ::new ((void*)(location)) T(forward<Args>(args)...);
+    [[msvc::constexpr]] return ::new (location) T{__UTL forward<Args>(args)...};
 }
 UTL_NAMESPACE_END
 #      define UTL_CONSTEXPR_CONSTRUCTS_AT constexpr
@@ -68,9 +68,9 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 template <typename T, typename... Args>
 inline __UTL_HIDE_FROM_ABI T* construct_at(T* location, Args&&... args) noexcept(
-    noexcept(::new((void*)0) T(declval<Args>()...))) {
+    noexcept(::new((void*)0) T{__UTL declval<Args>()...})) {
     UTL_ASSERT(location != nullptr);
-    return ::new ((void*)(location)) T(forward<Args>(args)...);
+    return ::new (location) T{__UTL forward<Args>(args)...};
 }
 UTL_NAMESPACE_END
 #  define UTL_CONSTEXPR_CONSTRUCTS_AT

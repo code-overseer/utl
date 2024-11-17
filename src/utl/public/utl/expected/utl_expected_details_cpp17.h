@@ -48,21 +48,13 @@ UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace expected {
-
-template <typename T>
-__UTL_HIDE_FROM_ABI inline constexpr void invoke_destructor(T* ptr) {
-    if constexpr (!UTL_TRAIT_is_trivially_destructible(T)) {
-        ptr->~T();
-    }
-}
-
 template <typename T, typename... Args>
 __UTL_HIDE_FROM_ABI inline constexpr T* replace_object(T* ptr, Args&&... args) noexcept {
     if constexpr (UTL_TRAIT_conjunction(is_trivially_destructible<T>,
                       is_trivially_move_assignable<T>, is_trivially_constructible<T, Args...>)) {
         *ptr = T{__UTL forward<Args>(args)};
     } else {
-        invoke_destructor(ptr);
+        __UTL destroy_at(ptr);
         return ::new (ptr) T{__UTL forward<Args>(args)};
     }
 
@@ -359,13 +351,13 @@ protected:
         UTL_TRAIT_is_nothrow_constructible(T, Args...)) {
         UTL_ASSERT(!has_value());
         if constexpr (UTL_TRAIT_is_nothrow_constructible(T, Args...)) {
-            invoke_destructor(error_ptr());
+            __UTL destroy_at(error_ptr());
             auto ptr = ::new (value_ptr()) T{__UTL forward<Args>(args)...};
             has_value_ = true;
             return ptr;
         } else {
             E backup(__UTL move(error_ref()));
-            invoke_destructor(error_ptr());
+            __UTL destroy_at(error_ptr());
             UTL_TRY {
                 auto ptr = ::new (value_ptr()) T{__UTL forward<Args>(args)...};
                 has_value_ = true;
@@ -382,13 +374,13 @@ protected:
         UTL_TRAIT_is_nothrow_constructible(E, Args...)) {
         UTL_ASSERT(has_value());
         if constexpr (UTL_TRAIT_is_nothrow_constructible(E, Args...)) {
-            invoke_destructor(value_ptr());
+            __UTL destroy_at(value_ptr());
             auto ptr = ::new (error_ptr()) E{__UTL forward<Args>(args)...};
             has_value_ = false;
             return ptr;
         } else {
             T backup(__UTL move(value_ref()));
-            invoke_destructor(value_ptr());
+            __UTL destroy_at(value_ptr());
             UTL_TRY {
                 auto ptr = ::new (error_ptr()) E{__UTL forward<Args>(args)...};
                 has_value_ = false;
@@ -588,10 +580,10 @@ private:
         UTL_ASSERT(has_value() && !other.has_value());
         if constexpr (UTL_TRAIT_is_nothrow_move_constructible(E)) {
             E tmp(__UTL move(other.error_ref()));
-            details::expected::invoke_destructor(other.error_ptr());
+            __UTL destroy_at(other.error_ptr());
             UTL_TRY {
                 ::new (other.value_ptr()) T{__UTL move(this->value_ref())};
-                details::expected::invoke_destructor(this->value_ptr());
+                __UTL destroy_at(this->value_ptr());
                 ::new (this->error_ptr()) E{__UTL move(tmp)};
             } UTL_CATCH(...) {
                 ::new (other.error_ptr()) E{__UTL move(tmp)};
@@ -599,10 +591,10 @@ private:
             }
         } else {
             T tmp(__UTL move(this->value_ref()));
-            details::expected::invoke_destructor(this->value_ptr());
+            __UTL destroy_at(this->value_ptr());
             UTL_TRY {
                 ::new (this->error_ptr()) E{__UTL move(other.error_ref())};
-                details::expected::invoke_destructor(other.error_ptr());
+                __UTL destroy_at(other.error_ptr());
                 ::new (other.value_ptr()) T{__UTL move(tmp)};
             } UTL_CATCH(...) {
                 ::new (this->value_ptr()) T{__UTL move(tmp)};
@@ -658,7 +650,7 @@ private:
         UTL_TRAIT_is_nothrow_move_constructible(E)) {
         UTL_ASSERT(has_value() && !other.has_value());
         ::new (this->error_ptr()) E{__UTL move(other.error_ref())};
-        details::expected::invoke_destructor(other.error_ptr());
+        __UTL destroy_at(other.error_ptr());
         E tmp(__UTL move(other.error_ref()));
         this->has_value_ = false;
         other.has_value_ = true;
