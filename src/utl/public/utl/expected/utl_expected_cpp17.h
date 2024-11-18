@@ -24,6 +24,7 @@
 #include "utl/type_traits/utl_invoke.h"
 #include "utl/type_traits/utl_is_assignable.h"
 #include "utl/type_traits/utl_is_boolean.h"
+#include "utl/type_traits/utl_is_boolean_testable.h"
 #include "utl/type_traits/utl_is_complete.h"
 #include "utl/type_traits/utl_is_constructible.h"
 #include "utl/type_traits/utl_is_convertible.h"
@@ -70,7 +71,7 @@ class __UTL_PUBLIC_TEMPLATE expected : private details::expected::storage<expect
     static_assert(!UTL_TRAIT_is_same(remove_cvref_t<T>, in_place_t), "Invalid value type");
     static_assert(!__UTL_TRAIT_is_unexpected(remove_cvref_t<T>), "Invalid value type");
     static_assert(UTL_TRAIT_is_complete(unexpected<E>), "Invalid error type");
-    using base_type = details::expected::storage<T, E>;
+    using base_type = details::expected::storage<expected, T, E>;
 
     template <typename T1, typename E1, typename T1Qual, typename E1Qual>
     using can_convert = conjunction<is_constructible<T, T1Qual>, is_constructible<E, E1Qual>,
@@ -661,7 +662,7 @@ private:
         UTL_TRAIT_is_nothrow_invocable(F, T&)) {
         UTL_ASSERT(has_value());
         if constexpr (UTL_TRAIT_is_void(R)) {
-            __UTL invoke(__UTL forward<F>(f), __UTL move(this->value_ref()));
+            __UTL invoke(__UTL forward<F>(f), this->value_ref());
             return expected<void, E>{};
         } else {
             return expected<R, E>{
@@ -673,7 +674,7 @@ private:
         UTL_TRAIT_is_nothrow_invocable(F, T const&)) {
         UTL_ASSERT(has_value());
         if constexpr (UTL_TRAIT_is_void(R)) {
-            __UTL invoke(__UTL forward<F>(f), __UTL move(this->value_ref()));
+            __UTL invoke(__UTL forward<F>(f), this->value_ref());
             return expected<R, E>{};
         } else {
             return expected<R, E>{
@@ -709,14 +710,14 @@ private:
     __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected<R, E> transform_impl(F&& f) & noexcept(
         UTL_TRAIT_is_nothrow_invocable(F, T&)) {
         UTL_ASSERT(has_value());
-        __UTL invoke(__UTL forward<F>(f), __UTL move(this->value_ref()));
+        __UTL invoke(__UTL forward<F>(f), this->value_ref());
         return expected<void, E>{};
     }
     template <typename R, typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_void(R))>
     __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected<R, E> transform_impl(F&& f) const& noexcept(
         UTL_TRAIT_is_nothrow_invocable(F, T const&)) {
         UTL_ASSERT(has_value());
-        __UTL invoke(__UTL forward<F>(f), __UTL move(this->value_ref()));
+        __UTL invoke(__UTL forward<F>(f), this->value_ref());
         return expected<R, E>{};
     }
     template <typename R, typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_void(R))>
@@ -769,7 +770,7 @@ private:
 };
 
 template <typename E>
-class expected<void, E> : __UTL details::expected::void_storage<E> {
+class __UTL_PUBLIC_TEMPLATE expected<void, E> : __UTL details::expected::void_storage<E> {
     static_assert(UTL_TRAIT_is_complete(unexpected<E>), "Invalid error type");
     using base_type = details::expected::void_storage<E>;
 

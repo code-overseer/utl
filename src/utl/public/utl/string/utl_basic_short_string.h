@@ -83,8 +83,6 @@ public:
     class iterator;
 
 private:
-    using char_pointer = CharType*;
-    using value_type const* = CharType const*;
     using alloc_traits = allocator_traits<allocator_type>;
     static constexpr size_type inline_size = ShortSize + 1;
 
@@ -144,7 +142,7 @@ public:
             iterator&& other) noexcept = default;
 
     private:
-        __UTL_HIDE_FROM_ABI inline constexpr iterator(char_pointer data) noexcept
+        __UTL_HIDE_FROM_ABI inline constexpr iterator(value_type* data) noexcept
             : base_type(data) {}
         template <typename It>
         __UTL_HIDE_FROM_ABI inline constexpr iterator(It other) noexcept
@@ -317,7 +315,7 @@ public:
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX20 ~basic_short_string() noexcept { destroy(); }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 char_pointer data() noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 value_type* data() noexcept UTL_LIFETIMEBOUND {
         return !is_heap_ ? get_short().data_ : __UTL to_address(get_heap().data_);
     }
 
@@ -376,9 +374,9 @@ public:
         size_ = new_size;
     }
 
-    template <typename Op UTL_CONSTRAINT_CXX11(
-        is_integral<decltype(__UTL declval<Op>()(char_pointer{}, size_type{}))>::value)>
-    UTL_CONSTRAINT_CXX20(requires(Op op, char_pointer p, size_type s) {
+    template <typename Op UTL_CONSTRAINT_CXX11(is_integral<decltype(__UTL declval<Op>()(
+            static_cast<value_type*>(0), size_type{}))>::value)>
+    UTL_CONSTRAINT_CXX20(requires(Op op, value_type* p, size_type s) {
         { op(p, s) } -> integral;
     })
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_WITH_TRY void resize_and_overwrite(

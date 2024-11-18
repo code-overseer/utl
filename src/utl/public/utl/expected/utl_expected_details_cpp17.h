@@ -270,7 +270,7 @@ protected:
 
     template <typename U>
     __UTL_HIDE_FROM_ABI inline constexpr storage_base(converting_t, bool has_value,
-        U&& data) noexcept(noexcept(make_union(has_value, __UTL forward<U>(data))))
+        U&& data) noexcept(noexcept(make_union<data_type>(has_value, __UTL forward<U>(data))))
         : data_{make_union<data_type>(has_value, __UTL forward<U>(data))}
         , has_value_{has_value} {}
 
@@ -481,8 +481,10 @@ private:
         UTL_TRAIT_is_nothrow_copy_assignable(E)) {
         if (this->has_value() != other.has_value()) {
             if (other.has_value()) {
+                __UTL destroy_at(this->error_ptr());
                 ::new (this->value_ptr()) T{other.value_ref()};
             } else {
+                __UTL destroy_at(this->value_ptr());
                 ::new (this->error_ptr()) E{other.error_ref()};
             }
         } else if (other.has_value()) {
@@ -522,18 +524,20 @@ protected:
 private:
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr void assign(move_assign_t&& other) noexcept(
         UTL_TRAIT_is_nothrow_move_assignable(T) && UTL_TRAIT_is_nothrow_move_assignable(E)) {
-        if (has_value_ != other.has_value_) {
-            if (other.has_value_) {
+        if (this->has_value() != other.has_value()) {
+            if (other.has_value()) {
+                __UTL destroy_at(this->error_ptr());
                 ::new (this->value_ptr()) T{__UTL move(other.value_ref())};
             } else {
+                __UTL destroy_at(this->value_ptr());
                 ::new (this->error_ptr()) E{__UTL move(other.error_ref())};
             }
-        } else if (other.has_value_) {
+        } else if (other.has_value()) {
             this->value_ref() = __UTL move(other.value_ref());
         } else {
             this->error_ref() = __UTL move(other.error_ref());
         }
-        has_value_ = other.has_value_;
+        has_value_ = other.has_value();
     }
 };
 
