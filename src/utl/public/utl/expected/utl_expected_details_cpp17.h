@@ -48,18 +48,6 @@ UTL_NAMESPACE_BEGIN
 
 namespace details {
 namespace expected {
-template <typename T, typename... Args>
-__UTL_HIDE_FROM_ABI inline constexpr T* replace_object(T* ptr, Args&&... args) noexcept {
-    if constexpr (UTL_TRAIT_conjunction(is_trivially_destructible<T>,
-                      is_trivially_move_assignable<T>, is_trivially_constructible<T, Args...>)) {
-        *ptr = T{__UTL forward<Args>(args)};
-    } else {
-        __UTL destroy_at(ptr);
-        return ::new (ptr) T{__UTL forward<Args>(args)};
-    }
-
-    return ptr;
-}
 
 template <typename T, typename U>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr T make_union(
@@ -328,22 +316,9 @@ protected:
 
     template <typename... Args>
     __UTL_HIDE_FROM_ABI inline constexpr T& emplace_value(Args&&... args) noexcept {
-        if (has_value()) {
-            return *__UTL details::expected::replace_object(
-                value_ptr(), __UTL forward<Args>(args)...);
-        } else {
-            return *reinitialize_as_value(__UTL forward<Args>(args)...);
-        }
-    }
-
-    template <typename... Args>
-    __UTL_HIDE_FROM_ABI inline constexpr E& emplace_error(Args&&... args) noexcept {
-        if (!has_value()) {
-            return *__UTL details::expected::replace_object(
-                error_ptr(), __UTL forward<Args>(args)...);
-        } else {
-            return *reinitialize_as_error(__UTL forward<Args>(args)...);
-        }
+        static_assert(UTL_TRAIT_is_nothrow_constructible(T, Args...), "Invalid implementation");
+        __UTL destroy_at(value_ptr());
+        return *__UTL construct_at(value_ptr(), __UTL forward<Args>(args)...);
     }
 
     template <typename... Args>
@@ -663,7 +638,7 @@ private:
 
 template <typename D, typename T, typename E>
 class storage : protected swap_base<D, T, E> {
-    static_assert(!UTL_TRAIT_is_same(T, empty_t), "Invalid value type");
+    static_assert(!UTL_TRAIT_is_same(remove_cvref_t<T>, empty_t), "Invalid value type");
     static_assert(!UTL_TRAIT_is_void(T), "Invalid value type");
 
 public:
@@ -679,9 +654,9 @@ template <typename D, typename E>
 class void_storage : protected swap_base<D, empty_t, E> {
 public:
     using swap_base<D, empty_t, E>::swap_base;
-    using swap_base<D, empty_t, E>::swap;
 
 protected:
+    using swap_base<D, empty_t, E>::swap;
     using swap_base<D, empty_t, E>::operator=;
     inline ~void_storage() noexcept = default;
 };

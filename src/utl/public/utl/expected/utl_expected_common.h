@@ -53,7 +53,9 @@ struct converting_t {
 };
 UTL_INLINE_CXX17 constexpr converting_t converting{};
 struct empty_t {
-    __UTL_HIDE_FROM_ABI explicit inline constexpr empty_t() noexcept = default;
+    __UTL_HIDE_FROM_ABI inline constexpr empty_t() noexcept = default;
+    template <typename... Ts>
+    __UTL_HIDE_FROM_ABI inline constexpr empty_t(Ts&&...) noexcept {}
 };
 UTL_INLINE_CXX17 constexpr empty_t empty{};
 } // namespace expected

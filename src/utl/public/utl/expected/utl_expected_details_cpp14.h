@@ -60,23 +60,6 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) static inline constexpr T make_uni
                      : T{__UTL unexpect, __UTL forward_like<U>(arg.error)};
 }
 
-template <typename T, typename... Args UTL_CONSTRAINT_CXX11(
-    UTL_TRAIT_conjunction(is_trivially_destructible<T>, is_trivially_move_assignable<T>,
-        is_trivially_constructible<T, Args...>))>
-__UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 T* replace_object(T* ptr, Args&&... args) noexcept {
-    *ptr = T{__UTL forward<Args>(args)};
-    return ptr;
-}
-
-template <typename T, typename... Args UTL_CONSTRAINT_CXX11(
-    !UTL_TRAIT_conjunction(is_trivially_destructible<T>, is_trivially_move_assignable<T>,
-        is_trivially_constructible<T, Args...>))>
-__UTL_HIDE_FROM_ABI inline T* replace_object(T* ptr, Args&&... args) noexcept(
-    UTL_TRAIT_is_nothrow_constructible(T, Args...)) {
-    __UTL destroy_at(ptr);
-    return ::new (ptr) T{__UTL forward<Args>(args)};
-}
-
 template <typename T, typename E, bool = UTL_TRAIT_is_default_constructible(T),
     bool = UTL_TRAIT_is_trivially_destructible(T) && UTL_TRAIT_is_trivially_destructible(E)>
 union data_union {
@@ -360,22 +343,9 @@ protected:
 
     template <typename... Args>
     __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 T& emplace_value(Args&&... args) noexcept {
-        if (has_value()) {
-            return *__UTL details::expected::replace_object(
-                value_ptr(), __UTL forward<Args>(args)...);
-        } else {
-            return *reinitialize_as_value(__UTL forward<Args>(args)...);
-        }
-    }
-
-    template <typename... Args>
-    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 E& emplace_error(Args&&... args) noexcept {
-        if (!has_value()) {
-            return *__UTL details::expected::replace_object(
-                error_ptr(), __UTL forward<Args>(args)...);
-        } else {
-            return *reinitialize_as_error(__UTL forward<Args>(args)...);
-        }
+        static_assert(UTL_TRAIT_is_nothrow_constructible(T, Args...), "Invalid implementation");
+        __UTL destroy_at(value_ptr());
+        return *__UTL construct_at(value_ptr(), __UTL forward<Args>(args)...);
     }
 
     template <typename... Args UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_nothrow_constructible(T, Args...))>
@@ -696,7 +666,7 @@ protected:
 
 template <typename D, typename T, typename E>
 class storage : protected swap_base<D, T, E> {
-    static_assert(!UTL_TRAIT_is_same(T, empty_t), "Invalid value type");
+    static_assert(!UTL_TRAIT_is_same(remove_cvref_t<T>, empty_t), "Invalid value type");
     static_assert(!UTL_TRAIT_is_void(T), "Invalid value type");
 
 public:
