@@ -663,7 +663,7 @@ private:
         UTL_ASSERT(has_value());
         if constexpr (UTL_TRAIT_is_void(R)) {
             __UTL invoke(__UTL forward<F>(f), this->value_ref());
-            return expected<void, E>{};
+            return expected<R, E>{};
         } else {
             return expected<R, E>{
                 __UTL details::expected::transforming, __UTL forward<F>(f), this->value_ref()};
@@ -699,7 +699,7 @@ private:
         UTL_ASSERT(has_value());
         if constexpr (UTL_TRAIT_is_void(R)) {
             __UTL invoke(__UTL forward<F>(f), __UTL move(this->value_ref()));
-            return expected<void, E>{};
+            return expected<R, E>{};
         } else {
             return expected<R, E>{__UTL details::expected::transforming, __UTL forward<F>(f),
                 __UTL move(this->value_ref())};
@@ -711,7 +711,7 @@ private:
         UTL_TRAIT_is_nothrow_invocable(F, T&)) {
         UTL_ASSERT(has_value());
         __UTL invoke(__UTL forward<F>(f), this->value_ref());
-        return expected<void, E>{};
+        return expected<R, E>{};
     }
     template <typename R, typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_void(R))>
     __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected<R, E> transform_impl(F&& f) const& noexcept(
@@ -732,7 +732,7 @@ private:
         UTL_TRAIT_is_nothrow_invocable(F, T const&&)) {
         UTL_ASSERT(has_value());
         __UTL invoke(__UTL forward<F>(f), __UTL move(this->value_ref()));
-        return expected<void, E>{};
+        return expected<R, E>{};
     }
 
     template <typename R, typename F UTL_CONSTRAINT_CXX11(!UTL_TRAIT_is_void(R))>
@@ -1210,7 +1210,7 @@ private:
         UTL_ASSERT(has_value());
         if constexpr (UTL_TRAIT_is_void(R)) {
             __UTL invoke(__UTL forward<F>(f));
-            return expected<void, E>{};
+            return expected<R, E>{};
         } else {
             return expected<R, E>{__UTL details::expected::transforming, __UTL forward<F>(f)};
         }
@@ -1220,7 +1220,7 @@ private:
         UTL_ASSERT(has_value());
         if constexpr (UTL_TRAIT_is_void(R)) {
             __UTL invoke(__UTL forward<F>(f));
-            return expected<void, E>{};
+            return expected<R, E>{};
         } else {
             return expected<R, E>{__UTL details::expected::transforming, __UTL forward<F>(f)};
         }
@@ -1231,7 +1231,7 @@ private:
         UTL_ASSERT(has_value());
         if constexpr (UTL_TRAIT_is_void(R)) {
             __UTL invoke(__UTL forward<F>(f));
-            return expected<void, E>{};
+            return expected<R, E>{};
         } else {
             return expected<R, E>{__UTL details::expected::transforming, __UTL forward<F>(f)};
         }
@@ -1241,7 +1241,7 @@ private:
         UTL_ASSERT(has_value());
         if constexpr (UTL_TRAIT_is_void(R)) {
             __UTL invoke(__UTL forward<F>(f));
-            return expected<void, E>{};
+            return expected<R, E>{};
         } else {
             return expected<R, E>{__UTL details::expected::transforming, __UTL forward<F>(f)};
         }
@@ -1252,28 +1252,28 @@ private:
         UTL_THROWS {
         UTL_ASSERT(has_value());
         __UTL invoke(__UTL forward<F>(f));
-        return expected<void, E>{};
+        return expected<R, E>{};
     }
     template <typename R, typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_void(R))>
     __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected<R, E> transform_impl(F&& f) const&
         UTL_THROWS {
         UTL_ASSERT(has_value());
         __UTL invoke(__UTL forward<F>(f));
-        return expected<void, E>{};
+        return expected<R, E>{};
     }
     template <typename R, typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_void(R))>
     __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected<R, E> transform_impl(F&& f) &&
         UTL_THROWS {
         UTL_ASSERT(has_value());
         __UTL invoke(__UTL forward<F>(f));
-        return expected<void, E>{};
+        return expected<R, E>{};
     }
     template <typename R, typename F UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_void(R))>
     __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 expected<R, E> transform_impl(F&& f) const&&
         UTL_THROWS {
         UTL_ASSERT(has_value());
         __UTL invoke(__UTL forward<F>(f));
-        return expected<void, E>{};
+        return expected<R, E>{};
     }
 
     template <typename R, typename F UTL_CONSTRAINT_CXX11(!UTL_TRAIT_is_void(R))>
@@ -1378,7 +1378,7 @@ public:
 
 UTL_NAMESPACE_END
 
-#undef __UTL_TRAIT_assingment_initializable
-#undef __UTL_DELETE_OR_UNDEFINED
 #undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_EXPECTED_INLINE_PURE
 #undef __UTL_ATTRIBUTE_EXPECTED_INLINE_PURE
+#undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_EXPECTED_INLINE_CONST
+#undef __UTL_ATTRIBUTE_EXPECTED_INLINE_CONST
