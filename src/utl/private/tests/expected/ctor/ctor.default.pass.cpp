@@ -49,9 +49,17 @@ struct TailClobberer {
     constexpr TailClobberer(int) : TailClobberer() {}
     constexpr TailClobberer(std::initializer_list<int>) noexcept : TailClobberer() {}
 
-    friend constexpr bool operator==(TailClobberer const&, TailClobberer const&) = default;
+    friend constexpr bool operator==(
+        TailClobberer const& left, TailClobberer const& right) noexcept {
+        return left.b == right.b;
+    }
 
-    friend constexpr void swap(TailClobberer&, TailClobberer&) {}
+    friend constexpr bool operator!=(
+        TailClobberer const& left, TailClobberer const& right) noexcept {
+        return left.b != right.b;
+    }
+
+    friend constexpr void swap(TailClobberer& l, TailClobberer& r) { __UTL ranges::swap(l, r); }
 
 private:
     alignas(2) bool b;
@@ -74,7 +82,6 @@ struct MyInt {
 
 template <class T, class E>
 UTL_CONSTEXPR_CXX14 void testDefaultCtor() {
-    [[maybe_unused]] utl::details::expected::data_union<T, E> u{__UTL in_place};
     utl::expected<T, E> e;
     assert(e.has_value());
     assert(e.value() == T());

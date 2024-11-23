@@ -17,6 +17,7 @@
 #include "utl/type_traits/utl_is_nothrow_move_constructible.h"
 #include "utl/type_traits/utl_is_reference.h"
 #include "utl/type_traits/utl_is_swappable.h"
+#include "utl/type_traits/utl_remove_cvref.h"
 #include "utl/utility/utl_forward.h"
 #include "utl/utility/utl_in_place.h"
 #include "utl/utility/utl_move.h"
@@ -155,9 +156,9 @@ public:
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend inline constexpr bool operator==(unexpected const& left,
         unexpected<E1> const& right) noexcept(UTL_TRAIT_is_nothrow_equality_comparable_with(E,
         E1)) {
-        static_assert(is_equality_comparable_with_v<E, E1>, "Program ill-formed");
-        static_assert(
-            boolean_testable<decltype(left.error() == right.error())>, "Program ill-formed");
+        static_assert(UTL_TRAIT_is_equality_comparable_with(E, E1), "Program ill-formed");
+        static_assert(UTL_TRAIT_is_boolean_testable(decltype(left.error() == right.error())),
+            "Program ill-formed");
         return left.error() == right.error();
     }
 
