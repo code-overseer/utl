@@ -542,29 +542,23 @@ private:
         UTL_ASSERT(this->has_value() && !other.has_value());
         if constexpr (UTL_TRAIT_is_nothrow_move_constructible(E)) {
             E tmp(__UTL move(other.error_ref()));
-            __UTL destroy_at(other.error_ptr());
             UTL_TRY {
-                ::new (other.value_ptr()) T{__UTL move(this->value_ref())};
-                __UTL destroy_at(this->value_ptr());
-                ::new (this->error_ptr()) E{__UTL move(tmp)};
+                other.reinitialize_as_value(__UTL move(this->value_ref()));
+                this->reinitialize_as_error(__UTL move(tmp));
             } UTL_CATCH(...) {
-                ::new (other.error_ptr()) E{__UTL move(tmp)};
+                other.reinitialize_as_error(__UTL move(tmp));
                 UTL_RETHROW();
             }
         } else {
             T tmp(__UTL move(this->value_ref()));
-            __UTL destroy_at(this->value_ptr());
             UTL_TRY {
-                ::new (this->error_ptr()) E{__UTL move(other.error_ref())};
-                __UTL destroy_at(other.error_ptr());
-                ::new (other.value_ptr()) T{__UTL move(tmp)};
+                this->reinitialize_as_error(__UTL move(other.error_ref()));
+                other.reinitialize_as_value(__UTL move(tmp));
             } UTL_CATCH(...) {
-                ::new (this->value_ptr()) T{__UTL move(tmp)};
+                this->reinitialize_as_value(__UTL move(tmp));
                 UTL_RETHROW();
             }
         }
-        this->has_value_ = false;
-        other.has_value_ = true;
     }
 };
 

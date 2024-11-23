@@ -66,10 +66,11 @@ private:
 };
 
 // Test constraints
-static_assert(utl::is_default_constructible_v<utl::expected<int, int>>);
-static_assert(!utl::is_default_constructible_v<utl::expected<NoDefaultCtor, int>>);
+static_assert(utl::is_default_constructible_v<utl::expected<int, int>>, "");
+static_assert(!utl::is_default_constructible_v<utl::expected<NoDefaultCtor, int>>, "");
 static_assert(utl::is_constructible_v<utl::details::expected::data_union<int, NoDefaultCtor>,
-    utl::in_place_t>);
+                  utl::in_place_t>,
+    "");
 struct MyInt {
     int i;
     friend constexpr bool operator==(MyInt const& left, MyInt const& right) noexcept {
@@ -117,7 +118,7 @@ void testException() {
 int main(int, char**) {
     test();
 #if UTL_CXX14
-    static_assert(test());
+    static_assert(test(), "");
 #endif
     testException();
     return 0;

@@ -7,7 +7,7 @@
 #if !defined(UTL_EXPECTED_PRIVATE_HEADER_GUARD)
 #  error "Private header accessed"
 #endif
-#if !UTL_CXX17
+#if !UTL_CXX20
 #  error "Invalid header accessed"
 #endif
 

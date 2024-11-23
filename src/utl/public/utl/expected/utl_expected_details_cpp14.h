@@ -12,6 +12,7 @@
 #include "utl/expected/utl_expected_common.h"
 #include "utl/expected/utl_unexpected.h"
 #include "utl/memory/utl_addressof.h"
+#include "utl/memory/utl_construct_at.h"
 #include "utl/memory/utl_destroy_at.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_declval.h"
@@ -273,17 +274,15 @@ protected:
               __UTL forward<Args>(args)...}
         , has_value_{false} {}
 
-    template <typename U UTL_CONSTRAINT_CXX11(
-        UTL_TRAIT_is_trivially_move_constructible(data_type) ||
-        UTL_TRAIT_is_trivially_copy_constructible(data_type))>
+    template <typename U UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_trivially_constructible(data_type, U))>
     __UTL_HIDE_FROM_ABI inline constexpr storage_base(converting_t, bool has_value,
         U&& data) noexcept(noexcept(make_union<data_type>(has_value, __UTL declval<U>())))
         : data_{make_union<data_type>(has_value, __UTL forward<U>(data))}
         , has_value_(has_value) {}
 
-    template <typename U UTL_CONSTRAINT_CXX11(
-        !UTL_TRAIT_is_trivially_move_constructible(data_type) &&
-        !UTL_TRAIT_is_trivially_copy_constructible(data_type))>
+    template <typename U UTL_CONSTRAINT_CXX11(!UTL_TRAIT_is_trivially_constructible(data_type, U) &&
+        UTL_TRAIT_is_constructible(T, decltype(__UTL declval<U>().value)) &&
+        UTL_TRAIT_is_constructible(E, decltype(__UTL declval<U>().error)))>
     __UTL_HIDE_FROM_ABI inline storage_base(converting_t, bool has_value, U&& data) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, decltype(__UTL declval<U>().value)) &&
         UTL_TRAIT_is_nothrow_constructible(E, decltype(__UTL declval<U>().error)))
@@ -291,16 +290,16 @@ protected:
         if (has_value) {
             ::new (value_ptr()) T{__UTL forward_like<U>(data.value)};
         } else {
-            ::new (value_ptr()) T{__UTL forward_like<U>(data.error)};
+            ::new (error_ptr()) T{__UTL forward_like<U>(data.error)};
         }
         has_value_ = has_value;
     }
 
     __UTL_HIDE_FROM_ABI inline ~storage_base() = default;
 
-    UTL_ATTRIBUTE(GETTER) inline constexpr data_union const& data_ref() const& noexcept { return data_; }
+    UTL_ATTRIBUTE(GETTER) inline constexpr data_type const& data_ref() const& noexcept { return data_; }
 
-    UTL_ATTRIBUTE(GETTER) inline UTL_CONSTEXPR_CXX14 data_union& data_ref() & noexcept { return data_; }
+    UTL_ATTRIBUTE(GETTER) inline UTL_CONSTEXPR_CXX14 data_type& data_ref() & noexcept { return data_; }
     UTL_ATTRIBUTE(GETTER) inline constexpr T const* value_ptr() const noexcept {
         return __UTL addressof(data_.value);
     }
@@ -405,11 +404,13 @@ protected:
 
 template <typename T, typename E>
 class copy_ctor_t<T, E, true, false> : protected storage_base<T, E> {
+    using base_type = storage_base<T, E>;
+
 public:
     using storage_base<T, E>::storage_base;
     __UTL_HIDE_FROM_ABI inline constexpr copy_ctor_t(copy_ctor_t const& other) noexcept(
         UTL_TRAIT_is_nothrow_copy_constructible(T) && UTL_TRAIT_is_nothrow_copy_constructible(E))
-        : storage_base{converting, other.has_value(), other.data_ref()} {}
+        : base_type{converting, other.has_value(), other.data_ref()} {}
 
 protected:
     using storage_base<T, E>::operator=;
@@ -429,12 +430,14 @@ protected:
 
 template <typename T, typename E>
 class move_ctor_t<T, E, true, false> : protected copy_ctor_t<T, E> {
+    using base_type = copy_ctor_t<T, E>;
+
 public:
     using copy_ctor_t<T, E>::copy_ctor_t;
 
     __UTL_HIDE_FROM_ABI inline constexpr move_ctor_t(move_ctor_t&& other) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_move_constructible(E))
-        : copy_ctor_t{converting, other.has_value(), __UTL move(other.data_ref())} {}
+        : base_type{converting, other.has_value(), __UTL move(other.data_ref())} {}
 
 protected:
     using copy_ctor_t<T, E>::operator=;
@@ -474,18 +477,15 @@ private:
         UTL_TRAIT_is_nothrow_copy_assignable(E)) {
         if (this->has_value() != other.has_value()) {
             if (other.has_value()) {
-                __UTL destroy_at(this->error_ptr());
-                ::new (this->value_ptr()) T{other.value_ref()};
+                this->reinitialize_as_value(other.value_ref());
             } else {
-                __UTL destroy_at(this->value_ptr());
-                ::new (this->error_ptr()) E{other.error_ref()};
+                this->reinitialize_as_error(other.error_ref());
             }
         } else if (other.has_value()) {
             this->value_ref() = other.value_ref();
         } else {
             this->error_ref() = other.error_ref();
         }
-        has_value_ = other.has_value();
     }
 };
 
@@ -518,18 +518,15 @@ private:
         UTL_TRAIT_is_nothrow_move_assignable(T) && UTL_TRAIT_is_nothrow_move_assignable(E)) {
         if (this->has_value() != other.has_value()) {
             if (other.has_value()) {
-                __UTL destroy_at(this->error_ptr());
-                ::new (this->value_ptr()) T{__UTL move(other.value_ref())};
+                this->reinitialize_as_value(__UTL move(other.value_ref()));
             } else {
-                __UTL destroy_at(this->value_ptr());
-                ::new (this->error_ptr()) E{__UTL move(other.error_ref())};
+                this->reinitialize_as_error(__UTL move(other.error_ref()));
             }
         } else if (other.has_value()) {
             this->value_ref() = __UTL move(other.value_ref());
         } else {
             this->error_ref() = __UTL move(other.error_ref());
         }
-        has_value_ = other.has_value();
     }
 };
 
@@ -539,7 +536,7 @@ template <typename D, typename T, typename E,
         disjunction<is_nothrow_move_constructible<T>, is_nothrow_move_constructible<E>>),
     bool = UTL_TRAIT_is_nothrow_move_constructible(E)>
 class swap_base : protected move_assign_t<T, E> {
-    static_assert(__UTL_TRAIT_is_expected(D));
+    static_assert(__UTL_TRAIT_is_expected(D), "Invalid derived type");
 
 public:
     using move_assign_t<T, E>::move_assign_t;
@@ -572,27 +569,23 @@ protected:
     __UTL_HIDE_FROM_ABI inline ~swap_base() noexcept = default;
 
 private:
-    __UTL_HIDE_FROM_ABI inline void cross_swap(storage_base& other) noexcept(
+    __UTL_HIDE_FROM_ABI inline void cross_swap(swap_base& other) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(T)) {
-        UTL_ASSERT(has_value() && !other.has_value());
+        UTL_ASSERT(this->has_value() && !other.has_value());
         E tmp(__UTL move(other.error_ref()));
-        __UTL destroy_at(other.error_ptr());
         UTL_TRY {
-            ::new (other.value_ptr()) T{__UTL move(this->value_ref())};
-            __UTL destroy_at(this->value_ptr());
-            ::new (this->error_ptr()) E{__UTL move(tmp)};
+            other.reinitialize_as_value(__UTL move(this->value_ref()));
+            this->reinitialize_as_error(__UTL move(tmp));
         } UTL_CATCH(...) {
-            ::new (other.error_ptr()) E{__UTL move(tmp)};
+            other.reinitialize_as_error(__UTL move(tmp));
             UTL_RETHROW();
         }
-        this->has_value_ = false;
-        other.has_value_ = true;
     }
 };
 
 template <typename D, typename T, typename E>
 class swap_base<D, T, E, true, false> : protected move_assign_t<T, E> {
-    static_assert(__UTL_TRAIT_is_expected(D));
+    static_assert(__UTL_TRAIT_is_expected(D), "Invalid derived type");
 
 public:
     using move_assign_t<T, E>::move_assign_t;
@@ -618,26 +611,22 @@ protected:
     __UTL_HIDE_FROM_ABI inline ~swap_base() noexcept = default;
 
 private:
-    __UTL_HIDE_FROM_ABI inline void cross_swap(storage_base& other) {
-        UTL_ASSERT(has_value() && !other.has_value());
+    __UTL_HIDE_FROM_ABI inline void cross_swap(swap_base& other) {
+        UTL_ASSERT(this->has_value() && !other.has_value());
         T tmp(__UTL move(this->value_ref()));
-        __UTL destroy_at(this->value_ptr());
         UTL_TRY {
-            ::new (this->error_ptr()) E{__UTL move(other.error_ref())};
-            __UTL destroy_at(other.error_ptr());
-            ::new (other.value_ptr()) T{__UTL move(tmp)};
+            this->reinitialize_as_error(__UTL move(other.error_ref()));
+            other.reinitialize_as_value(__UTL move(tmp));
         } UTL_CATCH(...) {
-            ::new (this->value_ptr()) T{__UTL move(tmp)};
+            this->reinitialize_as_value(__UTL move(tmp));
             UTL_RETHROW();
         }
-        this->has_value_ = false;
-        other.has_value_ = true;
     }
 };
 
 template <typename D, typename T, typename E, bool O>
 class swap_base<D, T, E, false, O> : protected move_assign_t<T, E> {
-    static_assert(__UTL_TRAIT_is_expected(D));
+    static_assert(__UTL_TRAIT_is_expected(D), "Invalid derived type");
 
 public:
     using move_assign_t<T, E>::move_assign_t;
@@ -655,10 +644,10 @@ class storage : protected swap_base<D, T, E> {
 
 public:
     using swap_base<D, T, E>::swap_base;
+    using swap_base<D, T, E>::operator=;
 
 protected:
     using swap_base<D, T, E>::swap;
-    using swap_base<D, empty_t, E>::operator=;
     inline ~storage() noexcept = default;
 };
 
@@ -666,10 +655,10 @@ template <typename D, typename E>
 class void_storage : protected swap_base<D, empty_t, E> {
 public:
     using swap_base<D, empty_t, E>::swap_base;
-    using swap_base<D, empty_t, E>::swap;
+    using swap_base<D, empty_t, E>::operator=;
 
 protected:
-    using swap_base<D, empty_t, E>::operator=;
+    using swap_base<D, empty_t, E>::swap;
     inline ~void_storage() noexcept = default;
 };
 

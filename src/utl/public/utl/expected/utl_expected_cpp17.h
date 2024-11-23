@@ -7,9 +7,6 @@
 #if !defined(UTL_EXPECTED_PRIVATE_HEADER_GUARD)
 #  error "Private header accessed"
 #endif
-#if !UTL_CXX17
-#  error "Invalid header accessed"
-#endif
 
 #include "utl/initializer_list/utl_initializer_list_fwd.h"
 
