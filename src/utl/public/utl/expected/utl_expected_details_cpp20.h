@@ -17,18 +17,23 @@
 #include "utl/functional/utl_invoke.h"
 #include "utl/memory/utl_addressof.h"
 #include "utl/memory/utl_construct_at.h"
+#include "utl/memory/utl_destroy_at.h"
 #include "utl/scope/utl_scope_fail.h"
 #include "utl/type_traits/utl_constants.h"
 #include "utl/type_traits/utl_declval.h"
 #include "utl/type_traits/utl_enable_if.h"
 #include "utl/type_traits/utl_invoke.h"
+#include "utl/type_traits/utl_is_copy_assignable.h"
 #include "utl/type_traits/utl_is_copy_constructible.h"
 #include "utl/type_traits/utl_is_destructible.h"
+#include "utl/type_traits/utl_is_explicit_constructible.h"
+#include "utl/type_traits/utl_is_move_assignable.h"
 #include "utl/type_traits/utl_is_move_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_assignable.h"
 #include "utl/type_traits/utl_is_nothrow_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_copy_assignable.h"
 #include "utl/type_traits/utl_is_nothrow_copy_constructible.h"
+#include "utl/type_traits/utl_is_nothrow_default_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_move_assignable.h"
 #include "utl/type_traits/utl_is_nothrow_move_constructible.h"
 #include "utl/type_traits/utl_is_trivially_constructible.h"
@@ -73,7 +78,7 @@ UTL_ATTRIBUTE(GETTER) inline constexpr T make_from_union(bool has_value, U&& arg
 template <bool NoUniqueAdress, typename T>
 struct conditionally_overlapable {
     __UTL_HIDE_FROM_ABI inline constexpr conditionally_overlapable() = delete;
-    __UTL_HIDE_FROM_ABI explicit(is_explicitly_constructible_v<
+    __UTL_HIDE_FROM_ABI explicit(is_explicit_constructible_v<
         T>) inline constexpr conditionally_overlapable() noexcept(is_nothrow_default_constructible_v<T>)
     requires (is_default_constructible_v<T>)
     = default;
@@ -94,7 +99,7 @@ struct conditionally_overlapable {
 template <typename T>
 struct conditionally_overlapable<false, T> {
     __UTL_HIDE_FROM_ABI inline constexpr conditionally_overlapable() = delete;
-    __UTL_HIDE_FROM_ABI explicit(is_explicitly_constructible_v<
+    __UTL_HIDE_FROM_ABI explicit(is_explicit_constructible_v<
         T>) inline constexpr conditionally_overlapable() noexcept(is_nothrow_default_constructible_v<T>)
     requires (is_default_constructible_v<T>)
     = default;
@@ -113,18 +118,7 @@ struct conditionally_overlapable<false, T> {
 };
 
 template <typename T, typename E>
-struct data_union {
-    // Compiler selects the more specialized overload [delete is considered an overload]
-    __UTL_HIDE_FROM_ABI explicit data_union() = delete;
-    __UTL_HIDE_FROM_ABI explicit(is_explicitly_constructible_v<
-        T>) inline constexpr data_union() noexcept(is_nothrow_default_constructible_v<T>)
-    requires (is_default_constructible_v<T> && !is_trivially_default_constructible_v<T>)
-        : data_union(__UTL in_place) {}
-    __UTL_HIDE_FROM_ABI explicit(is_explicitly_constructible_v<
-        T>) inline constexpr data_union() noexcept(is_nothrow_default_constructible_v<T>)
-    requires (is_default_constructible_v<T> && is_trivially_default_constructible_v<T>)
-    = default;
-
+union data_union {
     __UTL_HIDE_FROM_ABI inline constexpr data_union(data_union const&) = delete;
     __UTL_HIDE_FROM_ABI inline constexpr data_union(data_union const&) noexcept(
         is_nothrow_copy_constructible_v<T> && is_nothrow_copy_constructible_v<E>)
@@ -200,16 +194,6 @@ class storage_base {
     static constexpr bool allow_external_overlap = !place_flag_in_tail;
 
     struct container {
-        __UTL_HIDE_FROM_ABI explicit container() = delete;
-        __UTL_HIDE_FROM_ABI explicit(is_explicitly_constructible_v<
-            T>) inline constexpr container() noexcept(is_nothrow_default_constructible_v<T>)
-        requires (is_default_constructible_v<T> && !is_trivially_default_constructible_v<T>)
-            : container(__UTL in_place) {}
-        __UTL_HIDE_FROM_ABI explicit(is_explicitly_constructible_v<
-            T>) inline constexpr container() noexcept(is_nothrow_default_constructible_v<T>)
-        requires (is_default_constructible_v<T> && is_trivially_default_constructible_v<T>)
-            : has_value_{true} {}
-
         template <typename... Args>
         __UTL_HIDE_FROM_ABI inline constexpr explicit container(in_place_t, Args&&... args)
             : union_{__UTL in_place, __UTL in_place, __UTL forward<Args>(args)...}
@@ -308,15 +292,8 @@ class storage_base {
             has_value_ = false;
         }
 
-        __UTL_HIDE_FROM_ABI inline constexpr ~container() noexcept
-        requires (!is_trivially_destructible_v<T> || !is_trivially_destructible_v<E>)
-        {
-            destroy_member();
-        }
-
-        __UTL_HIDE_FROM_ABI inline constexpr ~container() noexcept
-        requires (is_trivially_destructible_v<T> && is_trivially_destructible_v<E>)
-        = default;
+        UTL_ATTRIBUTES(NO_UNIQUE_ADDRESS) conditionally_overlapable<place_flag_in_tail, data_type> union_;
+        UTL_ATTRIBUTES(NO_UNIQUE_ADDRESS) bool has_value_;
 
     private:
         __UTL_HIDE_FROM_ABI inline constexpr void destroy_member() noexcept {
@@ -326,9 +303,6 @@ class storage_base {
                 __UTL destroy_at(__UTL addressof(union_.data.error));
             }
         }
-
-        UTL_ATTRIBUTES(NO_UNIQUE_ADDRESS) conditionally_overlapable<place_flag_in_tail, data_type> union_;
-        UTL_ATTRIBUTES(NO_UNIQUE_ADDRESS) bool has_value_;
     };
 
     template <typename U>
@@ -343,11 +317,6 @@ class storage_base {
     }
 
 protected:
-    __UTL_HIDE_FROM_ABI explicit storage_base() = delete;
-    __UTL_HIDE_FROM_ABI explicit(is_explicitly_constructible_v<
-        T>) inline constexpr storage_base() noexcept(is_nothrow_default_constructible_v<T>)
-    requires is_default_constructible_v<T>
-    = default;
     __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base const&) = delete;
     __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base const&) noexcept
     requires (is_copy_constructible_v<T> && is_copy_constructible_v<E> &&
@@ -419,7 +388,7 @@ protected:
         is_nothrow_invocable_v<F, Args...>)
     requires (place_flag_in_tail)
         : container_{__UTL details::expected::converting, [&]() {
-                         return container{__UTL unexpect_t,
+                         return container{__UTL unexpect,
                              __UTL invoke(__UTL forward<F>(f), __UTL forward<Args>(args)...)};
                      }} {}
 
@@ -430,8 +399,8 @@ protected:
         : container_{__UTL details::expected::converting,
               [&]() { return make_container(has_value, __UTL forward<U>(u)); }} {}
 
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(storage_base&&) = delete;
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(storage_base&&) noexcept
+    __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(storage_base const&) = delete;
+    __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(storage_base const&) noexcept
     requires (is_copy_assignable_v<T> && is_copy_assignable_v<E> &&
                  is_trivially_copy_assignable_v<T> && is_trivially_copy_assignable_v<E>)
     = default;
@@ -656,7 +625,7 @@ private:
 };
 
 template <typename E>
-class void_storage_base<E> {
+class void_storage_base {
     using data_type = data_union<empty_t, E>;
     static constexpr bool place_flag_in_tail = fits_in_tail_padding_v<data_type, bool>;
     static constexpr bool allow_external_overlap = !place_flag_in_tail;
@@ -745,16 +714,6 @@ class void_storage_base<E> {
             has_value_ = false;
         }
 
-        __UTL_HIDE_FROM_ABI inline constexpr ~container() noexcept
-        requires (!is_trivially_destructible_v<E>)
-        {
-            destroy_member();
-        }
-
-        __UTL_HIDE_FROM_ABI inline constexpr ~container() noexcept
-        requires (is_trivially_destructible_v<E>)
-        = default;
-
     private:
         __UTL_HIDE_FROM_ABI inline constexpr void destroy_member() noexcept {
             if (has_value_) {
@@ -779,36 +738,37 @@ class void_storage_base<E> {
     }
 
 protected:
-    __UTL_HIDE_FROM_ABI storage_base() noexcept = default;
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base const&) = delete;
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base const&) noexcept
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base() noexcept = default;
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base(void_storage_base const&) = delete;
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base(void_storage_base const&) noexcept
     requires (is_copy_constructible_v<E> && is_trivially_copy_constructible_v<E>)
     = default;
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base const& other) noexcept(
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base(void_storage_base const& other) noexcept(
         is_nothrow_copy_constructible_v<E>)
     requires (is_copy_constructible_v<E> && !is_trivially_copy_constructible_v<E>)
-        : storage_base(__UTL details::expected::converting, other.has_value(), other.data_ref()) {}
+        : void_storage_base(
+              __UTL details::expected::converting, other.has_value(), other.data_ref()) {}
 
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base&&) = delete;
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base&&) noexcept
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base(void_storage_base&&) = delete;
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base(void_storage_base&&) noexcept
     requires (is_move_constructible_v<E> && is_trivially_move_constructible_v<E>)
     = default;
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base&& other) noexcept(
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base(void_storage_base&& other) noexcept(
         is_nothrow_move_constructible_v<E>)
     requires (is_move_constructible_v<E> && !is_trivially_move_constructible_v<E>)
-        : storage_base(__UTL details::expected::converting, other.has_value(),
+        : void_storage_base(__UTL details::expected::converting, other.has_value(),
               __UTL move(other.data_ref())) {}
 
-    __UTL_HIDE_FROM_ABI inline constexpr explicit storage_base(in_place_t) noexcept
+    __UTL_HIDE_FROM_ABI inline constexpr explicit void_storage_base(in_place_t) noexcept
         : container_{} {}
 
     template <typename... Args>
-    __UTL_HIDE_FROM_ABI inline constexpr explicit storage_base(unexpect_t, Args&&... args) noexcept(
-        is_nothrow_constructible_v<container, unexpect_t, Args...>)
+    __UTL_HIDE_FROM_ABI inline constexpr explicit void_storage_base(unexpect_t,
+        Args&&... args) noexcept(is_nothrow_constructible_v<container, unexpect_t, Args...>)
         : container_{__UTL in_place, __UTL unexpect, __UTL forward<Args>(args)...} {}
 
     template <typename... Args>
-    __UTL_HIDE_FROM_ABI inline constexpr explicit storage_base(
+    __UTL_HIDE_FROM_ABI inline constexpr explicit void_storage_base(
         transforming_error_t, Args&&... args) noexcept(is_nothrow_constructible_v<container,
         transforming_error_t, Args...>)
     requires (allow_external_overlap)
@@ -816,37 +776,38 @@ protected:
               __UTL forward<Args>(args)...} {}
 
     template <typename U>
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(converting_t, bool has_value, U&& u) noexcept(
-        is_nothrow_constructible_v<container, converting_t, bool, U>)
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base(converting_t, bool has_value,
+        U&& u) noexcept(is_nothrow_constructible_v<container, converting_t, bool, U>)
     requires (allow_external_overlap)
         : container_{__UTL in_place, __UTL details::expected::converting, has_value,
               __UTL forward<U>(u)} {}
 
     template <typename F, typename... Args>
-    __UTL_HIDE_FROM_ABI inline constexpr explicit storage_base(transforming_error_t, F&& f,
+    __UTL_HIDE_FROM_ABI inline constexpr explicit void_storage_base(transforming_error_t, F&& f,
         Args&&... args) noexcept(is_nothrow_constructible_v<container, in_place_t, unexpect_t,
                                      invoke_result_t<F, Args...>> &&
         is_nothrow_invocable_v<F, Args...>)
     requires (place_flag_in_tail)
         : container_{__UTL details::expected::converting, [&]() {
-                         return container{__UTL unexpect_t,
+                         return container{__UTL unexpect,
                              __UTL invoke(__UTL forward<F>(f), __UTL forward<Args>(args)...)};
                      }} {}
 
     template <typename U>
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(converting_t, bool has_value, U&& u) noexcept(
-        noexcept(make_container(has_value, __UTL declval<U>())))
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base(converting_t, bool has_value,
+        U&& u) noexcept(noexcept(make_container(has_value, __UTL declval<U>())))
     requires (place_flag_in_tail)
         : container_{__UTL details::expected::converting,
               [&]() { return make_container(has_value, __UTL forward<U>(u)); }} {}
 
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(storage_base const&) = delete;
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(storage_base const&) noexcept
-    requires (is_copy_assignable_v<T> && is_copy_assignable_v<E> &&
-                 is_trivially_copy_assignable_v<T> && is_trivially_copy_assignable_v<E>)
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base& operator=(
+        void_storage_base const&) = delete;
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base& operator=(
+        void_storage_base const&) noexcept
+    requires (is_copy_assignable_v<E> && is_trivially_copy_assignable_v<E>)
     = default;
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(
-        storage_base const& other) noexcept(is_nothrow_copy_assignable_v<E>)
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base& operator=(
+        void_storage_base const& other) noexcept(is_nothrow_copy_assignable_v<E>)
     requires (is_copy_assignable_v<E> && !is_trivially_copy_assignable_v<E>)
     {
         if (this->has_value() != other.has_value()) {
@@ -866,15 +827,13 @@ protected:
         return *this;
     }
 
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(storage_base&&) = delete;
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(storage_base&&) noexcept
-    requires (is_move_assignable_v<T> && is_move_assignable_v<E> &&
-                 is_trivially_move_assignable_v<T> && is_trivially_move_assignable_v<E>)
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base& operator=(void_storage_base&&) = delete;
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base& operator=(void_storage_base&&) noexcept
+    requires (is_move_assignable_v<E> && is_trivially_move_assignable_v<E>)
     = default;
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(storage_base&& other) noexcept(
-        is_nothrow_move_assignable_v<T> && is_nothrow_move_assignable_v<E>)
-    requires (is_move_assignable_v<T> && is_move_assignable_v<E> &&
-        !(is_trivially_move_assignable_v<T> && is_trivially_move_assignable_v<E>))
+    __UTL_HIDE_FROM_ABI inline constexpr void_storage_base& operator=(
+        void_storage_base&& other) noexcept(is_nothrow_move_assignable_v<E>)
+    requires (is_move_assignable_v<E> && !is_trivially_move_assignable_v<E>)
     {
         if (this->has_value() != other.has_value()) {
             if (other.has_value()) {
@@ -893,7 +852,7 @@ protected:
         return *this;
     }
 
-    __UTL_HIDE_FROM_ABI inline constexpr ~storage_base() noexcept = default;
+    __UTL_HIDE_FROM_ABI inline constexpr ~void_storage_base() noexcept = default;
 
     UTL_ATTRIBUTE(GETTER) inline constexpr data_type const& data_ref() const& noexcept {
         return container_.data.union_.data;
@@ -962,7 +921,7 @@ protected:
         }
     }
 
-    __UTL_HIDE_FROM_ABI inline constexpr void cross_swap(storage_base& other) noexcept(
+    __UTL_HIDE_FROM_ABI inline constexpr void cross_swap(void_storage_base& other) noexcept(
         is_nothrow_move_constructible_v<E>)
     requires (is_move_constructible_v<E>)
     {
@@ -983,9 +942,9 @@ private:
         }
     }
 
-    __UTL_HIDE_FROM_ABI inline constexpr T* construct_value() noexcept {
+    __UTL_HIDE_FROM_ABI inline constexpr void construct_value() noexcept {
         if constexpr (place_flag_in_tail) {
-            return __UTL construct_at(__UTL addressof(container_.data), __UTL in_place);
+            __UTL construct_at(__UTL addressof(container_.data), __UTL in_place);
         } else {
             container_.data.construct_union(__UTL in_place);
         }

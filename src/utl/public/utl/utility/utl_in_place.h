@@ -36,7 +36,7 @@ namespace in_place {
 
 #if UTL_CXX20
 template <typename U>
-concept tag_type = (same_as<U, ::std::in_place_t> || same_as<U, in_place_t>)
+concept tag_type = (same_as<U, ::std::in_place_t> || same_as<U, in_place_t>);
 
 #  define __UTL_TRAIT_in_place_tag(...) __UTL details::in_place::tag_type<__VA_ARGS__>
 

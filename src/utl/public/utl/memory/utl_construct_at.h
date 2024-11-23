@@ -6,6 +6,7 @@
 
 #include "utl/assert/utl_assert.h"
 #include "utl/type_traits/utl_declval.h"
+#include "utl/type_traits/utl_is_constructible.h"
 #include "utl/utility/utl_forward.h"
 
 #if UTL_CXX20
@@ -16,7 +17,8 @@
  */
 namespace std {
 /* UTL_UNDEFINED_BEHAVIOUR */
-template <typename T, typename... Args>
+template <typename T, typename... Args UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_constructible(T, Args...))>
+UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_constructible(T, Args...))
 __UTL_HIDE_FROM_ABI inline constexpr T* utl_construct_at_impl(T* location, Args&&... args) noexcept(
     noexcept(::new((void*)0) T{__UTL declval<Args>()...})) {
     return ::new (location) T{__UTL forward<Args>(args)...};
@@ -24,11 +26,12 @@ __UTL_HIDE_FROM_ABI inline constexpr T* utl_construct_at_impl(T* location, Args&
 } // namespace std
 
 UTL_NAMESPACE_BEGIN
-template <typename T, typename... Args>
+template <typename T, typename... Args UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_constructible(T, Args...))>
+UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_constructible(T, Args...))
 __UTL_HIDE_FROM_ABI inline constexpr T* construct_at(T* location, Args&&... args) noexcept(
     noexcept(::new((void*)0) T(declval<Args>()...))) {
     UTL_ASSERT_CXX14(location != nullptr);
-    return ::std::utl_construct_at_impl(location, forward<Args>(args)...);
+    return ::std::utl_construct_at_impl(location, __UTL forward<Args>(args)...);
 }
 UTL_NAMESPACE_END
 #    define UTL_CONSTEXPR_CONSTRUCTS_AT constexpr

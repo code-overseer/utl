@@ -30,6 +30,8 @@
 #include "utl/type_traits/utl_is_convertible.h"
 #include "utl/type_traits/utl_is_copy_constructible.h"
 #include "utl/type_traits/utl_is_destructible.h"
+#include "utl/type_traits/utl_is_equality_comparable.h"
+#include "utl/type_traits/utl_is_function.h"
 #include "utl/type_traits/utl_is_move_constructible.h"
 #include "utl/type_traits/utl_is_nothrow_assignable.h"
 #include "utl/type_traits/utl_is_nothrow_constructible.h"

@@ -4,10 +4,6 @@
 
 #include "utl/utl_config.h"
 
-#if !defined(UTL_EXPECTED_PRIVATE_HEADER_GUARD)
-#  error "Private header accessed"
-#endif
-
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename E>

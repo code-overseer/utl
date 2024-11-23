@@ -9,8 +9,11 @@
 #include "utl/type_traits/utl_is_array.h"
 #include "utl/type_traits/utl_is_constructible.h"
 #include "utl/type_traits/utl_is_destructible.h"
+#include "utl/type_traits/utl_is_equality_comparable.h"
 #include "utl/type_traits/utl_is_nothrow_constructible.h"
+#include "utl/type_traits/utl_is_nothrow_copy_assignable.h"
 #include "utl/type_traits/utl_is_nothrow_copy_constructible.h"
+#include "utl/type_traits/utl_is_nothrow_move_assignable.h"
 #include "utl/type_traits/utl_is_nothrow_move_constructible.h"
 #include "utl/type_traits/utl_is_reference.h"
 #include "utl/type_traits/utl_is_swappable.h"
@@ -19,7 +22,6 @@
 #include "utl/utility/utl_move.h"
 
 UTL_STD_NAMESPACE_BEGIN
-template <typename>
 struct unexpect_t;
 template <typename>
 class unexpected;
@@ -30,7 +32,6 @@ UTL_STD_NAMESPACE_END
 
 UTL_NAMESPACE_BEGIN
 
-template <typename T>
 struct __UTL_ABI_PUBLIC unexpect_t {
     __UTL_HIDE_FROM_ABI explicit inline constexpr unexpect_t() noexcept = default;
 #ifdef UTL_CXX20
@@ -45,7 +46,6 @@ struct __UTL_ABI_PUBLIC unexpect_t {
 };
 
 #if UTL_CXX14
-template <typename T>
 UTL_INLINE_CXX17 constexpr unexpect_t unexpect{};
 #endif
 
@@ -54,7 +54,7 @@ namespace unexpect {
 
 #if UTL_CXX20
 template <typename U>
-concept tag_type = (same_as<U, ::std::unexpect_t> || same_as<U, unexpect_t>)
+concept tag_type = (same_as<U, ::std::unexpect_t> || same_as<U, unexpect_t>);
 
 #  define __UTL_TRAIT_unexpect_tag(...) __UTL details::in_place::tag_type<__VA_ARGS__>
 
@@ -153,7 +153,8 @@ public:
 
     template <typename E1>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend inline constexpr bool operator==(unexpected const& left,
-        unexpected<E1> const& right) noexcept(is_nothrow_equality_comparable_v<E, E1>) {
+        unexpected<E1> const& right) noexcept(UTL_TRAIT_is_nothrow_equality_comparable_with(E,
+        E1)) {
         static_assert(is_equality_comparable_with_v<E, E1>, "Program ill-formed");
         static_assert(
             boolean_testable<decltype(left.error() == right.error())>, "Program ill-formed");
@@ -162,7 +163,8 @@ public:
 
     template <typename E1>
     UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend inline constexpr bool operator!=(unexpected const& left,
-        unexpected<E1> const& right) noexcept(is_nothrow_equality_comparable_v<E, E1>) {
+        unexpected<E1> const& right) noexcept(UTL_TRAIT_is_nothrow_equality_comparable_with(E,
+        E1)) {
         return !(left.error() == right.error());
     }
 
