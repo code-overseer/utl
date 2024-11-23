@@ -65,6 +65,9 @@ private:
     alignas(2) bool b;
 };
 
+namespace expected {
+namespace ctor {
+
 // Test constraints
 static_assert(utl::is_default_constructible_v<utl::expected<int, int>>, "");
 static_assert(!utl::is_default_constructible_v<utl::expected<NoDefaultCtor, int>>, "");
@@ -115,11 +118,12 @@ void testException() {
 #endif // TEST_HAS_NO_EXCEPTIONS
 }
 
-int main(int, char**) {
+void default_ctor(int, char**) {
     test();
 #if UTL_CXX14
     static_assert(test(), "");
 #endif
     testException();
-    return 0;
 }
+} // namespace ctor
+} // namespace expected
