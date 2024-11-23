@@ -58,6 +58,8 @@
 #define __UTL_ATTRIBUTE_EXPECTED_INLINE_CONST \
     (ALWAYS_INLINE)(CONST)(NODISCARD)__UTL_ATTRIBUTE__HIDE_FROM_ABI
 #define __UTL_ATTRIBUTE_TYPE_AGGREGATE_EXPECTED_INLINE_CONST
+#define __UTL_ATTRIBUTE_GETTER (ALWAYS_INLINE)(NODISCARD) __UTL_ATTRIBUTE__HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_TYPE_AGGREGATE_GETTER
 
 UTL_NAMESPACE_BEGIN
 
@@ -66,8 +68,8 @@ class __UTL_PUBLIC_TEMPLATE expected : private details::expected::storage_base<T
     static_assert(UTL_TRAIT_is_destructible(T), "Invalid value type");
     static_assert(!UTL_TRAIT_is_reference(T), "Invalid value type");
     static_assert(!UTL_TRAIT_is_function(T), "Invalid value type");
-    static_assert(!UTL_TRAIT_is_same(remove_cvref_t<T>, unexpect_t), "Invalid value type");
-    static_assert(!UTL_TRAIT_is_same(remove_cvref_t<T>, in_place_t), "Invalid value type");
+    static_assert(!__UTL_TRAIT_unexpect_tag(remove_cvref_t<T>), "Invalid value type");
+    static_assert(!__UTL_TRAIT_in_place_tag(remove_cvref_t<T>), "Invalid value type");
     static_assert(!__UTL_TRAIT_is_unexpected(remove_cvref_t<T>), "Invalid value type");
     static_assert(UTL_TRAIT_is_complete(unexpected<E>), "Invalid error type");
     using base_type = details::expected::storage_base<T, E>;
@@ -128,7 +130,7 @@ public:
               __UTL move(other.data_ref())) {}
 
     template <typename U = T>
-    requires (constructible_from<T, U> && !same_as<in_place_t, remove_cvref_t<U>> &&
+    requires (constructible_from<T, U> && !__UTL_TRAIT_in_place_tag(remove_cvref_t<U>) &&
         !same_as<expected, remove_cvref_t<U>> && !details::is_unexpected_type_v<remove_cvref_t<U>>)
     __UTL_HIDE_FROM_ABI explicit(!is_convertible_v<U, T>) inline constexpr expected(
         U&& value) noexcept(is_nothrow_constructible_v<T, U>)
@@ -214,19 +216,19 @@ public:
 
     using base_type::has_value;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const& value() const& UTL_THROWS {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T const& value() const& UTL_THROWS {
         static_assert(is_copy_constructible_v<E>, "Invalid error type");
         UTL_THROW_IF(
             !has_value(), bad_expected_access<decay_t<E>>(error_ref(), UTL_SOURCE_LOCATION()));
         return this->value_ref();
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T& value() & UTL_THROWS {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T& value() & UTL_THROWS {
         static_assert(is_copy_constructible_v<E>, "Invalid error type");
         UTL_THROW_IF(
             !has_value(), bad_expected_access<decay_t<E>>(error_ref(), UTL_SOURCE_LOCATION()));
         return this->value_ref();
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const&& value() const&& UTL_THROWS {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T const&& value() const&& UTL_THROWS {
         static_assert(is_copy_constructible_v<E> ||
                 is_constructible_v<E, decltype(__UTL move(this->error_ref()))>,
             "Invalid error type");
@@ -234,7 +236,7 @@ public:
             !has_value(), bad_expected_access<decay_t<E>>(error_ref(), UTL_SOURCE_LOCATION()));
         return __UTL move(this->value_ref());
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T&& value() && UTL_THROWS {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T&& value() && UTL_THROWS {
         static_assert(is_copy_constructible_v<E> ||
                 is_constructible_v<E, decltype(__UTL move(this->error_ref()))>,
             "Invalid error type");
@@ -791,19 +793,19 @@ public:
 
     using base_type::has_value;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const& value() const& UTL_THROWS {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T const& value() const& UTL_THROWS {
         static_assert(is_copy_constructible_v<E>, "Invalid error type");
         UTL_THROW_IF(
             !has_value(), bad_expected_access<decay_t<E>>(error_ref(), UTL_SOURCE_LOCATION()));
         return this->value_ref();
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T& value() & UTL_THROWS {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T& value() & UTL_THROWS {
         static_assert(is_copy_constructible_v<E>, "Invalid error type");
         UTL_THROW_IF(
             !has_value(), bad_expected_access<decay_t<E>>(error_ref(), UTL_SOURCE_LOCATION()));
         return this->value_ref();
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const&& value() const&& UTL_THROWS {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T const&& value() const&& UTL_THROWS {
         static_assert(is_copy_constructible_v<E> ||
                 is_constructible_v<E, decltype(__UTL move(this->error_ref()))>,
             "Invalid error type");
@@ -811,7 +813,7 @@ public:
             !has_value(), bad_expected_access<decay_t<E>>(error_ref(), UTL_SOURCE_LOCATION()));
         return __UTL move(this->value_ref());
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T&& value() && UTL_THROWS {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T&& value() && UTL_THROWS {
         static_assert(is_copy_constructible_v<E> ||
                 is_constructible_v<E, decltype(__UTL move(this->error_ref()))>,
             "Invalid error type");
@@ -1191,6 +1193,8 @@ public:
 
 UTL_NAMESPACE_END
 
+#undef __UTL_ATTRIBUTE_GETTER
+#undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_GETTER
 #undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_EXPECTED_INLINE_PURE
 #undef __UTL_ATTRIBUTE_EXPECTED_INLINE_PURE
 #undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_EXPECTED_INLINE_CONST

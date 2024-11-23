@@ -44,6 +44,9 @@
 
 #include <new>
 
+#define __UTL_ATTRIBUTE_GETTER (ALWAYS_INLINE)(NODISCARD) __UTL_ATTRIBUTE__HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_TYPE_AGGREGATE_GETTER
+
 UTL_NAMESPACE_BEGIN
 
 namespace details {
@@ -264,55 +267,32 @@ protected:
 
     __UTL_HIDE_FROM_ABI inline ~storage_base() = default;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr data_union const&
-    data_ref() const& noexcept {
-        return data_;
-    }
+    UTL_ATTRIBUTE(GETTER) inline constexpr data_union const& data_ref() const& noexcept { return data_; }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr data_union& data_ref() & noexcept {
-        return data_;
-    }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const* value_ptr() const noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr data_union& data_ref() & noexcept { return data_; }
+    UTL_ATTRIBUTE(GETTER) inline constexpr T const* value_ptr() const noexcept {
         return __UTL addressof(data_.value);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T* value_ptr() noexcept {
-        return __UTL addressof(data_.value);
-    }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E const* error_ptr() const noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T* value_ptr() noexcept { return __UTL addressof(data_.value); }
+    UTL_ATTRIBUTE(GETTER) inline constexpr E const* error_ptr() const noexcept {
         return __UTL addressof(data_.error);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E* error_ptr() noexcept {
-        return __UTL addressof(data_.error);
-    }
+    UTL_ATTRIBUTE(GETTER) inline constexpr E* error_ptr() noexcept { return __UTL addressof(data_.error); }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const& value_ref() const& noexcept {
-        return data_.value;
-    }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T& value_ref() & noexcept {
-        return data_.value;
-    }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const&& value_ref() const&& noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T const& value_ref() const& noexcept { return data_.value; }
+    UTL_ATTRIBUTE(GETTER) inline constexpr T& value_ref() & noexcept { return data_.value; }
+    UTL_ATTRIBUTE(GETTER) inline constexpr T const&& value_ref() const&& noexcept {
         return __UTL move(data_.value);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T&& value_ref() && noexcept {
-        return __UTL move(data_.value);
-    }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E const& error_ref() const& noexcept {
-        return data_.error;
-    }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E& error_ref() & noexcept {
-        return data_.error;
-    }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E const&& error_ref() const&& noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T&& value_ref() && noexcept { return __UTL move(data_.value); }
+    UTL_ATTRIBUTE(GETTER) inline constexpr E const& error_ref() const& noexcept { return data_.error; }
+    UTL_ATTRIBUTE(GETTER) inline constexpr E& error_ref() & noexcept { return data_.error; }
+    UTL_ATTRIBUTE(GETTER) inline constexpr E const&& error_ref() const&& noexcept {
         return __UTL move(data_.error);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E&& error_ref() && noexcept {
-        return __UTL move(data_.error);
-    }
+    UTL_ATTRIBUTE(GETTER) inline constexpr E&& error_ref() && noexcept { return __UTL move(data_.error); }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr bool has_value() const noexcept {
-        return has_value_;
-    }
+    UTL_ATTRIBUTE(GETTER) inline constexpr bool has_value() const noexcept { return has_value_; }
 
     template <typename... Args>
     __UTL_HIDE_FROM_ABI inline constexpr T& emplace_value(Args&&... args) noexcept {
@@ -665,3 +645,6 @@ protected:
 } // namespace details
 
 UTL_NAMESPACE_END
+
+#undef __UTL_ATTRIBUTE_GETTER
+#undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_GETTER

@@ -46,6 +46,9 @@
 
 #include <new>
 
+#define __UTL_ATTRIBUTE_GETTER (ALWAYS_INLINE)(NODISCARD) __UTL_ATTRIBUTE__HIDE_FROM_ABI
+#define __UTL_ATTRIBUTE_TYPE_AGGREGATE_GETTER
+
 UTL_NAMESPACE_BEGIN
 
 namespace details {
@@ -60,9 +63,8 @@ inline constexpr bool fits_in_tail_padding_v = []() {
 }();
 
 template <typename T, typename U>
-UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T make_from_union(
-    bool has_value, U&& arg) noexcept(UTL_TRAIT_is_nothrow_constructible(T, in_place_t,
-                                          decltype(__UTL declval<U>().value)) &&
+UTL_ATTRIBUTE(GETTER) inline constexpr T make_from_union(bool has_value, U&& arg) noexcept(
+    UTL_TRAIT_is_nothrow_constructible(T, in_place_t, decltype(__UTL declval<U>().value)) &&
     UTL_TRAIT_is_nothrow_constructible(T, unexpect_t, decltype(__UTL declval<U>().error))) {
     return has_value ? T{__UTL in_place, __UTL forward_like<U>(arg.value)}
                      : T{__UTL unexpect, __UTL forward_like<U>(arg.error)};
@@ -485,59 +487,58 @@ protected:
 
     __UTL_HIDE_FROM_ABI inline constexpr ~storage_base() noexcept = default;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr data_type const& data_ref() const& noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr data_type const& data_ref() const& noexcept {
         return container_.data.union_.data;
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr data_type& data_ref() & noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr data_type& data_ref() & noexcept {
         return container_.data.union_.data;
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr data_type const&&
-    data_ref() const&& noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr data_type const&& data_ref() const&& noexcept {
         return __UTL move(container_.data.union_.data);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr data_type&& data_ref() && noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr data_type&& data_ref() && noexcept {
         return __UTL move(container_.data.union_.data);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const* value_ptr() const noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T const* value_ptr() const noexcept {
         return __UTL addressof(container_.data.union_.data.value);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T* value_ptr() noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T* value_ptr() noexcept {
         return __UTL addressof(container_.data.union_.data.value);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E const* error_ptr() const noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr E const* error_ptr() const noexcept {
         return __UTL addressof(container_.data.union_.data.error);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E* error_ptr() noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr E* error_ptr() noexcept {
         return __UTL addressof(container_.data.union_.data.error);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const& value_ref() const& noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T const& value_ref() const& noexcept {
         return container_.data.union_.data.value;
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T& value_ref() & noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T& value_ref() & noexcept {
         return container_.data.union_.data.value;
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T const&& value_ref() const&& noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T const&& value_ref() const&& noexcept {
         return __UTL move(container_.data.union_.data.value);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr T&& value_ref() && noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr T&& value_ref() && noexcept {
         return __UTL move(container_.data.union_.data.value);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E const& error_ref() const& noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr E const& error_ref() const& noexcept {
         return container_.data.union_.data.error;
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E& error_ref() & noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr E& error_ref() & noexcept {
         return container_.data.union_.data.error;
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E const&& error_ref() const&& noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr E const&& error_ref() const&& noexcept {
         return __UTL move(container_.data.union_.data.error);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E&& error_ref() && noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr E&& error_ref() && noexcept {
         return __UTL move(container_.data.union_.data.error);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr bool has_value() const noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr bool has_value() const noexcept {
         return container_.data.has_value_;
     }
 
@@ -894,40 +895,39 @@ protected:
 
     __UTL_HIDE_FROM_ABI inline constexpr ~storage_base() noexcept = default;
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr data_type const& data_ref() const& noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr data_type const& data_ref() const& noexcept {
         return container_.data.union_.data;
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr data_type& data_ref() & noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr data_type& data_ref() & noexcept {
         return container_.data.union_.data;
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr data_type const&&
-    data_ref() const&& noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr data_type const&& data_ref() const&& noexcept {
         return __UTL move(container_.data.union_.data);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr data_type&& data_ref() && noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr data_type&& data_ref() && noexcept {
         return __UTL move(container_.data.union_.data);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E const* error_ptr() const noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr E const* error_ptr() const noexcept {
         return __UTL addressof(container_.data.union_.data.error);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E* error_ptr() noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr E* error_ptr() noexcept {
         return __UTL addressof(container_.data.union_.data.error);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E const& error_ref() const& noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr E const& error_ref() const& noexcept {
         return container_.data.union_.data.error;
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E& error_ref() & noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr E& error_ref() & noexcept {
         return container_.data.union_.data.error;
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E const&& error_ref() const&& noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr E const&& error_ref() const&& noexcept {
         return __UTL move(container_.data.union_.data.error);
     }
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr E&& error_ref() && noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr E&& error_ref() && noexcept {
         return __UTL move(container_.data.union_.data.error);
     }
 
-    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr bool has_value() const noexcept {
+    UTL_ATTRIBUTE(GETTER) inline constexpr bool has_value() const noexcept {
         return container_.data.has_value_;
     }
 
@@ -1006,3 +1006,6 @@ private:
 } // namespace details
 
 UTL_NAMESPACE_END
+
+#undef __UTL_ATTRIBUTE_GETTER
+#undef __UTL_ATTRIBUTE_TYPE_AGGREGATE_GETTER
