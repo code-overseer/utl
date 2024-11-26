@@ -152,14 +152,16 @@ public:
 
     template <typename U = T UTL_CONSTRAINT_CXX11(!__UTL_TRAIT_in_place_tag(remove_cvref_t<U>) &&
         !UTL_TRAIT_is_same(expected, remove_cvref_t<U>) && UTL_TRAIT_is_constructible(T, U) &&
-        !__UTL_TRAIT_is_unexpected(remove_cvref_t<U>) && UTL_TRAIT_is_convertible(U, T))>
+        !__UTL_TRAIT_is_unexpected(remove_cvref_t<U>) && UTL_TRAIT_is_convertible(U, T) &&
+        (!UTL_TRAIT_is_boolean(T) || !__UTL_TRAIT_is_expected(remove_cvref_t<U>)))>
     __UTL_HIDE_FROM_ABI inline constexpr expected(U&& value) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, U))
         : base_type(__UTL in_place, __UTL forward<U>(value)) {}
 
     template <typename U = T UTL_CONSTRAINT_CXX11(!__UTL_TRAIT_in_place_tag(remove_cvref_t<U>) &&
         !UTL_TRAIT_is_same(expected, remove_cvref_t<U>) && UTL_TRAIT_is_constructible(T, U) &&
-        !__UTL_TRAIT_is_unexpected(remove_cvref_t<U>) && !UTL_TRAIT_is_convertible(U, T))>
+        !__UTL_TRAIT_is_unexpected(remove_cvref_t<U>) && !UTL_TRAIT_is_convertible(U, T) &&
+        (!UTL_TRAIT_is_boolean(T) || !__UTL_TRAIT_is_expected(remove_cvref_t<U>)))>
     __UTL_HIDE_FROM_ABI explicit inline constexpr expected(U&& value) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, U))
         : base_type(__UTL in_place, __UTL forward<U>(value)) {}
@@ -277,44 +279,64 @@ public:
             bad_expected_access<decay_t<E>>(this->error_ref(), UTL_SOURCE_LOCATION()));
         return __UTL move(this->value_ref());
     }
-    UTL_ATTRIBUTES(EXPECTED_INLINE_CONST) inline constexpr T const& error() const& noexcept {
-        UTL_ASSERT(!has_value());
+    UTL_ATTRIBUTES(EXPECTED_INLINE_CONST) inline constexpr E const& error() const& noexcept {
+        return UTL_CONSTANT_P(this->error_ref()) ? this->error_ref()
+                                                 : (UTL_ASSERT(!has_value()), this->error_ref());
+    }
+    UTL_ATTRIBUTES(EXPECTED_INLINE_CONST) inline UTL_CONSTEXPR_CXX14 E& error() & noexcept {
+        if (!UTL_CONSTANT_P(this->error_ref())) {
+            UTL_ASSERT(!has_value());
+        }
+
         return this->error_ref();
     }
-    UTL_ATTRIBUTES(EXPECTED_INLINE_CONST) inline UTL_CONSTEXPR_CXX14 T& error() & noexcept {
-        UTL_ASSERT(!has_value());
+    UTL_ATTRIBUTES(EXPECTED_INLINE_CONST) inline constexpr E const&& error() const&& noexcept {
+        return UTL_CONSTANT_P(this->error_ref())
+            ? __UTL move(this->error_ref())
+            : (UTL_ASSERT(!has_value()), __UTL move(this->error_ref()));
+    }
+    UTL_ATTRIBUTES(EXPECTED_INLINE_CONST) inline UTL_CONSTEXPR_CXX14 E&& error() && noexcept {
+        if (!UTL_CONSTANT_P(this->error_ref())) {
+            UTL_ASSERT(!has_value());
+        }
+
         return this->error_ref();
-    }
-    UTL_ATTRIBUTES(EXPECTED_INLINE_CONST) inline constexpr T const&& error() const&& noexcept {
-        UTL_ASSERT(!has_value());
-        return __UTL move(this->error_ref());
-    }
-    UTL_ATTRIBUTES(EXPECTED_INLINE_CONST) inline UTL_CONSTEXPR_CXX14 T&& error() && noexcept {
-        UTL_ASSERT(!has_value());
-        return __UTL move(this->error_ref());
     }
 
     UTL_ATTRIBUTE(EXPECTED_INLINE_CONST) inline UTL_CONSTEXPR_CXX14 T* operator->() noexcept {
+        if (!UTL_CONSTANT_P(this->value_ref())) {
+            UTL_ASSERT(has_value());
+        }
         return this->value_ptr();
     }
 
     UTL_ATTRIBUTE(EXPECTED_INLINE_CONST) inline constexpr T const* operator->() const noexcept {
-        return this->value_ptr();
+        return UTL_CONSTANT_P(this->value_ref()) ? this->value_ptr()
+                                                 : (UTL_ASSERT(has_value()), this->value_ptr());
     }
 
     UTL_ATTRIBUTE(EXPECTED_INLINE_CONST) inline UTL_CONSTEXPR_CXX14 T& operator*() & noexcept {
+        if (!UTL_CONSTANT_P(this->value_ref())) {
+            UTL_ASSERT(has_value());
+        }
         return this->value_ref();
     }
 
     UTL_ATTRIBUTE(EXPECTED_INLINE_CONST) inline UTL_CONSTEXPR_CXX14 T&& operator*() && noexcept {
+        if (!UTL_CONSTANT_P(this->value_ref())) {
+            UTL_ASSERT(has_value());
+        }
         return __UTL move(this->value_ref());
     }
 
     UTL_ATTRIBUTE(EXPECTED_INLINE_CONST) inline constexpr T const& operator*() const& noexcept {
-        return this->value_ref();
+        return UTL_CONSTANT_P(this->value_ref()) ? this->value_ref()
+                                                 : (UTL_ASSERT(has_value()), this->value_ref());
     }
     UTL_ATTRIBUTE(EXPECTED_INLINE_CONST) inline constexpr T const&& operator*() const&& noexcept {
-        return __UTL move(this->value_ref());
+        return UTL_CONSTANT_P(this->value_ref())
+            ? __UTL move(this->value_ref())
+            : (UTL_ASSERT(has_value()), __UTL move(this->value_ref()));
     }
 
     UTL_ATTRIBUTE(EXPECTED_INLINE_PURE) inline constexpr explicit operator bool() const noexcept {

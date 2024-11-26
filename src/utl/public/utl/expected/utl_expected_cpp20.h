@@ -81,13 +81,14 @@ class __UTL_PUBLIC_TEMPLATE expected : private details::expected::storage_base<T
     template <typename T1, typename E1, typename T1Qual, typename E1Qual>
     using can_convert = conjunction<is_constructible<T, T1Qual>, is_constructible<E, E1Qual>,
         conditional_t<!UTL_TRAIT_is_boolean(T),
-            negation<disjunction<
-                bool_constant<UTL_TRAIT_is_same(T, T1) && UTL_TRAIT_is_same(E, E1)>,
-                is_constructible<T, expected<T1, E1>&>, is_constructible<T, expected<T1, E1>>,
-                is_constructible<T, expected<T1, E1> const&>,
-                is_constructible<T, expected<T1, E1> const>, is_convertible<expected<T1, E1>&, T>,
-                is_convertible<expected<T1, E1>&&, T>, is_convertible<expected<T1, E1> const&, T>,
-                is_convertible<expected<T1, E1> const&&, T>>>,
+            negation<
+                disjunction<bool_constant<UTL_TRAIT_is_same(T, T1) && UTL_TRAIT_is_same(E, E1)>,
+                    is_constructible<T, expected<T1, E1>&>, is_convertible<expected<T1, E1>&, T>,
+                    is_constructible<T, expected<T1, E1>>, is_convertible<expected<T1, E1>, T>,
+                    is_constructible<T, expected<T1, E1> const&>,
+                    is_convertible<expected<T1, E1> const&, T>,
+                    is_constructible<T, expected<T1, E1> const>,
+                    is_convertible<expected<T1, E1> const, T>>>,
             true_type>,
         negation<disjunction<is_constructible<unexpected<E>, expected<T1, E1>&>,
             is_constructible<unexpected<E>, expected<T1, E1>>,
@@ -136,7 +137,9 @@ public:
 
     template <typename U = T>
     requires (constructible_from<T, U> && !__UTL_TRAIT_in_place_tag(remove_cvref_t<U>) &&
-        !same_as<expected, remove_cvref_t<U>> && !details::is_unexpected_type_v<remove_cvref_t<U>>)
+        !same_as<expected, remove_cvref_t<U>> &&
+        !details::is_unexpected_type_v<remove_cvref_t<U>> &&
+        (!is_boolean_v<T> || !__UTL_TRAIT_is_expected(remove_cvref_t<U>)))
     __UTL_HIDE_FROM_ABI explicit(!is_convertible_v<U, T>) inline constexpr expected(
         U&& value) noexcept(is_nothrow_constructible_v<T, U>)
         : base_type(__UTL in_place, __UTL forward<U>(value)) {}

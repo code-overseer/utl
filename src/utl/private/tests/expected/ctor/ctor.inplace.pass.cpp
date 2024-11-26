@@ -1,4 +1,5 @@
 // Adapted from the LLVM Project, Copyright 2023-2024 Bryan Wong
+// Commit: 9fd3c4115cf2cd3da1405e1f2c38d53582b5dc81
 
 //===----------------------------------------------------------------------===//
 //
@@ -46,52 +47,6 @@ static_assert(utl::is_implicit_constructible<int, int>::value, "");
 static_assert(!utl::is_implicit_constructible<utl::expected<int, int>, utl::in_place_t>::value, "");
 static_assert(
     !utl::is_implicit_constructible<utl::expected<int, int>, utl::in_place_t, int>::value, "");
-
-struct CopyOnly {
-    int i;
-    constexpr CopyOnly(int ii) : i(ii) {}
-    CopyOnly(CopyOnly const&) = default;
-    CopyOnly(CopyOnly&&) = delete;
-    friend constexpr bool operator==(CopyOnly const& mi, int ii) { return mi.i == ii; }
-};
-
-class MoveOnly {
-    int data_;
-
-public:
-    constexpr MoveOnly(int data = 1) : data_(data) {}
-
-    MoveOnly(MoveOnly const&) = delete;
-    MoveOnly& operator=(MoveOnly const&) = delete;
-
-    UTL_CONSTEXPR_CXX14 MoveOnly(MoveOnly&& x) noexcept : data_(x.data_) { x.data_ = 0; }
-    UTL_CONSTEXPR_CXX14 MoveOnly& operator=(MoveOnly&& x) {
-        data_ = x.data_;
-        x.data_ = 0;
-        return *this;
-    }
-
-    friend constexpr bool operator==(MoveOnly const& x, MoveOnly const& y) {
-        return x.data_ == y.data_;
-    }
-    friend constexpr bool operator!=(MoveOnly const& x, MoveOnly const& y) {
-        return x.data_ != y.data_;
-    }
-    friend constexpr bool operator<(MoveOnly const& x, MoveOnly const& y) {
-        return x.data_ < y.data_;
-    }
-    friend constexpr bool operator<=(MoveOnly const& x, MoveOnly const& y) {
-        return x.data_ <= y.data_;
-    }
-    friend constexpr bool operator>(MoveOnly const& x, MoveOnly const& y) {
-        return x.data_ > y.data_;
-    }
-    friend constexpr bool operator>=(MoveOnly const& x, MoveOnly const& y) {
-        return x.data_ >= y.data_;
-    }
-
-    constexpr int get() const { return data_; }
-};
 
 template <class T, class E = int>
 UTL_CONSTEXPR_CXX14 void testInt() {

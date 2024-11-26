@@ -1,4 +1,5 @@
 // Adapted from the LLVM Project, Copyright 2023-2024 Bryan Wong
+// Commit: 9fd3c4115cf2cd3da1405e1f2c38d53582b5dc81
 
 //===----------------------------------------------------------------------===//
 //
@@ -84,7 +85,7 @@ void testException() {
 #endif // TEST_HAS_NO_EXCEPTIONS
 }
 
-void default_ctor(int, char**) {
+void default_ctor() {
     test();
 #if UTL_CXX14
     static_assert(test(), "");

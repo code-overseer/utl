@@ -290,7 +290,7 @@ protected:
         if (has_value) {
             ::new (value_ptr()) T{__UTL forward_like<U>(data.value)};
         } else {
-            ::new (error_ptr()) T{__UTL forward_like<U>(data.error)};
+            ::new (error_ptr()) E{__UTL forward_like<U>(data.error)};
         }
         has_value_ = has_value;
     }
