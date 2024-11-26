@@ -1,4 +1,4 @@
-// Copyright 2023-2024 Bryan Wong
+// Adapted from the LLVM Project, Copyright 2023-2024 Bryan Wong
 
 //===----------------------------------------------------------------------===//
 //
@@ -22,6 +22,7 @@
 
 #include "utl/utl_config.h"
 
+#include "tests/expected/test_types.h"
 #include "tests/test_macros.h"
 #include "utl/expected/utl_expected.h"
 #include "utl/type_traits/utl_is_default_constructible.h"
@@ -29,44 +30,9 @@
 #include <cassert>
 #include <initializer_list>
 
-struct Except {};
-struct NoDefaultCtor {
-    NoDefaultCtor() = delete;
-};
-
-template <int Constant>
-struct TailClobberer {
-    constexpr TailClobberer() noexcept {
-        if (!UTL_CONSTANT_P(static_cast<void*>(this))) {
-            memset(static_cast<void*>(this), Constant, sizeof(*this));
-        }
-        // Always set `b` itself to `false` so that the comparison works.
-        b = false;
-    }
-    constexpr TailClobberer(TailClobberer const&) : TailClobberer() {}
-    constexpr TailClobberer(TailClobberer&&) = default;
-    // Converts from `int`/`std::initializer_list<int>, used in some tests.
-    constexpr TailClobberer(int) : TailClobberer() {}
-    constexpr TailClobberer(std::initializer_list<int>) noexcept : TailClobberer() {}
-
-    friend constexpr bool operator==(
-        TailClobberer const& left, TailClobberer const& right) noexcept {
-        return left.b == right.b;
-    }
-
-    friend constexpr bool operator!=(
-        TailClobberer const& left, TailClobberer const& right) noexcept {
-        return left.b != right.b;
-    }
-
-    friend constexpr void swap(TailClobberer& l, TailClobberer& r) { __UTL ranges::swap(l, r); }
-
-private:
-    alignas(2) bool b;
-};
-
 namespace expected {
 namespace ctor {
+namespace default_ {
 
 // Test constraints
 static_assert(utl::is_default_constructible_v<utl::expected<int, int>>, "");
@@ -125,5 +91,7 @@ void default_ctor(int, char**) {
 #endif
     testException();
 }
+
+} // namespace default_
 } // namespace ctor
 } // namespace expected

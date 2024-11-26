@@ -64,7 +64,8 @@
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename E>
-class __UTL_PUBLIC_TEMPLATE expected : private details::expected::storage<expected<T, E>, T, E> {
+class __UTL_PUBLIC_TEMPLATE expected :
+    private details::expected::storage_base<expected<T, E>, T, E> {
     static_assert(UTL_TRAIT_is_destructible(T), "Invalid value type");
     static_assert(!UTL_TRAIT_is_reference(T), "Invalid value type");
     static_assert(!UTL_TRAIT_is_function(T), "Invalid value type");
@@ -72,7 +73,7 @@ class __UTL_PUBLIC_TEMPLATE expected : private details::expected::storage<expect
     static_assert(!__UTL_TRAIT_in_place_tag(remove_cvref_t<T>), "Invalid value type");
     static_assert(!__UTL_TRAIT_is_unexpected(remove_cvref_t<T>), "Invalid value type");
     static_assert(UTL_TRAIT_is_complete(unexpected<E>), "Invalid error type");
-    using base_type = details::expected::storage<expected, T, E>;
+    using base_type = details::expected::storage_base<expected, T, E>;
 
     template <typename T1, typename E1, typename T1Qual, typename E1Qual>
     using can_convert = conjunction<is_constructible<T, T1Qual>, is_constructible<E, E1Qual>,
@@ -780,9 +781,9 @@ private:
 
 template <typename E>
 class __UTL_PUBLIC_TEMPLATE expected<void, E> :
-    __UTL details::expected::void_storage<expected<void, E>, E> {
+    __UTL details::expected::void_storage_base<expected<void, E>, E> {
     static_assert(UTL_TRAIT_is_complete(unexpected<E>), "Invalid error type");
-    using base_type = details::expected::void_storage<expected, E>;
+    using base_type = details::expected::void_storage_base<expected, E>;
 
     template <typename T1, typename E1, typename E1Qual>
     using can_convert = conjunction<is_void<T1>, is_constructible<E, E1Qual>,

@@ -219,59 +219,59 @@ union data_union<T, E, false, false> {
 };
 
 template <typename T, typename E>
-class storage_base {
+class underlying_storage {
     using data_type = data_union<T, E>;
 
 public:
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base() noexcept(
+    __UTL_HIDE_FROM_ABI inline constexpr underlying_storage() noexcept(
         UTL_TRAIT_is_nothrow_default_constructible(T)) = default;
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base const&) noexcept(
+    __UTL_HIDE_FROM_ABI inline constexpr underlying_storage(underlying_storage const&) noexcept(
         UTL_TRAIT_is_nothrow_copy_constructible(T) &&
         UTL_TRAIT_is_nothrow_copy_constructible(E)) = default;
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base&&) noexcept(
+    __UTL_HIDE_FROM_ABI inline constexpr underlying_storage(underlying_storage&&) noexcept(
         UTL_TRAIT_is_nothrow_move_constructible(T) &&
         UTL_TRAIT_is_nothrow_move_constructible(E)) = default;
 
 protected:
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(storage_base const&) noexcept(
-        UTL_TRAIT_is_nothrow_copy_assignable(T) &&
+    __UTL_HIDE_FROM_ABI inline constexpr underlying_storage& operator=(
+        underlying_storage const&) noexcept(UTL_TRAIT_is_nothrow_copy_assignable(T) &&
         UTL_TRAIT_is_nothrow_copy_assignable(E)) = default;
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(storage_base&&) noexcept(
-        UTL_TRAIT_is_nothrow_move_assignable(T) &&
+    __UTL_HIDE_FROM_ABI inline constexpr underlying_storage& operator=(
+        underlying_storage&&) noexcept(UTL_TRAIT_is_nothrow_move_assignable(T) &&
         UTL_TRAIT_is_nothrow_move_assignable(E)) = default;
 
     template <typename... Args>
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(in_place_t, Args&&... args) noexcept(
+    __UTL_HIDE_FROM_ABI inline constexpr underlying_storage(in_place_t, Args&&... args) noexcept(
         UTL_TRAIT_is_nothrow_constructible(T, Args...))
         : data_{__UTL in_place, __UTL forward<Args>(args)...}
         , has_value_{true} {}
 
     template <typename... Args>
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(unexpect_t, Args&&... args) noexcept(
+    __UTL_HIDE_FROM_ABI inline constexpr underlying_storage(unexpect_t, Args&&... args) noexcept(
         UTL_TRAIT_is_nothrow_constructible(E, Args...))
         : data_{__UTL unexpect, __UTL forward<Args>(args)...}
         , has_value_{false} {}
 
     template <typename F, typename... Args>
-    __UTL_HIDE_FROM_ABI inline constexpr explicit storage_base(
+    __UTL_HIDE_FROM_ABI inline constexpr explicit underlying_storage(
         transforming_t, F&& f, Args&&... args) noexcept(UTL_TRAIT_is_nothrow_invocable(F, Args...))
         : data_{__UTL details::expected::transforming, __UTL forward<F>(f),
               __UTL forward<Args>(args)...}
         , has_value_{true} {}
     template <typename F, typename... Args>
-    __UTL_HIDE_FROM_ABI inline constexpr explicit storage_base(transforming_error_t, F&& f,
+    __UTL_HIDE_FROM_ABI inline constexpr explicit underlying_storage(transforming_error_t, F&& f,
         Args&&... args) noexcept(UTL_TRAIT_is_nothrow_invocable(F, Args...))
         : data_{__UTL details::expected::transforming_error, __UTL forward<F>(f),
               __UTL forward<Args>(args)...}
         , has_value_{false} {}
 
     template <typename U>
-    __UTL_HIDE_FROM_ABI inline constexpr storage_base(converting_t, bool has_value,
+    __UTL_HIDE_FROM_ABI inline constexpr underlying_storage(converting_t, bool has_value,
         U&& data) noexcept(noexcept(make_union<data_type>(has_value, __UTL forward<U>(data))))
         : data_{make_union<data_type>(has_value, __UTL forward<U>(data))}
         , has_value_{has_value} {}
 
-    __UTL_HIDE_FROM_ABI inline ~storage_base() = default;
+    __UTL_HIDE_FROM_ABI inline ~underlying_storage() = default;
 
     UTL_ATTRIBUTE(GETTER) inline constexpr data_type const& data_ref() const& noexcept { return data_; }
 
@@ -362,26 +362,26 @@ template <typename T, typename E,
     bool = UTL_TRAIT_is_copy_constructible(T) && UTL_TRAIT_is_copy_constructible(E),
     bool = UTL_TRAIT_is_trivially_copy_constructible(T) &&
         UTL_TRAIT_is_trivially_copy_constructible(E)>
-class copy_ctor_t : protected storage_base<T, E> {
+class copy_ctor_t : protected underlying_storage<T, E> {
 public:
-    using storage_base<T, E>::storage_base;
+    using underlying_storage<T, E>::underlying_storage;
 
 protected:
-    using storage_base<T, E>::operator=;
+    using underlying_storage<T, E>::operator=;
 };
 
 template <typename T, typename E>
-class copy_ctor_t<T, E, true, false> : protected storage_base<T, E> {
-    using base_type = storage_base<T, E>;
+class copy_ctor_t<T, E, true, false> : protected underlying_storage<T, E> {
+    using base_type = underlying_storage<T, E>;
 
 public:
-    using storage_base<T, E>::storage_base;
+    using underlying_storage<T, E>::underlying_storage;
     __UTL_HIDE_FROM_ABI inline constexpr copy_ctor_t(copy_ctor_t const& other) noexcept(
         UTL_TRAIT_is_nothrow_copy_constructible(T) && UTL_TRAIT_is_nothrow_copy_constructible(E))
         : base_type{converting, other.has_value(), other.data_ref()} {}
 
 protected:
-    using storage_base<T, E>::operator=;
+    using underlying_storage<T, E>::operator=;
 };
 
 template <typename T, typename E,
@@ -612,7 +612,7 @@ private:
 };
 
 template <typename D, typename T, typename E>
-class storage : protected swap_base<D, T, E> {
+class storage_base : protected swap_base<D, T, E> {
     static_assert(!UTL_TRAIT_is_same(remove_cvref_t<T>, empty_t), "Invalid value type");
     static_assert(!UTL_TRAIT_is_void(T), "Invalid value type");
 
@@ -622,18 +622,18 @@ public:
 
 protected:
     using swap_base<D, T, E>::swap;
-    inline ~storage() noexcept = default;
+    inline ~storage_base() noexcept = default;
 };
 
 template <typename D, typename E>
-class void_storage : protected swap_base<D, empty_t, E> {
+class void_storage_base : protected swap_base<D, empty_t, E> {
 public:
     using swap_base<D, empty_t, E>::swap_base;
     using swap_base<D, empty_t, E>::operator=;
 
 protected:
     using swap_base<D, empty_t, E>::swap;
-    inline ~void_storage() noexcept = default;
+    inline ~void_storage_base() noexcept = default;
 };
 
 } // namespace expected

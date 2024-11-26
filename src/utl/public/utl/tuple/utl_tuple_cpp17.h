@@ -1225,7 +1225,8 @@ __UTL_HIDE_FROM_ABI constexpr bool equals(T const& l, U const& r) noexcept(
 template <typename... Ts, typename... Us>
 UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) constexpr enable_if_t<
     conjunction<compare_ops::all_have_eq<tuple<Ts...>, tuple<Us...>>>::value, bool>
-operator==(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(details::tuple::equals(l, r)) {
+operator==(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
+    noexcept(details::tuple::equals(l, r))) {
     return details::tuple::equals(l, r);
 }
 
@@ -1234,7 +1235,8 @@ UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) constexpr enable_if_t<
     conjunction<compare_ops::all_have_eq<tuple<Ts...>, tuple<Us...>>,
         compare_ops::all_have_lt<tuple<Ts...>, tuple<Us...>>>::value,
     bool>
-operator<(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(details::tuple::less(l, r)) {
+operator<(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
+    noexcept(details::tuple::less(l, r))) {
     return details::tuple::less(l, r);
 }
 
