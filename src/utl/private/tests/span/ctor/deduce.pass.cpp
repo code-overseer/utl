@@ -1,4 +1,5 @@
-// Copyright 2023-2024 Bryan Wong
+// Adapted from the LLVM Project, Copyright 2023-2024 Bryan Wong
+// Commit: 99696b35bc8a0054e0b0c1a26e8dd5049fa8c41b
 
 //===----------------------------------------------------------------------===//
 //
@@ -41,8 +42,6 @@
 #  include <array>
 #  include <cassert>
 namespace span {
-namespace deduct {
-
 void test_iterator_sentinel() {
     int arr[] = {1, 2, 3};
     {
@@ -102,9 +101,9 @@ void test_std_array() {
     }
 }
 
-#  if 0
-// Unimplemented
+// Unimplemented; requires ranges
 void test_range_std_container() {
+#  if 0
     {
         utl::string str{"ABCDE"};
         utl::span s{str};
@@ -120,19 +119,24 @@ void test_range_std_container() {
         assert(s.size() == str.size());
         assert(s.data() == str.data());
     }
-}
-#  else
-void test_range_std_container() {}
 #  endif
+}
 
-void deduct_run_test() {
+void deduce_run_test() {
     test_iterator_sentinel();
     test_c_array();
     test_std_array();
     test_range_std_container();
 }
-
-} // namespace deduct
 } // namespace span
 
-#endif
+int main() {
+    span::deduce_run_test();
+}
+
+#else
+
+int main() {
+    return 0;
+}
+#endif // UTL_CXX17

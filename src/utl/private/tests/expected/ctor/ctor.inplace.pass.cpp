@@ -32,8 +32,6 @@
 #include <cassert>
 
 namespace expected {
-namespace ctor {
-namespace inplace {
 
 // Test Constraints:
 static_assert(utl::is_constructible_v<utl::expected<int, int>, utl::in_place_t>, "");
@@ -121,13 +119,12 @@ void testException() {
 #endif // UTL_WITH_EXCEPTIONS
 }
 
-void execute() {
-    test();
-#if UTL_CXX14
-    static_assert(test(), "");
-#endif
-    testException();
-}
-} // namespace inplace
-} // namespace ctor
 } // namespace expected
+
+int main() {
+    expected::test();
+#if UTL_CXX14
+    static_assert(expected::test(), "");
+#endif
+    expected::testException();
+}

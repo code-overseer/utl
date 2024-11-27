@@ -32,8 +32,6 @@
 #include <initializer_list>
 
 namespace expected {
-namespace ctor {
-namespace default_ {
 
 // Test constraints
 static_assert(utl::is_default_constructible_v<utl::expected<int, int>>, "");
@@ -85,14 +83,12 @@ void testException() {
 #endif // TEST_HAS_NO_EXCEPTIONS
 }
 
-void default_ctor() {
-    test();
-#if UTL_CXX14
-    static_assert(test(), "");
-#endif
-    testException();
-}
-
-} // namespace default_
-} // namespace ctor
 } // namespace expected
+
+int main() {
+    expected::test();
+#if UTL_CXX14
+    static_assert(expected::test(), "");
+#endif
+    expected::testException();
+}

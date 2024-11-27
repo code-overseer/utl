@@ -1,4 +1,5 @@
-// Copyright 2023-2024 Bryan Wong
+// Adapted from the LLVM Project, Copyright 2023-2024 Bryan Wong
+// Commit: 99696b35bc8a0054e0b0c1a26e8dd5049fa8c41b
 
 //===----------------------------------------------------------------------===//
 //
@@ -22,7 +23,6 @@
 #include <cassert>
 
 namespace span {
-namespace copy {
 
 template <class T>
 constexpr void test() {
@@ -119,5 +119,8 @@ void copy_test_driver() {
     static_assert(test_all());
 #endif
 }
-} // namespace copy
 } // namespace span
+
+int main() {
+    span::copy_test_driver();
+}
