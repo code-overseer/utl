@@ -19,6 +19,6 @@ struct __UTL_ABI_PUBLIC ignore_t {
 #endif
 };
 
-UTL_INLINE_CXX17 constexpr ignore_t ignore = ignore_t{};
+UTL_INLINE_CXX17 constexpr ignore_t ignore{};
 
 UTL_NAMESPACE_END

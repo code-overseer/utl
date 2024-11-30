@@ -32,12 +32,20 @@
 			"variants":
 			[
 				{
-					"name": "Compile Tests",
+					"name": "Build and run tests",
+					"shell_cmd": "make -C $project_path/src/utl tests -j8"
+				},
+				{
+					"name": "Compile only",
 					"shell_cmd": "make -C $project_path/src/utl compile -j8"
 				},
 				{
-					"name": "Preprocess Tests",
+					"name": "Preprocess only",
 					"shell_cmd": "make -C $project_path/src/utl preprocess -j8"
+				},
+				{
+					"name": "Clean",
+					"shell_cmd": "make -C $project_path/src/utl clean -j8"	
 				},
 				{
 					"name": "Print Build Variables",

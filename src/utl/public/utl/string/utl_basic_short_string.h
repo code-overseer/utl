@@ -4,6 +4,7 @@
 
 #include "utl/utl_config.h"
 
+#include "utl/initializer_list/utl_initializer_list_fwd.h"
 #include "utl/string/utl_string_fwd.h"
 
 #include "utl/algorithm/utl_remove.h"
@@ -37,7 +38,6 @@
 #include "utl/utility/utl_compressed_pair.h"
 
 #include <climits>
-#include <initializer_list>
 
 #if UTL_WITH_EXCEPTIONS
 #  define UTL_CONSTEXPR_WITH_TRY UTL_CONSTEXPR_CXX20
@@ -83,8 +83,6 @@ public:
     class iterator;
 
 private:
-    using char_pointer = CharType*;
-    using const_char_pointer = CharType const*;
     using alloc_traits = allocator_traits<allocator_type>;
     static constexpr size_type inline_size = ShortSize + 1;
 
@@ -120,12 +118,12 @@ private:
         }
     };
 
-    union storage_union {
+    union data_union {
         short_type short_;
         heap_type heap_;
     };
 
-    using storage_type = compressed_pair<storage_union, allocator_type>;
+    using storage_type = compressed_pair<data_union, allocator_type>;
 
 public:
     class __UTL_ABI_PUBLIC iterator : __UTL contiguous_iterator_base<iterator, value_type> {
@@ -144,7 +142,7 @@ public:
             iterator&& other) noexcept = default;
 
     private:
-        __UTL_HIDE_FROM_ABI inline constexpr iterator(char_pointer data) noexcept
+        __UTL_HIDE_FROM_ABI inline constexpr iterator(value_type* data) noexcept
             : base_type(data) {}
         template <typename It>
         __UTL_HIDE_FROM_ABI inline constexpr iterator(It other) noexcept
@@ -167,7 +165,7 @@ public:
         , is_heap_() {}
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string(
-        const_char_pointer str, size_type len, allocator_type const& a = allocator_type())
+        value_type const* str, size_type len, allocator_type const& a = allocator_type())
         UTL_THROWS
         : basic_short_string(a) {
         assign(str, len);
@@ -182,7 +180,7 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string(
-        const_char_pointer str, allocator_type const& a = allocator_type()) UTL_THROWS
+        value_type const* str, allocator_type const& a = allocator_type()) UTL_THROWS
         : basic_short_string(str, traits_type::length(str), a) {}
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string(
@@ -217,7 +215,7 @@ public:
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string(
         basic_short_string const& other) UTL_THROWS
-        : storage_(other.storage_.first(),
+        : storage_(other.get_union(),
               alloc_traits::select_on_container_copy_construction(other.allocator_ref()))
         , size_(other.size_)
         , is_heap_(other.is_heap_) {
@@ -229,7 +227,7 @@ public:
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string(
         basic_short_string const& other, size_type pos, size_type count,
         allocator_type const& alloc = allocator_type()) UTL_THROWS
-        : storage_(other.storage_.first(), alloc)
+        : storage_(other.get_union(), alloc)
         , size_(other.size_)
         , is_heap_(other.is_heap_) {
         UTL_THROW_IF(pos > other.size(),
@@ -253,7 +251,7 @@ public:
         basic_short_string const& other) UTL_THROWS {
         if (this != __UTL addressof(other)) {
             destroy();
-            storage_.first() = other.storage_.first();
+            other.get_union() = other.get_union();
             alloc_traits::assign(allocator_ref(), other.allocator_ref());
             size_ = other.size_;
             is_heap_ = other.is_heap_;
@@ -276,7 +274,7 @@ public:
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string(basic_short_string&& other,
         size_type pos, size_type count, allocator_type const& alloc = allocator_type()) UTL_THROWS
-        : storage_(other.storage_.first(), alloc)
+        : storage_(other.get_union(), alloc)
         , size_(other.size_)
         , is_heap_(other.is_heap_) {
         UTL_THROW_IF(pos > other.size(),
@@ -317,11 +315,11 @@ public:
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX20 ~basic_short_string() noexcept { destroy(); }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 char_pointer data() noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 value_type* data() noexcept UTL_LIFETIMEBOUND {
         return !is_heap_ ? get_short().data_ : __UTL to_address(get_heap().data_);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr const_char_pointer data() const noexcept UTL_LIFETIMEBOUND {
+    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr value_type const* data() const noexcept UTL_LIFETIMEBOUND {
         return !is_heap_ ? get_short().data_ : __UTL to_address(get_heap().data_);
     }
 
@@ -376,9 +374,9 @@ public:
         size_ = new_size;
     }
 
-    template <typename Op UTL_CONSTRAINT_CXX11(
-        is_integral<decltype(__UTL declval<Op>()(char_pointer{}, size_type{}))>::value)>
-    UTL_CONSTRAINT_CXX20(requires(Op op, char_pointer p, size_type s) {
+    template <typename Op UTL_CONSTRAINT_CXX11(is_integral<decltype(__UTL declval<Op>()(
+            static_cast<value_type*>(0), size_type{}))>::value)>
+    UTL_CONSTRAINT_CXX20(requires(Op op, value_type* p, size_type s) {
         { op(p, s) } -> integral;
     })
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_WITH_TRY void resize_and_overwrite(
@@ -527,7 +525,7 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& assign(
-        const_char_pointer str, size_type count) UTL_THROWS UTL_LIFETIMEBOUND {
+        value_type const* str, size_type count) UTL_THROWS UTL_LIFETIMEBOUND {
         UTL_ASSERT(str != nullptr);
         reserve(count);
         traits_type::copy(data(), str, count)[count] = value_type();
@@ -536,7 +534,7 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& assign(
-        const_char_pointer str) UTL_THROWS {
+        value_type const* str) UTL_THROWS {
         UTL_ASSERT(str != nullptr);
         assign(str, traits_type::length(str));
     }
@@ -614,7 +612,7 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& insert(
-        size_type pos, const_char_pointer str, size_type length) UTL_THROWS UTL_LIFETIMEBOUND {
+        size_type pos, value_type const* str, size_type length) UTL_THROWS UTL_LIFETIMEBOUND {
         UTL_THROW_IF(pos > size(),
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::insert` operation failed, "
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
@@ -629,7 +627,7 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& insert(
-        size_type pos, const_char_pointer str) UTL_THROWS UTL_LIFETIMEBOUND {
+        size_type pos, value_type const* str) UTL_THROWS UTL_LIFETIMEBOUND {
         return insert(pos, str, traits_type::length(str));
     }
 
@@ -713,9 +711,8 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_convertible(View, view_type))>
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& insert(
-        size_type pos, View const& view, size_type subidx, size_type subcount = npos)
-        UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 basic_short_string& insert(size_type pos, View const& view,
+        size_type subidx, size_type subcount = npos) UTL_THROWS UTL_LIFETIMEBOUND {
         view_type const v(view);
         UTL_THROW_IF(subidx > v.size(),
             out_of_range(
@@ -733,21 +730,20 @@ public:
         return erase(first, first + length), *this;
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 iterator erase(iterator pos) noexcept UTL_LIFETIMEBOUND {
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 iterator erase(iterator pos) noexcept UTL_LIFETIMEBOUND {
         return erase(pos, pos + 1);
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 iterator erase(const_iterator pos) noexcept UTL_LIFETIMEBOUND {
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 iterator erase(const_iterator pos) noexcept UTL_LIFETIMEBOUND {
         return erase(pos, pos + 1);
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 iterator erase(
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 iterator erase(
         const_iterator first, const_iterator last) noexcept UTL_LIFETIMEBOUND {
         return erase(iterator(first), iterator(last));
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 iterator erase(
-        iterator first, iterator last) noexcept UTL_LIFETIMEBOUND {
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 iterator erase(iterator first, iterator last) noexcept UTL_LIFETIMEBOUND {
         auto const length = last - first;
         auto const src = last.operator->();
         auto const dst = first.operator->();
@@ -774,12 +770,12 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& append(
-        const_char_pointer str) UTL_THROWS UTL_LIFETIMEBOUND {
+        value_type const* str) UTL_THROWS UTL_LIFETIMEBOUND {
         return insert(size(), str);
     }
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& append(
-        const_char_pointer str, size_type count) UTL_THROWS UTL_LIFETIMEBOUND {
+        value_type const* str, size_type count) UTL_THROWS UTL_LIFETIMEBOUND {
         return insert(size(), str, count);
     }
 
@@ -816,30 +812,30 @@ public:
         return insert(size(), v.substr(subidx, subcount));
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(
         basic_short_string const& str) UTL_THROWS UTL_LIFETIMEBOUND {
         return append(str);
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(
-        value_type ch) UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(value_type ch)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         return append(1, ch);
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(
-        const_char_pointer str) UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(
+        value_type const* str) UTL_THROWS UTL_LIFETIMEBOUND {
         return append(str);
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(
         ::std::initializer_list<value_type> list) UTL_THROWS UTL_LIFETIMEBOUND {
         return append(list);
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_convertible(View, view_type))>
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(
-        View const& view) UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 basic_short_string& operator+=(View const& view)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         return append(view);
     }
 
@@ -867,9 +863,8 @@ public:
         return replace(pos, count, view.data(), view.size());
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& replace(
-        size_type pos, size_type count, const_char_pointer str, size_type length)
-        UTL_THROWS UTL_LIFETIMEBOUND {
+    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& replace(size_type pos,
+        size_type count, value_type const* str, size_type length) UTL_THROWS UTL_LIFETIMEBOUND {
         UTL_THROW_IF(pos > size(),
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::replace` operation failed, "
                                             "Reason=[index out of range], pos=[%zu], size=[%zu]"),
@@ -879,8 +874,8 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& replace(
-        const_iterator first, const_iterator last, const_char_pointer str,
-        size_type length) UTL_THROWS UTL_LIFETIMEBOUND {
+        const_iterator first, const_iterator last, value_type const* str, size_type length)
+        UTL_THROWS UTL_LIFETIMEBOUND {
         auto const replaced_count = last - first;
         auto copy_str = [p = const_cast<pointer>(first.operator->()), str](
                             size_type count) { return traits_type::move(p, str, count); };
@@ -897,13 +892,13 @@ public:
     }
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& replace(
-        size_type pos, size_type count, const_char_pointer str) UTL_THROWS {
+        size_type pos, size_type count, value_type const* str) UTL_THROWS {
         UTL_ASSERT(str != nullptr);
         return replace(pos, count, str, traits_type::length(str));
     }
 
     __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 basic_short_string& replace(
-        const_iterator first, const_iterator last, const_char_pointer str)
+        const_iterator first, const_iterator last, value_type const* str)
         UTL_THROWS UTL_LIFETIMEBOUND {
         UTL_ASSERT(str != nullptr);
         return replace(first, last, str, traits_type::length(str));
@@ -1017,255 +1012,250 @@ public:
         return copied;
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 void swap(basic_short_string& other) noexcept(
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void swap(basic_short_string& other) noexcept(
         alloc_traits::propagate_on_container_swap::value || alloc_traits::is_always_equal::value) {
         using swap_alloc_t = bool_constant<alloc_traits::propagate_on_container_swap::value ||
             !alloc_traits::is_always_equal::value>;
         swap(other, swap_alloc_t{});
     }
 
-    __UTL_HIDE_FROM_ABI friend __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 void swap(
+    __UTL_HIDE_FROM_ABI friend inline UTL_CONSTEXPR_CXX14 void swap(
         basic_short_string& l, basic_short_string& r) noexcept(noexcept(l.swap(r))) {
         l.swap(r);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find(
         basic_short_string const& str, size_type pos = 0) const noexcept {
         return find(str.data(), pos, str.size());
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find(
-        const_char_pointer str, size_type pos, size_type str_len) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find(
+        value_type const* str, size_type pos, size_type str_len) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return details::string::find<traits_type>(data(), size(), str, str_len, pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find(
-        const_char_pointer str, size_type pos = 0) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find(
+        value_type const* str, size_type pos = 0) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return find(str, pos, traits_type::length(str));
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find(
         value_type ch, size_type pos = 0) const noexcept {
         return details::string::find<traits_type>(data(), size(), ch, pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find(
         view_type view, size_type pos = 0) const noexcept {
         return find(view.data(), pos, view.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_convertible(View, view_type))>
-    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE constexpr size_type find(View const& view,
+    UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) inline constexpr size_type find(View const& view,
         size_type pos = 0) const noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return find(view_type(view), pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type rfind(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type rfind(
         basic_short_string const& str, size_type pos = npos) const noexcept {
         return rfind(str.data(), pos, str.size());
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type rfind(
-        const_char_pointer str, size_type pos, size_type str_len) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type rfind(
+        value_type const* str, size_type pos, size_type str_len) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return details::string::rfind<traits_type>(data(), size(), str, str_len, pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type rfind(
-        const_char_pointer str, size_type pos = npos) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type rfind(
+        value_type const* str, size_type pos = npos) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return rfind(str, pos, traits_type::length(str));
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type rfind(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type rfind(
         value_type ch, size_type pos = npos) const noexcept {
         return details::string::rfind<traits_type>(data(), size(), ch, pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type rfind(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type rfind(
         view_type view, size_type pos = npos) const noexcept {
         return rfind(view.data(), pos, view.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_convertible(View, view_type))>
-    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE constexpr size_type rfind(View const& view,
+    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) inline constexpr size_type rfind(View const& view,
         size_type pos = npos) const noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return rfind(view_type(view), pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_first_of(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_first_of(
         basic_short_string const& chars, size_type pos = 0) const noexcept {
         return find_first_of(chars.data(), pos, chars.size());
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_first_of(
-        const_char_pointer chars, size_type pos, size_type chars_count) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_first_of(
+        value_type const* chars, size_type pos, size_type chars_count) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_first_of<traits_type>(data(), size(), chars, chars_count, pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_first_of(
-        const_char_pointer chars, size_type pos = 0) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_first_of(
+        value_type const* chars, size_type pos = 0) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_first_of(chars, pos, traits_type::length(chars));
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_first_of(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_first_of(
         value_type ch, size_type pos = 0) const noexcept {
         return details::string::find_first_of<traits_type>(data(), size(), ch, pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_first_of(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_first_of(
         view_type view, size_type pos = 0) const noexcept {
         return find_first_of(view.data(), pos, view.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_convertible(View, view_type))>
-    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE constexpr size_type find_first_of(
-        View const& view, size_type pos = 0) const
-        noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
+    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) inline constexpr size_type find_first_of(View const& view,
+        size_type pos = 0) const noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return find_first_of(view_type(view), pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_first_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_first_not_of(
         basic_short_string const& chars, size_type pos = 0) const noexcept {
         return find_first_not_of(chars.data(), pos, chars.size());
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_first_not_of(
-        const_char_pointer chars, size_type pos, size_type chars_count) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_first_not_of(
+        value_type const* chars, size_type pos, size_type chars_count) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_first_not_of<traits_type>(
             data(), size(), chars, chars_count, pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_first_not_of(
-        const_char_pointer chars, size_type pos = 0) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_first_not_of(
+        value_type const* chars, size_type pos = 0) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_first_not_of(chars, pos, traits_type::length(chars));
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_first_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_first_not_of(
         value_type ch, size_type pos = 0) const noexcept {
         return find_first_not_of(&ch, pos, 1);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_first_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_first_not_of(
         view_type view, size_type pos = 0) const noexcept {
         return find_first_not_of(view.data(), pos, view.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_convertible(View, view_type))>
-    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE constexpr size_type find_first_not_of(
-        View const& view, size_type pos = 0) const
-        noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
+    UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) inline constexpr size_type find_first_not_of(View const& view,
+        size_type pos = 0) const noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return find_first_not_of(view_type(view), pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_last_of(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_last_of(
         basic_short_string const& chars, size_type pos = npos) const noexcept {
         return find_last_of(chars.data(), pos, chars.size());
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_last_of(
-        const_char_pointer chars, size_type pos, size_type chars_count) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_last_of(
+        value_type const* chars, size_type pos, size_type chars_count) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_last_of<traits_type>(data(), size(), chars, chars_count, pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_last_of(
-        const_char_pointer chars, size_type pos = npos) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_last_of(
+        value_type const* chars, size_type pos = npos) const noexcept {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_last_of(chars, pos, traits_type::length(chars));
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_last_of(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_last_of(
         value_type ch, size_type pos = npos) const noexcept {
         return find_last_of(&ch, pos, 1);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_last_of(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_last_of(
         view_type view, size_type pos = npos) const noexcept {
         return find_last_of(view.data(), pos, view.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_convertible(View, view_type))>
-    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE constexpr size_type find_last_of(
-        View const& view, size_type pos = npos) const
-        noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
+    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) inline constexpr size_type find_last_of(View const& view,
+        size_type pos = npos) const noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return find_last_of(view_type(view), pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_last_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_last_not_of(
         basic_short_string const& chars, size_type pos = npos) const noexcept {
         return find_last_not_of(chars.data(), pos, chars.size());
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_last_not_of(
-        const_char_pointer chars, size_type pos, size_type count) const UTL_THROWS {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_last_not_of(
+        value_type const* chars, size_type pos, size_type count) const UTL_THROWS {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return details::string::find_last_not_of<traits_type>(data(), size(), chars, count, pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_last_not_of(
-        const_char_pointer chars, size_type pos = npos) const UTL_THROWS {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_last_not_of(
+        value_type const* chars, size_type pos = npos) const UTL_THROWS {
         // CONSTEXPR_ASSERT(chars != nullptr);
         return find_last_not_of(chars, pos, traits_type::length(chars));
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_last_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_last_not_of(
         value_type ch, size_type pos = npos) const UTL_THROWS {
         return find_last_not_of(&ch, pos, 1);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr size_type find_last_not_of(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr size_type find_last_not_of(
         view_type view, size_type pos = npos) const UTL_THROWS {
         return find_last_not_of(view.data(), pos, view.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_convertible(View, view_type))>
-    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE constexpr size_type find_last_not_of(
-        View const& view, size_type pos = npos) const UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_convertible(View,
+    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) inline constexpr size_type find_last_not_of(View const& view,
+        size_type pos = npos) const UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_convertible(View,
         view_type)) {
         return find_last_not_of(view_type(view), pos);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr int compare(
-        basic_short_string const& other) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr int compare(basic_short_string const& other) const noexcept {
         return details::string::compare<traits_type>(data(), size(), other.data(), other.size());
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr int compare(
-        const_char_pointer str) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr int compare(value_type const* str) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return details::string::compare<traits_type>(data(), size(), str, traits_type::length(str));
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr int compare(view_type view) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr int compare(view_type view) const noexcept {
         return details::string::compare<traits_type>(data(), size(), view.data(), view.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(UTL_TRAIT_is_convertible(View, view_type))>
-    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 int compare(View const& view) const
+    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) inline UTL_CONSTEXPR_CXX14 int compare(View const& view) const
         noexcept(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return compare(view_type(view));
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 int compare(
+    UTL_ATTRIBUTE(STRING_PURE) inline UTL_CONSTEXPR_CXX14 int compare(
         size_type pos, size_type count, basic_short_string const& other) const UTL_THROWS {
         return compare(pos, count, other.data(), other.size());
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 int compare(
-        size_type pos, size_type count, const_char_pointer str, size_type str_len) const UTL_THROWS {
+    UTL_ATTRIBUTE(STRING_PURE) inline UTL_CONSTEXPR_CXX14 int compare(
+        size_type pos, size_type count, value_type const* str, size_type str_len) const UTL_THROWS {
         UTL_ASSERT(str != nullptr);
         UTL_THROW_IF(pos > size(),
             out_of_range(UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::replace` operation failed, "
@@ -1275,24 +1265,24 @@ public:
             data() + pos, __UTL numeric::min(count, size() - pos), str, str_len);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 int compare(
-        size_type pos, size_type count, const_char_pointer str) const UTL_THROWS {
+    UTL_ATTRIBUTE(STRING_PURE) inline UTL_CONSTEXPR_CXX14 int compare(
+        size_type pos, size_type count, value_type const* str) const UTL_THROWS {
         return compare(pos, count, str, traits_type::length(str));
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 int compare(
+    UTL_ATTRIBUTE(STRING_PURE) inline UTL_CONSTEXPR_CXX14 int compare(
         size_type pos, size_type count, view_type view) const UTL_THROWS {
         return compare(pos, count, view.data(), view.size());
     }
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_convertible(View, view_type))>
-    UTL_ATTRIBUTES(NODISCARD, _ABI_PRIVATE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 int compare(
-        size_type pos, size_type count, View const& view) const UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
+    UTL_ATTRIBUTES(NODISCARD, _HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
+        View const& view) const UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_convertible(View, view_type)) {
         return compare(pos, count, view_type(view));
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
+    UTL_ATTRIBUTE(STRING_PURE) inline UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
         basic_short_string const& other, size_type pos2, size_type count2 = npos) const UTL_THROWS {
         UTL_THROW_IF(pos2 > other.size(),
             out_of_range(
@@ -1302,8 +1292,8 @@ public:
         return compare(pos, count, view_type(other).substr(pos2, count2));
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
-        view_type view, size_type pos2, size_type count2 = npos) const UTL_THROWS {
+    UTL_ATTRIBUTE(STRING_PURE) inline UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count, view_type view,
+        size_type pos2, size_type count2 = npos) const UTL_THROWS {
         UTL_THROW_IF(pos2 > view.size(),
             out_of_range(
                 UTL_MESSAGE_FORMAT("[UTL] `basic_short_string::compare` operation failed, "
@@ -1314,70 +1304,66 @@ public:
 
     template <UTL_CONCEPT_CXX20(convertible_to<view_type>) View UTL_CONSTRAINT_CXX11(
         UTL_TRAIT_is_convertible(View, view_type))>
-    UTL_ATTRIBUTES(NODISCARD, PURE, _ABI_PRIVATE) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 int compare(size_type pos,
-        size_type count, View const& view, size_type pos2, size_type count2 = npos) const UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_convertible(View,
+    UTL_ATTRIBUTES(NODISCARD, PURE, _HIDE_FROM_ABI) inline UTL_CONSTEXPR_CXX14 int compare(size_type pos, size_type count,
+        View const& view, size_type pos2, size_type count2 = npos) const UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_convertible(View,
         view_type)) {
         return compare(pos, count, view_type(view), pos2, count2);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool starts_with(view_type view) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool starts_with(view_type view) const noexcept {
         return size() >= view.size() && traits_type::compare(data(), view.data(), view.size()) == 0;
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool starts_with(value_type ch) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool starts_with(value_type ch) const noexcept {
         return !empty() && front() == ch;
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool starts_with(
-        const_char_pointer str) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool starts_with(value_type const* str) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return starts_with(view_type(str));
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool ends_with(view_type view) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool ends_with(view_type view) const noexcept {
         return size() >= view.size() &&
             traits_type::compare(view_type(*this).substr(size() - view.size()).data(), view.data(),
                 view.size()) == 0;
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool ends_with(value_type ch) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool ends_with(value_type ch) const noexcept {
         return !empty() && back() == ch;
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool ends_with(
-        const_char_pointer str) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool ends_with(value_type const* str) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return ends_with(view_type(str));
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool contains(view_type view) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool contains(view_type view) const noexcept {
         return find(view) != npos;
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool contains(value_type ch) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool contains(value_type ch) const noexcept {
         return traits_type::find(data(), size(), ch) != nullptr;
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool contains(
-        const_char_pointer str) const noexcept {
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool contains(value_type const* str) const noexcept {
         // CONSTEXPR_ASSERT(str != nullptr);
         return contains(view_type(str));
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr basic_short_string substr(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr basic_short_string substr(
         size_type pos = 0, size_type count = npos) const& {
         return basic_short_string(*this, pos, count);
     }
 
-    UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr basic_short_string substr(
+    UTL_ATTRIBUTE(STRING_PURE) inline constexpr basic_short_string substr(
         size_type pos = 0, size_type count = npos) const&& {
         return basic_short_string(__UTL move(*this), pos, count);
     }
 
 private:
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 void swap(
-        basic_short_string& other, false_type) noexcept {
-        ranges::swap(storage_.first(), other.storage_.first());
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void swap(basic_short_string& other, false_type) noexcept {
+        ranges::swap(get_union(), other.get_union());
         auto size_tmp = size_;
         auto heap_tmp = is_heap_;
         size_ = other.size_;
@@ -1386,8 +1372,7 @@ private:
         other.is_heap_ = heap_tmp;
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 void swap(
-        basic_short_string& other, true_type) noexcept {
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void swap(basic_short_string& other, true_type) noexcept {
         swap(other, false_type{});
         ranges::swap(allocator_ref(), other.allocator_ref());
     }
@@ -1447,7 +1432,7 @@ private:
         }
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 void reset_to_short() && noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, REINITIALIZES) inline UTL_CONSTEXPR_CXX14 void reset_to_short() && noexcept {
         // The && qualifier is not needed but added to prevent accidental use
         // constexpr only if `is_heap_` is `false` because constexpr placement new is not portable
         if (is_heap_) {
@@ -1457,15 +1442,15 @@ private:
         }
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 void move_assign(
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void move_assign(
         basic_short_string& other, false_type) UTL_THROWS {
         *this = other;
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 void move_assign(
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void move_assign(
         basic_short_string& other, true_type) noexcept {
         destroy();
-        storage_.first() = other.storage_.first();
+        get_union() = other.get_union();
         alloc_traits::assign(allocator_ref(), __UTL move(other.allocator_ref()));
         size_ = other.size_;
         is_heap_ = other.is_heap_;
@@ -1473,14 +1458,14 @@ private:
         __UTL move(other).reset_to_short();
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 void inline_substring(
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void inline_substring(
         size_type pos, size_type count) noexcept {
         auto const new_size = __UTL numeric::min(this->size() - pos, count);
         traits_type::move(this->data(), this->data() + pos, new_size);
         this->resize(new_size);
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 void on_move_construct_with_alloc(
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void on_move_construct_with_alloc(
         basic_short_string& other, size_type pos, size_type count, true_type) UTL_THROWS {
         if (!alloc_traits::equals(allocator_ref(), other.allocator_ref()) && other.is_heap_) {
             storage_.get_heap() = clone_heap(allocator_ref(), other);
@@ -1491,28 +1476,37 @@ private:
         }
     }
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 void on_move_construct_with_alloc(
+    __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 void on_move_construct_with_alloc(
         basic_short_string& other, size_type pos, size_type count, false_type) noexcept {
         inline_substring(pos, count);
         __UTL move(other).reset_to_short();
     }
 
-    UTL_ATTRIBUTE(STRING_CONST) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 short_type& get_short() noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 data_union& get_union() noexcept {
+        return storage_.first();
+    }
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 short_type& get_short() noexcept {
         return storage_.first().short_;
     }
-    UTL_ATTRIBUTE(STRING_CONST) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 heap_type& get_heap() noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 heap_type& get_heap() noexcept {
         return storage_.first().heap_;
     }
-    UTL_ATTRIBUTE(STRING_CONST) __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14 allocator_type& allocator_ref() noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline UTL_CONSTEXPR_CXX14 allocator_type& allocator_ref() noexcept {
         return storage_.second();
     }
-    UTL_ATTRIBUTE(STRING_CONST) __UTL_STRING_INLINE constexpr short_type const& get_short() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr data_union const&
+    get_union() const noexcept {
+        return storage_.first();
+    }
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr short_type const&
+    get_short() const noexcept {
         return storage_.first().short_;
     }
-    UTL_ATTRIBUTE(STRING_CONST) __UTL_STRING_INLINE constexpr heap_type const& get_heap() const noexcept {
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr heap_type const& get_heap() const noexcept {
         return storage_.first().heap_;
     }
-    UTL_ATTRIBUTE(STRING_CONST) __UTL_STRING_INLINE constexpr allocator_type const&
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, ALWAYS_INLINE) inline constexpr allocator_type const&
     allocator_ref() const noexcept {
         return storage_.second();
     }
@@ -1529,9 +1523,8 @@ private:
 };
 
 template <typename CharT, size_t N, typename Traits, typename Alloc, typename U>
-__UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14
-    typename basic_short_string<CharT, N, Traits, Alloc>::size_type
-    erase(basic_short_string<CharT, N, Traits, Alloc>& c, U const& value) {
+__UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 typename basic_short_string<CharT, N, Traits, Alloc>::size_type
+erase(basic_short_string<CharT, N, Traits, Alloc>& c, U const& value) {
     auto const it = __UTL remove(c.begin(), c.end(), value);
     auto const result = c.end() - it;
     c.erase(it, c.end());
@@ -1539,9 +1532,8 @@ __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc, typename Pred>
-__UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14
-    typename basic_short_string<CharT, N, Traits, Alloc>::size_type
-    erase_if(basic_short_string<CharT, N, Traits, Alloc>& c, Pred const& pred) {
+__UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 typename basic_short_string<CharT, N, Traits, Alloc>::size_type
+erase_if(basic_short_string<CharT, N, Traits, Alloc>& c, Pred const& pred) {
     auto const it = __UTL remove_if(c.begin(), c.end(), pred);
     auto const result = c.end() - it;
     c.erase(it, c.end());
@@ -1549,21 +1541,21 @@ __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE UTL_CONSTEXPR_CXX14
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator==(
+UTL_ATTRIBUTES(STRING_PURE) inline constexpr bool operator==(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return lhs.size() == rhs.size() && lhs.compare(rhs) == 0;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator==(
+UTL_ATTRIBUTES(STRING_PURE) inline constexpr bool operator==(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return lhs.compare(rhs) == 0;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(basic_short_string<CharT, N, Traits, Alloc> const& l,
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l,
     basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
     basic_short_string<CharT, N, Traits, Alloc> output;
     output.reserve(l.size() + r.size());
@@ -1573,14 +1565,14 @@ operator+(basic_short_string<CharT, N, Traits, Alloc> const& l,
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(basic_short_string<CharT, N, Traits, Alloc> const& l, CharT const* r) UTL_THROWS {
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l, CharT const* r) UTL_THROWS {
     return l + basic_string_view<CharT, Traits>(r);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(basic_short_string<CharT, N, Traits, Alloc> const& l, CharT r) UTL_THROWS {
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l, CharT r) UTL_THROWS {
     basic_short_string<CharT, N, Traits, Alloc> output;
     output.reserve(l.size() + 1);
     output += l;
@@ -1589,8 +1581,8 @@ operator+(basic_short_string<CharT, N, Traits, Alloc> const& l, CharT r) UTL_THR
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(basic_short_string<CharT, N, Traits, Alloc> const& l,
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l,
     type_identity_t<basic_string_view<CharT, Traits>> r) UTL_THROWS {
     basic_short_string<CharT, N, Traits, Alloc> output;
     output.reserve(l.size() + r.size());
@@ -1600,14 +1592,14 @@ operator+(basic_short_string<CharT, N, Traits, Alloc> const& l,
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(CharT const* l, basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    CharT const* l, basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
     return basic_string_view<CharT, Traits>(l) + r;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(CharT l, basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    CharT l, basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
     basic_short_string<CharT, N, Traits, Alloc> output;
     output.reserve(l.size() + 1);
     output += l;
@@ -1616,8 +1608,8 @@ operator+(CharT l, basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THR
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(type_identity_t<basic_string_view<CharT, Traits>> l,
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    type_identity_t<basic_string_view<CharT, Traits>> l,
     basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
     basic_short_string<CharT, N, Traits, Alloc> output;
     output.reserve(l.size() + r.size());
@@ -1626,60 +1618,60 @@ operator+(type_identity_t<basic_string_view<CharT, Traits>> l,
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(basic_short_string<CharT, N, Traits, Alloc>&& l,
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l,
     basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
     return __UTL move(l.append(r));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(basic_short_string<CharT, N, Traits, Alloc>&& l,
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l,
     basic_short_string<CharT, N, Traits, Alloc> const& r) UTL_THROWS {
     return __UTL move(l.append(r));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(basic_short_string<CharT, N, Traits, Alloc>&& l, CharT const* r) UTL_THROWS {
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l, CharT const* r) UTL_THROWS {
     return __UTL move(l.append(r));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(basic_short_string<CharT, N, Traits, Alloc>&& l, CharT r) UTL_THROWS {
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l, CharT r) UTL_THROWS {
     return __UTL move(l.append(r));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(basic_short_string<CharT, N, Traits, Alloc>&& l,
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc>&& l,
     type_identity_t<basic_string_view<CharT, Traits>> r) UTL_THROWS {
     return __UTL move(l.append(r));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(basic_short_string<CharT, N, Traits, Alloc> const& l,
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    basic_short_string<CharT, N, Traits, Alloc> const& l,
     basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
     return __UTL move(r.insert(0, l));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(CharT const* l, basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    CharT const* l, basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
     return __UTL move(r.insert(0, l));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(CharT l, basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    CharT l, basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
     return __UTL move(r.insert(0, l));
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) __UTL_STRING_INLINE constexpr basic_short_string<CharT, N, Traits, Alloc>
-operator+(type_identity_t<basic_string_view<CharT, Traits>> l,
+UTL_ATTRIBUTES(NODISCARD,_HIDE_FROM_ABI) inline constexpr basic_short_string<CharT, N, Traits, Alloc> operator+(
+    type_identity_t<basic_string_view<CharT, Traits>> l,
     basic_short_string<CharT, N, Traits, Alloc>&& r) UTL_THROWS {
     return __UTL move(r.insert(0, l));
 }
@@ -1693,7 +1685,7 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr typename Traits::comparison_category operator<=>(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr typename Traits::comparison_category operator<=>(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     using result_type = typename Traits::comparison_category;
@@ -1701,7 +1693,7 @@ UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr typename Traits::compar
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr typename Traits::comparison_category operator<=>(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr typename Traits::comparison_category operator<=>(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     using result_type = typename Traits::comparison_category;
     return static_cast<result_type>(lhs.compare(rhs) <=> 0);
@@ -1714,96 +1706,96 @@ UTL_NAMESPACE_END
 UTL_NAMESPACE_BEGIN
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator<(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator<(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return lhs.compare(rhs) < 0;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator<(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator<(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return lhs.compare(rhs) < 0;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator<(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator<(
     CharT const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return rhs.compare(lhs) > 0;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator>(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator>(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return rhs < lhs;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator>(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator>(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return rhs < lhs;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator>(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator>(
     CharT const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return rhs < lhs;
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator>=(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator>=(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(lhs < rhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator>=(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator>=(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return !(lhs < rhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator>=(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator>=(
     CharT const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(lhs < rhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator<=(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator<=(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(rhs < lhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator<=(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator<=(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return !(rhs < lhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator<=(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator<=(
     CharT const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(rhs < lhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator!=(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator!=(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs,
     basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(lhs == rhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator!=(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator!=(
     basic_short_string<CharT, N, Traits, Alloc> const& lhs, CharT const* rhs) noexcept {
     return !(lhs == rhs);
 }
 
 template <typename CharT, size_t N, typename Traits, typename Alloc>
-UTL_ATTRIBUTE(STRING_PURE) __UTL_STRING_INLINE constexpr bool operator!=(
+UTL_ATTRIBUTE(STRING_PURE) inline constexpr bool operator!=(
     CharT const* lhs, basic_short_string<CharT, N, Traits, Alloc> const& rhs) noexcept {
     return !(lhs == rhs);
 }

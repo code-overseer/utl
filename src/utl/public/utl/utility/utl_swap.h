@@ -16,31 +16,28 @@ UTL_NAMESPACE_END
 
 #else // UTL_USE_STD_swap
 
-#  include "utl/ranges/utl_swap.h"
-
-#  if UTL_CXX20
-
-UTL_NAMESPACE_BEGIN
-
-template <typename T>
-requires requires(T& l, T& r) { ranges::swap(l, r); }
-__UTL_HIDE_FROM_ABI inline constexpr void swap(T& l, T& r) noexcept(noexcept(ranges::swap(l, r))) {
-    ranges::swap(l, r);
-}
-
-UTL_NAMESPACE_END
-
-#  else
+#  include "utl/type_traits/utl_enable_if.h"
+#  include "utl/type_traits/utl_is_swappable.h"
 
 UTL_NAMESPACE_BEGIN
 
 template <typename T>
-__UTL_HIDE_FROM_ABI inline constexpr auto swap(T& l, T& r) noexcept(noexcept(ranges::swap(l, r)))
-    -> decltype(ranges::swap(l, r)) {
-    ranges::swap(l, r);
+__UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 auto swap(T& l, T& r) noexcept(
+    UTL_TRAIT_is_nothrow_move_constructible(T) && UTL_TRAIT_is_nothrow_move_assignable(T))
+    -> enable_if_t<UTL_TRAIT_is_move_constructible(T) && UTL_TRAIT_is_move_assignable(T)> {
+    T tmp{__UTL move(l)};
+    l = __UTL move(r);
+    r = __UTL move(tmp);
+}
+
+template <typename T, size_t N>
+__UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 auto swap(T (&l)[N], T (&r)[N]) noexcept(
+    UTL_TRAIT_is_nothrow_swappable(T)) -> enable_if_t<UTL_TRAIT_is_swappable(T)> {
+    for (auto i = 0u; i < N; ++i) {
+        swap(l[i], r[i]);
+    }
 }
 
 UTL_NAMESPACE_END
 
-#  endif
-#endif // UTL_CXX20 && UTL_USE_STD_swap
+#endif // UTL_USE_STD_swap

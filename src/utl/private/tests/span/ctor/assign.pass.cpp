@@ -1,4 +1,5 @@
-// Copyright 2023-2024 Bryan Wong
+// Adapted from the LLVM Project, Copyright 2023-2024 Bryan Wong
+// Commit: 99696b35bc8a0054e0b0c1a26e8dd5049fa8c41b
 
 //===----------------------------------------------------------------------===//
 //
@@ -22,8 +23,6 @@
 #include <cassert>
 
 namespace span {
-namespace assign {
-
 template <typename T>
 constexpr bool doAssign(T lhs, T rhs) {
     ASSERT_NOEXCEPT(utl::declval<T&>() = rhs);
@@ -293,5 +292,8 @@ void assign_test_driver() {
     }
 }
 
-} // namespace assign
 } // namespace span
+
+int main() {
+    span::assign_test_driver();
+}

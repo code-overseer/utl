@@ -444,19 +444,29 @@ public:
 
 private:
     template <constructible_as<Types>... Us>
-    requires (... && !reference_constructs_from_temporary_v<Types, Us>)
-    __UTL_HIDE_FROM_ABI constexpr tuple(private_tag_t, Us&&... args) noexcept(
-        is_nothrow_constructible_v<base_type, Us...>)
-        : base_type(__UTL forward<Us>(args)...) {}
-
-    template <constructible_as<Types>... Us>
-    requires (... || reference_constructs_from_temporary_v<Types, Us>)
+    requires (... || reference_constructs_from_temporary_v<Types, Us &&>)
     constexpr tuple(private_tag_t, Us&&... args) noexcept(
         is_nothrow_constructible_v<base_type, Us...>) = delete;
 
     template <constructible_as<Types>... Us>
-    static constexpr bool explicit_constructible_v =
-        (... || is_explicit_constructible_v<Types, Us>);
+    requires (... && !reference_constructs_from_temporary_v<Types, Us &&>)
+    __UTL_HIDE_FROM_ABI constexpr tuple(private_tag_t, Us&&... args) noexcept(
+        is_nothrow_constructible_v<base_type, Us...>)
+        : base_type(__UTL forward<Us>(args)...) {}
+
+    template <typename... Us>
+    static consteval bool explicit_constructible() {
+        return false;
+    }
+
+    template <typename... Us>
+    requires (sizeof...(Us) == sizeof...(Types))
+    static consteval bool explicit_constructible() {
+        return (... || is_explicit_constructible_v<Types, Us>);
+    }
+
+    template <typename... Us>
+    static constexpr bool explicit_constructible_v = explicit_constructible<Us...>();
 
 public:
     template <not_resolvable_to<private_tag_t> UHead, typename... UTail>
@@ -600,14 +610,14 @@ public:
 
 public:
     template <allocator_type Alloc, variadic_match<Types>... UTypes>
-    requires (is_ctor_with_alloc_args_v<Alloc, UTypes...> && !is_dangling_v<Alloc, UTypes...>)
+    requires (is_ctor_with_alloc_args_v<Alloc, UTypes...> && !is_dangling_v<Alloc, UTypes && ...>)
     __UTL_HIDE_FROM_ABI explicit(is_explicit_with_alloc_args_v<Alloc, UTypes...>) constexpr tuple(
         allocator_arg_t, Alloc const& alloc,
         UTypes&&... args) noexcept(is_nothrow_with_alloc_v<Alloc, UTypes...>)
         : base_type(allocator_arg, alloc, forward<UTypes>(args)...) {}
 
     template <allocator_type Alloc, variadic_match<Types>... UTypes>
-    requires (is_ctor_with_alloc_args_v<Alloc, UTypes...> && is_dangling_v<Alloc, UTypes...>)
+    requires (is_ctor_with_alloc_args_v<Alloc, UTypes...> && is_dangling_v<Alloc, UTypes && ...>)
     explicit(is_explicit_with_alloc_args_v<Alloc, UTypes...>) constexpr tuple(allocator_arg_t,
         Alloc const& alloc,
         UTypes&&... args) noexcept(is_nothrow_with_alloc_v<Alloc, UTypes...>) = delete;

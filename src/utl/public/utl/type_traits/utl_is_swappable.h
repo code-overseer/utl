@@ -112,9 +112,10 @@ UTL_INLINE_CXX17 constexpr bool is_swappable_with_v = details::swappable::trait<
 template <typename L, typename R>
 UTL_INLINE_CXX17 constexpr bool is_nothrow_swappable_with_v = details::swappable::is_nothrow<L, R>::value;
 template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_swappable_v = is_swappable<T>::value;
+UTL_INLINE_CXX17 constexpr bool is_swappable_v = is_referenceable_v<T> && is_swappable_with_v<T&, T&>;
 template <typename T>
-UTL_INLINE_CXX17 constexpr bool is_nothrow_swappable_v = is_nothrow_swappable<T>::value;
+UTL_INLINE_CXX17 constexpr bool is_nothrow_swappable_v =
+    is_referenceable_v<T> && is_nothrow_swappable_with_v<T&, T&>;
 
 #    endif // if UTL_CXX14
 

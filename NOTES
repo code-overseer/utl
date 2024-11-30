@@ -6,3 +6,6 @@
 # TODO: Investigate consteval bugs
 # TODO: Enable UTL keywords (utl_standard.h) based on features instead of standard
 # TODO: Make string_view use pointer_traits to allow smaller pointers
+# TODO: Use multi inheritance for <c++20 tuple
+# TODO: Expose ABI maintenance option
+# TODO: replace `futex::result` with `error_code`

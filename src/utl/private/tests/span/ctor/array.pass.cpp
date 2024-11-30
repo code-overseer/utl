@@ -1,4 +1,5 @@
-// Copyright 2023-2024 Bryan Wong
+// Adapted from the LLVM Project, Copyright 2023-2024 Bryan Wong
+// Commit: 99696b35bc8a0054e0b0c1a26e8dd5049fa8c41b
 
 //===----------------------------------------------------------------------===//
 //
@@ -26,8 +27,6 @@
 #include <cassert>
 
 namespace span {
-namespace array {
-
 void checkCV() {
     int arr[] = {1, 2, 3};
     int const carr[] = {4, 5, 6};
@@ -165,6 +164,9 @@ void array_test_driver() {
             "");
     }
 }
-
-} // namespace array
 } // namespace span
+
+#include <cstdio>
+int main() {
+    span::array_test_driver();
+}

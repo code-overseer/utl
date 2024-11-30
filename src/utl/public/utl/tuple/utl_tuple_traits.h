@@ -138,4 +138,12 @@ using tuple_like_trait UTL_NODEBUG = decltype(is_tuple_like_impl<T>(0));
 template <typename T>
 struct is_tuple_like : details::tuple::tuple_like_trait<T> {};
 
+#if UTL_CXX14
+template <typename T>
+UTL_INLINE_CXX17 constexpr bool is_tuple_like_v = __UTL details::tuple::tuple_like_trait<T>::value;
+#  define UTL_TRAIT_is_tuple_like(...) __UTL details::tuple::tuple_like_trait<__VA_ARGS__>::value
+#else
+#  define UTL_TRAIT_is_tuple_like(...) __UTL is_tuple_like<__VA_ARGS__>::value
+#endif
+
 UTL_NAMESPACE_END

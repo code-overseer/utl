@@ -629,8 +629,7 @@ public:
 public:
     template <typename TupleLike,
         enable_if_t<
-            conjunction<not_this<TupleLike>,
-                details::tuple::is_all_gettable<TupleLike, sizeof...(Types)>,
+            conjunction<not_this<TupleLike>, is_tuple_like<remove_cvref_t<TupleLike>>,
                 details::tuple::rebind_references_t<traits::template is_implicit_constructible,
                     TupleLike, sizeof...(Types)>,
                 negation<details::tuple::rebind_references_t<traits::template is_dangling,
@@ -644,8 +643,7 @@ public:
 
     template <typename TupleLike,
         enable_if_t<
-            conjunction<not_this<TupleLike>,
-                details::tuple::is_all_gettable<TupleLike, sizeof...(Types)>,
+            conjunction<not_this<TupleLike>, is_tuple_like<remove_cvref_t<TupleLike>>,
                 details::tuple::rebind_references_t<traits::template is_explicit_constructible,
                     TupleLike, sizeof...(Types)>,
                 negation<details::tuple::rebind_references_t<traits::template is_dangling,
@@ -659,8 +657,7 @@ public:
 
     template <typename TupleLike,
         enable_if_t<
-            conjunction<not_this<TupleLike>,
-                details::tuple::is_all_gettable<TupleLike, sizeof...(Types)>,
+            conjunction<not_this<TupleLike>, is_tuple_like<remove_cvref_t<TupleLike>>,
                 details::tuple::rebind_references_t<traits::template is_implicit_constructible,
                     TupleLike, sizeof...(Types)>,
                 details::tuple::rebind_references_t<traits::template is_dangling, TupleLike,
@@ -673,8 +670,7 @@ public:
 
     template <typename TupleLike,
         enable_if_t<
-            conjunction<not_this<TupleLike>,
-                details::tuple::is_all_gettable<TupleLike, sizeof...(Types)>,
+            conjunction<not_this<TupleLike>, is_tuple_like<remove_cvref_t<TupleLike>>,
                 details::tuple::rebind_references_t<traits::template is_explicit_constructible,
                     TupleLike, sizeof...(Types)>,
                 details::tuple::rebind_references_t<traits::template is_dangling, TupleLike,
@@ -1225,7 +1221,8 @@ __UTL_HIDE_FROM_ABI constexpr bool equals(T const& l, U const& r) noexcept(
 template <typename... Ts, typename... Us>
 UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) constexpr enable_if_t<
     conjunction<compare_ops::all_have_eq<tuple<Ts...>, tuple<Us...>>>::value, bool>
-operator==(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(details::tuple::equals(l, r)) {
+operator==(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
+    noexcept(details::tuple::equals(l, r))) {
     return details::tuple::equals(l, r);
 }
 
@@ -1234,7 +1231,8 @@ UTL_ATTRIBUTES(NODISCARD, FLATTEN, _HIDE_FROM_ABI) constexpr enable_if_t<
     conjunction<compare_ops::all_have_eq<tuple<Ts...>, tuple<Us...>>,
         compare_ops::all_have_lt<tuple<Ts...>, tuple<Us...>>>::value,
     bool>
-operator<(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(details::tuple::less(l, r)) {
+operator<(tuple<Ts...> const& l, tuple<Us...> const& r) noexcept(
+    noexcept(details::tuple::less(l, r))) {
     return details::tuple::less(l, r);
 }
 

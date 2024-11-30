@@ -1,10 +1,15 @@
+
 /**
  * Copyright 2023-2024 Bryan Wong
  * Credit: This file contains code derived from the GCC test suite.
  */
 
 #include "utl/ranges/utl_swap.h"
+#include "utl/string/utl_basic_short_string.h"
 #include "utl/utility/utl_swap.h"
+
+#include <string>
+
 UTL_DISABLE_WARNING_PUSH()
 #if UTL_COMPILER_GNU_BASED
 UTL_DISABLE_WARNING("-Wunused-function")
@@ -137,19 +142,36 @@ void swap(ranges_W<T>& x, ranges_W<T>& y) {
 
 // DR 809. swap should be overloaded for array types.
 void defect_809() {
-    utility_W<std::string[8]> w1, w2; // Two objects of a Swappable type.
+    utility_W<utl::string[8]> w1, w2; // Two objects of a Swappable type.
     using utl::swap;
     swap(w1, w2);
 }
 
 void defect_809_ranges() {
+    ranges_W<utl::string[8]> w1, w2;
+    utl::ranges::swap(w1, w2);
+}
+
+void std_swap() {
+    std::string w1, w2; // Two objects of a Swappable type.
+    using utl::swap;
+    swap(w1, w2);
+}
+
+void std_defect_809() {
+    utility_W<std::string[8]> w1, w2; // Two objects of a Swappable type.
+    utl::swap(w1, w2);
+}
+
+void std_defect_809_ranges() {
     ranges_W<std::string[8]> w1, w2;
     utl::ranges::swap(w1, w2);
 }
 
 void adl_test() {
-    adl_W<std::string[8]> w1, w2;
+    adl_W<utl::string[8]> w1, w2;
     utl::ranges::swap(w1, w2);
 }
+
 UTL_DISABLE_WARNING_POP()
 } // namespace
