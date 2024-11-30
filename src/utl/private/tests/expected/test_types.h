@@ -1,6 +1,10 @@
 // Adapted from the LLVM Project, Copyright 2023-2024 Bryan Wong
 
 #include "utl/ranges/utl_swap.h"
+#include "utl/type_traits/utl_is_copy_constructible.h"
+#include "utl/type_traits/utl_is_move_constructible.h"
+#include "utl/type_traits/utl_is_trivially_copy_constructible.h"
+#include "utl/type_traits/utl_is_trivially_move_constructible.h"
 #include "utl/utility/utl_constant_p.h"
 
 #include <cstring>
@@ -92,4 +96,28 @@ public:
 
     constexpr int get() const { return data_; }
 };
+
+template <int Constant, bool Noexcept = true, bool ThrowOnMove = false>
+struct TailClobbererNonTrivialMove : TailClobberer<Constant> {
+    using TailClobberer<Constant>::TailClobberer;
+
+    [[noreturn]] void ThrowExcept() { throw Except{}; }
+
+    constexpr TailClobbererNonTrivialMove(TailClobbererNonTrivialMove&&) noexcept(Noexcept)
+        : TailClobberer<Constant>() {
+#if UTL_WITH_EXCEPTIONS
+#  if UTL_CXX17
+        if constexpr (!Noexcept && ThrowOnMove)
+#  else
+        if (!Noexcept && ThrowOnMove)
+#  endif
+            ThrowExcept();
+#endif
+    }
+};
+static_assert(!utl::is_trivially_copy_constructible_v<TailClobbererNonTrivialMove<0>>, "");
+static_assert(utl::is_move_constructible_v<TailClobbererNonTrivialMove<0>>, "");
+static_assert(!utl::is_trivially_move_constructible_v<TailClobbererNonTrivialMove<0>>, "");
+static_assert(utl::is_nothrow_move_constructible_v<TailClobbererNonTrivialMove<0, true>>, "");
+static_assert(!utl::is_nothrow_move_constructible_v<TailClobbererNonTrivialMove<0, false>>, "");
 } // namespace expected

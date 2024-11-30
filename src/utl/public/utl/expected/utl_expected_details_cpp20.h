@@ -193,6 +193,7 @@ class storage_base {
     static constexpr bool place_flag_in_tail = fits_in_tail_padding_v<data_type, bool>;
     static constexpr bool allow_external_overlap = !place_flag_in_tail;
 
+public:
     struct container {
         template <typename... Args>
         __UTL_HIDE_FROM_ABI inline constexpr explicit container(in_place_t, Args&&... args)
@@ -316,12 +317,14 @@ class storage_base {
                          : container{__UTL unexpect, __UTL forward_like<U>(u.error)};
     }
 
-protected:
+public:
+    __UTL_HIDE_FROM_ABI inline constexpr ~storage_base() noexcept = default;
     __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base const&) = delete;
     __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base const&) noexcept
     requires (is_copy_constructible_v<T> && is_copy_constructible_v<E> &&
                  is_trivially_copy_constructible_v<T> && is_trivially_copy_constructible_v<E>)
     = default;
+
     __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base const& other) noexcept(
         is_nothrow_copy_constructible_v<T> && is_nothrow_copy_constructible_v<E>)
     requires (is_copy_constructible_v<T> && is_copy_constructible_v<E> &&
@@ -333,6 +336,7 @@ protected:
     requires (is_move_constructible_v<T> && is_move_constructible_v<E> &&
                  is_trivially_move_constructible_v<T> && is_trivially_move_constructible_v<E>)
     = default;
+
     __UTL_HIDE_FROM_ABI inline constexpr storage_base(storage_base&& other) noexcept(
         is_nothrow_move_constructible_v<T> && is_nothrow_move_constructible_v<E>)
     requires (is_move_constructible_v<T> && is_move_constructible_v<E> &&
@@ -340,6 +344,7 @@ protected:
         : storage_base(__UTL details::expected::converting, other.has_value(),
               __UTL move(other.data_ref())) {}
 
+protected:
     template <typename... Args>
     __UTL_HIDE_FROM_ABI inline constexpr explicit storage_base(in_place_t, Args&&... args) noexcept(
         is_nothrow_constructible_v<container, in_place_t, Args...>)
@@ -453,8 +458,6 @@ protected:
 
         return *this;
     }
-
-    __UTL_HIDE_FROM_ABI inline constexpr ~storage_base() noexcept = default;
 
     UTL_ATTRIBUTE(GETTER) inline constexpr data_type const& data_ref() const& noexcept {
         return container_.data.union_.data;

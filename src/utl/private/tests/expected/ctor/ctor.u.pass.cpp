@@ -12,13 +12,13 @@
 // UNSUPPORTED: c++03, c++11, c++14, c++17, c++20
 
 // template<class U = T>
-//   constexpr explicit(!is_convertible_v<U, T>) expected(U&& v);
+//   constexpr explicit(!is_convertible<U, T>::value) expected(U&& v);
 //
 // Constraints:
-// - is_same_v<remove_cvref_t<U>, in_place_t> is false; and
-// - is_same_v<expected, remove_cvref_t<U>> is false; and
+// - is_same<remove_cvref_t<U>, in_place_t>::value is false; and
+// - is_same<expected, remove_cvref_t<U>>::value is false; and
 // - remove_cvref_t<U> is not a specialization of unexpected; and
-// - is_constructible_v<T, U> is true.
+// - is_constructible<T, U>::value is true.
 //
 // Effects: Direct-non-list-initializes val with utl::forward<U>(v).
 //
@@ -39,32 +39,33 @@
 namespace expected {
 
 // Test Constraints:
-static_assert(utl::is_constructible_v<utl::expected<int, int>, int>, "");
+static_assert(utl::is_constructible<utl::expected<int, int>, int>::value, "");
 
-// is_same_v<remove_cvref_t<U>, in_place_t>
+// is_same<remove_cvref_t<U>, in_place_t>::value
 struct FromJustInplace {
     FromJustInplace(utl::in_place_t);
 };
-static_assert(!utl::is_constructible_v<utl::expected<FromJustInplace, int>, utl::in_place_t>, "");
 static_assert(
-    !utl::is_constructible_v<utl::expected<FromJustInplace, int>, utl::in_place_t const&>, "");
+    !utl::is_constructible<utl::expected<FromJustInplace, int>, utl::in_place_t>::value, "");
+static_assert(
+    !utl::is_constructible<utl::expected<FromJustInplace, int>, utl::in_place_t const&>::value, "");
 
-// is_same_v<expected, remove_cvref_t<U>>
+// is_same<expected, remove_cvref_t<U>>::value
 // Note that result is true because it is covered by the constructors that take expected
-static_assert(utl::is_constructible_v<utl::expected<int, int>, utl::expected<int, int>&>, "");
+static_assert(utl::is_constructible<utl::expected<int, int>, utl::expected<int, int>&>::value, "");
 
 // remove_cvref_t<U> is a specialization of unexpected
 // Note that result is true because it is covered by the constructors that take unexpected
-static_assert(utl::is_constructible_v<utl::expected<int, int>, utl::unexpected<int>&>, "");
+static_assert(utl::is_constructible<utl::expected<int, int>, utl::unexpected<int>&>::value, "");
 
-// !is_constructible_v<T, U>
+// !is_constructible<T, U>::value
 struct foo {};
-static_assert(!utl::is_constructible_v<utl::expected<int, int>, foo>, "");
+static_assert(!utl::is_constructible<utl::expected<int, int>, foo>::value, "");
 
-// test explicit(!is_convertible_v<U, T>)
+// test explicit(!is_convertible<U, T>::value)
 
-static_assert(utl::is_convertible_v<int, utl::expected<int, int>>, "");
-static_assert(!utl::is_convertible_v<int, utl::expected<NotConvertible, int>>, "");
+static_assert(utl::is_convertible<int, utl::expected<int, int>>::value, "");
+static_assert(!utl::is_convertible<int, utl::expected<NotConvertible, int>>::value, "");
 
 struct BaseError {};
 struct DerivedError : BaseError {};
@@ -154,7 +155,7 @@ constexpr bool test() {
 }
 
 void testException() {
-#ifdef UTL_WITH_EXCEPTIONS
+#if UTL_WITH_EXCEPTIONS
     struct Throwing {
         Throwing(int) { throw Except{}; };
     };

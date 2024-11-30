@@ -14,7 +14,7 @@
 //
 // constexpr expected();
 
-// Constraints: is_default_constructible_v<T> is true.
+// Constraints: is_default_constructible<T>::value is true.
 //
 // Effects: Value-initializes val.
 // Postconditions: has_value() is true.
@@ -34,11 +34,9 @@
 namespace expected {
 
 // Test constraints
-static_assert(utl::is_default_constructible_v<utl::expected<int, int>>, "");
-static_assert(!utl::is_default_constructible_v<utl::expected<NoDefaultCtor, int>>, "");
-static_assert(utl::is_constructible_v<utl::details::expected::data_union<int, NoDefaultCtor>,
-                  utl::in_place_t>,
-    "");
+static_assert(utl::is_default_constructible<utl::expected<int, int>>::value, "");
+static_assert(!utl::is_default_constructible<utl::expected<NoDefaultCtor, int>>::value, "");
+
 struct MyInt {
     int i;
     friend constexpr bool operator==(MyInt const& left, MyInt const& right) noexcept {
@@ -71,7 +69,7 @@ UTL_CONSTEXPR_CXX14 bool test() {
 }
 
 void testException() {
-#ifdef UTL_WITH_EXCEPTIONS
+#if UTL_WITH_EXCEPTIONS
     struct Throwing {
         Throwing() { throw Except{}; };
     };

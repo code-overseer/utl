@@ -12,6 +12,7 @@
 
 #include "utl/expected/utl_bad_expected_access.h"
 #include "utl/expected/utl_expected_common.h"
+#include "utl/expected/utl_expected_details_cpp17.h"
 #include "utl/expected/utl_unexpected.h"
 #include "utl/functional/utl_invoke.h"
 #include "utl/type_traits/utl_constants.h"
@@ -44,13 +45,6 @@
 #include "utl/utility/utl_forward.h"
 #include "utl/utility/utl_in_place.h"
 #include "utl/utility/utl_move.h"
-
-#if UTL_CXX17
-// TODO expose ABI setting
-#  include "utl/expected/utl_expected_details_cpp17.h"
-#else
-#  include "utl/expected/utl_expected_details_cpp14.h"
-#endif
 
 #define __UTL_ATTRIBUTE_EXPECTED_INLINE_PURE \
     (ALWAYS_INLINE)(PURE)(NODISCARD)__UTL_ATTRIBUTE__HIDE_FROM_ABI

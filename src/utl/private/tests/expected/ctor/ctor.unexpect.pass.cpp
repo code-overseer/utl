@@ -9,12 +9,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-// UNSUPPORTED: c++03, c++11, c++14, c++17, c++20
+// UNSUPPORTED: c++03
 
 // template<class... Args>
 //   constexpr explicit expected(unexpect_t, Args&&... args);
 //
-// Constraints: is_constructible_v<E, Args...> is true.
+// Constraints: is_constructible<E, Args...>::value is true.
 //
 // Effects: Direct-non-list-initializes unex with utl::forward<Args>(args)....
 //
@@ -36,12 +36,12 @@
 
 namespace expected {
 // Test Constraints:
-static_assert(utl::is_constructible_v<utl::expected<int, int>, utl::unexpect_t>, "");
-static_assert(utl::is_constructible_v<utl::expected<int, int>, utl::unexpect_t, int>, "");
+static_assert(utl::is_constructible<utl::expected<int, int>, utl::unexpect_t>::value, "");
+static_assert(utl::is_constructible<utl::expected<int, int>, utl::unexpect_t, int>::value, "");
 
-// !is_constructible_v<T, Args...>
+// !is_constructible<T, Args...>::value
 struct foo {};
-static_assert(!utl::is_constructible_v<utl::expected<int, foo>, utl::unexpect_t, int>, "");
+static_assert(!utl::is_constructible<utl::expected<int, foo>, utl::unexpect_t, int>::value, "");
 
 static_assert(!utl::is_implicit_constructible<utl::expected<int, int>, utl::unexpect_t>::value, "");
 static_assert(
@@ -107,7 +107,7 @@ constexpr bool test() {
 }
 
 void testException() {
-#ifdef UTL_WITH_EXCEPTIONS
+#if UTL_WITH_EXCEPTIONS
     struct Throwing {
         Throwing(int) { throw Except{}; };
     };

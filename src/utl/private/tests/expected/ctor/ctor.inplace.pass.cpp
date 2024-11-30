@@ -12,7 +12,7 @@
 // template<class... Args>
 //   constexpr explicit expected(in_place_t, Args&&... args);
 //
-// Constraints: is_constructible_v<T, Args...> is true.
+// Constraints: is_constructible<T, Args...>::value is true.
 //
 // Effects: Direct-non-list-initializes val with utl::forward<Args>(args)....
 //
@@ -34,12 +34,12 @@
 namespace expected {
 
 // Test Constraints:
-static_assert(utl::is_constructible_v<utl::expected<int, int>, utl::in_place_t>, "");
-static_assert(utl::is_constructible_v<utl::expected<int, int>, utl::in_place_t, int>, "");
+static_assert(utl::is_constructible<utl::expected<int, int>, utl::in_place_t>::value, "");
+static_assert(utl::is_constructible<utl::expected<int, int>, utl::in_place_t, int>::value, "");
 
-// !is_constructible_v<T, Args...>
+// !is_constructible<T, Args...>::value
 struct foo {};
-static_assert(!utl::is_constructible_v<utl::expected<foo, int>, utl::in_place_t, int>, "");
+static_assert(!utl::is_constructible<utl::expected<foo, int>, utl::in_place_t, int>::value, "");
 
 static_assert(utl::is_implicit_constructible<int, int>::value, "");
 static_assert(!utl::is_implicit_constructible<utl::expected<int, int>, utl::in_place_t>::value, "");
@@ -106,7 +106,7 @@ UTL_CONSTEXPR_CXX14 bool test() {
 }
 
 void testException() {
-#ifdef UTL_WITH_EXCEPTIONS
+#if UTL_WITH_EXCEPTIONS
     struct Throwing {
         Throwing(int) { throw Except{}; };
     };
