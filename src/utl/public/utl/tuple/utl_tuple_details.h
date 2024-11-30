@@ -42,15 +42,15 @@ struct variadic_traits;
 
 namespace details {
 namespace tuple {
-template <size_t I, typename T UTL_CONSTRAINT_CXX11((I < tuple_size_v<T>))>
+template <size_t I, typename T UTL_CONSTRAINT_CXX11((I < tuple_size<T>::value))>
 UTL_CONSTRAINT_CXX20(requires {
     __UTL get_element<I>(__UTL declval<T>()); })
 auto decl_element() noexcept -> decltype(__UTL get_element<I>(__UTL declval<T>()));
 
-template <size_t I, typename T UTL_CONSTRAINT_CXX11((I >= tuple_size_v<T>))>
+template <size_t I, typename T UTL_CONSTRAINT_CXX11((I >= tuple_size<T>::value))>
 void decl_element() noexcept = delete;
 
-template <size_t I, typename T UTL_CONSTRAINT_CXX11((I < tuple_size_v<T>))>
+template <size_t I, typename T UTL_CONSTRAINT_CXX11((I < tuple_size<T>::value))>
 UTL_CONSTRAINT_CXX20(requires {
     __UTL get_element<I>(__UTL declval<T>()); })
 using get_type_t = decltype(__UTL get_element<I>(__UTL declval<T>()));

@@ -629,8 +629,7 @@ public:
 public:
     template <typename TupleLike,
         enable_if_t<
-            conjunction<not_this<TupleLike>,
-                details::tuple::is_all_gettable<TupleLike, sizeof...(Types)>,
+            conjunction<not_this<TupleLike>, is_tuple_like<remove_cvref_t<TupleLike>>,
                 details::tuple::rebind_references_t<traits::template is_implicit_constructible,
                     TupleLike, sizeof...(Types)>,
                 negation<details::tuple::rebind_references_t<traits::template is_dangling,
@@ -644,8 +643,7 @@ public:
 
     template <typename TupleLike,
         enable_if_t<
-            conjunction<not_this<TupleLike>,
-                details::tuple::is_all_gettable<TupleLike, sizeof...(Types)>,
+            conjunction<not_this<TupleLike>, is_tuple_like<remove_cvref_t<TupleLike>>,
                 details::tuple::rebind_references_t<traits::template is_explicit_constructible,
                     TupleLike, sizeof...(Types)>,
                 negation<details::tuple::rebind_references_t<traits::template is_dangling,
@@ -659,8 +657,7 @@ public:
 
     template <typename TupleLike,
         enable_if_t<
-            conjunction<not_this<TupleLike>,
-                details::tuple::is_all_gettable<TupleLike, sizeof...(Types)>,
+            conjunction<not_this<TupleLike>, is_tuple_like<remove_cvref_t<TupleLike>>,
                 details::tuple::rebind_references_t<traits::template is_implicit_constructible,
                     TupleLike, sizeof...(Types)>,
                 details::tuple::rebind_references_t<traits::template is_dangling, TupleLike,
@@ -673,8 +670,7 @@ public:
 
     template <typename TupleLike,
         enable_if_t<
-            conjunction<not_this<TupleLike>,
-                details::tuple::is_all_gettable<TupleLike, sizeof...(Types)>,
+            conjunction<not_this<TupleLike>, is_tuple_like<remove_cvref_t<TupleLike>>,
                 details::tuple::rebind_references_t<traits::template is_explicit_constructible,
                     TupleLike, sizeof...(Types)>,
                 details::tuple::rebind_references_t<traits::template is_dangling, TupleLike,
