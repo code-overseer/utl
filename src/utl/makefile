@@ -16,12 +16,10 @@ CXX := c++
 CXX_FLAGS := -std=c++20 -fPIC -O1 -I$(PUBLIC_DIR) -I$(PRIVATE_DIR) -DUTL_BUILD_TESTS -DUTL_BUILDING_LIBRARY=1 -Wall -Wpedantic -Wno-gnu-zero-variadic-macro-arguments
 LINKER_FLAGS := -lm
 OBJECTS := $(addsuffix .o, $(MODULE_SRCS:$(MODULE_ROOT)/%=%))
-OBJECT_PATHS := $(addprefix $(INTERMEDIATE_DIR)/,$(OBJECTS))
 DEPENDENCIES := $(OBJECTS:.o=.d)
 PREPROCESSED := $(OBJECTS:.o=.i)
 TEST_EXE_OBJECTS := $(filter %.pass.cpp.o,$(OBJECTS))
 TEST_EXES := $(patsubst %.pass.cpp.o,%,$(TEST_EXE_OBJECTS))
-TEST_EXE_PATHS := $(addprefix $(OUTPUT_DIR)/,$(TEST_EXES))
 
 compile: $(OBJECTS)
 	@
@@ -46,7 +44,7 @@ $(INTERMEDIATE_DIR)/%.cpp.o: $(MODULE_ROOT)/%.cpp $(MKFILE_PATH)
 	@echo "Creating object" $(patsubst $(INTERMEDIATE_DIR)/%,%,$@)
 	@$(CXX) $(CXX_FLAGS) -MMD -MP -MF '$(@:.o=.d)' -MT '$@' -c $< -o '$@'
 
--include $(INTERMEDIATE_DIR)/$(DEPENDENCIES)
+-include $(addprefix $(INTERMEDIATE_DIR)/,$(DEPENDENCIES))
 
 preprocess: $(INTERMEDIATE_DIR)/%.cpp.i
 	@
@@ -63,10 +61,8 @@ clean:
 print:
 	@echo "Bin: $(BIN)\n"
 	@echo "Makefile Directory: $(MKFILE_DIR)\n"
-	@echo "Sources: $(MODULE_SRCS)\n"
 	@echo "Objects: $(OBJECTS)\n"
 	@echo "Preprocessed: $(PREPROCESSED)\n"
-	@echo "Includes: $(MODULE_INCLUDES)\n"
 	@echo "Dependencies: $(DEPENDENCIES)\n"
 	@echo "CXX Flags: $(CXX_FLAGS)\n"
 	@echo "Linker Flags: $(LINKER_FLAGS)\n"

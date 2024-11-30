@@ -1,4 +1,5 @@
 // Adapted from the LLVM Project, Copyright 2023-2024 Bryan Wong
+#pragma once
 
 #include "utl/ranges/utl_swap.h"
 #include "utl/type_traits/utl_is_copy_constructible.h"
@@ -115,9 +116,11 @@ struct TailClobbererNonTrivialMove : TailClobberer<Constant> {
 #endif
     }
 };
-static_assert(!utl::is_trivially_copy_constructible_v<TailClobbererNonTrivialMove<0>>, "");
-static_assert(utl::is_move_constructible_v<TailClobbererNonTrivialMove<0>>, "");
-static_assert(!utl::is_trivially_move_constructible_v<TailClobbererNonTrivialMove<0>>, "");
-static_assert(utl::is_nothrow_move_constructible_v<TailClobbererNonTrivialMove<0, true>>, "");
-static_assert(!utl::is_nothrow_move_constructible_v<TailClobbererNonTrivialMove<0, false>>, "");
+
+static_assert(!utl::is_trivially_copy_constructible<TailClobbererNonTrivialMove<0>>::value, "");
+static_assert(utl::is_move_constructible<TailClobbererNonTrivialMove<0>>::value, "");
+static_assert(!utl::is_trivially_move_constructible<TailClobbererNonTrivialMove<0>>::value, "");
+static_assert(utl::is_nothrow_move_constructible<TailClobbererNonTrivialMove<0, true>>::value, "");
+static_assert(
+    !utl::is_nothrow_move_constructible<TailClobbererNonTrivialMove<0, false>>::value, "");
 } // namespace expected
