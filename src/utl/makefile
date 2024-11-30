@@ -33,7 +33,7 @@ $(TEST_EXES):%: $(OUTPUT_DIR)/%
 	@echo "Running test" $@
 	@$< && echo $@ "succeeded" || echo $@ "failed"
 
-$(OUTPUT_DIR)/%: $(INTERMEDIATE_DIR)/%.pass.cpp.o
+$(OUTPUT_DIR)/%: $(INTERMEDIATE_DIR)/%.pass.cpp.o $(MKFILE_PATH)
 	@mkdir -p '$(@D)'
 	@echo "Building test" $(patsubst $(OUTPUT_DIR)/%,%,$@)
 	@$(CXX) $(LINKER_FLAGS) $< -o $@
@@ -41,7 +41,7 @@ $(OUTPUT_DIR)/%: $(INTERMEDIATE_DIR)/%.pass.cpp.o
 $(OBJECTS):%.cpp.o: $(INTERMEDIATE_DIR)/%.cpp.o
 	@
 
-$(INTERMEDIATE_DIR)/%.cpp.o: $(MODULE_ROOT)/%.cpp
+$(INTERMEDIATE_DIR)/%.cpp.o: $(MODULE_ROOT)/%.cpp $(MKFILE_PATH)
 	@mkdir -p '$(@D)'
 	@echo "Creating object" $(patsubst $(INTERMEDIATE_DIR)/%,%,$@)
 	@$(CXX) $(CXX_FLAGS) -MMD -MP -MF '$(@:.o=.d)' -MT '$@' -c $< -o '$@'
