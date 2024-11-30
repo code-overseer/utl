@@ -1,6 +1,3 @@
-// Adapted from the LLVM Project, Copyright 2023-2024 Bryan Wong
-// Commit: 9fd3c4115cf2cd3da1405e1f2c38d53582b5dc81
-
 //===----------------------------------------------------------------------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -9,12 +6,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-// UNSUPPORTED: c++03
+// UNSUPPORTED: c++03, c++11, c++14, c++17, c++20
 
 // template<class G>
-//   constexpr explicit(!is_convertible<const G&, E>) expected(const unexpected<G>::value& e);
+//   constexpr explicit(!is_convertible<G, E>) expected(unexpected<G>::value&& e);
 //
-// Let GF be const G&
+// Let GF be G
 //
 // Constraints: is_constructible<E, GF>::value is true.
 //
@@ -34,25 +31,19 @@
 #include "utl/type_traits/utl_is_convertible.h"
 
 #include <cassert>
-
 namespace expected {
-
 // Test Constraints
+static_assert(utl::is_constructible<utl::expected<int, int>, utl::unexpected<int>>::value, "");
 static_assert(
-    utl::is_constructible<utl::expected<int, int>, utl::unexpected<int> const&>::value, "");
+    utl::is_constructible<utl::expected<int, MoveOnly>, utl::unexpected<MoveOnly>>::value, "");
 
 // !is_constructible<E, GF>::value
 struct foo {};
-static_assert(
-    !utl::is_constructible<utl::expected<int, int>, utl::unexpected<foo> const&>::value, "");
-static_assert(
-    !utl::is_constructible<utl::expected<int, MoveOnly>, utl::unexpected<MoveOnly> const&>::value,
-    "");
+static_assert(!utl::is_constructible<utl::expected<int, int>, utl::unexpected<foo>>::value, "");
 
-static_assert(utl::is_convertible<utl::unexpected<int> const&, utl::expected<int, int>>::value, "");
+static_assert(utl::is_convertible<utl::unexpected<int>&&, utl::expected<int, int>>::value, "");
 static_assert(
-    !utl::is_convertible<utl::unexpected<int> const&, utl::expected<int, NotConvertible>>::value,
-    "");
+    !utl::is_convertible<utl::unexpected<int>&&, utl::expected<int, NotConvertible>>::value, "");
 
 struct MyInt {
     int i;
@@ -61,18 +52,28 @@ struct MyInt {
     friend constexpr bool operator!=(MyInt const& l, MyInt const& r) { return l.i != r.i; }
 };
 
-template <class T, class V = int>
-UTL_CONSTEXPR_CXX14 void testUnexpected() {
-    utl::unexpected<int> const u(5);
-    utl::expected<V, T> e(u);
+template <class Err, class V = int>
+UTL_CONSTEXPR_CXX14 void testInt() {
+    utl::unexpected<int> u(5);
+    utl::expected<V, Err> e(utl::move(u));
     assert(!e.has_value());
     assert(e.error() == 5);
 }
 
+UTL_CONSTEXPR_CXX14 void testMoveOnly() {
+    utl::unexpected<MoveOnly> u(MoveOnly(5));
+    utl::expected<int, MoveOnly> e(utl::move(u));
+    assert(!e.has_value());
+    assert(e.error() == 5);
+    assert(u.error() == 0);
+}
+
 UTL_CONSTEXPR_CXX14 bool test() {
-    testUnexpected<int>();
-    testUnexpected<MyInt>();
-    testUnexpected<TailClobberer<1>, bool>();
+    testInt<int>();
+    testInt<MyInt>();
+    testInt<MoveOnly>();
+    testInt<TailClobberer<1>, bool>();
+    testMoveOnly();
     return true;
 }
 
@@ -83,9 +84,9 @@ void testException() {
     };
 
     {
-        utl::unexpected<int> const u(5);
+        utl::unexpected<int> u(5);
         try {
-            UTL_ATTRIBUTE(MAYBE_UNUSED) utl::expected<int, Throwing> e(u);
+            UTL_ATTRIBUTE(MAYBE_UNUSED) utl::expected<int, Throwing> e(utl::move(u));
             assert(false);
         } catch (Except) {}
     }
@@ -93,7 +94,6 @@ void testException() {
 #endif // TEST_HAS_NO_EXCEPTIONS
 }
 } // namespace expected
-
 int main(int, char**) {
     expected::test();
 #if UTL_CXX17
