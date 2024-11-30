@@ -58,7 +58,7 @@ $(INTERMEDIATE_DIR)/%.cpp.i: $(MODULE_ROOT)/%.cpp
 
 clean:
 	@echo "Cleaning up..."
-	@rm -rvf $(INTERMEDIATE_DIR)/**/*.o $(INTERMEDIATE_DIR)/**/*.d $(INTERMEDIATE_DIR)/**/*.prep.cpp $(OUTPUT_DIR)/
+	@rm -rvf $(INTERMEDIATE_DIR)/**/*.i $(INTERMEDIATE_DIR)/**/*.o $(INTERMEDIATE_DIR)/**/*.d $(INTERMEDIATE_DIR)/**/*.prep.cpp $(OUTPUT_DIR)/
 
 print:
 	@echo "Bin: $(BIN)\n"
