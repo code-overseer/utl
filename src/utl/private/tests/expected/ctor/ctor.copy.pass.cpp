@@ -93,7 +93,7 @@ struct Any {
     constexpr Any(T&&) {}
 };
 
-constexpr bool test() {
+UTL_CONSTEXPR_CXX14 bool test() {
     // copy the value non-trivial
     {
         utl::expected<CopyableNonTrivial, int> const e1(5);

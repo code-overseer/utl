@@ -48,14 +48,14 @@ static_assert(
     !utl::is_implicit_constructible<utl::expected<int, int>, utl::unexpect_t, int>::value, "");
 
 template <class T, class V = int>
-constexpr void testInt() {
+UTL_CONSTEXPR_CXX14 void testInt() {
     utl::expected<V, T> const e(utl::unexpect, 5);
     assert(!e.has_value());
     assert(e.error() == 5);
 }
 
 template <class T, class V = int>
-constexpr void testLValue() {
+UTL_CONSTEXPR_CXX14 void testLValue() {
     T t(5);
     utl::expected<V, T> e(utl::unexpect, t);
     assert(!e.has_value());
@@ -63,13 +63,13 @@ constexpr void testLValue() {
 }
 
 template <class T, class V = int>
-constexpr void testRValue() {
+UTL_CONSTEXPR_CXX14 void testRValue() {
     utl::expected<V, T> e(utl::unexpect, T(5));
     assert(!e.has_value());
     assert(e.error() == 5);
 }
 
-constexpr bool test() {
+UTL_CONSTEXPR_CXX14 bool test() {
     testInt<int>();
     testInt<CopyOnly>();
     testInt<MoveOnly>();

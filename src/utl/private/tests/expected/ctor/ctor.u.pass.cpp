@@ -71,14 +71,14 @@ struct BaseError {};
 struct DerivedError : BaseError {};
 
 template <class T, class E = int>
-constexpr void testInt() {
+UTL_CONSTEXPR_CXX14 void testInt() {
     utl::expected<T, E> e(5);
     assert(e.has_value());
     assert(e.value() == 5);
 }
 
 template <class T, class E = int>
-constexpr void testLValue() {
+UTL_CONSTEXPR_CXX14 void testLValue() {
     T t(5);
     utl::expected<T, E> e(t);
     assert(e.has_value());
@@ -86,13 +86,13 @@ constexpr void testLValue() {
 }
 
 template <class T, class E = int>
-constexpr void testRValue() {
+UTL_CONSTEXPR_CXX14 void testRValue() {
     utl::expected<T, E> e(T(5));
     assert(e.has_value());
     assert(e.value() == 5);
 }
 
-constexpr bool test() {
+UTL_CONSTEXPR_CXX14 bool test() {
     testInt<int>();
     testInt<CopyOnly>();
     testInt<MoveOnly>();

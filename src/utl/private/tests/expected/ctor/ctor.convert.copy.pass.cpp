@@ -185,7 +185,7 @@ struct Data {
     constexpr Data(int ii) : i(ii) {}
 };
 
-constexpr bool test() {
+UTL_CONSTEXPR_CXX14 bool test() {
     // convert the value
     {
         utl::expected<int, int> const e1(5);

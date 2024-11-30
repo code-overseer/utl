@@ -97,7 +97,7 @@ static_assert(!utl::is_nothrow_move_constructible<utl::expected<int, MoveMayThro
 static_assert(
     !utl::is_nothrow_move_constructible<utl::expected<MoveMayThrow, MoveMayThrow>>::value, "");
 
-constexpr bool test() {
+UTL_CONSTEXPR_CXX14 bool test() {
     // move the value non-trivial
     {
         utl::expected<MovableNonTrivial, int> e1(5);

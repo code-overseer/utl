@@ -179,7 +179,7 @@ struct Data {
     constexpr Data(MoveOnly&& m) : data(utl::move(m)) {}
 };
 
-constexpr bool test() {
+UTL_CONSTEXPR_CXX14 bool test() {
     // convert the value
     {
         utl::expected<MoveOnly, int> e1(5);
