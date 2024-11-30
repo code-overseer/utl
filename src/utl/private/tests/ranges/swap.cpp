@@ -1,3 +1,4 @@
+
 /**
  * Copyright 2023-2024 Bryan Wong
  * Credit: This file contains code derived from the GCC test suite.
@@ -149,6 +150,12 @@ void defect_809() {
 void defect_809_ranges() {
     ranges_W<utl::string[8]> w1, w2;
     utl::ranges::swap(w1, w2);
+}
+
+void std_swap() {
+    std::string w1, w2; // Two objects of a Swappable type.
+    using utl::swap;
+    swap(w1, w2);
 }
 
 void std_defect_809() {
