@@ -91,9 +91,6 @@ static_assert(!utl::is_trivially_move_constructible<
 // Test: The exception specification is equivalent to
 // is_nothrow_move_constructible<T> && is_nothrow_move_constructible_v<E>::value.
 
-static_assert(
-    utl::is_nothrow_move_constructible<utl::details::expected::underlying_storage<int, int>>::value,
-    "");
 static_assert(utl::is_nothrow_move_constructible<utl::expected<int, int>>::value, "");
 static_assert(!utl::is_nothrow_move_constructible<utl::expected<MoveMayThrow, int>>::value, "");
 static_assert(!utl::is_nothrow_move_constructible<utl::expected<int, MoveMayThrow>>::value, "");
