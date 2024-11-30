@@ -9,18 +9,18 @@
 //
 //===----------------------------------------------------------------------===//
 
-// UNSUPPORTED: c++03, c++11, c++14, c++17, c++20
+// UNSUPPORTED: c++03
 
 // template<class U, class... Args>
-//   constexpr explicit expected(in_place_t, initializer_list<U> il, Args&&... args);
+//   constexpr explicit expected(unexpect_t, initializer_list<U> il, Args&&... args);
 //
-// Constraints: is_constructible<T, initializer_list<U>&, Args...>::value is true.
+// Constraints: is_constructible_v<E, initializer_list<U>&, Args...> is true.
 //
-// Effects: Direct-non-list-initializes val with il, utl::forward<Args>(args)....
+// Effects: Direct-non-list-initializes unex with il, utl::forward<Args>(args)....
 //
-// Postconditions: has_value() is true.
+// Postconditions: has_value() is false.
 //
-// Throws: Any exception thrown by the initialization of val.
+// Throws: Any exception thrown by the initialization of unex.
 
 #include "utl/utl_config.h"
 
@@ -40,16 +40,16 @@
 
 namespace expected {
 // Test Constraints:
-static_assert(utl::is_constructible<utl::expected<std::vector<int>, int>, utl::in_place_t,
+static_assert(utl::is_constructible<utl::expected<int, std::vector<int>>, utl::unexpect_t,
                   std::initializer_list<int>>::value,
     "");
 
-// !is_constructible<T, initializer_list<U>&, Args...>::value
-static_assert(!utl::is_constructible<utl::expected<int, int>, utl::in_place_t,
+// !is_constructible_v<T, initializer_list<U>&, Args...>
+static_assert(!utl::is_constructible<utl::expected<int, int>, utl::unexpect_t,
                   std::initializer_list<int>>::value,
     "");
 
-static_assert(!utl::is_implicit_constructible<utl::expected<std::vector<int>, int>, utl::in_place_t,
+static_assert(!utl::is_implicit_constructible<utl::expected<int, std::vector<int>>, utl::unexpect_t,
                   std::initializer_list<int>>::value,
     "");
 
@@ -65,25 +65,22 @@ struct Data {
         , tuple_(utl::forward<Us>(us)...) {}
 };
 
-// C++23 only, std::vector not constexpr
 UTL_CONSTEXPR_CXX23 bool test() {
     // no arg
     {
-        utl::expected<Data<>, int> e(utl::in_place, {1, 2, 3});
-        assert(e.has_value());
-        // TODO
+        utl::expected<int, Data<>> e(utl::unexpect, {1, 2, 3});
+        assert(!e.has_value());
         // auto expectedList = {1, 2, 3};
-        // assert(utl::ranges::equal(e.value().vec_, expectedList));
+        // assert(utl::ranges::equal(e.error().vec_, expectedList));
     }
 
     // one arg
     {
-        utl::expected<Data<MoveOnly>, int> e(utl::in_place, {4, 5, 6}, MoveOnly(5));
-        assert(e.has_value());
-        // TODO
+        utl::expected<int, Data<MoveOnly>> e(utl::unexpect, {4, 5, 6}, MoveOnly(5));
+        assert(!e.has_value());
         // auto expectedList = {4, 5, 6};
-        // assert((utl::ranges::equal(e.value().vec_, expectedList)));
-        assert(utl::get<0>(e.value().tuple_) == 5);
+        // assert((utl::ranges::equal(e.error().vec_, expectedList)));
+        assert(utl::get<0>(e.error().tuple_) == 5);
     }
 
     // multi args
@@ -91,22 +88,21 @@ UTL_CONSTEXPR_CXX23 bool test() {
         int i = 5;
         int j = 6;
         MoveOnly m(7);
-        utl::expected<Data<int&, int&&, MoveOnly>, int> e(
-            utl::in_place, {1, 2}, i, utl::move(j), utl::move(m));
-        assert(e.has_value());
-        // TODO
+        utl::expected<int, Data<int&, int&&, MoveOnly>> e(
+            utl::unexpect, {1, 2}, i, utl::move(j), utl::move(m));
+        assert(!e.has_value());
         // auto expectedList = {1, 2};
-        // assert((utl::ranges::equal(e.value().vec_, expectedList)));
-        assert(&utl::get<0>(e.value().tuple_) == &i);
-        assert(&utl::get<1>(e.value().tuple_) == &j);
-        assert(utl::get<2>(e.value().tuple_) == 7);
+        // assert((utl::ranges::equal(e.error().vec_, expectedList)));
+        assert(&utl::get<0>(e.error().tuple_) == &i);
+        assert(&utl::get<1>(e.error().tuple_) == &j);
+        assert(utl::get<2>(e.error().tuple_) == 7);
         assert(m.get() == 0);
     }
 
     // TailClobberer
     {
-        utl::expected<TailClobberer<0>, bool> e(utl::in_place, {1, 2, 3});
-        assert(e.has_value());
+        utl::expected<bool, TailClobberer<1>> e(utl::unexpect, {1, 2, 3});
+        assert(!e.has_value());
     }
 
     return true;
@@ -119,11 +115,12 @@ void testException() {
     };
 
     try {
-        utl::expected<Throwing, int> u(utl::in_place, {1, 2}, 5);
+        utl::expected<int, Throwing> u(utl::unexpect, {1, 2}, 5);
         assert(false);
     } catch (Except) {}
 #endif // TEST_HAS_NO_EXCEPTIONS
 }
+
 } // namespace expected
 
 int main(int, char**) {
