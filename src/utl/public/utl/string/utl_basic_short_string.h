@@ -1357,7 +1357,7 @@ public:
     }
 
     UTL_ATTRIBUTE(STRING_PURE) inline constexpr basic_short_string substr(
-        size_type pos = 0, size_type count = npos) const&& {
+        size_type pos = 0, size_type count = npos) && {
         return basic_short_string(__UTL move(*this), pos, count);
     }
 
