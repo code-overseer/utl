@@ -64,6 +64,6 @@ UTL_ATTRIBUTES(_ABI_PUBLIC, CONST) error_category const& generic_category() noex
 UTL_ATTRIBUTES(_ABI_PUBLIC, CONST) error_category const& system_category() noexcept;
 
 #if UTL_TARGET_MICROSOFT
-UTL_ATTRIBUTES(_ABI_PUBLIC, CONST) error_category const& hresult_category() noexcept;
+UTL_ATTRIBUTES(_ABI_PUBLIC, CONST) error_category const& winapi_category() noexcept;
 #endif
 UTL_NAMESPACE_END

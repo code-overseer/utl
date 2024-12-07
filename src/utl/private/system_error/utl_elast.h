@@ -23,8 +23,6 @@
 #  define __UTL_ELAST 4095
 #elif defined(__APPLE__)
 // No __UTL_ELAST needed on Apple
-#elif UTL_TARGET_MICROSOFT
-#  define __UTL_ELAST (_sys_nerr - 1)
 #elif defined(__MVS__)
 #  define __UTL_ELAST 1160
 #elif defined(_AIX)
