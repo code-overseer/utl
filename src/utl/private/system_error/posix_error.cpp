@@ -2,11 +2,38 @@
 
 #include "utl/system_error/utl_system_error.h"
 #if !UTL_TARGET_MICROSOFT
-#  include "utl_elast.h"
+
+#  include <errno.h>
 
 #  include <cstdio>
 #  include <cstdlib>
 #  include <cstring>
+
+#  if defined(ELAST)
+#    define __UTL_ELAST ELAST
+#  elif defined(__LLVM_LIBC__)
+// No __UTL_ELAST needed for LLVM libc
+#  elif defined(_NEWLIB_VERSION)
+#    define __UTL_ELAST __ELASTERROR
+#  elif defined(__NuttX__)
+// No __UTL_ELAST needed on NuttX
+#  elif defined(__Fuchsia__)
+// No __UTL_ELAST needed on Fuchsia
+#  elif defined(__wasi__)
+// No __UTL_ELAST needed on WASI
+#  elif defined(__EMSCRIPTEN__)
+// No __UTL_ELAST needed on Emscripten
+#  elif defined(__linux__)
+#    define __UTL_ELAST 4095
+#  elif defined(__APPLE__)
+// No __UTL_ELAST needed on Apple
+#  elif defined(__MVS__)
+#    define __UTL_ELAST 1160
+#  elif defined(_AIX)
+#    define __UTL_ELAST 127
+#  else
+#    warning ELAST for this platform not yet implemented
+#  endif
 
 UTL_NAMESPACE_BEGIN
 
@@ -90,4 +117,9 @@ error_category const& system_category() noexcept {
 }
 
 UTL_NAMESPACE_END
+
+#  ifdef __UTL_ELAST
+#    undef __UTL_ELAST
+#  endif
+
 #endif
