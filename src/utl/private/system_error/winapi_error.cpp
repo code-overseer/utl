@@ -47,11 +47,14 @@ size_t message(DWORD code, char* buffer, size_t size) noexcept {
     return snprintf(buffer, size, "%s", local_buffer);
 }
 
-struct map_result {
+class map_result {
+public:
     inline constexpr map_result(errc val) noexcept : value_{val}, has_value{true} {}
     inline constexpr map_result() noexcept : value_{}, has_value{false} {}
     inline constexpr explicit operator bool() const noexcept { return has_value; }
     inline constexpr errc value() const noexcept { return value_; }
+
+private:
     errc value_;
     bool has_value;
 };
