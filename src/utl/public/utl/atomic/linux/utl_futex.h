@@ -67,7 +67,7 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline auto wait(T* address, T const& 
     __UTL tempus::duration t) noexcept -> UTL_ENABLE_IF_CXX11(error_code, UTL_TRAIT_is_futex_waitable(T)) {
 
     if (t == __UTL tempus::duration::zero()) {
-        return error_code{errc::timed_out};
+        return make_error_code(errc::timed_out);
     }
 
     static constexpr uint32_t op = FUTEX_WAIT_PRIVATE;

@@ -101,7 +101,7 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline auto wait(
     T* address, remove_volatile_t<T> value, __UTL tempus::duration t) noexcept
     -> UTL_ENABLE_IF_CXX11(error_code, UTL_TRAIT_is_futex_waitable(T) && !UTL_TRAIT_is_class(T)) {
     if (t == __UTL tempus::duration::zero()) {
-        return error_code{errc::timed_out};
+        return make_error_code(errc::timed_out);
     }
 
     if (WaitOnAddress(address, __UTL addressof(value), sizeof(T), details::to_milliseconds(t))) {
@@ -117,7 +117,7 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline auto wait(
     T* address, remove_volatile_t<T> const& value, __UTL tempus::duration t) noexcept
     -> UTL_ENABLE_IF_CXX11(error_code, UTL_TRAIT_is_futex_waitable(T) && UTL_TRAIT_is_class(T)) {
     if (t == __UTL tempus::duration::zero()) {
-        return error_code{errc::timed_out};
+        return make_error_code(errc::timed_out);
     }
 
     alignof(T) unsigned char buffer[sizeof(T)];
