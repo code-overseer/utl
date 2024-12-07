@@ -15,6 +15,9 @@
 #include "utl/memory/utl_addressof.h"
 #include "utl/numeric/utl_add_sat.h"
 #include "utl/numeric/utl_limits.h"
+#include "utl/system_error/utl_errc.h"
+#include "utl/system_error/utl_error_category.h"
+#include "utl/system_error/utl_error_code.h"
 #include "utl/tempus/utl_duration.h"
 #include "utl/type_traits/utl_constants.h"
 
@@ -46,20 +49,6 @@ UTL_NAMESPACE_BEGIN
 #define __UTL_UNUSED 0
 
 namespace futex {
-
-UTL_CONSTEVAL result result::success() noexcept {
-    return result(0);
-}
-
-constexpr bool result::interrupted() const noexcept {
-    return value_ == EINTR;
-}
-constexpr bool result::timed_out() const noexcept {
-    return value_ == ETIMEDOUT;
-}
-constexpr bool result::failed() const noexcept {
-    return value_ != 0;
-}
 
 UTL_INLINE_CXX17 constexpr size_t max_size = 8;
 UTL_INLINE_CXX17 constexpr size_t min_size = 4;
@@ -112,9 +101,9 @@ template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 4)
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline auto wait(
     T* address, T const& value, __UTL tempus::duration t) noexcept
-    -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
+    -> UTL_ENABLE_IF_CXX11(error_code, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 4) {
     if (t == __UTL tempus::duration::zero()) {
-        return result{ETIMEDOUT};
+        return make_error_code(errc::timed_out);
     }
 
     static constexpr uint32_t type = UL_COMPARE_AND_WAIT | UL_UNFAIR_LOCK;
@@ -124,10 +113,10 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline auto wait(
     __UTL_MEMCPY(&readable_value, __UTL addressof(value), sizeof(value));
     // If value is not equal ulock_wait returns 0
     if (__ulock_wait(op, address, readable_value, microseconds)) {
-        return result{errno};
+        return error_code{errno, system_category()};
     }
 
-    return result::success();
+    return error_code{};
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
@@ -151,9 +140,9 @@ template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(sizeof(T) == 8)
 UTL_ATTRIBUTE(_HIDE_FROM_ABI, NODISCARD) inline auto wait(
     T* address, T const& value, __UTL tempus::duration t) noexcept
-    -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 8) {
+    -> UTL_ENABLE_IF_CXX11(error_code, UTL_TRAIT_is_futex_waitable(T) && sizeof(T) == 8) {
     if (t == __UTL tempus::duration::zero()) {
-        return result{ETIMEDOUT};
+        return make_error_code(errc::timed_out);
     }
 
     static constexpr uint32_t type = UL_COMPARE_AND_WAIT64 | UL_UNFAIR_LOCK;
@@ -163,10 +152,10 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI, NODISCARD) inline auto wait(
     __UTL_MEMCPY(&readable_value, __UTL addressof(value), sizeof(value));
     // If value is not equal ulock_wait returns 0
     if (__ulock_wait(op, address, readable_value, microseconds)) {
-        return result{errno};
+        return error_code{errno, system_category()};
     }
 
-    return result::success();
+    return error_code{};
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>

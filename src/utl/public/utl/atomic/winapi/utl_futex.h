@@ -16,6 +16,9 @@
 
 #include "utl/memory/utl_addressof.h"
 #include "utl/numeric/utl_limits.h"
+#include "utl/system_error/utl_errc.h"
+#include "utl/system_error/utl_error_category.h"
+#include "utl/system_error/utl_error_code.h"
 #include "utl/type_traits/utl_is_class.h"
 #include "utl/type_traits/utl_is_const.h"
 #include "utl/type_traits/utl_remove_volatile.h"
@@ -45,20 +48,6 @@ namespace details {
 UTL_INLINE_CXX17 constexpr DWORD error_timeout = 0x5B4u;
 UTL_INLINE_CXX17 constexpr DWORD error_success = 0x0u;
 } // namespace details
-
-inline UTL_CONSTEVAL result result::success() noexcept {
-    return result(details::error_success);
-}
-
-inline constexpr bool result::interrupted() const noexcept {
-    return false;
-}
-inline constexpr bool result::timed_out() const noexcept {
-    return static_cast<DWORD>(value_) == details::error_timeout;
-}
-inline constexpr bool result::failed() const noexcept {
-    return value_ != details::error_success;
-}
 
 UTL_INLINE_CXX17 constexpr size_t max_size = 8;
 UTL_INLINE_CXX17 constexpr size_t min_size = 1;
@@ -110,34 +99,34 @@ UTL_ATTRIBUTE(_HIDE_FROM_ABI) inline DWORD to_milliseconds(__UTL tempus::duratio
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline auto wait(
     T* address, remove_volatile_t<T> value, __UTL tempus::duration t) noexcept
-    -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && !UTL_TRAIT_is_class(T)) {
+    -> UTL_ENABLE_IF_CXX11(error_code, UTL_TRAIT_is_futex_waitable(T) && !UTL_TRAIT_is_class(T)) {
     if (t == __UTL tempus::duration::zero()) {
-        return result{details::ERROR_TIMEOUT};
+        return make_error_code(errc::timed_out);
     }
 
     if (WaitOnAddress(address, __UTL addressof(value), sizeof(T), details::to_milliseconds(t))) {
-        return result::success();
+        return error_code{};
     }
 
-    return result{GetLastError()};
+    return error_code{GetLastError(), __UTL system_category()};
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
 UTL_CONSTRAINT_CXX20(UTL_TRAIT_is_class(T))
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline auto wait(
     T* address, remove_volatile_t<T> const& value, __UTL tempus::duration t) noexcept
-    -> UTL_ENABLE_IF_CXX11(result, UTL_TRAIT_is_futex_waitable(T) && UTL_TRAIT_is_class(T)) {
+    -> UTL_ENABLE_IF_CXX11(error_code, UTL_TRAIT_is_futex_waitable(T) && UTL_TRAIT_is_class(T)) {
     if (t == __UTL tempus::duration::zero()) {
-        return result{details::ERROR_TIMEOUT};
+        return make_error_code(errc::timed_out);
     }
 
     alignof(T) unsigned char buffer[sizeof(T)];
     auto cmp = __UTL_MEMCPY(buffer, __UTL addressof(value), sizeof(T));
     if (WaitOnAddress(address, cmp, sizeof(T), details::to_milliseconds(t))) {
-        return result::success();
+        return error_code{};
     }
 
-    return result{GetLastError()};
+    return error_code{GetLastError(), __UTL system_category()};
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
