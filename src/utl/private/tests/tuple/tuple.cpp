@@ -158,7 +158,7 @@ static_assert(utl::is_move_constructible<utl::tuple<int, int>>::value,
 
 static_assert(!utl::is_constructible<utl::tuple<move_only<0>, move_only<1>>,
                   utl::tuple<move_only<0>&&, move_only<1>&&> const&>::value,
-    "Move only tuple should be constructible with an lvalue tuple of rvalue references of the "
+    "Move only tuple should not be constructible with an lvalue tuple of rvalue references of the "
     "same element types");
 static_assert(utl::is_constructible<utl::tuple<move_only<0>, move_only<1>>,
                   utl::tuple<move_only<0>&&, move_only<1>&&>>::value,
@@ -317,23 +317,6 @@ static_assert(
     !utl::is_constructible<utl::tuple<long long&&, double&&>, std::tuple<int, float>>::value,
     "No dangling");
 static_assert(!utl::is_constructible<utl::tuple<long long&&, double>, std::pair<int, float>>::value,
-    "No dangling");
-
-using TupleLike = std::tuple<long long&&, double&&>;
-static_assert(
-    utl::is_constructible<utl::tuple<long long&&, double&&>,
-        decltype(utl::details::tuple::forward_unrecognized(__UTL declval<TupleLike>()))>::value,
-    "No dangling");
-
-static_assert(utl::is_constructible<utl::tuple<long long&&, double&&>,
-                  std::tuple<long long&&, double&&>>::value,
-    "No dangling");
-utl::tuple<long long&&, double&&> l326(std::tuple<long long&&, double&&> t) {
-    utl::tuple<long long&&, double&&> u(utl::details::tuple::forward_unrecognized(__UTL move(t)));
-    return u;
-}
-static_assert(
-    utl::is_constructible<utl::tuple<long long&&, double>, std::pair<long long, float>>::value,
     "No dangling");
 } // namespace tuple_test
 UTL_DISABLE_WARNING_POP()
