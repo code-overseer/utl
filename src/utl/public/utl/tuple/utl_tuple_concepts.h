@@ -19,7 +19,7 @@ template <typename T, size_t I>
 concept has_element = has_size<T> && requires(T t) {
     requires I < tuple_size<T>::value;
     typename tuple_element<I, T>::type;
-    { __UTL get_element<I>(__UTL forward<T>(t)) } -> convertible_to<tuple_element_t<I, T> const&>;
+    __UTL get_element<I>(__UTL forward<T>(t));
 };
 } // namespace tuple
 } // namespace details

@@ -106,7 +106,8 @@ __UTL_HIDE_FROM_ABI constexpr auto forward_unrecognized(
 template <unrecognized TupleLike>
 UTL_ATTRIBUTES(_HIDE_FROM_ABI, FLATTEN) constexpr auto forward_unrecognized(TupleLike&& t) noexcept(
     is_nothrow_accessible_v<TupleLike>) {
-    return forward_unrecognized(t, make_index_sequence<tuple_size<TupleLike>::value>{});
+    return forward_unrecognized(
+        __UTL forward<TupleLike>(t), make_index_sequence<tuple_size<TupleLike>::value>{});
 }
 
 template <typename T, typename... Tail>
@@ -132,17 +133,10 @@ public:
     __UTL_HIDE_FROM_ABI constexpr storage& operator=(storage const&) noexcept(
         (is_nothrow_copy_assignable_v<T> && ... && is_nothrow_copy_assignable_v<Tail>)) = default;
 
-#if UTL_ENFORCE_NONMOVABILIITY
-    constexpr storage(move_construct_t&&) noexcept((is_nothrow_move_constructible_v<T> && ... &&
-        is_nothrow_move_constructible_v<Tail>)) = delete;
-    constexpr storage& operator=(move_assign_t&&) noexcept(
-        (is_nothrow_move_assignable_v<T> && ... && is_nothrow_move_assignable_v<Tail>)) = delete;
-#else
     __UTL_HIDE_FROM_ABI constexpr storage(storage&&) noexcept((is_nothrow_move_constructible_v<T> &&
         ... && is_nothrow_move_constructible_v<Tail>)) = default;
     __UTL_HIDE_FROM_ABI constexpr storage& operator=(storage&&) noexcept(
         (is_nothrow_move_assignable_v<T> && ... && is_nothrow_move_assignable_v<Tail>)) = default;
-#endif
 
     template <constructible_as<T> UHead, constructible_as<Tail>... UTail>
     __UTL_HIDE_FROM_ABI constexpr storage(UHead&& other_head, UTail&&... other_tail) noexcept(
@@ -320,8 +314,6 @@ class UTL_ATTRIBUTES(
 private:
     template <size_t I, typename T>
     friend struct tuple_element_offset;
-    static constexpr struct private_tag_t {
-    } private_tag = {};
 
     using base_type UTL_NODEBUG = details::tuple::storage<Types...>;
     using swap_type UTL_NODEBUG = conditional_t<conjunction<is_swappable<Types>...>::value, tuple,
@@ -443,17 +435,6 @@ public:
         : base_type(args...) {}
 
 private:
-    template <constructible_as<Types>... Us>
-    requires (... || reference_constructs_from_temporary_v<Types, Us &&>)
-    constexpr tuple(private_tag_t, Us&&... args) noexcept(
-        is_nothrow_constructible_v<base_type, Us...>) = delete;
-
-    template <constructible_as<Types>... Us>
-    requires (... && !reference_constructs_from_temporary_v<Types, Us &&>)
-    __UTL_HIDE_FROM_ABI constexpr tuple(private_tag_t, Us&&... args) noexcept(
-        is_nothrow_constructible_v<base_type, Us...>)
-        : base_type(__UTL forward<Us>(args)...) {}
-
     template <typename... Us>
     static consteval bool explicit_constructible() {
         return false;
@@ -468,84 +449,126 @@ private:
     template <typename... Us>
     static constexpr bool explicit_constructible_v = explicit_constructible<Us...>();
 
-public:
-    template <not_resolvable_to<private_tag_t> UHead, typename... UTail>
-    __UTL_HIDE_FROM_ABI explicit(explicit_constructible_v<UHead, UTail...>) constexpr tuple(
-        UHead&& head,
-        UTail&&... tail) noexcept(is_nothrow_constructible_v<base_type, UHead, UTail...>)
-        : tuple(private_tag, __UTL forward<UHead>(head), __UTL forward<UTail>(tail)...) {}
+    template <typename Tuple>
+    static consteval bool use_other_overload() {
+        if constexpr (sizeof...(Types) != 1)
+            return false;
+        else if constexpr (is_same_v<remove_cvref_t<Tuple>, tuple>)
+            return true; // Should use a copy/move constructor instead.
+        else {
+            using First = tuple_element_t<0, tuple>;
+            if constexpr (is_convertible_v<Tuple, First>)
+                return true;
+            else if constexpr (is_constructible_v<First, Tuple>)
+                return true;
+        }
+        return false;
+    }
 
 public:
-    template <constructible_as<Types, add_lvalue_reference>... UTypes>
-    requires (... && !reference_constructs_from_temporary_v<Types, UTypes&>)
+    template <typename... Us>
+    requires (!requires {
+        requires (sizeof...(Us) == sizeof...(Types));
+        requires (... && is_constructible_v<Types, Us>);
+        requires (... && !reference_constructs_from_temporary_v<Types, Us &&>);
+    })
+    __UTL_HIDE_FROM_ABI tuple(Us&&... u) = delete;
+    template <typename... Us>
+    requires requires {
+        requires (sizeof...(Us) == sizeof...(Types));
+        requires (... && is_constructible_v<Types, Us>);
+        requires (... && !reference_constructs_from_temporary_v<Types, Us &&>);
+    }
+    __UTL_HIDE_FROM_ABI explicit(explicit_constructible_v<Us...>) constexpr tuple(
+        Us&&... u) noexcept(is_nothrow_constructible_v<base_type, Us...>)
+        : base_type(__UTL forward<Us>(u)...) {}
+
+public:
+    template <typename... UTypes>
+    requires requires {
+        requires (sizeof...(UTypes) == sizeof...(Types));
+        requires (!use_other_overload<tuple<UTypes...>&>());
+        requires (... && is_constructible_v<Types, UTypes&>);
+        requires (... || reference_constructs_from_temporary_v<Types, UTypes&>);
+    }
+    __UTL_HIDE_FROM_ABI tuple(tuple<UTypes...>& other) noexcept = delete;
+
+    template <typename... UTypes>
+    requires requires {
+        requires (sizeof...(UTypes) == sizeof...(Types));
+        requires (!use_other_overload<tuple<UTypes...>&>());
+        requires (... && is_constructible_v<Types, UTypes&>);
+        requires (... && !reference_constructs_from_temporary_v<Types, UTypes&>);
+    }
     __UTL_HIDE_FROM_ABI explicit(explicit_constructible_v<UTypes&...>) constexpr tuple(
         tuple<UTypes...>& other) noexcept((... && is_nothrow_constructible_v<Types, UTypes&>))
         : tuple(other, index_sequence_for<UTypes...>{}) {}
 
-    template <constructible_as<Types, add_lvalue_reference>... UTypes>
-    requires (... || reference_constructs_from_temporary_v<Types, UTypes&>)
-    explicit(explicit_constructible_v<UTypes&...>) constexpr tuple(
-        tuple<UTypes...>& other) noexcept((... &&
-        is_nothrow_constructible_v<Types, UTypes&>)) = delete;
-
 public:
-    template <constructible_as<Types, details::tuple::add_const_lvalue_reference>... UTypes>
-    requires (... && !reference_constructs_from_temporary_v<Types, UTypes const&>)
+    template <typename... UTypes>
+    requires requires {
+        requires (sizeof...(UTypes) == sizeof...(Types));
+        requires (!use_other_overload<tuple<UTypes...> const&>());
+        requires (... && is_constructible_v<Types, UTypes const&>);
+        requires (... || reference_constructs_from_temporary_v<Types, UTypes const&>);
+    }
+    __UTL_HIDE_FROM_ABI tuple(tuple<UTypes...> const& other) noexcept = delete;
+
+    template <typename... UTypes>
+    requires requires {
+        requires (sizeof...(UTypes) == sizeof...(Types));
+        requires (!use_other_overload<tuple<UTypes...> const&>());
+        requires (... && is_constructible_v<Types, UTypes const&>);
+        requires (... && !reference_constructs_from_temporary_v<Types, UTypes const&>);
+    }
     __UTL_HIDE_FROM_ABI explicit(explicit_constructible_v<UTypes const&...>) constexpr tuple(
         tuple<UTypes...> const& other) noexcept((... &&
         is_nothrow_constructible_v<Types, UTypes const&>))
         : tuple(other, index_sequence_for<UTypes...>{}) {}
 
-    template <constructible_as<Types, details::tuple::add_const_lvalue_reference>... UTypes>
-    requires (... || reference_constructs_from_temporary_v<Types, UTypes const&>)
-    explicit(explicit_constructible_v<UTypes const&...>) constexpr tuple(
-        tuple<UTypes...> const& other) noexcept((... &&
-        is_nothrow_constructible_v<Types, UTypes const&>)) = delete;
-
 public:
-    template <constructible_as<Types, add_rvalue_reference>... UTypes>
-    requires (... && !reference_constructs_from_temporary_v<Types, UTypes &&>)
-    __UTL_HIDE_FROM_ABI explicit(explicit_constructible_v<UTypes&&...>) constexpr tuple(
-        tuple<UTypes...>&& other) noexcept((... && is_nothrow_constructible_v<Types, UTypes&&>))
+    template <typename... UTypes>
+    requires requires {
+        requires (sizeof...(UTypes) == sizeof...(Types));
+        requires (!use_other_overload<tuple<UTypes...> &&>());
+        requires (... && is_constructible_v<Types, UTypes>);
+        requires (... || reference_constructs_from_temporary_v<Types, UTypes &&>);
+    }
+    __UTL_HIDE_FROM_ABI tuple(tuple<UTypes...>&& other) noexcept = delete;
+
+    template <typename... UTypes>
+    requires requires {
+        requires (sizeof...(UTypes) == sizeof...(Types));
+        requires (!use_other_overload<tuple<UTypes...> &&>());
+        requires (... && is_constructible_v<Types, UTypes>);
+        requires (... && !reference_constructs_from_temporary_v<Types, UTypes &&>);
+    }
+    __UTL_HIDE_FROM_ABI explicit(explicit_constructible_v<UTypes...>) constexpr tuple(
+        tuple<UTypes...>&& other) noexcept((... && is_nothrow_constructible_v<Types, UTypes>))
         : tuple(__UTL move(other), index_sequence_for<UTypes...>{}) {}
 
-    template <constructible_as<Types, add_rvalue_reference>... UTypes>
-    requires (... || reference_constructs_from_temporary_v<Types, UTypes &&>)
-    explicit(explicit_constructible_v<UTypes&&...>) constexpr tuple(
-        tuple<UTypes...>&& other) noexcept((... &&
-        is_nothrow_constructible_v<Types, UTypes&&>)) = delete;
-
-#if UTL_ENFORCE_NONMOVABILIITY
-    /**
-     * Non-standard overload
-     */
-    template <variadic_match<Types>... UTypes>
-    requires (... || !is_constructible_v<Types, UTypes>)
-    constexpr tuple(tuple<UTypes...>&&) = delete;
-#endif
-
 public:
-    template <constructible_as<Types, details::tuple::add_const_rvalue_reference>... UTypes>
-    requires (... && !reference_constructs_from_temporary_v<Types, UTypes const &&>)
-    __UTL_HIDE_FROM_ABI explicit(explicit_constructible_v<UTypes const&&...>) constexpr tuple(
+    template <typename... UTypes>
+    requires requires {
+        requires (sizeof...(UTypes) == sizeof...(Types));
+        requires (!use_other_overload<tuple<UTypes...> &&>());
+        requires (... && is_constructible_v<Types, UTypes>);
+        requires (... || reference_constructs_from_temporary_v<Types, UTypes const &&>);
+    }
+    __UTL_HIDE_FROM_ABI tuple(tuple<UTypes...> const&& other) noexcept = delete;
+
+    template <typename... UTypes>
+    requires requires {
+        requires (sizeof...(UTypes) == sizeof...(Types));
+        requires (!use_other_overload<tuple<UTypes...> const &&>());
+        requires (!same_as<tuple<UTypes...>, tuple>);
+        requires (... && is_constructible_v<Types, UTypes const>);
+        requires (... && !reference_constructs_from_temporary_v<Types, UTypes const &&>);
+    }
+    __UTL_HIDE_FROM_ABI explicit(explicit_constructible_v<UTypes const...>) constexpr tuple(
         tuple<UTypes...> const&& other) noexcept((... &&
-        is_nothrow_constructible_v<Types, UTypes const&&>))
+        is_nothrow_constructible_v<Types, UTypes const>))
         : tuple(__UTL move(other), index_sequence_for<UTypes...>{}) {}
-
-    template <constructible_as<Types, details::tuple::add_const_rvalue_reference>... UTypes>
-    requires (... || reference_constructs_from_temporary_v<Types, UTypes const &&>)
-    explicit(explicit_constructible_v<UTypes const&&...>) constexpr tuple(
-        tuple<UTypes...> const&& other) noexcept((... &&
-        is_nothrow_constructible_v<Types, UTypes const&&>)) = delete;
-
-#if UTL_ENFORCE_NONMOVABILIITY
-    /**
-     * Non-standard overload
-     */
-    template <variadic_match<Types>... UTypes>
-    requires (... || !is_constructible_v<Types, UTypes const &&>)
-    constexpr tuple(tuple<UTypes...> const&&) = delete;
-#endif
 
 private:
     template <details::tuple::unrecognized TupleLike>
@@ -554,8 +577,11 @@ private:
 
 public:
     template <details::tuple::unrecognized TupleLike>
-    requires (is_constructible_v<tuple,
-        decltype(details::tuple::forward_unrecognized(__UTL declval<TupleLike>()))>)
+    requires requires {
+        requires (!use_other_overload<TupleLike &&>());
+        requires is_constructible_v<tuple,
+            decltype(details::tuple::forward_unrecognized(__UTL declval<TupleLike>()))>;
+    }
     __UTL_HIDE_FROM_ABI explicit(is_explicit_v<TupleLike>) constexpr tuple(TupleLike&& t) noexcept(
         details::tuple::is_nothrow_accessible_v<TupleLike> &&
         is_nothrow_constructible_v<tuple,
@@ -563,154 +589,174 @@ public:
         : tuple(details::tuple::forward_unrecognized(__UTL forward<TupleLike>(t))) {}
 
 private:
-    template <allocator_type Alloc>
-    static constexpr bool is_ctor_with_alloc_v =
-        (... || (is_constructible_with_allocator_v<Types, Alloc>));
-    template <allocator_type Alloc>
-    static constexpr bool is_explicit_with_alloc_v = (... ||
-        (is_explicit_constructible_with_allocator_v<Types, Alloc> ||
-            is_explicit_constructible_v<Types>));
+    template <allocator_type Alloc, typename... Args>
+    static consteval bool is_nothrow_constructible_with_allocator() {
+        if constexpr (sizeof...(Types) != sizeof...(Args)) {
+            return false;
+        } else {
+            return (
+                ... && is_nothrow_constructible_v<base_type, allocator_arg_t, Alloc const&, Args>);
+        }
+    }
+
+    template <allocator_type Alloc, typename... Args>
+    static consteval bool is_constructible_with_allocator() {
+        if constexpr (sizeof...(Types) != sizeof...(Args)) {
+            return false;
+        } else {
+            return (... || is_constructible_with_allocator_v<Types, Alloc, Args>);
+        }
+    }
 
     template <allocator_type Alloc, details::tuple::unrecognized TupleLike>
-    static constexpr bool is_explicit_tuple_with_alloc_v = is_explicit_constructible_v<tuple,
-        Alloc const&, decltype(details::tuple::forward_unrecognized(__UTL declval<TupleLike>()))>;
+    static consteval bool is_explicit_tuple_with_alloc() {
+        return is_explicit_constructible_v<tuple, Alloc const&,
+            decltype(details::tuple::forward_unrecognized(__UTL declval<TupleLike>()))>;
+    }
 
-    template <allocator_type Alloc, variadic_match<Types>... Args>
-    static constexpr bool is_nothrow_with_alloc_v =
-        is_nothrow_constructible_v<base_type, allocator_arg_t, Alloc const&, Args...>;
+    template <allocator_type Alloc, typename... Args>
+    static consteval bool is_explicit_with_allocator() {
+        if constexpr (sizeof...(Types) != sizeof...(Args)) {
+            return false;
+        } else {
+            return (... ||
+                (is_explicit_constructible_with_allocator_v<Types, Alloc, Args> ||
+                    is_explicit_constructible_v<Types, Args>));
+        }
+    }
 
-    template <allocator_type Alloc, variadic_match<Types>... Args>
-    static constexpr bool is_ctor_with_alloc_args_v =
-        (... || (is_constructible_with_allocator_v<Types, Alloc, Args>));
-
-    template <allocator_type Alloc, variadic_match<Types>... Args>
-    static constexpr bool is_explicit_with_alloc_args_v = (... ||
-        (is_explicit_constructible_with_allocator_v<Types, Alloc, Args> ||
-            is_explicit_constructible_v<Types, Args>));
-
-    template <allocator_type Alloc, variadic_match<Types>... Args>
-    static constexpr bool is_dangling_v = (... ||
-        (!uses_allocator_v<Types, Alloc> && reference_constructs_from_temporary_v<Types, Args>));
+    template <allocator_type Alloc, typename... T>
+    static consteval bool dangling_construction() {
+        return (... ||
+            (!uses_allocator_v<Types, Alloc> && reference_constructs_from_temporary_v<Types, T&&>));
+    }
 
 public:
     template <allocator_type Alloc>
-    requires (is_ctor_with_alloc_v<Alloc>)
-    __UTL_HIDE_FROM_ABI explicit(is_explicit_with_alloc_v<Alloc>) constexpr tuple(
-        allocator_arg_t, Alloc const& alloc) noexcept(is_nothrow_with_alloc_v<Alloc>)
+    requires (... || is_constructible_with_allocator_v<Types, Alloc>)
+    __UTL_HIDE_FROM_ABI explicit(is_explicit_with_allocator<Alloc>()) constexpr tuple(
+        allocator_arg_t, Alloc const& alloc) noexcept(is_nothrow_constructible_v<base_type,
+        allocator_arg_t, Alloc const&>)
         : base_type(allocator_arg, alloc) {}
 
 public:
     template <allocator_type Alloc>
-    requires (is_ctor_with_alloc_args_v<Alloc, Types const&...>)
+    requires requires {
+        requires is_constructible_with_allocator<Alloc, Types const&...>();
+        requires !dangling_construction<Alloc, Types const&...>();
+    }
     __UTL_HIDE_FROM_ABI explicit(
-        is_explicit_with_alloc_args_v<Alloc, Types const&...>) constexpr tuple(allocator_arg_t,
+        is_explicit_with_allocator<Alloc, Types const&...>()) constexpr tuple(allocator_arg_t,
         Alloc const& alloc,
-        Types const&... args) noexcept(is_nothrow_with_alloc_v<Alloc, Types const&...>)
+        Types const&... args) noexcept(is_nothrow_constructible_with_allocator<Alloc,
+        Types const&...>())
         : base_type(allocator_arg, alloc, args...) {}
 
 public:
-    template <allocator_type Alloc, variadic_match<Types>... UTypes>
-    requires (is_ctor_with_alloc_args_v<Alloc, UTypes...> && !is_dangling_v<Alloc, UTypes && ...>)
-    __UTL_HIDE_FROM_ABI explicit(is_explicit_with_alloc_args_v<Alloc, UTypes...>) constexpr tuple(
+    template <allocator_type Alloc, typename... UTypes>
+    requires requires {
+        requires is_constructible_with_allocator<Alloc, UTypes...>();
+        requires !dangling_construction<Alloc, UTypes...>();
+    }
+    __UTL_HIDE_FROM_ABI explicit(is_explicit_with_allocator<Alloc, UTypes...>()) constexpr tuple(
         allocator_arg_t, Alloc const& alloc,
-        UTypes&&... args) noexcept(is_nothrow_with_alloc_v<Alloc, UTypes...>)
+        UTypes&&... args) noexcept(is_nothrow_constructible_with_allocator<Alloc, UTypes...>())
         : base_type(allocator_arg, alloc, forward<UTypes>(args)...) {}
 
-    template <allocator_type Alloc, variadic_match<Types>... UTypes>
-    requires (is_ctor_with_alloc_args_v<Alloc, UTypes...> && is_dangling_v<Alloc, UTypes && ...>)
-    explicit(is_explicit_with_alloc_args_v<Alloc, UTypes...>) constexpr tuple(allocator_arg_t,
-        Alloc const& alloc,
-        UTypes&&... args) noexcept(is_nothrow_with_alloc_v<Alloc, UTypes...>) = delete;
+    template <allocator_type Alloc, typename... UTypes>
+    requires requires {
+        requires is_constructible_with_allocator<Alloc, UTypes...>();
+        requires dangling_construction<Alloc, UTypes...>();
+    }
+    __UTL_HIDE_FROM_ABI tuple(allocator_arg_t, Alloc const& alloc, UTypes&&... args) = delete;
 
 public:
-    template <allocator_type Alloc, variadic_match<Types>... UTypes>
-    requires (is_ctor_with_alloc_args_v<Alloc, UTypes&...> && !is_dangling_v<Alloc, UTypes&...>)
-    __UTL_HIDE_FROM_ABI explicit(is_explicit_with_alloc_args_v<Alloc, UTypes&...>) constexpr tuple(
+    template <allocator_type Alloc, typename... UTypes>
+    requires requires {
+        requires is_constructible_with_allocator<Alloc, UTypes&...>();
+        requires !dangling_construction<Alloc, UTypes&...>();
+    }
+    __UTL_HIDE_FROM_ABI explicit(is_explicit_with_allocator<Alloc, UTypes&...>()) constexpr tuple(
         allocator_arg_t, Alloc const& alloc,
-        tuple<UTypes...>& other) noexcept(is_nothrow_with_alloc_v<Alloc, UTypes&...>)
+        tuple<UTypes...>&
+            other) noexcept(is_nothrow_constructible_with_allocator<Alloc, UTypes&...>())
         : tuple(allocator_arg, alloc, other, index_sequence_for<UTypes...>{}) {}
 
-    template <allocator_type Alloc, variadic_match<Types>... UTypes>
-    requires (is_ctor_with_alloc_args_v<Alloc, UTypes&...> && is_dangling_v<Alloc, UTypes&...>)
-    explicit(is_explicit_with_alloc_args_v<Alloc, UTypes&...>) constexpr tuple(allocator_arg_t,
-        Alloc const& alloc,
-        tuple<UTypes...>& other) noexcept(is_nothrow_with_alloc_v<Alloc, UTypes&...>) = delete;
+    template <allocator_type Alloc, typename... UTypes>
+    requires requires {
+        requires is_constructible_with_allocator<Alloc, UTypes&...>();
+        requires dangling_construction<Alloc, UTypes&...>();
+    }
+    __UTL_HIDE_FROM_ABI tuple(
+        allocator_arg_t, Alloc const& alloc, tuple<UTypes...>& other) = delete;
 
 public:
-    template <allocator_type Alloc, variadic_match<Types>... UTypes>
-    requires (is_ctor_with_alloc_args_v<Alloc, UTypes const&...> &&
-        !is_dangling_v<Alloc, UTypes const&...>)
+    template <allocator_type Alloc, typename... UTypes>
+    requires requires {
+        requires is_constructible_with_allocator<Alloc, UTypes const&...>();
+        requires !dangling_construction<Alloc, UTypes const&...>();
+    }
     __UTL_HIDE_FROM_ABI explicit(
-        is_explicit_with_alloc_args_v<Alloc, UTypes const&...>) constexpr tuple(allocator_arg_t,
+        is_explicit_with_allocator<Alloc, UTypes const&...>()) constexpr tuple(allocator_arg_t,
         Alloc const& alloc,
-        tuple<UTypes...> const& other) noexcept(is_nothrow_with_alloc_v<Alloc, UTypes const&...>)
+        tuple<UTypes...> const&
+            other) noexcept(is_nothrow_constructible_with_allocator<Alloc, UTypes const&...>())
         : tuple(allocator_arg, alloc, other, index_sequence_for<UTypes...>{}) {}
 
-    template <allocator_type Alloc, variadic_match<Types>... UTypes>
-    requires (is_ctor_with_alloc_args_v<Alloc, UTypes const&...> &&
-                 is_dangling_v<Alloc, UTypes const&...>)
-    explicit(is_explicit_with_alloc_args_v<Alloc, UTypes const&...>) constexpr tuple(
-        allocator_arg_t, Alloc const& alloc,
-        tuple<UTypes...> const& other) noexcept(is_nothrow_with_alloc_v<Alloc, UTypes const&...>) =
-        delete;
+    template <allocator_type Alloc, typename... UTypes>
+    requires requires {
+        requires is_constructible_with_allocator<Alloc, UTypes const&...>();
+        requires dangling_construction<Alloc, UTypes const&...>();
+    }
+    __UTL_HIDE_FROM_ABI tuple(
+        allocator_arg_t, Alloc const& alloc, tuple<UTypes...> const& other) = delete;
 
 public:
-    template <allocator_type Alloc, variadic_match<Types>... UTypes>
-    requires (
-        is_ctor_with_alloc_args_v<Alloc, UTypes && ...> && !is_dangling_v<Alloc, UTypes && ...>)
-    __UTL_HIDE_FROM_ABI explicit(is_explicit_with_alloc_args_v<Alloc, UTypes&&...>) constexpr tuple(
+    template <allocator_type Alloc, typename... UTypes>
+    requires requires {
+        requires is_constructible_with_allocator<Alloc, UTypes...>();
+        requires !dangling_construction<Alloc, UTypes...>();
+    }
+    __UTL_HIDE_FROM_ABI explicit(is_explicit_with_allocator<Alloc, UTypes...>()) constexpr tuple(
         allocator_arg_t, Alloc const& alloc,
-        tuple<UTypes...>&& other) noexcept(is_nothrow_with_alloc_v<Alloc, UTypes&&...>)
+        tuple<UTypes...>&&
+            other) noexcept(is_nothrow_constructible_with_allocator<Alloc, UTypes...>())
         : tuple(allocator_arg, alloc, __UTL move(other), index_sequence_for<UTypes...>{}) {}
 
-    template <allocator_type Alloc, variadic_match<Types>... UTypes>
-    requires (is_ctor_with_alloc_args_v<Alloc, UTypes && ...> &&
-                 is_dangling_v<Alloc, UTypes && ...>)
-    explicit(is_explicit_with_alloc_args_v<Alloc, UTypes&&...>) constexpr tuple(allocator_arg_t,
-        Alloc const& alloc,
-        tuple<UTypes...>&& other) noexcept(is_nothrow_with_alloc_v<Alloc, UTypes&&...>) = delete;
-
-#if UTL_ENFORCE_NONMOVABILIITY
-    /**
-     * Non-standard overload
-     */
-    template <allocator_type Alloc, variadic_match<Types>... UTypes>
-    requires (!is_ctor_with_alloc_args_v<Alloc, UTypes && ...>::value)
-    constexpr tuple(allocator_arg_t, Alloc const& alloc, tuple<UTypes...>&& other) = delete;
-#endif
+    template <allocator_type Alloc, typename... UTypes>
+    requires requires {
+        requires is_constructible_with_allocator<Alloc, UTypes...>();
+        requires dangling_construction<Alloc, UTypes...>();
+    }
+    __UTL_HIDE_FROM_ABI tuple(
+        allocator_arg_t, Alloc const& alloc, tuple<UTypes...>&& other) = delete;
 
 public:
-    template <allocator_type Alloc, variadic_match<Types>... UTypes>
-    requires (is_ctor_with_alloc_args_v<Alloc, UTypes const && ...> &&
-        !is_dangling_v<Alloc, UTypes const && ...>)
+    template <allocator_type Alloc, typename... UTypes>
+    requires requires {
+        requires is_constructible_with_allocator<Alloc, UTypes const...>();
+        requires !dangling_construction<Alloc, UTypes const...>();
+    }
     __UTL_HIDE_FROM_ABI explicit(
-        is_explicit_with_alloc_args_v<Alloc, UTypes const&&...>) constexpr tuple(allocator_arg_t,
+        is_explicit_with_allocator<Alloc, UTypes const...>()) constexpr tuple(allocator_arg_t,
         Alloc const& alloc,
-        tuple<UTypes...> const&& other) noexcept(is_nothrow_with_alloc_v<Alloc, UTypes const&&...>)
+        tuple<UTypes...> const&&
+            other) noexcept(is_nothrow_constructible_with_allocator<Alloc, UTypes const...>())
         : tuple(allocator_arg, alloc, other, index_sequence_for<UTypes...>{}) {}
 
-    template <allocator_type Alloc, variadic_match<Types>... UTypes>
-    requires (is_ctor_with_alloc_args_v<Alloc, UTypes const && ...> &&
-                 is_dangling_v<Alloc, UTypes const && ...>)
-    explicit(is_explicit_with_alloc_args_v<Alloc, UTypes const&&...>) constexpr tuple(
-        allocator_arg_t, Alloc const& alloc,
-        tuple<UTypes...> const&&
-            other) noexcept(is_nothrow_with_alloc_v<Alloc, UTypes const&&...>) = delete;
-
-#if UTL_ENFORCE_NONMOVABILIITY
-    /**
-     * Non-standard overload
-     */
-    template <allocator_type Alloc, variadic_match<Types>... UTypes>
-    requires (!is_ctor_with_alloc_args_v<Alloc, UTypes const && ...>::value)
-    constexpr tuple(allocator_arg_t, Alloc const& alloc, tuple<UTypes...> const&& other) = delete;
-#endif
+    template <allocator_type Alloc, typename... UTypes>
+    requires requires {
+        requires is_constructible_with_allocator<Alloc, UTypes const...>();
+        requires dangling_construction<Alloc, UTypes const...>();
+    }
+    __UTL_HIDE_FROM_ABI tuple(
+        allocator_arg_t, Alloc const& alloc, tuple<UTypes...> const&& other) = delete;
 
 public:
     template <allocator_type Alloc, details::tuple::unrecognized TupleLike>
     requires (is_constructible_v<tuple, Alloc const&,
         decltype(details::tuple::forward_unrecognized(__UTL declval<TupleLike>()))>)
-    __UTL_HIDE_FROM_ABI explicit(is_explicit_tuple_with_alloc_v<Alloc, TupleLike>) constexpr tuple(
+    __UTL_HIDE_FROM_ABI explicit(is_explicit_tuple_with_alloc<Alloc, TupleLike>()) constexpr tuple(
         allocator_arg_t, Alloc const& alloc,
         TupleLike&& other) noexcept(details::tuple::is_nothrow_accessible_v<TupleLike> &&
         is_nothrow_constructible_v<tuple, Alloc const&,
@@ -720,19 +766,25 @@ public:
 
 public:
     template <allocator_type Alloc>
-    requires (
-        is_ctor_with_alloc_args_v<Alloc, Types const&...> && !is_dangling_v<Alloc, Types const&...>)
+    requires requires {
+        requires is_constructible_with_allocator<Alloc, Types const&...>();
+        requires !dangling_construction<Alloc, Types const&...>();
+    }
     __UTL_HIDE_FROM_ABI explicit(
-        is_explicit_with_alloc_args_v<Alloc, Types const&...>) constexpr tuple(allocator_arg_t,
+        is_explicit_with_allocator<Alloc, Types const&...>()) constexpr tuple(allocator_arg_t,
         Alloc const& alloc,
-        tuple const& other) noexcept(is_nothrow_with_alloc_v<Alloc, Types const&...>)
+        tuple const&
+            other) noexcept(is_nothrow_constructible_with_allocator<Alloc, Types const&...>())
         : tuple(allocator_arg, alloc, other, index_sequence_for<Types...>{}) {}
 
     template <allocator_type Alloc>
-    requires (is_ctor_with_alloc_args_v<Alloc, Types && ...> && !is_dangling_v<Alloc, Types && ...>)
-    __UTL_HIDE_FROM_ABI explicit(is_explicit_with_alloc_args_v<Alloc, Types&&...>) constexpr tuple(
+    requires requires {
+        requires is_constructible_with_allocator<Alloc, Types...>();
+        requires !dangling_construction<Alloc, Types...>();
+    }
+    __UTL_HIDE_FROM_ABI explicit(is_explicit_with_allocator<Alloc, Types&&...>()) constexpr tuple(
         allocator_arg_t, Alloc const& alloc,
-        tuple&& other) noexcept(is_nothrow_with_alloc_v<Alloc, Types&&...>)
+        tuple&& other) noexcept(is_nothrow_constructible_with_allocator<Alloc, Types...>())
         : tuple(allocator_arg, alloc, __UTL move(other), index_sequence_for<Types...>{}) {}
 
 public:
@@ -768,28 +820,12 @@ public:
         return assign(__UTL move(other), index_sequence_for<Types...>{});
     }
 
-#if UTL_ENFORCE_NONMOVABILIITY
-    /**
-     * Non-standard overload
-     */
-    template <typename... UTypes>
-    constexpr tuple& operator=(tuple<UTypes...>&& other) = delete;
-#endif
-
 public:
     template <assignable_to<Types const&, add_rvalue_reference>... UTypes>
     __UTL_HIDE_FROM_ABI constexpr tuple const& operator=(tuple<UTypes...>&& other) const
         noexcept((... && is_nothrow_assignable_v<Types const&, UTypes&&>)) {
         return assign(__UTL move(other), index_sequence_for<Types...>{});
     }
-
-#if UTL_ENFORCE_NONMOVABILIITY
-    /**
-     * Non-standard overload
-     */
-    template <typename... UTypes>
-    constexpr tuple const& operator=(tuple<UTypes...>&& other) const = delete;
-#endif
 
 public:
     template <assignable_to<Types&, details::tuple::add_const_rvalue_reference>... UTypes>
@@ -798,28 +834,12 @@ public:
         return assign(__UTL move(other), index_sequence_for<Types...>{});
     }
 
-#if UTL_ENFORCE_NONMOVABILIITY
-    /**
-     * Non-standard overload
-     */
-    template <typename... UTypes>
-    constexpr tuple& operator=(tuple<UTypes...> const&& other) = delete;
-#endif
-
 public:
     template <assignable_to<Types const&, details::tuple::add_const_rvalue_reference>... UTypes>
     __UTL_HIDE_FROM_ABI constexpr tuple const& operator=(tuple<UTypes...> const&& other) const
         noexcept((... && is_nothrow_assignable_v<Types const&, UTypes const&&>)) {
         return assign(__UTL move(other), index_sequence_for<Types...>{});
     }
-
-#if UTL_ENFORCE_NONMOVABILIITY
-    /**
-     * Non-standard overload
-     */
-    template <typename... UTypes>
-    constexpr tuple const& operator=(tuple<UTypes...> const&& other) const = delete;
-#endif
 
 public:
     template <details::tuple::unrecognized TupleLike>
