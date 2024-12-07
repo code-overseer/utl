@@ -233,7 +233,7 @@ UTL_ATTRIBUTES(LIBC_PURE) inline T* strnset(T* dst, T const val, element_count_t
     T* ptr = dst;
     do {
         size_t const copy_size = len < buffer_count ? len : buffer_count;
-        ::memcpy(ptr, buffer, byte_count<T>(copy_size));
+        ::memcpy(ptr, buffer, byte_count<T>(static_cast<element_count_t>(copy_size)));
         len -= copy_size;
         ptr += copy_size;
     } while (len);
