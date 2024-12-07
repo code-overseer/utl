@@ -108,7 +108,7 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline auto wait(
         return error_code{};
     }
 
-    return error_code{GetLastError(), __UTL hresult_category()};
+    return error_code{GetLastError(), __UTL system_category()};
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
@@ -126,7 +126,7 @@ UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) inline auto wait(
         return error_code{};
     }
 
-    return error_code{GetLastError(), __UTL hresult_category()};
+    return error_code{GetLastError(), __UTL system_category()};
 }
 
 template <UTL_CONCEPT_CXX20(waitable_type) T>
