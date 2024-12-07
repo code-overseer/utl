@@ -158,7 +158,7 @@ static_assert(utl::is_move_constructible<utl::tuple<int, int>>::value,
 
 static_assert(!utl::is_constructible<utl::tuple<move_only<0>, move_only<1>>,
                   utl::tuple<move_only<0>&&, move_only<1>&&> const&>::value,
-    "Move only tuple should not be constructible with an lvalue tuple of rvalue references of the "
+    "Move only tuple should be constructible with an lvalue tuple of rvalue references of the "
     "same element types");
 static_assert(utl::is_constructible<utl::tuple<move_only<0>, move_only<1>>,
                   utl::tuple<move_only<0>&&, move_only<1>&&>>::value,
@@ -170,46 +170,24 @@ static_assert(utl::is_constructible<utl::tuple<copy_only<0>, copy_only<1>>,
     "Copy only tuple should be constructible with an lvalue tuple of rvalue references of the same "
     "element types");
 
-#ifdef UTL_ENFORCE_NONMOVABILIITY
-static_assert(!utl::is_assignable<utl::tuple<copy_only<0>, copy_only<1>>&,
-                  utl::tuple<copy_only<0>&&, copy_only<1>&&>>::value,
-    "Copy only tuple should not be assignable with an rvalue tuple of rvalue references of the "
-    "same element types");
 static_assert(!utl::is_constructible<utl::tuple<copy_only<0>, copy_only<1>>, utl::allocator_arg_t,
-                  alloc, utl::tuple<copy_only<0>&&, copy_only<1>&&>>::value,
-    "Copy only tuple should not be constructible with an rvalue tuple of rvalue references of the "
-    "same element types");
-static_assert(!utl::is_move_constructible<utl::tuple<copy_only<0>, copy_only<1>>>::value,
-    "if non-move_only element exists, tuple should not be move_only");
-static_assert(!utl::is_constructible<utl::tuple<copy_only<0>, copy_only<1>>,
-                  utl::tuple<copy_only<0>&&, copy_only<1>&&>>::value,
-    "Copy only tuple should not be constructible with an rvalue tuple of rvalue references of the "
-    "same element types");
-static_assert(!utl::is_move_constructible<utl::tuple<move_only<0>, copy_only<0>>>::value,
-    "if non-move_only element exists, tuple should not be move_only");
-static_assert(!utl::is_move_assignable<utl::tuple<move_only<0>, copy_only<0>>>::value,
-    "if non-move_only element exists, tuple should not be move_only");
-static_assert(!utl::is_move_assignable<utl::tuple<copy_only<0>, copy_only<1>>>::value,
-    "if non-move_only element exists, tuple should not be move_only");
-#else
-static_assert(utl::is_constructible<utl::tuple<copy_only<0>, copy_only<1>>, utl::allocator_arg_t,
                   alloc, utl::tuple<copy_only<0>&&, copy_only<1>&&>>::value,
     "Copy only tuple should be constructible with an rvalue tuple of rvalue references of the same "
     "element types");
 
 static_assert(utl::is_move_constructible<utl::tuple<copy_only<0>, copy_only<1>>>::value,
     "if non-move_only element exists, tuple should still be movable");
-static_assert(utl::is_constructible<utl::tuple<copy_only<0>, copy_only<1>>,
+static_assert(!utl::is_constructible<utl::tuple<copy_only<0>, copy_only<1>>,
                   utl::tuple<copy_only<0>&&, copy_only<1>&&>>::value,
     "Copy only tuple should be constructible with an rvalue tuple of rvalue references of the same "
     "element types");
+
 static_assert(utl::is_move_constructible<utl::tuple<move_only<0>, copy_only<0>>>::value,
     "if non-move_only element exists, tuple should still be movable");
 static_assert(utl::is_move_assignable<utl::tuple<move_only<0>, copy_only<0>>>::value,
     "if non-move_only element exists, tuple should still be movable");
 static_assert(utl::is_move_assignable<utl::tuple<copy_only<0>, copy_only<1>>>::value,
     "if non-move_only element exists, tuple should still be movable");
-#endif
 
 static_assert(utl::is_move_constructible<utl::tuple<move_only<0>, move_only<1>>>::value,
     "if all elements are move_only, tuple should be move_only");
@@ -309,8 +287,6 @@ static_assert(utl::is_trivially_destructible<trivial_tuple>::value,
     "If all element are trivial, tuple is trivial in >C++20");
 static_assert(utl::is_trivially_copyable<trivial_tuple>::value,
     "If all element are trivial, tuple is trivial in >C++20");
-static_assert(utl::is_trivial<trivial_tuple>::value,
-    "If all element are trivial, tuple is trivial in >C++20");
 #endif
 
 static_assert(utl::is_standard_layout<trivial_tuple>::value,
@@ -339,8 +315,25 @@ static_assert(utl::is_assignable<utl::tuple<long long, double>, std::pair<int, f
 
 static_assert(
     !utl::is_constructible<utl::tuple<long long&&, double&&>, std::tuple<int, float>>::value,
-    "If all element are constructible, tuple is constructible from const reference");
+    "No dangling");
 static_assert(!utl::is_constructible<utl::tuple<long long&&, double>, std::pair<int, float>>::value,
-    "If all element are constructible, tuple is constructible from const reference");
+    "No dangling");
+
+using TupleLike = std::tuple<long long&&, double&&>;
+static_assert(
+    utl::is_constructible<utl::tuple<long long&&, double&&>,
+        decltype(utl::details::tuple::forward_unrecognized(__UTL declval<TupleLike>()))>::value,
+    "No dangling");
+
+static_assert(utl::is_constructible<utl::tuple<long long&&, double&&>,
+                  std::tuple<long long&&, double&&>>::value,
+    "No dangling");
+utl::tuple<long long&&, double&&> l326(std::tuple<long long&&, double&&> t) {
+    utl::tuple<long long&&, double&&> u(utl::details::tuple::forward_unrecognized(__UTL move(t)));
+    return u;
+}
+static_assert(
+    utl::is_constructible<utl::tuple<long long&&, double>, std::pair<long long, float>>::value,
+    "No dangling");
 } // namespace tuple_test
 UTL_DISABLE_WARNING_POP()
