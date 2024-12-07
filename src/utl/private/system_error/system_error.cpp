@@ -9,11 +9,13 @@
 
 UTL_NAMESPACE_BEGIN
 
-static size_t error_message(int code, char* buffer, size_t size) noexcept;
+namespace system_error {
+
+static size_t message(int code, char* buffer, size_t size) noexcept;
 
 #if UTL_TARGET_MICROSOFT
 
-static size_t error_message(int code, char* buffer, size_t size) noexcept {
+static size_t message(int code, char* buffer, size_t size) noexcept {
 #  ifdef __UTL_ELAST
     if (code > __UTL_ELAST) {
         return snprintf(buffer, size, "Unspecified generic_category error");
@@ -51,7 +53,7 @@ UTL_ATTRIBUTE(MAYBE_UNUSED) static char const* handle_strerror(int result, char*
     std::abort();
 }
 
-static size_t error_message(int code, char* buffer, size_t size) noexcept {
+static size_t message(int code, char* buffer, size_t size) noexcept {
 #  ifdef __UTL_ELAST
     if (code > __UTL_ELAST) {
         return snprintf(buffer, size, "Unspecified generic_category error");
@@ -71,12 +73,13 @@ static size_t error_message(int code, char* buffer, size_t size) noexcept {
 }
 
 #endif
+} // namespace system_error
 
 class __UTL_ABI_PRIVATE generic_error_category final : public error_category {
 public:
     virtual char const* name() const noexcept final { return "generic"; }
     virtual size_t message(int code, char* buffer, size_t size) const noexcept final {
-        return error_message(code, buffer, size);
+        return system_error::message(code, buffer, size);
     }
 };
 
@@ -98,7 +101,7 @@ public:
             return snprintf(buffer, size, "Unspecified generic_category error");
         }
 #endif // __UTL_ELAST
-        return error_message(code, buffer, size);
+        return system_error::message(code, buffer, size);
     }
 };
 
