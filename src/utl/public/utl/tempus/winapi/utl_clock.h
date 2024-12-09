@@ -193,6 +193,26 @@ private:
     __UTL_ABI_PUBLIC static value_type get_time() noexcept;
 };
 
+template <>
+struct __UTL_PUBLIC_TEMPLATE clock_traits<file_clock_t> : private clock_traits<system_clock_t> {
+private:
+    using base_type = clock_traits<system_clock_t>;
+
+public:
+    using clock = file_clock_t;
+    using typename base_type::duration_type;
+    using typename base_type::value_type;
+
+    using base_type::compare;
+    using base_type::difference;
+    using base_type::equal;
+    using base_type::time_since_epoch;
+
+    UTL_ATTRIBUTES(_HIDE_FROM_ABI, NODISCARD) friend time_point<file_clock_t> get_time(file_clock_t) noexcept {
+        return time_point<file_clock_t>{get_time(steady_clock).value()};
+    }
+};
+
 } // namespace tempus
 
 UTL_NAMESPACE_END

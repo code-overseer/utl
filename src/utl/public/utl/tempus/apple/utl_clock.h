@@ -72,9 +72,9 @@ public:
 };
 
 template <>
-struct __UTL_PUBLIC_TEMPLATE clock_traits<thread_clock_t> : private clock_traits<system_clock_t> {
+struct __UTL_PUBLIC_TEMPLATE clock_traits<thread_clock_t> : private details::timeval_traits {
 private:
-    using base_type = clock_traits<system_clock_t>;
+    using base_type = details::timeval_traits;
 
 public:
     using clock = thread_clock_t;
