@@ -59,8 +59,14 @@ protected:
     UTL_CONSTEXPR_CXX20 ~error_category() = default;
 };
 
+#if UTL_CXX20
 UTL_ATTRIBUTES(_ABI_PUBLIC, CONST) error_category const& generic_category() noexcept;
 
 UTL_ATTRIBUTES(_ABI_PUBLIC, CONST) error_category const& system_category() noexcept;
+#else
+UTL_ATTRIBUTES(_ABI_PUBLIC) error_category const& generic_category() noexcept;
+
+UTL_ATTRIBUTES(_ABI_PUBLIC) error_category const& system_category() noexcept;
+#endif
 
 UTL_NAMESPACE_END

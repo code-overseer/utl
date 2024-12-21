@@ -292,10 +292,7 @@ public:
 
     // TODO: container-compatible-ranges ctor
 
-    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE constexpr operator view_type() const noexcept UTL_LIFETIMEBOUND {
-        return view_type{data(), size()};
-    }
-    __UTL_HIDE_FROM_ABI explicit __UTL_STRING_INLINE constexpr
+    __UTL_HIDE_FROM_ABI __UTL_STRING_INLINE constexpr
     operator basic_zstring_view<value_type, traits_type>() const noexcept UTL_LIFETIMEBOUND {
         return basic_zstring_view<value_type, traits_type>{data(), size()};
     }

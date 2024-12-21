@@ -634,7 +634,9 @@ class void_storage_base {
     static constexpr bool allow_external_overlap = !place_flag_in_tail;
 
     struct container {
-        __UTL_HIDE_FROM_ABI inline constexpr container() noexcept : union_{}, has_value_{true} {};
+        __UTL_HIDE_FROM_ABI inline constexpr container() noexcept
+            : union_{__UTL in_place, __UTL in_place}
+            , has_value_{true} {};
 
         __UTL_HIDE_FROM_ABI inline constexpr explicit container(in_place_t tag)
             : union_{__UTL in_place, tag}
