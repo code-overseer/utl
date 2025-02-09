@@ -31,9 +31,11 @@
 #    define UTL_CXX17 1
 #    define UTL_CONSTEXPR_CXX17 constexpr
 #    define UTL_INLINE_CXX17 inline
+#    define UTL_IF_CONSTEXPR if constexpr
 #  else /* UTL_CXX >= 201703L */
 #    define UTL_INLINE_CXX17
 #    define UTL_CONSTEXPR_CXX17
+#    define UTL_IF_CONSTEXPR if
 #  endif /* UTL_CXX >= 201703L */
 
 #  if UTL_CXX >= 202002L

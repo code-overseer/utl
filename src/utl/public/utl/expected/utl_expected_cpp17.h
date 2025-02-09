@@ -437,7 +437,7 @@ public:
                     UTL_TRAIT_is_constructible(return_type, invoke_result_t<F, T&>)),
             "Invalid return type");
         if (has_value()) {
-            transform_impl<return_type>(__UTL forward<F>(f));
+            return transform_impl<return_type>(__UTL forward<F>(f));
         }
 
         return expected<return_type, E>{__UTL unexpect, this->error_ref()};
@@ -454,7 +454,7 @@ public:
             "Invalid return type");
 
         if (has_value()) {
-            transform_impl<return_type>(__UTL forward<F>(f));
+            return transform_impl<return_type>(__UTL forward<F>(f));
         }
 
         return expected<return_type, E>{__UTL unexpect, this->error_ref()};
@@ -471,7 +471,7 @@ public:
             "Invalid return type");
 
         if (has_value()) {
-            __UTL move(*this).template transform_impl<return_type>(__UTL forward<F>(f));
+            return __UTL move(*this).template transform_impl<return_type>(__UTL forward<F>(f));
         }
 
         return expected<return_type, E>{__UTL unexpect, __UTL move(this->error_ref())};
@@ -488,7 +488,7 @@ public:
             "Invalid return type");
 
         if (has_value()) {
-            __UTL move(*this).template transform_impl<return_type>(__UTL forward<F>(f));
+            return __UTL move(*this).template transform_impl<return_type>(__UTL forward<F>(f));
         }
 
         return expected<return_type, E>{__UTL unexpect, __UTL move(this->error_ref())};
