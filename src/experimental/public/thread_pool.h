@@ -166,7 +166,7 @@ public:
     }
 };
 
-// https://godbolt.org/z/34ac46bqr (C++11)
+// https://godbolt.org/z/18zE4dvvs (C++11)
 // https://godbolt.org/z/x51Mf41q7 (C++14)
 
 namespace details {
