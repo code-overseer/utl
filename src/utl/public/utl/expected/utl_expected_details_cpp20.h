@@ -411,17 +411,16 @@ protected:
     = default;
     __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(
         storage_base const& other) noexcept(is_nothrow_copy_assignable_v<T> &&
-        is_nothrow_copy_assignable_v<E>)
+        is_nothrow_copy_assignable_v<E> && is_nothrow_copy_constructible_v<T> &&
+        is_nothrow_copy_constructible_v<E>)
     requires (is_copy_assignable_v<T> && is_copy_assignable_v<E> &&
         !(is_trivially_copy_assignable_v<T> && is_trivially_copy_assignable_v<E>))
     {
         if (this->has_value() != other.has_value()) {
             if (other.has_value()) {
-                this->destroy();
-                this->construct_value(other.value_ref());
+                this->reinitialize_as_value(other.value_ref());
             } else {
-                this->destroy();
-                this->construct_error(other.error_ref());
+                this->reinitialize_as_error(other.error_ref());
             }
         } else if (other.has_value()) {
             this->value_ref() = other.value_ref();
@@ -438,17 +437,16 @@ protected:
                  is_trivially_move_assignable_v<T> && is_trivially_move_assignable_v<E>)
     = default;
     __UTL_HIDE_FROM_ABI inline constexpr storage_base& operator=(storage_base&& other) noexcept(
-        is_nothrow_move_assignable_v<T> && is_nothrow_move_assignable_v<E>)
+        is_nothrow_move_assignable_v<T> && is_nothrow_move_assignable_v<E> &&
+        is_nothrow_move_constructible_v<T> && is_nothrow_move_constructible_v<E>)
     requires (is_move_assignable_v<T> && is_move_assignable_v<E> &&
         !(is_trivially_move_assignable_v<T> && is_trivially_move_assignable_v<E>))
     {
         if (this->has_value() != other.has_value()) {
             if (other.has_value()) {
-                this->destroy();
-                this->construct_value(__UTL move(other.value_ref()));
+                this->reinitialize_as_value(__UTL move(other.value_ref()));
             } else {
-                this->destroy();
-                this->construct_error(__UTL move(other.error_ref()));
+                this->reinitialize_as_error(__UTL move(other.error_ref()));
             }
         } else if (other.has_value()) {
             this->value_ref() = __UTL move(other.value_ref());
@@ -604,6 +602,7 @@ private:
                 __UTL addressof(container_.data), __UTL unexpect, __UTL forward<Args>(args)...);
         } else {
             container_.data.construct_union(__UTL unexpect, __UTL forward<Args>(args)...);
+            return error_ptr();
         }
     }
 
@@ -615,6 +614,7 @@ private:
                 __UTL addressof(container_.data), __UTL in_place, __UTL forward<Args>(args)...);
         } else {
             container_.data.construct_union(__UTL in_place, __UTL forward<Args>(args)...);
+            return value_ptr();
         }
     }
     __UTL_HIDE_FROM_ABI inline constexpr void destroy() noexcept {
@@ -812,16 +812,15 @@ protected:
     requires (is_copy_assignable_v<E> && is_trivially_copy_assignable_v<E>)
     = default;
     __UTL_HIDE_FROM_ABI inline constexpr void_storage_base& operator=(
-        void_storage_base const& other) noexcept(is_nothrow_copy_assignable_v<E>)
+        void_storage_base const& other) noexcept(is_nothrow_copy_assignable_v<E> &&
+        is_nothrow_copy_constructible_v<E>)
     requires (is_copy_assignable_v<E> && !is_trivially_copy_assignable_v<E>)
     {
         if (this->has_value() != other.has_value()) {
             if (other.has_value()) {
-                this->destroy();
-                this->construct_value(other.value_ref());
+                this->reinitialize_as_value();
             } else {
-                this->destroy();
-                this->construct_error(other.error_ref());
+                this->reinitialize_as_error(other.error_ref());
             }
         } else if (other.has_value()) {
             this->value_ref() = other.value_ref();
@@ -837,16 +836,15 @@ protected:
     requires (is_move_assignable_v<E> && is_trivially_move_assignable_v<E>)
     = default;
     __UTL_HIDE_FROM_ABI inline constexpr void_storage_base& operator=(
-        void_storage_base&& other) noexcept(is_nothrow_move_assignable_v<E>)
+        void_storage_base&& other) noexcept(is_nothrow_move_assignable_v<E> &&
+        is_nothrow_move_constructible_v<E>)
     requires (is_move_assignable_v<E> && !is_trivially_move_assignable_v<E>)
     {
         if (this->has_value() != other.has_value()) {
             if (other.has_value()) {
-                this->destroy();
-                this->construct_value(__UTL move(other.value_ref()));
+                this->reinitialize_as_value();
             } else {
-                this->destroy();
-                this->construct_error(__UTL move(other.error_ref()));
+                this->reinitialize_as_error(__UTL move(other.error_ref()));
             }
         } else if (other.has_value()) {
             this->value_ref() = __UTL move(other.value_ref());
@@ -944,6 +942,7 @@ private:
                 __UTL addressof(container_.data), __UTL unexpect, __UTL forward<Args>(args)...);
         } else {
             container_.data.construct_union(__UTL unexpect, __UTL forward<Args>(args)...);
+            return error_ptr();
         }
     }
 
