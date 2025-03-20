@@ -147,7 +147,7 @@ constexpr map_result map_to_generic(int code) noexcept {
     case WAIT_TIMEOUT:
         return errc::timed_out;
     case ERROR_DIRECTORY:
-        return errc::invalid_argument;
+        return errc::not_a_directory;
     case ERROR_OPERATION_ABORTED:
         return errc::operation_canceled;
     case ERROR_NOACCESS:

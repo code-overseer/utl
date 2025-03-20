@@ -9,29 +9,31 @@ UTL_NAMESPACE_BEGIN
 namespace tempus {
 
 template <typename>
-struct is_clock;
+struct __UTL_PUBLIC_TEMPLATE is_clock;
 
-struct system_clock_t;
+struct __UTL_ABI_PUBLIC system_clock_t;
 
-struct steady_clock_t;
+struct __UTL_ABI_PUBLIC steady_clock_t;
 
-struct high_resolution_clock_t;
+struct __UTL_ABI_PUBLIC high_resolution_clock_t;
 
-struct process_clock_t;
+struct __UTL_ABI_PUBLIC process_clock_t;
 
-struct thread_clock_t;
+struct __UTL_ABI_PUBLIC thread_clock_t;
 
-struct hardware_clock_t;
+struct __UTL_ABI_PUBLIC hardware_clock_t;
+
+struct __UTL_ABI_PUBLIC file_clock_t;
 
 template <typename>
-struct clock_traits;
+struct __UTL_PUBLIC_TEMPLATE clock_traits;
 
 template <typename>
-class time_point;
+class __UTL_PUBLIC_TEMPLATE time_point;
 
-class duration;
+class __UTL_ABI_PUBLIC duration;
 
-class hardware_ticks;
+class __UTL_ABI_PUBLIC hardware_ticks;
 
 enum class clock_order : signed char;
 

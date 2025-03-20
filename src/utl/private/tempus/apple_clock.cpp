@@ -43,8 +43,8 @@ auto clock_traits<thread_clock_t>::get_time() noexcept -> value_type {
 
     ::timeval const user{info.user_time.seconds, info.user_time.microseconds};
     ::timeval const kernel{info.system_time.seconds, info.system_time.microseconds};
-    auto const user_time = details::timeval_to_usec(user);
-    auto const kernel_time = details::timeval_to_usec(kernel);
+    auto const user_time = base_type::timeval_to_usec(user);
+    auto const kernel_time = base_type::timeval_to_usec(kernel);
     return user_time + kernel_time;
 }
 

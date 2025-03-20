@@ -26,8 +26,10 @@
 
 UTL_NAMESPACE_BEGIN
 template <typename CharType, typename Traits>
-class __UTL_PUBLIC_TEMPLATE basic_zstring_view : private basic_string_view<CharType, Traits> {
+class __UTL_PUBLIC_TEMPLATE basic_zstring_view : public basic_string_view<CharType, Traits> {
     using base_type = basic_string_view<CharType, Traits>;
+    using base_type::remove_suffix;
+    using base_type::swap;
 
 public:
     using base_type::npos;
@@ -51,7 +53,7 @@ public:
     __UTL_HIDE_FROM_ABI inline UTL_CONSTEXPR_CXX14 basic_zstring_view(
         const_pointer data, size_type size) UTL_THROWS
         : base_type(data, size) {
-        UTL_THROW_IF(data()[size] != 0,
+        UTL_THROW_IF(this->data()[size] != 0,
             invalid_argument(UTL_MESSAGE_FORMAT(
                 "zstring_view construction failed, Reason=[argument string not null-terminated]")));
     }
@@ -66,10 +68,8 @@ public:
         UTL_NOEXCEPT(UTL_TRAIT_is_nothrow_dereferenceable(It)&& noexcept(end - begin))
         : basic_zstring_view(__UTL to_address(begin), end - begin) {}
 
-    __UTL_HIDE_FROM_ABI explicit UTL_CONSTEXPR_CXX14 basic_zstring_view(base_type other) UTL_THROWS
+    __UTL_HIDE_FROM_ABI explicit UTL_CONSTEXPR_CXX14 basic_zstring_view(base_type const& other) UTL_THROWS
         : basic_zstring_view(other.data(), other.size()) {}
-
-    __UTL_HIDE_FROM_ABI inline constexpr operator base_type() const { return *this; }
 
     // TODO: ranges ctor
 
