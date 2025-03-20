@@ -17,7 +17,7 @@ inline UTL_CONSTEXPR_CXX20 auto allocator<T>::allocate(size_type count) UTL_THRO
     UTL_THROW_IF(count > memory::max_size<T>::value,
         bad_array_new_length(
             UTL_MESSAGE_FORMAT("[UTL] allocation operation failed, Reason=[element count "
-                               "limit exceeded], count=[%s], limit=[%s]"),
+                               "limit exceeded], count=[%zu], limit=[%zu]"),
             count, memory::max_size<T>::value));
 
     return memory::allocate<value_type>(count);

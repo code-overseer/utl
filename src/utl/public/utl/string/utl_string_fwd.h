@@ -70,7 +70,7 @@ public:
     static constexpr size_t value = bytes / sizeof(CharType) - 1;
 };
 
-#ifdef UTL_SUPPORTS_CHAR8_T
+#if UTL_SUPPORTS_CHAR8_T
 template <>
 struct default_inline_size<char8_t, __UTL allocator<char8_t>> :
     default_inline_size<char, __UTL allocator<char>> {};
@@ -90,8 +90,10 @@ using string = basic_string<char>;
 using wstring = basic_string<wchar_t>;
 using u16string = basic_string<char16_t>;
 using u32string = basic_string<char32_t>;
-#ifdef UTL_SUPPORTS_CHAR8_T
+#if UTL_SUPPORTS_CHAR8_T
 using u8string = basic_string<char8_t>;
+#else
+using u8string = basic_string<char>;
 #endif
 
 template <size_t N>
@@ -102,25 +104,32 @@ template <size_t N>
 using short_u16string = basic_short_string<char16_t, N>;
 template <size_t N>
 using short_u32string = basic_short_string<char32_t, N>;
-#ifdef UTL_SUPPORTS_CHAR8_T
+#if UTL_SUPPORTS_CHAR8_T
 template <size_t N>
 using short_u8string = basic_short_string<char8_t, N>;
+#else
+template <size_t N>
+using short_u8string = basic_short_string<char, N>;
 #endif
 
 using string_view = basic_string_view<char>;
 using wstring_view = basic_string_view<wchar_t>;
 using u16string_view = basic_string_view<char16_t>;
 using u32string_view = basic_string_view<char32_t>;
-#ifdef UTL_SUPPORTS_CHAR8_T
+#if UTL_SUPPORTS_CHAR8_T
 using u8string_view = basic_string_view<char8_t>;
+#else
+using u8string_view = basic_string_view<char>;
 #endif
 
 using zstring_view = basic_zstring_view<char>;
 using zwstring_view = basic_zstring_view<wchar_t>;
 using zu16string_view = basic_zstring_view<char16_t>;
 using zu32string_view = basic_zstring_view<char32_t>;
-#ifdef UTL_SUPPORTS_CHAR8_T
+#if UTL_SUPPORTS_CHAR8_T
 using zu8string_view = basic_zstring_view<char8_t>;
+#else
+using zu8string_view = basic_zstring_view<char>;
 #endif
 
 UTL_NAMESPACE_END

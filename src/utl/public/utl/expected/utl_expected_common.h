@@ -4,6 +4,8 @@
 
 #include "utl/utl_config.h"
 
+#include "utl/type_traits/utl_constants.h"
+
 UTL_NAMESPACE_BEGIN
 
 template <typename T, typename E>

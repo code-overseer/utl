@@ -2,7 +2,6 @@
 
 #include "utl/system_error/utl_errc.h"
 #include "utl/system_error/utl_system_error.h"
-#include "utl_elast.h"
 
 #include <cstdio>
 #include <cstdlib>
